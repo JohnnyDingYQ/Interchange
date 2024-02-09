@@ -1,35 +1,43 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using QuikGraph;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Splines;
 
 public class BuildManager : MonoBehaviour
 {
-    private static int A, B, C;
-    [SerializeField] private const float SplineResolution = 0.2f;
+    private static int start, pivot, end;
+    [SerializeField] private const float SplineResolution = 0.4f;
     [SerializeField] private const float LaneWidth = 2.5f;
     [SerializeField] private GameObject roads;
 
     [SerializeField] private Road roadPreFab;
     private int nextAvailableId;
     private Dictionary<int, Road> roadDict = new();
-    private bool DebugShowStartEnd;
-    private bool DebugShowCandidateTile;
+    /// <summary>
+    /// Key: node (int), Value: All roads that have lanes that start or end at such node
+    /// </summary>
+    private Dictionary<int, List<Road>> nodeRoads = new();
+    private bool DebugDrawStartEnd;
+    private bool DebugDrawCrossedTile;
     private bool DebugDrawCenter;
     private bool DebugDrawLanes;
+    private bool DebugDrawMeshVertices;
     private int DebugDuration;
 
     // Start is called before the first frame update
     void Start()
     {
-        A = -1;
-        B = -1;
-        DebugShowStartEnd = true;
-        DebugShowCandidateTile = false;
-        DebugDrawCenter = true;
-        DebugDrawLanes = true;
+        start = -1;
+        pivot = -1;
+        DebugDrawStartEnd = true;
+        DebugDrawCrossedTile = false;
+        DebugDrawCenter = false;
+        DebugDrawLanes = false;
+        DebugDrawMeshVertices = false;
         DebugDuration = 5;
     }
 
@@ -43,78 +51,42 @@ public class BuildManager : MonoBehaviour
             {
                 return;
             }
-            if (A == -1)
+            if (start == -1)
             {
-                A = hoveredTile;
+                start = hoveredTile;
                 Log.Info.Log($"Road Manager: Tile A loaded");
             }
-            else if (B == -1)
+            else if (pivot == -1)
             {
-                B = hoveredTile;
+                pivot = hoveredTile;
                 Log.Info.Log($"Road Manager: Tile B loaded");
             }
             else
             {
-                C = hoveredTile;
+                end = hoveredTile;
                 Log.Info.Log($"Road Manager: Tile C loaded");
-                Vector3 posA = Grid.GetWorldPosByID(A);
-                Vector3 posB = Grid.GetWorldPosByID(B);
-                Vector3 posC = Grid.GetWorldPosByID(C);
+                Vector3 posA = Grid.GetWorldPosByID(start);
+                Vector3 posB = Grid.GetWorldPosByID(pivot);
+                Vector3 posC = Grid.GetWorldPosByID(end);
 
                 float linearLength = Vector3.Distance(posA, posB) + Vector3.Distance(posB, posC);
                 int segCount = (int)(linearLength * SplineResolution + 1.0);
-                
 
 
-                CheckConnection(A, C, out Lane otherLane, out bool flow);
-                if (otherLane != null)
+
+                CheckConnection(start, end, out Road otherRoad, out Lane connectedLane, out bool flow);
+                if (otherRoad != null)
                 {
-                    Spline spline = CreateSpline(otherLane.Spline.EvaluatePosition(1) , posB, posC, segCount);
+                    Spline spline = CreateSpline(connectedLane.Spline.EvaluatePosition(1), posB, posC, segCount);
                     Log.Info.Log("Road Manager: Connecting Roads");
-                    int[] start = new int[] { A };
-
-                    otherLane.Spline.Evaluate(1, out float3 position, out float3 forward, out float3 upVector);
-                    float3 normal = Vector3.Cross(forward, upVector).normalized;
-                    float3 left = position + normal;
-                    float3 right = position - normal;
-                    Plane guard = new(left, right, position + upVector);
-
-                    if (flow)
-                    {
-                        int index = 0;
-                        foreach (BezierKnot knot in otherLane.Spline.Knots)
-                        {
-                            spline.Insert(index++, knot);
-                        }
-                    }
-                    else
-                    {
-                        foreach (BezierKnot knot in otherLane.Spline.Knots)
-                        {
-                            spline.Add(knot);
-                        }
-                    }
-
-                    int count = 1;
-                    IEnumerable<BezierKnot> k = spline.Knots;
-                    float3 d = new(0, 0.1f, 0);
-                    while (count < k.Count())
-                    {
-                        Debug.DrawLine(k.ElementAt(count).Position + d, k.ElementAt(count - 1).Position + d, Color.white, DebugDuration);
-                        count += 1;
-                    }
-
-                    Debug.DrawLine(left, right, Color.cyan, 100);
-                    Debug.DrawLine(left, position + upVector, Color.cyan, 100);
-                    Debug.DrawLine(right, position + upVector, Color.cyan, 100);
-
-                    Road r = InitiateRoad(spline, A, C, Main.BuildMode);
-                    r.GetComponent<MeshFilter>().mesh = ConnectRoadMesh(start, spline, guard);
+                    int[] starts = new int[] { start };
+                    Road r = InitiateRoad(spline, otherRoad.End, end, Main.BuildMode);
+                    EvaluateMesh(otherRoad.End);
                 }
                 else
                 {
                     Spline spline = CreateSpline(posA, posB, posC, segCount);
-                    Road road = InitiateRoad(spline, A, C, Main.BuildMode);
+                    Road road = InitiateRoad(spline, start, end, Main.BuildMode);
                     IntersectCheck(road, out int newNode, out Road roadToSplit);
                     if (newNode != -1)
                     {
@@ -122,8 +94,8 @@ public class BuildManager : MonoBehaviour
                     }
                 }
 
-                A = -1;
-                B = -1;
+                start = -1;
+                pivot = -1;
             }
         }
     }
@@ -138,9 +110,51 @@ public class BuildManager : MonoBehaviour
         road.Id = nextAvailableId++;
         roadDict.Add(road.Id, road); // BuildManager now watches this road
 
-        road.Lanes = CreateLanes(spline, laneCount);
+        if (laneCount == 1)
+        {
+            road.Lanes = new Lane[1] {
+                new() {
+                    Spline = new(),
+                    Start = Grid.GetIdByPos(spline.EvaluatePosition(0)),
+                    End = Grid.GetIdByPos(spline.EvaluatePosition(1))
+                }
+            };
+        }
+        else
+        {
+            road.Lanes = CreateLanes(spline, laneCount);
+        }
 
-        if (DebugShowStartEnd)
+        road.LaneNodes = new()
+        {
+            [start] = new(),
+            [end] = new()
+        };
+        foreach (Lane lane in road.Lanes)
+        {
+            road.LaneNodes[start].Add(lane.Start);
+            road.LaneNodes[end].Add(lane.End);
+        }
+
+        if (nodeRoads.ContainsKey(start))
+        {
+            nodeRoads[start].Add(road);
+        }
+        else
+        {
+            nodeRoads[start] = new() { road };
+        }
+
+        if (nodeRoads.ContainsKey(end))
+        {
+            nodeRoads[end].Add(road);
+        }
+        else
+        {
+            nodeRoads[end] = new() { road };
+        }
+
+        if (DebugDrawStartEnd)
         {
             Log.ShowTile(start, Color.green, DebugDuration);
             Log.ShowTile(end, Color.red, DebugDuration);
@@ -150,14 +164,7 @@ public class BuildManager : MonoBehaviour
         {
             foreach (Lane lane in road.Lanes)
             {
-                int count = 1;
-                IEnumerable<BezierKnot> k = lane.Spline.Knots;
-                float3 d = new(0, 0.1f, 0);
-                while (count < k.Count())
-                {
-                    Debug.DrawLine(k.ElementAt(count).Position + d, k.ElementAt(count - 1).Position + d, Color.white, DebugDuration);
-                    count += 1;
-                }
+                Log.DrawSpline(lane.Spline, DebugDuration);
             }
         }
 
@@ -167,16 +174,17 @@ public class BuildManager : MonoBehaviour
         PathGraph.Graph.AddVertex(start);
         PathGraph.Graph.AddVertex(end);
         PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(start, end, spline));
-        Spline reversed = new();
-        reversed.Copy(spline);
-        SplineUtility.ReverseFlow(reversed);
-        PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(end, start, reversed));
+        // Spline reversed = new();
+        // reversed.Copy(spline);
+        // SplineUtility.ReverseFlow(reversed);
+        // PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(end, start, reversed));
         // PathGraph.Print();
         return road;
     }
     Spline CreateSpline(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
     {
-
+        // posA = Grid.GetWorldPosByID(Grid.GetIdByPos(posA));
+        // posC = Grid.GetWorldPosByID(Grid.GetIdByPos(posC));
         Spline spline = new();
         Vector3 AB, BC, AB_BC, prev = new();
         nodeCount -= 1;
@@ -217,7 +225,12 @@ public class BuildManager : MonoBehaviour
             right = position - normal * LaneWidth * laneCount;
             leftVs.Add(left);
             rightVs.Add(right);
-            Debug.DrawLine(left, right, Color.white, 2);
+            if (DebugDrawMeshVertices)
+            {
+                DebugExtension.DebugPoint(left, Color.black, 1, DebugDuration);
+                DebugExtension.DebugPoint(right, Color.black, 1, DebugDuration);
+            }
+
         }
         road.LeftMesh = leftVs;
         road.RightMesh = rightVs;
@@ -274,7 +287,7 @@ public class BuildManager : MonoBehaviour
             float3 position = spline.EvaluatePosition(i / (float)steps);
             int candidate = Grid.GetIdByPos(position);
             candidateTiles.Add(candidate);
-            if (DebugShowCandidateTile)
+            if (DebugDrawCrossedTile)
             {
                 Log.ShowTile(candidate, Color.cyan, DebugDuration);
             }
@@ -283,9 +296,10 @@ public class BuildManager : MonoBehaviour
         candidateTiles.Remove(road.End);
         return candidateTiles;
     }
-    void CheckConnection(int start, int end, out Lane connectedLane, out bool flow)
+    void CheckConnection(int start, int end, out Road connectedRoad, out Lane connectedLane, out bool flow)
     {
         flow = false;
+        connectedRoad = null;
         connectedLane = null;
         foreach (var (id, road) in roadDict)
         {
@@ -294,21 +308,25 @@ public class BuildManager : MonoBehaviour
                 if (start == lane.Start)
                 {
                     flow = true;
+                    connectedRoad = road;
                     connectedLane = lane;
                 }
                 else if (start == lane.End)
                 {
                     flow = true;
+                    connectedRoad = road;
                     connectedLane = lane;
                 }
                 else if (end == lane.Start)
                 {
                     flow = false;
+                    connectedRoad = road;
                     connectedLane = lane;
                 }
                 else if (end == lane.End)
                 {
                     flow = false;
+                    connectedRoad = road;
                     connectedLane = lane;
                 }
             }
@@ -316,18 +334,78 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    Mesh ConnectRoadMesh(int[] start, Spline spline, Plane guard)
+    void RemoveRoad(Road road)
     {
-        int laneCount = start.Count();
-        Lane[] lanes = CreateLanes(spline, laneCount);
+        DestroyImmediate(road.gameObject);
+        roadDict.Remove(road.Id);
+    }
 
-        // justify branch starting positions
+    Lane[] CreateLanes(Spline spline, int laneCount)
+    {
+        Lane[] lanes = new Lane[laneCount];
         for (int i = 0; i < laneCount; i++)
         {
-            lanes[i].Start = start[i];
+            lanes[i] = new() { Spline = new() };
         }
+        int segCount = spline.Knots.Count() - 1;
+        for (int i = 0; i <= segCount; i++)
+        {
+            spline.Evaluate(1 / (float)segCount * i, out float3 position, out float3 forward, out float3 upVector);
+            float3 normal = Vector3.Cross(forward, upVector).normalized;
+            for (int j = 0; j < laneCount; j++)
+            {
+                float3 pos = position + normal * LaneWidth - j * 2 * normal * LaneWidth;
+                lanes[j].Spline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
+                if (i == 0)
+                {
+                    int start = Grid.GetIdByPos(pos);
+                    lanes[j].Start = start;
+                    if (DebugDrawStartEnd)
+                    {
+                        Log.ShowTile(start, Color.green, DebugDuration);
+                    }
+                }
+                else if (i == segCount)
+                {
+                    int end = Grid.GetIdByPos(pos);
+                    lanes[j].End = end;
+                    if (DebugDrawStartEnd)
+                    {
+                        Log.ShowTile(end, Color.red, DebugDuration);
+                    }
+                }
+            }
+        }
+        return lanes;
 
-        int segCount = spline.Knots.Count()*2;
+    }
+
+    void IntersectCheck(Road road, out int newNode, out Road roadToSplit)
+    {
+        int start = road.Start;
+        int end = road.End;
+        newNode = -1;
+        roadToSplit = null;
+        foreach (var (key, _road) in roadDict)
+        {
+            if (_road.CrossedTiles.Contains(start))
+            {
+                newNode = BuildManager.start;
+                roadToSplit = _road;
+                return;
+            }
+            else if (_road.CrossedTiles.Contains(end))
+            {
+                newNode = BuildManager.end;
+                roadToSplit = _road;
+                return;
+            }
+        }
+    }
+
+    Mesh ConnectRoadMesh(int laneCount, Spline spline, Plane guard, float3 intersection, bool isLeft, Vector3 bound)
+    {
+        int segCount = spline.Knots.Count();
         Vector3 end = spline.EvaluatePosition(1);
         DebugExtension.DebugPoint(end, Color.magenta, 1, 100);
         List<float3> leftVs = new();
@@ -342,30 +420,64 @@ public class BuildManager : MonoBehaviour
             bool rightOverlap = false;
             if (!guard.SameSide(end, left))
             {
-                left = guard.ClosestPointOnPlane(left);
+                if (!isLeft)
+                {
+                    left = intersection;
+                }
+                else
+                {
+                    left = guard.ClosestPointOnPlane(left);
+                }
+
                 leftOverlap = true;
             }
+            else if (!isLeft && Vector3.Distance(left, intersection) < 1.5)
+            {
+                left = intersection;
+            }
+
             if (!guard.SameSide(end, right))
             {
-                right = guard.ClosestPointOnPlane(right);
+                if (isLeft)
+                {
+                    right = intersection;
+
+                }
+                else
+                {
+                    right = guard.ClosestPointOnPlane(right);
+                }
+
                 rightOverlap = true;
+            }
+            else if (isLeft && Vector3.Distance(right, intersection) < 1.5)
+            {
+                right = intersection;
             }
             if (leftOverlap && rightOverlap)
             {
-                left = guard.ClosestPointOnPlane(left);
-                right = guard.ClosestPointOnPlane(right);
-                DebugExtension.DebugPoint(left, Color.magenta, 1, 100);
-                DebugExtension.DebugPoint(right, Color.magenta, 1, 100);
+                if (isLeft)
+                {
+                    right = intersection;
+                    left = bound;
+                }
+                else
+                {
+                    left = intersection;
+                    right = bound;
+                }
+
+                // DebugExtension.DebugPoint(left, Color.black, 1, DebugDruation);
+                // DebugExtension.DebugPoint(right, Color.black, 1, DebugDruation);
                 leftVs.Add(left);
                 rightVs.Add(right);
-                Debug.DrawLine(left, right, Color.white, 2);
                 break;
             }
-            DebugExtension.DebugPoint(left, Color.magenta, 1, 100);
-            DebugExtension.DebugPoint(right, Color.magenta, 1, 100);
+            // DebugExtension.DebugPoint(left, Color.magenta, 1, DebugDruation);
+            // DebugExtension.DebugPoint(right, Color.magenta, 1, DebugDruation);
             leftVs.Add(left);
             rightVs.Add(right);
-            
+
         }
 
         leftVs.Reverse();
@@ -387,11 +499,6 @@ public class BuildManager : MonoBehaviour
             int t1 = offset + 0;
             int t2 = offset + 2;
             int t3 = offset + 3;
-
-            // Debug.DrawLine(p1, p2, Color.green, 100);
-            // Debug.DrawLine(p3, p4, Color.green, 100);
-            // Debug.DrawLine(p4, p1, Color.green, 100);
-
             int t4 = offset + 3;
             int t5 = offset + 1;
             int t6 = offset + 0;
@@ -410,78 +517,124 @@ public class BuildManager : MonoBehaviour
         return m;
     }
 
-    void RemoveRoad(Road road)
+    void EvaluateMesh(int node)
     {
-        DestroyImmediate(road.gameObject);
-        roadDict.Remove(road.Id);
-    }
+        List<Road> roads = nodeRoads[node];
+        Dictionary<Road, List<int>> d = new();
+        List<int> allNodes = null;
+        Road mainRoad = null;
+        int max = 0;
 
-    Lane[] CreateLanes(Spline spline, int laneCount)
-    {
-        if (laneCount == 1)
+        foreach (Road r in roads)
         {
-            return new Lane[1] { new() { Spline = new() } };
-        }
-
-        Lane[] lanes = new Lane[laneCount];
-        for (int i = 0; i < laneCount; i++)
-        {
-            lanes[i] = new() { Spline = new() };
-        }
-        int segCount = spline.Knots.Count() - 1;
-        for (int i = 0; i <= segCount; i++)
-        {
-            spline.Evaluate(1 / (float)segCount * i, out float3 position, out float3 forward, out float3 upVector);
-            float3 normal = Vector3.Cross(forward, upVector).normalized;
-            for (int j = 0; j < laneCount; j++)
+            int size = r.LaneNodes[node].Count();
+            if (size > max)
             {
-                float3 pos = position - normal * LaneWidth + j * 2 * normal * LaneWidth;
-                lanes[j].Spline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
-                if (i == 0)
+                max = size;
+                mainRoad = r;
+                allNodes = r.LaneNodes[node];
+            }
+            d[r] = r.LaneNodes[node];
+        }
+        d.Remove(mainRoad);
+        for (int i = 1; i < allNodes.Count(); i++)
+        {
+            int nodeA = allNodes[i - 1];
+            int nodeB = allNodes[i];
+            Road roadA = null;
+            Road roadB = null;
+            foreach (var (r, nodes) in d)
+            {
+                if (nodes.Contains(nodeA))
                 {
-                    int start = Grid.GetIdByPos(pos);
-                    lanes[j].Start = start;
-                    if (DebugShowStartEnd)
+                    roadA = r;
+                }
+                if (nodes.Contains(nodeB))
+                {
+                    roadB = r;
+                }
+
+            }
+            if (roadA != roadB && roadA != null && roadB != null)
+            {
+                Log.Info.Log("Hooray");
+                float3 intersection = new();
+                // find intersection!
+                for (float j = 0; j < 1.5; j += 0.025f)
+                {
+                    Spline leftSpline = new();
+                    Spline rightSpline = new();
+                    foreach (float3 k in roadA.LeftMesh)
                     {
-                        Log.ShowTile(start, Color.green, DebugDuration);
+                        leftSpline.Add(new BezierKnot(k), TangentMode.AutoSmooth);
+                    }
+                    foreach (float3 k in roadB.RightMesh)
+                    {
+                        rightSpline.Add(new BezierKnot(k), TangentMode.AutoSmooth);
+                    }
+                    float t1 = leftSpline.GetCurveInterpolation(0, j);
+                    float t2 = rightSpline.GetCurveInterpolation(0, j);
+                    float3 p1 = leftSpline.EvaluatePosition(t1);
+                    float3 p2 = rightSpline.EvaluatePosition(t2);
+                    // Log.Info.Log(Vector3.Distance(p1, p2));
+                    if (Vector3.Distance(p1, p2) > LaneWidth * 4 + 0.5f)
+                    {
+                        intersection = Vector3.Lerp(p1, p2, 0.5f);
+                        DebugExtension.DebugPoint(intersection, Color.magenta, 1, 100);
+                        break;
                     }
                 }
-                else if (i == segCount)
+                // Draw the holy triangle
+                Mesh m = mainRoad.GetComponent<MeshFilter>().mesh;
+                Vector3[] v = new Vector3[] { mainRoad.LeftMesh.Last(), intersection, mainRoad.RightMesh.Last() };
+                int[] tri = new int[] { m.vertexCount, m.vertexCount + 1, m.vertexCount + 2 };
+
+                List<Vector3> mv = new();
+                mv.AddRange(m.vertices);
+                mv.AddRange(v);
+
+                List<int> mtri = new();
+                mtri.AddRange(m.triangles);
+                mtri.AddRange(tri);
+
+                List<Vector2> muv = new();
+                muv.AddRange(m.uv);
+                muv.AddRange(new Vector2[] { new(0, 1), new(0.5f, 1), new(1, 1) });
+
+                List<Vector3> mn = new();
+                mn.AddRange(m.normals);
+                mn.AddRange(new Vector3[] { Vector3.up, Vector3.up, Vector3.up });
+
+                m.SetVertices(mv);
+                m.SetUVs(0, muv);
+                m.SetTriangles(mtri, 0);
+                m.SetNormals(mn);
+
+                mainRoad.GetComponent<MeshFilter>().mesh = m;
+
+                mainRoad.Spline.Evaluate(1, out float3 position, out float3 forward, out float3 upVector);
+                Plane guard = new(mainRoad.LeftMesh.Last(), intersection - upVector, intersection + upVector);
+
+                Spline combinedSpline = mainRoad.GetLaneByNode(nodeA).Spline;
+                foreach (BezierKnot knot in roadA.Spline.Knots)
                 {
-                    int end = Grid.GetIdByPos(pos);
-                    lanes[j].End = end;
-                    if (DebugShowStartEnd)
-                    {
-                        Log.ShowTile(end, Color.red, DebugDuration);
-                    }
+                    combinedSpline.Add(knot);
                 }
+                roadA.GetComponent<MeshFilter>().mesh = ConnectRoadMesh(roadA.Lanes.Count(), combinedSpline, guard, intersection, true, mainRoad.LeftMesh.Last());
+
+                mainRoad.Spline.Evaluate(1, out position, out forward, out upVector);
+                guard = new(mainRoad.RightMesh.Last(), intersection - upVector, intersection + upVector);
+
+                combinedSpline = mainRoad.GetLaneByNode(nodeB).Spline;
+                foreach (BezierKnot knot in roadB.Spline.Knots)
+                {
+                    combinedSpline.Add(knot);
+                }
+                roadB.GetComponent<MeshFilter>().mesh = ConnectRoadMesh(roadB.Lanes.Count(), combinedSpline, guard, intersection, false, mainRoad.RightMesh.Last());
+
             }
         }
-        return lanes;
+
 
     }
-
-    void IntersectCheck(Road road, out int newNode, out Road roadToSplit)
-    {
-        int start = road.Start;
-        int end = road.End;
-        newNode = -1;
-        roadToSplit = null;
-        foreach (var (key, _road) in roadDict)
-        {
-            if (_road.CrossedTiles.Contains(start))
-            {
-                newNode = A;
-                roadToSplit = _road;
-                return;
-            }
-            else if (_road.CrossedTiles.Contains(end))
-            {
-                newNode = C;
-                roadToSplit = _road;
-                return;
-            }
-        }
-    }
-
 }
