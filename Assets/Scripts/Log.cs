@@ -47,14 +47,14 @@ public static class Log
         Debug.DrawLine(topRight, bottomRight, Color.cyan, 100);
     }
 
-    public static void DrawSpline(Spline spline, int duration)
+    public static void DrawSpline(Spline spline, Color color, int duration)
     {
         int count = 1;
         IEnumerable<BezierKnot> k = spline.Knots;
         float3 d = new(0, 0.1f, 0);
         while (count < k.Count())
         {
-            Debug.DrawLine(k.ElementAt(count).Position + d, k.ElementAt(count - 1).Position + d, Color.white, duration);
+            Debug.DrawLine(k.ElementAt(count).Position + d, k.ElementAt(count - 1).Position + d, color, duration);
             count += 1;
         }
     }

@@ -34,18 +34,20 @@ public class Main : MonoBehaviour
             z = Camera.main.transform.position.y - Grid.Level
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (BuildMode == 2)
-            {
-                BuildMode = 1;
-                Log.Info.Log("Main: Build mode switched to 1");
-            }
-            else if (BuildMode == 1)
-            {
-                BuildMode = 2;
-                Log.Info.Log("Main: Build mode switched to 2");
-            }
+            BuildMode = 1;
+            Log.Info.Log("Main: Build mode switched to 1");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            BuildMode = 2;
+            Log.Info.Log("Main: Build mode switched to 2");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            BuildMode = 3;
+            Log.Info.Log("Main: Build mode switched to 3");
         }
     }
 }

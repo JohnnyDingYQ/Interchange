@@ -427,7 +427,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roads: {fileID: 11189981}
-  roadPreFab: {fileID: -3306313335246171355, guid: 40e6f51076f10904b970a7109837b626, type: 3}
+  twoLaneRoad: {fileID: -3306313335246171355, guid: 40e6f51076f10904b970a7109837b626, type: 3}
+  oneLaneRoad: {fileID: -3306313335246171355, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
 --- !u!4 &944784745
 Transform:
   m_ObjectHideFlags: 0
