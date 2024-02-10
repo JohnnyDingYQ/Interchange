@@ -13,6 +13,7 @@ public class Road : MonoBehaviour
 
     public List<float3> LeftMesh {get; set;}
     public List<float3> RightMesh {get; set;}
+    public Mesh OriginalMesh {get; set;}
     public Lane[] Lanes {get; set;}
     public HashSet<int> CrossedTiles{ get; set; }
     /// <summary>
