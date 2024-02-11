@@ -12,9 +12,7 @@ public class PathGraph : MonoBehaviour
     private static AdjacencyGraph<int, TaggedEdge<int, Spline>> graph;
     public static AdjacencyGraph<int, TaggedEdge<int, Spline>> Graph {
         get {
-            if (graph == null) {
-                graph = new();
-            }
+            graph ??= new();
             return graph;
         }
         set {

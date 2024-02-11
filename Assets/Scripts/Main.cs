@@ -9,14 +9,16 @@ public class Main : MonoBehaviour
     void Awake()
     {
         Log.Info.logEnabled = true;
-        Log.DrawGridBounds();
 
         Grid.Height = Height;
         Grid.Width = Width;
         Grid.Dim = 1;
         Grid.Level = 1;
+        Log.DrawGridBounds();
 
         BuildMode = 1;
+
+        Application.targetFrameRate = 165;
 
         Camera.main.transform.position =
             new Vector3(

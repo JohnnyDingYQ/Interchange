@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour
 {
     [SerializeField] private int cameraSpeed;
+    private const float CameraScrollMultiplier = 1.5f;
     // Start is called before the first frame update
     void Start()
     {
@@ -34,6 +35,6 @@ public class CameraControl : MonoBehaviour
             float normalizedSpeed = cameraSpeed*Time.deltaTime;
             Camera.main.transform.position += new Vector3(normalizedSpeed, 0 ,0);
         }
-        Camera.main.transform.position += new Vector3(0, -Input.mouseScrollDelta.y ,0);
+        Camera.main.transform.position += new Vector3(0, -Input.mouseScrollDelta.y * CameraScrollMultiplier ,0);
     }
 }

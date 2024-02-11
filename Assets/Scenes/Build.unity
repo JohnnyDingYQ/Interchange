@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 11189981}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 75.44416, y: -15.2917185, z: 60.188694}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -185,55 +185,10 @@ Transform:
   m_Children:
   - {fileID: 1721243202}
   - {fileID: 944784745}
-  - {fileID: 131945593}
   - {fileID: 596496077}
   - {fileID: 948732633}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &131945591
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 131945593}
-  - component: {fileID: 131945594}
-  m_Layer: 0
-  m_Name: Grid
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &131945593
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 131945591}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -69.90016, y: 4.268284, z: -10.596776}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 35865360}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &131945594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 131945591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38ab4d47ada3ad34da22e7cc4372c352, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &596496076
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,8 +382,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roads: {fileID: 11189981}
-  twoLaneRoad: {fileID: -3306313335246171355, guid: 40e6f51076f10904b970a7109837b626, type: 3}
-  oneLaneRoad: {fileID: -3306313335246171355, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
+  snapPointPrefab: {fileID: 2099091613340855668, guid: 84563d96b247c4540ab47c3bc5b08ded, type: 3}
+  roadPrefab: {fileID: -3306313335246171355, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
 --- !u!4 &944784745
 Transform:
   m_ObjectHideFlags: 0

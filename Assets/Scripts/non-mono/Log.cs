@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Splines;
 
 public static class Log
 {
+
+    private const int DrawBoundsDuration = 10000;
     private static Logger info;
     public static Logger Info
     {
@@ -21,7 +22,7 @@ public static class Log
         }
     }
 
-    public static void ShowTile(int id, Color color, float duration)
+    public static void ShowNode(int id, Color color, float duration)
     {
         Vector3 pos = Grid.GetWorldPosByID(id);
         float offset = (float)Grid.Dim / 2;
@@ -41,10 +42,10 @@ public static class Log
         Vector3 bottomRight = new(Grid.Dim * Grid.Width, Grid.Level, 0);
         Vector3 topLeft = new(0, Grid.Level, Grid.Dim * Grid.Height);
         Vector3 topRight = new(Grid.Dim * Grid.Width, Grid.Level, Grid.Dim * Grid.Height);
-        Debug.DrawLine(bottomLeft, bottomRight, Color.cyan, 100);
-        Debug.DrawLine(bottomLeft, topLeft, Color.cyan, 100);
-        Debug.DrawLine(topRight, topLeft, Color.cyan, 100);
-        Debug.DrawLine(topRight, bottomRight, Color.cyan, 100);
+        Debug.DrawLine(bottomLeft, bottomRight, Color.cyan, DrawBoundsDuration);
+        Debug.DrawLine(bottomLeft, topLeft, Color.cyan, DrawBoundsDuration);
+        Debug.DrawLine(topRight, topLeft, Color.cyan, DrawBoundsDuration);
+        Debug.DrawLine(topRight, bottomRight, Color.cyan, DrawBoundsDuration);
     }
 
     public static void DrawSpline(Spline spline, Color color, int duration)
