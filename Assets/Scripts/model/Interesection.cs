@@ -3,7 +3,6 @@ using System.Linq;
 
 public class Intersection
 {
-    public int Id {get; set;}
     private Dictionary<int, List<Lane>> nodeWithLane;
     /// <summary>
     /// Key: node, Value: Lane connected to it

@@ -5,7 +5,6 @@ public class Main : MonoBehaviour
     public static Vector3 MouseWorldPos;
     [SerializeField] private int Height;
     [SerializeField] private int Width;
-    public static int BuildMode { get; set; }
     void Awake()
     {
         Log.Info.logEnabled = true;
@@ -15,8 +14,6 @@ public class Main : MonoBehaviour
         Grid.Dim = 1;
         Grid.Level = 1;
         Log.DrawGridBounds();
-
-        BuildMode = 1;
 
         Application.targetFrameRate = 165;
 
@@ -36,20 +33,5 @@ public class Main : MonoBehaviour
             z = Camera.main.transform.position.y - Grid.Level
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            BuildMode = 1;
-            Log.Info.Log("Main: Build mode switched to 1");
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            BuildMode = 2;
-            Log.Info.Log("Main: Build mode switched to 2");
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            BuildMode = 3;
-            Log.Info.Log("Main: Build mode switched to 3");
-        }
     }
 }
