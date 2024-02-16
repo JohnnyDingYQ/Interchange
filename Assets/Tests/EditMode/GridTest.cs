@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridTest
 {
-    [SetUp]
+    [OneTimeSetUp]
     public void SetUp()
     {
         Grid.Height = 100;
@@ -60,6 +60,15 @@ public class GridTest
         float offset = (float)Grid.Dim/2;
         Vector3 expected = new(2 + offset, 0, 70 + offset);
         Assert.AreEqual(expected, (Vector3) Grid.GetWorldPosByID(id));
+    }
+
+    [Test]
+    public void SnapPosToGrid()
+    {
+        Vector3 pos = new(30.25f, 0, 30.75f);
+        Vector3 expected = new(30.5f, 0, 30.5f);
+        Assert.AreEqual(1, Grid.Dim);
+        Assert.AreEqual(expected, (Vector3) Grid.SnapPosToGrid(pos));
     }
 
 }

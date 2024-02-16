@@ -32,6 +32,11 @@ public static class Grid
         return new float3(x * Dim + (float) Dim / 2, Level, z * Dim + (float) Dim / 2);
     }
 
+    public static float3 SnapPosToGrid(float3 pos)
+    {
+        return GetWorldPosByID(GetIdByPos(pos));
+    }
+
     private static bool IsValidId(int id)
     {
         return id < Height*Width && id >= 0;

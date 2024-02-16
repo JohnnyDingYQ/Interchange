@@ -40,13 +40,6 @@ public class Intersection
         return NodeWithLane[node].Count > 1;
     }
 
-    public List<Road> GetMinorRoads()
-    {
-        List<Road> roads = new(Roads);
-        roads.Remove(GetMainRoad());
-        return roads;
-    }
-
     public List<int> GetNodes()
     {
         List<int> keys = new();

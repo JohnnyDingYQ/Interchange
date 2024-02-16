@@ -13,8 +13,8 @@ public static class RoadView
         List<int> nodes = intersection.GetNodes();
         Road mainRoad = intersection.GetMainRoad();
         float3 upVector = mainRoad.Spline.EvaluateUpVector(1);
-        float3 leftCorner = mainRoad.LeftMesh.Last();
-        float3 rightCorner = mainRoad.RightMesh.Last();
+        float3 leftCorner = mainRoad.RoadGameObject.LeftMesh.Last();
+        float3 rightCorner = mainRoad.RoadGameObject.RightMesh.Last();
 
         if (intersection.IsRepeating())
         {
@@ -68,7 +68,7 @@ public static class RoadView
                 combinedSpline.Add(knot);
             }
 
-            lesserRoad.GetComponent<MeshFilter>().mesh = ConnectLaneMesh(lesserRoad.Lanes.Count, combinedSpline, delimiter);
+            lesserRoad.RoadGameObject.GetComponent<MeshFilter>().mesh = ConnectLaneMesh(lesserRoad.Lanes.Count, combinedSpline, delimiter);
         }
 
         List<float3> GetDivergePoints(List<Road> roads)
@@ -84,11 +84,11 @@ public static class RoadView
                 {
                     Spline leftSpline = new();
                     Spline rightSpline = new();
-                    foreach (float3 knot in roadLeft.LeftMesh)
+                    foreach (float3 knot in roadLeft.RoadGameObject.LeftMesh)
                     {
                         leftSpline.Add(new BezierKnot(knot), TangentMode.AutoSmooth);
                     }
-                    foreach (float3 knot in roadRight.RightMesh)
+                    foreach (float3 knot in roadRight.RoadGameObject.RightMesh)
                     {
                         rightSpline.Add(new BezierKnot(knot), TangentMode.AutoSmooth);
                     }
@@ -127,7 +127,7 @@ public static class RoadView
 
         void DrawConnectorPolygon(Road mainRoad, List<float3> divergePoints, List<Vector3> v)
         {
-            Mesh m = Object.Instantiate(mainRoad.OriginalMesh);
+            Mesh m = Object.Instantiate(mainRoad.RoadGameObject.OriginalMesh);
 
             List<int> tri = new();
             List<Vector2> uvs = new() { new(0.5f, 1), new(0, 1) };
@@ -172,7 +172,7 @@ public static class RoadView
             m.SetTriangles(mtri, 0);
             m.SetNormals(mn);
 
-            mainRoad.GetComponent<MeshFilter>().mesh = m;
+            mainRoad.RoadGameObject.GetComponent<MeshFilter>().mesh = m;
         }
 
         Delimiter GetBounds(int offset)
@@ -368,8 +368,8 @@ public static class RoadView
             leftVs.Add(left);
             rightVs.Add(right);
         }
-        road.LeftMesh = leftVs;
-        road.RightMesh = rightVs;
+        road.RoadGameObject.LeftMesh = leftVs;
+        road.RoadGameObject.RightMesh = rightVs;
 
         return Extrude(leftVs, rightVs);
     }

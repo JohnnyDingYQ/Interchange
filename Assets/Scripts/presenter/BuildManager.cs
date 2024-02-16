@@ -11,7 +11,7 @@ public class BuildManager : MonoBehaviour
     private const float SplineResolution = 0.4f;
     private const float LaneWidth = GlobalConstants.LaneWidth;
     [SerializeField] private GameObject roads;
-    [SerializeField] private Road roadPrefab;
+    [SerializeField] private RoadGameObject roadPrefab;
     [SerializeField] private InputManager inputManager;
     private int laneCount = 1;
     private int nextAvailableId;
@@ -26,9 +26,9 @@ public class BuildManager : MonoBehaviour
         if (inputManager != null)
         { 
             inputManager.BuildRoad += HandleBuildCommand;
-            inputManager.Build1Lane += Build1Lane;
-            inputManager.Build2Lane += Build2Lane;
-            inputManager.Build3Lane += Build3Lane;
+            inputManager.Build1Lane += BuildMode_OneLane;
+            inputManager.Build2Lane += BuildMode_TwoLanes;
+            inputManager.Build3Lane += BuildMode_ThreeLanes;
         }
     }
 
@@ -37,9 +37,9 @@ public class BuildManager : MonoBehaviour
         if (inputManager != null)
         {
             inputManager.BuildRoad -= HandleBuildCommand;
-            inputManager.Build1Lane -= Build1Lane;
-            inputManager.Build2Lane -= Build2Lane;
-            inputManager.Build3Lane -= Build3Lane;
+            inputManager.Build1Lane -= BuildMode_OneLane;
+            inputManager.Build2Lane -= BuildMode_TwoLanes;
+            inputManager.Build3Lane -= BuildMode_ThreeLanes;
         }
     }
 
@@ -71,17 +71,17 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    void Build1Lane()
+    void BuildMode_OneLane()
     {
         laneCount = 1;
     }
 
-    void Build2Lane()
+    void BuildMode_TwoLanes()
     {
         laneCount = 2;
     }
 
-    void Build3Lane()
+    void BuildMode_ThreeLanes()
     {
         laneCount = 3;
     }
@@ -128,19 +128,26 @@ public class BuildManager : MonoBehaviour
 
     Road InitiateRoad(Spline spline)
     {
-        Road road = Instantiate(roadPrefab, roads.transform, true);
-        road.Spline = spline;
-        road.name = $"Road-{nextAvailableId}";
-        road.Id = nextAvailableId++;
+        RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
+        roadGameObject.name = $"Road-{nextAvailableId}";
+        roadGameObject.LaneSplines = new();
+        Road road = new()
+        {
+            Id = nextAvailableId++,
+            RoadGameObject = roadGameObject,
+            Spline = spline
+        };
         RoadWatcher.Add(road.Id, road);
 
 
         Mesh mesh = RoadView.CreateMesh(road, laneCount);
-        road.GetComponent<MeshFilter>().mesh = mesh;
-        road.OriginalMesh = Instantiate(mesh);
+        roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
+        roadGameObject.OriginalMesh = Instantiate(mesh);
 
         List<Lane> lanes = InitiateLanes(road, laneCount);
         road.Lanes = lanes;
+
+        roadGameObject.Road = road;
 
         PathGraph.Graph.AddVertex(start);
         PathGraph.Graph.AddVertex(end);
@@ -150,8 +157,6 @@ public class BuildManager : MonoBehaviour
 
     Spline BuildSpline(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
     {
-        // posA = Grid.GetWorldPosByID(Grid.GetIdByPos(posA));
-        // posC = Grid.GetWorldPosByID(Grid.GetIdByPos(posC));
         Spline spline = new();
         Vector3 AB, BC, AB_BC;
         nodeCount -= 1;
@@ -184,12 +189,6 @@ public class BuildManager : MonoBehaviour
 
         }
         return connectedLane;
-    }
-
-    void RemoveRoad(Road road)
-    {
-        DestroyImmediate(road.gameObject);
-        RoadWatcher.Remove(road.Id);
     }
 
     List<Lane> InitiateLanes(Road road, int laneCount)
@@ -239,6 +238,5 @@ public class BuildManager : MonoBehaviour
         }
 
     }
-
 
 }

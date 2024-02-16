@@ -16,7 +16,7 @@ public class Snapper : MonoBehaviour
     void Update()
     {
         SnappedNode = SnapToLaneNodes(Main.MouseWorldPos, SnapDistance);
-        if (SnappedNode != 1)
+        if (SnappedNode != -1)
         {
             snapPoint.GetComponent<Renderer>().enabled = true;
             snapPoint.transform.position = Grid.GetWorldPosByID(SnappedNode);

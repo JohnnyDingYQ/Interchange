@@ -428,7 +428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roads: {fileID: 11189981}
-  roadPrefab: {fileID: -3306313335246171355, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
+  roadPrefab: {fileID: -3574864123057897704, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
   inputManager: {fileID: 745351445}
 --- !u!4 &944784745
 Transform:
