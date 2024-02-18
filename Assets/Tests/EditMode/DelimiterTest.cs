@@ -10,7 +10,7 @@ public class DelimiterTest
     float3 right;
     float3 up;
     
-    [OneTimeSetUp]
+    [SetUp]
     public void SetUp()
     {
         left = new(1, 0, 0);

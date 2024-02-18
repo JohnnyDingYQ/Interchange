@@ -10,5 +10,4 @@ public class RoadGameObject : MonoBehaviour
     public List<float3> LeftMesh { get; set; }
     public List<float3> RightMesh { get; set; }
     public Mesh OriginalMesh { get; set; }
-    public List<Spline> LaneSplines { get; set; }
 }

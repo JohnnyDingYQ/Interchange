@@ -5,47 +5,38 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
-public class BuildManager : MonoBehaviour
+public static class BuildManager
 {
     private static int start, pivot, end;
     private const float SplineResolution = 0.4f;
     private const float LaneWidth = GlobalConstants.LaneWidth;
-    [SerializeField] private GameObject roads;
-    [SerializeField] private RoadGameObject roadPrefab;
-    [SerializeField] private InputManager inputManager;
-    private int laneCount = 1;
-    private int nextAvailableId;
-    public static Dictionary<int, Road> RoadWatcher { get; set; }
-    void Start()
+    public static int LaneCount {get; set;}
+    public static int NextAvailableId { get; set; }
+    public static IBuildManagerBoundary client;
+    public static Dictionary<int, Road> roadWatcher;
+    public static Dictionary<int, Road> RoadWatcher
     {
+        get
+        {
+            roadWatcher ??= new();
+            return roadWatcher;
+        }
+        set
+        {
+            roadWatcher = value;
+        }
+    }
+
+    static BuildManager()
+    {
+        LaneCount = 1;
         start = -1;
         pivot = -1;
-
-        RoadWatcher = new();
-
-        if (inputManager != null)
-        { 
-            inputManager.BuildRoad += HandleBuildCommand;
-            inputManager.Build1Lane += BuildMode_OneLane;
-            inputManager.Build2Lane += BuildMode_TwoLanes;
-            inputManager.Build3Lane += BuildMode_ThreeLanes;
-        }
     }
 
-    void OnDestroy()
+    public static void HandleBuildCommand()
     {
-        if (inputManager != null)
-        {
-            inputManager.BuildRoad -= HandleBuildCommand;
-            inputManager.Build1Lane -= BuildMode_OneLane;
-            inputManager.Build2Lane -= BuildMode_TwoLanes;
-            inputManager.Build3Lane -= BuildMode_ThreeLanes;
-        }
-    }
-
-    void HandleBuildCommand()
-    {
-        int hoveredTile = Grid.GetIdByPos(Main.MouseWorldPos);
+        int hoveredTile = Grid.GetIdByPos(client.GetPos());
         if (hoveredTile == -1)
         {
             return;
@@ -71,21 +62,7 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    void BuildMode_OneLane()
-    {
-        laneCount = 1;
-    }
-
-    void BuildMode_TwoLanes()
-    {
-        laneCount = 2;
-    }
-
-    void BuildMode_ThreeLanes()
-    {
-        laneCount = 3;
-    }
-    void BuildRoad()
+    static void BuildRoad()
     {
         Vector3 posA = Grid.GetWorldPosByID(start);
         Vector3 posB = Grid.GetWorldPosByID(pivot);
@@ -126,36 +103,28 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    Road InitiateRoad(Spline spline)
+    static Road InitiateRoad(Spline spline)
     {
-        RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-        roadGameObject.name = $"Road-{nextAvailableId}";
-        roadGameObject.LaneSplines = new();
+        
         Road road = new()
         {
-            Id = nextAvailableId++,
-            RoadGameObject = roadGameObject,
+            Id = NextAvailableId++,
             Spline = spline
         };
         RoadWatcher.Add(road.Id, road);
 
-
-        Mesh mesh = RoadView.CreateMesh(road, laneCount);
-        roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
-        roadGameObject.OriginalMesh = Instantiate(mesh);
-
-        List<Lane> lanes = InitiateLanes(road, laneCount);
+        List<Lane> lanes = InitiateLanes(road, LaneCount);
         road.Lanes = lanes;
-
-        roadGameObject.Road = road;
 
         PathGraph.Graph.AddVertex(start);
         PathGraph.Graph.AddVertex(end);
         PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(start, end, spline));
+
+        client.InstantiateRoad(road);
         return road;
     }
 
-    Spline BuildSpline(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
+    static Spline BuildSpline(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
     {
         Spline spline = new();
         Vector3 AB, BC, AB_BC;
@@ -170,7 +139,7 @@ public class BuildManager : MonoBehaviour
         return spline;
     }
 
-    Lane CheckConnection(int node)
+    static Lane CheckConnection(int node)
     {
         Lane connectedLane = null;
         foreach (var (id, road) in RoadWatcher)
@@ -191,7 +160,7 @@ public class BuildManager : MonoBehaviour
         return connectedLane;
     }
 
-    List<Lane> InitiateLanes(Road road, int laneCount)
+    static List<Lane> InitiateLanes(Road road, int laneCount)
     {
         Spline spline = road.Spline;
 
