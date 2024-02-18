@@ -5,29 +5,32 @@ using UnityEngine.Splines;
 public class Road
 {
 
-    public Intersection Start { get; set; }
-    public Intersection End { get; set; }
+    public Intersection StartIx { get; set; } // Ix is shorthand for intersection
+    public Intersection EndIx { get; set; }
     public int Id { get; set; }
     public RoadGameObject RoadGameObject { get; set; }
     public Spline Spline { get; set; }
     public List<Lane> Lanes { get; set; }
+    public int StartNode {get; set;}
+    public int PivotNode {get; set;}
+    public int EndNode {get; set;}
 
     public Road()
     {
-        Start = null;
-        End = null;
+        StartIx = null;
+        EndIx = null;
     }
 
     public void InitiateStartIntersection()
     {
-        if (Start != null)
+        if (StartIx != null)
             throw new InvalidOperationException("Intersection at Start is already initalized");
-        Dictionary<int, List<Lane>> nodeWithLane = new();
+        Dictionary<int, HashSet<Lane>> nodeWithLane = new();
         foreach (Lane lane in Lanes)
         {
             nodeWithLane[lane.Start] = new() { lane };
         }
-        Start = new Intersection()
+        StartIx = new Intersection()
         {
             NodeWithLane = nodeWithLane,
             Roads = new() { this }
@@ -36,14 +39,14 @@ public class Road
 
     public void InitiateEndIntersection()
     {
-        if (End != null)
+        if (EndIx != null)
             throw new InvalidOperationException("Intersection at End is already initalized");
-        Dictionary<int, List<Lane>> nodeWithLane = new();
+        Dictionary<int, HashSet<Lane>> nodeWithLane = new();
         foreach (Lane lane in Lanes)
         {
             nodeWithLane[lane.End] = new() { lane };
         }
-        End = new Intersection()
+        EndIx = new Intersection()
         {
             NodeWithLane = nodeWithLane,
             Roads = new() { this }

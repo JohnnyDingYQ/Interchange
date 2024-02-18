@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using QuikGraph;
@@ -7,13 +8,14 @@ using UnityEngine.Splines;
 
 public static class BuildManager
 {
-    private static int start, pivot, end;
+    private static int startNode, pivotNode, endNode;
     private const float SplineResolution = 0.4f;
     private const float LaneWidth = GlobalConstants.LaneWidth;
-    public static int LaneCount {get; set;}
+    public static int LaneCount { get; set; }
     public static int NextAvailableId { get; set; }
-    public static IBuildManagerBoundary client;
-    public static Dictionary<int, Road> roadWatcher;
+    public static IBuildManagerBoundary Client;
+    private const float SnapDistance = GlobalConstants.SnapDistance;
+    private static Dictionary<int, Road> roadWatcher;
     public static Dictionary<int, Road> RoadWatcher
     {
         get
@@ -30,73 +32,114 @@ public static class BuildManager
     static BuildManager()
     {
         LaneCount = 1;
-        start = -1;
-        pivot = -1;
+        startNode = -1;
+        pivotNode = -1;
+        NextAvailableId = 0;
+    }
+
+    public static void Reset()
+    {
+        LaneCount = 1;
+        startNode = -1;
+        pivotNode = -1;
+        RoadWatcher = new();
+        Client = null;
+        NextAvailableId = 0;
     }
 
     public static void HandleBuildCommand()
     {
-        int hoveredTile = Grid.GetIdByPos(client.GetPos());
-        if (hoveredTile == -1)
+        int hoveredNode = Grid.GetIdByPos(Client.GetPos());
+        if (HoveredNodeInvalid(hoveredNode))
         {
             return;
         }
-        if (start == -1)
+        if (StartNodeUnassigned())
         {
-            start = Snapper.Snapped() ? Snapper.SnappedNode : hoveredTile;
+            List<BuildTarget> buildTargets = GetBuildTarget(hoveredNode, LaneCount);
+            if (buildTargets[0] == null)
+            {
+                startNode = hoveredNode;
+            }
+            else
+            {
+                startNode = buildTargets[0].Node;
+            }
             Log.Info.Log($"Road Manager: Tile A loaded");
         }
-        else if (pivot == -1)
+        else if (PivotNodeUnassigned())
         {
-            pivot = hoveredTile;
+            pivotNode = hoveredNode;
             Log.Info.Log($"Road Manager: Tile B loaded");
         }
         else
         {
-            end = hoveredTile;
+            endNode = hoveredNode;
             Log.Info.Log($"Road Manager: Tile C loaded");
             BuildRoad();
 
-            start = -1;
-            pivot = -1;
+            startNode = -1;
+            pivotNode = -1;
+        }
+
+        static bool StartNodeUnassigned()
+        {
+            return startNode == -1;
+        }
+
+        static bool PivotNodeUnassigned()
+        {
+            return pivotNode == -1;
+        }
+
+        static bool HoveredNodeInvalid(int hoveredNode)
+        {
+            return hoveredNode == -1;
         }
     }
 
     static void BuildRoad()
     {
-        Vector3 posA = Grid.GetWorldPosByID(start);
-        Vector3 posB = Grid.GetWorldPosByID(pivot);
-        Vector3 posC = Grid.GetWorldPosByID(end);
+        Vector3 posA = Grid.GetPosByID(startNode);
+        Vector3 posB = Grid.GetPosByID(pivotNode);
+        Vector3 posC = Grid.GetPosByID(endNode);
 
         float linearLength = Vector3.Distance(posA, posB) + Vector3.Distance(posB, posC);
         int segCount = (int)(linearLength * SplineResolution + 1);
 
-        Lane connectedLane = CheckConnection(start);
-        if (connectedLane != null)
+        Lane connectedLaneStart = CheckConnection(startNode);
+        Lane connectedLaneEnd = CheckConnection(endNode);
+        if (connectedLaneStart != null || connectedLaneEnd != null)
         {
-            Spline spline = BuildSpline(connectedLane.Spline.EvaluatePosition(1), posB, posC, segCount);
+            posA = connectedLaneStart != null ? connectedLaneStart.Spline.EvaluatePosition(1) : posA;
+            posC = connectedLaneEnd != null ? connectedLaneEnd.Spline.EvaluatePosition(0) : posC;
+            Spline spline = BuildSplineQuadraticInterpolation(posA, posB, posC, segCount);
             Log.Info.Log("Road Manager: Connecting Roads");
             Road road = InitiateRoad(spline);
-            Road connectedRoad = connectedLane.Road;
+            Road connectedRoad;
             Intersection intersection = null;
-            if (start == connectedLane.Start)
+            if (connectedLaneEnd != null)
             {
-                intersection = connectedRoad.Start;
-                intersection.NodeWithLane[start].Add(road.Lanes[0]);
-
+                connectedRoad = connectedLaneEnd.Road;
+                intersection = connectedRoad.StartIx;
+                connectedRoad.StartIx.NodeWithLane[endNode].Add(road.Lanes[0]);
+                road.EndIx = intersection;
+                road.InitiateStartIntersection();
             }
-            else if (start == connectedLane.End)
+            else if (connectedLaneStart != null)
             {
-                intersection = connectedRoad.End;
-                connectedLane.Road.End.NodeWithLane[start].Add(road.Lanes[0]);
+                connectedRoad = connectedLaneStart.Road;
+                intersection = connectedRoad.EndIx;
+                connectedRoad.EndIx.NodeWithLane[startNode].Add(road.Lanes[0]);
+                road.StartIx = intersection;
+                road.InitiateEndIntersection();
             }
             intersection.Roads.Add(road);
-            road.InitiateEndIntersection();
-            RoadView.EvaluateIntersection(intersection);
+            Client.EvaluateIntersection(intersection);
         }
-        if (connectedLane == null)
+        if (connectedLaneStart == null)
         {
-            Spline spline = BuildSpline(posA, posB, posC, segCount);
+            Spline spline = BuildSplineQuadraticInterpolation(posA, posB, posC, segCount);
             Road road = InitiateRoad(spline);
             road.InitiateStartIntersection();
             road.InitiateEndIntersection();
@@ -105,26 +148,29 @@ public static class BuildManager
 
     static Road InitiateRoad(Spline spline)
     {
-        
+
         Road road = new()
         {
             Id = NextAvailableId++,
-            Spline = spline
+            Spline = spline,
+            StartNode = startNode,
+            PivotNode = pivotNode,
+            EndNode = endNode
         };
         RoadWatcher.Add(road.Id, road);
 
         List<Lane> lanes = InitiateLanes(road, LaneCount);
         road.Lanes = lanes;
 
-        PathGraph.Graph.AddVertex(start);
-        PathGraph.Graph.AddVertex(end);
-        PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(start, end, spline));
+        PathGraph.Graph.AddVertex(startNode);
+        PathGraph.Graph.AddVertex(endNode);
+        PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(startNode, endNode, spline));
 
-        client.InstantiateRoad(road);
+        Client.InstantiateRoad(road);
         return road;
     }
 
-    static Spline BuildSpline(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
+    static Spline BuildSplineQuadraticInterpolation(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
     {
         Spline spline = new();
         Vector3 AB, BC, AB_BC;
@@ -206,6 +252,54 @@ public static class BuildManager
             return Vector3.Cross(tangent, upVector).normalized;
         }
 
+    }
+
+    static List<BuildTarget> GetBuildTarget(int target, int count)
+    {
+        List<BuildTarget> BuildTargets = new();
+        List<BuildTarget> candidates = new();
+        foreach (Road road in roadWatcher.Values)
+            foreach (Lane lane in road.Lanes)
+                foreach (int node in new List<int>() { lane.Start, lane.End })
+                {
+                    float distance = Grid.GetDistance(target, node);
+                    if (distance < SnapDistance)
+                        candidates.Add(new BuildTarget(lane, node, distance));
+                }
+        candidates.Sort();
+        for (int i = 0; i < count; i++)
+        {
+            if (i < candidates.Count)
+            {
+                BuildTargets.Add(candidates[i]);
+            }
+            else
+            {
+                BuildTargets.Add(null);
+            }
+            
+        }
+        return BuildTargets;
+
+    }
+
+    private class BuildTarget : IComparable<BuildTarget>
+    {
+        public int Node { get; set; }
+        public Lane Lane { get; set; }
+        public float Distance { get; set; }
+
+        public BuildTarget(Lane lane, int node, float distance)
+        {
+            Lane = lane;
+            Node = node;
+            Distance = distance;
+        }
+
+        public int CompareTo(BuildTarget other)
+        {
+            return Distance.CompareTo(other.Distance);
+        }
     }
 
 }

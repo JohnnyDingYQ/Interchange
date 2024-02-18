@@ -50,7 +50,7 @@ public class IntersectionTest
 
         void CreateIntersection()
         {
-            Dictionary<int, List<Lane>> d = new()
+            Dictionary<int, HashSet<Lane>> d = new()
             {
                 [1] = new() { lane11, lane21 },
             };
@@ -73,7 +73,7 @@ public class IntersectionTest
 
         void CreateIntersection()
         {
-            Dictionary<int, List<Lane>> d = new()
+            Dictionary<int, HashSet<Lane>> d = new()
             {
                 [1] = new() { lane11, lane21 },
                 [3] = new() { lane12, lane22 }
@@ -100,7 +100,7 @@ public class IntersectionTest
 
         void CreateIntersection()
         {
-            Dictionary<int, List<Lane>> d = new()
+            Dictionary<int, HashSet<Lane>> d = new()
             {
                 [1] = new() { lane11, lane31 },
                 [3] = new() { lane12, lane41 }
@@ -129,7 +129,7 @@ public class IntersectionTest
 
         void CreateIntersection()
         {
-            Dictionary<int, List<Lane>> d = new()
+            Dictionary<int, HashSet<Lane>> d = new()
             {
                 [1] = new() { lane51, lane11 },
                 [3] = new() { lane52, lane12 },
@@ -157,7 +157,7 @@ public class IntersectionTest
 
         void CreateIntersection()
         {
-            Dictionary<int, List<Lane>> d = new()
+            Dictionary<int, HashSet<Lane>> d = new()
             {
                 [1] = new() { lane11, lane31 },
                 [3] = new() { lane12 }

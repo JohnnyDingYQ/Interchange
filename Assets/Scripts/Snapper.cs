@@ -19,7 +19,7 @@ public class Snapper : MonoBehaviour
         if (SnappedNode != -1)
         {
             snapPoint.GetComponent<Renderer>().enabled = true;
-            snapPoint.transform.position = Grid.GetWorldPosByID(SnappedNode);
+            snapPoint.transform.position = Grid.GetPosByID(SnappedNode);
             snapPoint.transform.position = new Vector3(snapPoint.transform.position.x, Grid.Level + 0.1f, snapPoint.transform.position.z);
         }
         else
@@ -36,14 +36,14 @@ public class Snapper : MonoBehaviour
         {
             foreach (Lane lane in road.Lanes)
             {
-                float distance = Vector3.Distance(Grid.GetWorldPosByID(lane.Start), worldPos);
+                float distance = Vector3.Distance(Grid.GetPosByID(lane.Start), worldPos);
                 if (minDistance > distance)
                 {
                     minDistance = distance;
                     closest = lane.Start;
                 }
 
-                distance = Vector3.Distance(Grid.GetWorldPosByID(lane.End), worldPos);
+                distance = Vector3.Distance(Grid.GetPosByID(lane.End), worldPos);
                 if (minDistance > distance)
                 {
                     minDistance = distance;

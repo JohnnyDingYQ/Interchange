@@ -24,7 +24,7 @@ public static class Log
 
     public static void ShowNode(int id, Color color, float duration)
     {
-        Vector3 pos = Grid.GetWorldPosByID(id);
+        Vector3 pos = Grid.GetPosByID(id);
         float offset = (float)Grid.Dim / 2;
         Vector3 a = pos + new Vector3(offset, 0, offset);
         Vector3 b = pos + new Vector3(offset, 0, -offset);
@@ -58,5 +58,12 @@ public static class Log
             Debug.DrawLine(k.ElementAt(count).Position + d, k.ElementAt(count - 1).Position + d, color, duration);
             count += 1;
         }
+    }
+
+    public static void DrawDelimiter(Delimiter delimiter, Color color, int duration)
+    {
+        Debug.DrawLine(delimiter.LeftBound, delimiter.RightBound, color, duration);
+        Debug.DrawLine(delimiter.LeftBound, delimiter.LeftBound + delimiter.UpVector, color, duration);
+        Debug.DrawLine(delimiter.RightBound, delimiter.LeftBound + delimiter.UpVector, color, duration);
     }
 }

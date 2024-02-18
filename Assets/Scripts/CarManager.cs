@@ -14,7 +14,7 @@ public class CarManager : MonoBehaviour
     {
         int origin = Grid.Height * Grid.Width/2;
         int destination = origin + Grid.Height - 1;
-        Car car = Instantiate(carPreFab, Grid.GetWorldPosByID(origin), Quaternion.identity);
+        Car car = Instantiate(carPreFab, Grid.GetPosByID(origin), Quaternion.identity);
         car.setID(id);
         car.Origin = origin;
         PathGraph.Graph.AddVertex(origin);

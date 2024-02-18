@@ -13,8 +13,17 @@ public static class RoadView
         List<int> nodes = intersection.GetNodes();
         Road mainRoad = intersection.GetMainRoad();
         float3 upVector = mainRoad.Spline.EvaluateUpVector(1);
-        float3 leftCorner = mainRoad.RoadGameObject.LeftMesh.Last();
-        float3 rightCorner = mainRoad.RoadGameObject.RightMesh.Last();
+        float3 leftCorner, rightCorner;
+        if (intersection.RoadEntersIntersection(mainRoad))
+        {
+            leftCorner = mainRoad.RoadGameObject.LeftMesh.Last();
+            rightCorner = mainRoad.RoadGameObject.RightMesh.Last();
+        }
+        else
+        {
+            leftCorner = mainRoad.RoadGameObject.LeftMesh.First();
+            rightCorner = mainRoad.RoadGameObject.RightMesh.First();
+        }
 
         if (intersection.IsRepeating())
         {
@@ -62,13 +71,27 @@ public static class RoadView
         {
             Road lesserRoad = lesserLane.Road;
             Spline combinedSpline = new();
+            bool reversed = false;
+            if (!(mainLane.End == lesserLane.Start))
+            {
+                (mainLane, lesserLane) = (lesserLane, mainLane);
+                reversed = true;
+            }
             combinedSpline.Copy(mainLane.Spline);
             foreach (BezierKnot knot in lesserLane.Spline)
             {
                 combinedSpline.Add(knot);
             }
 
-            lesserRoad.RoadGameObject.GetComponent<MeshFilter>().mesh = ConnectLaneMesh(lesserRoad.Lanes.Count, combinedSpline, delimiter);
+            if (reversed)
+            {
+                SplineUtility.ReverseFlow(combinedSpline);
+            }
+
+            Log.DrawSpline(combinedSpline, Color.white, 100);
+
+            Mesh mesh = ConnectedLaneMesh(lesserRoad.Lanes.Count, combinedSpline, delimiter, reversed);
+            lesserRoad.RoadGameObject.GetComponent<MeshFilter>().mesh = mesh;
         }
 
         List<float3> GetDivergePoints(List<Road> roads)
@@ -262,21 +285,40 @@ public static class RoadView
         }
     }
 
-    static Mesh ConnectLaneMesh(int laneCount, Spline spline, Delimiter delimiter)
+    static Mesh ConnectedLaneMesh(int laneCount, Spline spline, Delimiter delimiter, bool reversed)
     {
+        Log.DrawDelimiter(delimiter, Color.magenta, 100);
         int segCount = spline.Knots.Count();
-        Vector3 end = spline.EvaluatePosition(1);
         List<float3> leftVs = new();
         List<float3> rightVs = new();
         Plane guard = delimiter.Plane;
         float3 leftBound = delimiter.LeftBound;
         float3 rightBound = delimiter.RightBound;
+        if (reversed)
+        {
+            (leftBound, rightBound) = (rightBound, leftBound);
+        }
+        Vector3 end = spline.EvaluatePosition(1);
         for (int i = segCount; i >= 0; i--)
+        {
+            DetermineVerticeLocation(i);
+        }
+
+        leftVs.Reverse();
+        rightVs.Reverse();
+
+        return Extrude(leftVs, rightVs);
+
+        void DetermineVerticeLocation(int i)
         {
             spline.Evaluate(1 / (float)segCount * i, out float3 position, out float3 forward, out float3 upVector);
             float3 normal = Vector3.Cross(forward, upVector).normalized;
             float3 left = position + normal * LaneWidth * laneCount / 2;
             float3 right = position - normal * LaneWidth * laneCount / 2;
+            if (reversed)
+            {
+                // (left, right) = (right, left);
+            }
             bool leftOverlap = false;
             bool rightOverlap = false;
             if (!guard.SameSide(end, left))
@@ -301,19 +343,15 @@ public static class RoadView
             }
             if (leftOverlap && rightOverlap)
             {
-                leftVs.Add(left);
-                rightVs.Add(right);
-                break;
+                leftVs.Add(leftBound);
+                rightVs.Add(rightBound);
+                return;
             }
+            DebugExtension.DebugPoint(left, Color.blue, 1, 100);
+            DebugExtension.DebugPoint(right, Color.black, 1, 100);
             leftVs.Add(left);
             rightVs.Add(right);
-
         }
-
-        leftVs.Reverse();
-        rightVs.Reverse();
-
-        return Extrude(leftVs, rightVs);
     }
 
     public static Mesh Extrude(List<float3> leftVs, List<float3> rightVs)

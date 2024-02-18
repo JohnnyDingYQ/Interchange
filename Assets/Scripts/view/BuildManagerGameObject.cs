@@ -10,7 +10,7 @@ public class BuildManagerGameObject : MonoBehaviour, IBuildManagerBoundary
 
     void Start()
     {
-        BuildManager.client = this;
+        BuildManager.Client = this;
 
         if (inputManager != null)
         {
@@ -70,5 +70,10 @@ public class BuildManagerGameObject : MonoBehaviour, IBuildManagerBoundary
     public float3 GetPos()
     {
         return Main.MouseWorldPos;
+    }
+
+    public void EvaluateIntersection(Intersection intersection)
+    {
+        RoadView.EvaluateIntersection(intersection);
     }
 }

@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 public class Intersection
 {
-    private Dictionary<int, List<Lane>> nodeWithLane;
+    private Dictionary<int, HashSet<Lane>> nodeWithLane;
     /// <summary>
     /// Key: node, Value: Lane connected to it
     /// </summary>
-    public Dictionary<int, List<Lane>> NodeWithLane {
+    public Dictionary<int, HashSet<Lane>> NodeWithLane {
         get {
             nodeWithLane ??= new();
             return nodeWithLane;
@@ -59,7 +60,7 @@ public class Intersection
         {
             return false;
         }
-        foreach (List<Lane> lanes in nodeWithLane.Values)
+        foreach (HashSet<Lane> lanes in nodeWithLane.Values)
         {
             if (lanes.Count < 2)
             {
@@ -73,7 +74,7 @@ public class Intersection
     public Road GetMinorRoadofNode(int node)
     {
         Road mainRoad = GetMainRoad();
-        List<Lane> lanes = nodeWithLane[node];
+        HashSet<Lane> lanes = nodeWithLane[node];
         foreach (Lane lane in lanes)
         {
             if (lane.Road != mainRoad)
@@ -82,5 +83,21 @@ public class Intersection
             }
         } 
         return null;
+    }
+
+    public bool RoadEntersIntersection(Road road)
+    {
+        foreach (var(key, value) in nodeWithLane)
+        {
+            if (key == road.Lanes[0].End)
+            {
+                return true;
+            }
+            if (key == road.Lanes[0].Start)
+            {
+                return false;
+            }
+        }
+        throw new InvalidOperationException("Main Road must either enter or exit the intersection");
     }
 }

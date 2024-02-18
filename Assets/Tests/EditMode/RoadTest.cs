@@ -48,7 +48,7 @@ public class RoadTest
     {
         road.Lanes = new() {lane1};
         road.InitiateStartIntersection();
-        Intersection intersection = road.Start;
+        Intersection intersection = road.StartIx;
         Assert.AreEqual(1, intersection.Roads.Count);
         Assert.AreSame(road, intersection.Roads.First());
         Assert.AreEqual(1 ,intersection.NodeWithLane.Count);
@@ -60,7 +60,7 @@ public class RoadTest
     {
         road.Lanes = new() {lane1, lane2};
         road.InitiateStartIntersection();
-        Intersection intersection = road.Start;
+        Intersection intersection = road.StartIx;
 
         Assert.AreEqual(1, intersection.Roads.Count);
         Assert.AreSame(road, intersection.Roads.First());
@@ -74,7 +74,7 @@ public class RoadTest
     {
         road.Lanes = new() {lane1};
         road.InitiateEndIntersection();
-        Intersection intersection = road.End;
+        Intersection intersection = road.EndIx;
         Assert.AreEqual(1, intersection.Roads.Count);
         Assert.AreSame(road, intersection.Roads.First());
         Assert.AreEqual(1 ,intersection.NodeWithLane.Count);
@@ -86,7 +86,7 @@ public class RoadTest
     {
         road.Lanes = new() {lane1, lane2};
         road.InitiateEndIntersection();
-        Intersection intersection = road.End;
+        Intersection intersection = road.EndIx;
 
         Assert.AreEqual(1, intersection.Roads.Count);
         Assert.AreSame(road, intersection.Roads.First());
