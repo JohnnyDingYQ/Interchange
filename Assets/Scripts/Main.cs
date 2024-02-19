@@ -7,13 +7,13 @@ public class Main : MonoBehaviour
     [SerializeField] private int Width;
     void Awake()
     {
-        Log.Info.logEnabled = true;
+        Utility.Info.logEnabled = true;
 
         Grid.Height = Height;
         Grid.Width = Width;
         Grid.Dim = 1;
         Grid.Level = 1;
-        Log.DrawGridBounds();
+        Utility.DrawGridBounds();
 
         Application.targetFrameRate = 165;
 

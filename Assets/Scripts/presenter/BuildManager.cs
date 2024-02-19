@@ -9,7 +9,7 @@ using UnityEngine.Splines;
 public static class BuildManager
 {
     private static int startNode, pivotNode, endNode;
-    private const float SplineResolution = 0.4f;
+    private const float SplineResolution = GlobalConstants.SplineResolution;
     private const float LaneWidth = GlobalConstants.LaneWidth;
     public static int LaneCount { get; set; }
     public static int NextAvailableId { get; set; }
@@ -65,17 +65,17 @@ public static class BuildManager
             {
                 startNode = buildTargets[0].Node;
             }
-            Log.Info.Log($"Road Manager: Tile A loaded");
+            Utility.Info.Log($"Road Manager: Tile A loaded");
         }
         else if (PivotNodeUnassigned())
         {
             pivotNode = hoveredNode;
-            Log.Info.Log($"Road Manager: Tile B loaded");
+            Utility.Info.Log($"Road Manager: Tile B loaded");
         }
         else
         {
             endNode = hoveredNode;
-            Log.Info.Log($"Road Manager: Tile C loaded");
+            Utility.Info.Log($"Road Manager: Tile C loaded");
             BuildRoad();
 
             startNode = -1;
@@ -114,7 +114,7 @@ public static class BuildManager
             posA = connectedLaneStart != null ? connectedLaneStart.Spline.EvaluatePosition(1) : posA;
             posC = connectedLaneEnd != null ? connectedLaneEnd.Spline.EvaluatePosition(0) : posC;
             Spline spline = BuildSplineQuadraticInterpolation(posA, posB, posC, segCount);
-            Log.Info.Log("Road Manager: Connecting Roads");
+            Utility.Info.Log("Road Manager: Connecting Roads");
             Road road = InitiateRoad(spline);
             Road connectedRoad;
             Intersection intersection = null;
@@ -258,14 +258,15 @@ public static class BuildManager
     {
         List<BuildTarget> BuildTargets = new();
         List<BuildTarget> candidates = new();
-        foreach (Road road in roadWatcher.Values)
-            foreach (Lane lane in road.Lanes)
-                foreach (int node in new List<int>() { lane.Start, lane.End })
-                {
-                    float distance = Grid.GetDistance(target, node);
-                    if (distance < SnapDistance)
-                        candidates.Add(new BuildTarget(lane, node, distance));
-                }
+        if (roadWatcher != null)
+            foreach (Road road in roadWatcher.Values)
+                foreach (Lane lane in road.Lanes)
+                    foreach (int node in new List<int>() { lane.Start, lane.End })
+                    {
+                        float distance = Grid.GetDistance(target, node);
+                        if (distance < SnapDistance)
+                            candidates.Add(new BuildTarget(lane, node, distance));
+                    }
         candidates.Sort();
         for (int i = 0; i < count; i++)
         {

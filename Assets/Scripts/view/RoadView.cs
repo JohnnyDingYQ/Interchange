@@ -88,7 +88,7 @@ public static class RoadView
                 SplineUtility.ReverseFlow(combinedSpline);
             }
 
-            Log.DrawSpline(combinedSpline, Color.white, 100);
+            Utility.DrawSpline(combinedSpline, Color.white, 100);
 
             Mesh mesh = ConnectedLaneMesh(lesserRoad.Lanes.Count, combinedSpline, delimiter, reversed);
             lesserRoad.RoadGameObject.GetComponent<MeshFilter>().mesh = mesh;
@@ -287,7 +287,7 @@ public static class RoadView
 
     static Mesh ConnectedLaneMesh(int laneCount, Spline spline, Delimiter delimiter, bool reversed)
     {
-        Log.DrawDelimiter(delimiter, Color.magenta, 100);
+        Utility.DrawDelimiter(delimiter, Color.magenta, 100);
         int segCount = spline.Knots.Count();
         List<float3> leftVs = new();
         List<float3> rightVs = new();

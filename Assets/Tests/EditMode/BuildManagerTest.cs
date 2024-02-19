@@ -1,9 +1,7 @@
-using UnityEngine;
 using NUnit.Framework;
-using Unity.Mathematics;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+using Unity.Mathematics;
 
 public class BuildManagerTest
 {
@@ -33,7 +31,7 @@ public class BuildManagerTest
     [Test]
     public void BuildOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new() { 30, 60, 90, });
+        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, });
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
         Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
@@ -50,7 +48,7 @@ public class BuildManagerTest
     [Test]
     public void BuildTwoLaneRoad()
     {
-        BuildManager.Client = new MockClient(new() { 30, 60, 90 });
+        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90 });
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
@@ -67,7 +65,7 @@ public class BuildManagerTest
     [Test]
     public void BuildingOnEndCreatesConnection_OneLane()
     {
-        BuildManager.Client = new MockClient(new() { 30, 60, 90, 90, 120, 150 });
+        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150 });
         BuildManager.LaneCount = 1;
 
         BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(30, 90);
@@ -76,7 +74,7 @@ public class BuildManagerTest
     [Test]
     public void BuildingOnStartCreatesConnection_OneLane()
     {
-        BuildManager.Client = new MockClient(new() { 90, 120, 150, 30, 60, 90 });
+        BuildManager.Client = new MockClient(new List<int>() { 90, 120, 150, 30, 60, 90 });
         BuildManager.LaneCount = 1;
 
         BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(30, 90);
@@ -85,15 +83,15 @@ public class BuildManagerTest
     [Test]
     public void SnappingCreatesIntersection_OneLane()
     {
-        BuildManager.Client = new MockClient(new() { 30, 60, 90, 90 + (int) (GlobalConstants.SnapDistance - 1), 120, 150});
+        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90 + (int)(GlobalConstants.SnapDistance - 1), 120, 150 });
         BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(30, 90);
     }
 
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        int exitingRoadStartNode = 90 + (int) (GlobalConstants.SnapDistance + 1);
-        BuildManager.Client = new MockClient(new() { 30, 60, 90, exitingRoadStartNode, 120, 150});
+        int exitingRoadStartNode = 90 + (int)(GlobalConstants.SnapDistance + 1);
+        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, exitingRoadStartNode, 120, 150 });
         BuildManager.LaneCount = 1;
         for (int i = 0; i < 6; i++)
         {
@@ -109,7 +107,7 @@ public class BuildManagerTest
     // [Test]
     public void BuildingOnEndCreatesConnection_TwoLanes()
     {
-        BuildManager.Client = new MockClient(new() { 30, 60, 90, 90, 120, 150 });
+        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150 });
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 6; i++)
         {
@@ -135,7 +133,7 @@ public class BuildManagerTest
     public void BuildingOnStartCreatesConnection_TwoLanes()
     {
         BuildManager.Client = new MockClient(
-            new() { 90, 120, 150, 30, 60, 90 });
+            new List<int>() { 90, 120, 150, 30, 60, 90 });
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 6; i++)
         {
@@ -169,14 +167,22 @@ public class BuildManagerTest
         return null;
     }
 
-    public class MockClient : IBuildManagerBoundary
+    private class MockClient : IBuildManagerBoundary
     {
-        readonly List<int> MockPos;
+        readonly List<int> MockID;
         int count = 0;
 
         public MockClient(List<int> mockPos)
         {
-            MockPos = mockPos;
+            MockID = mockPos;
+        }
+
+        public MockClient(List<float2> mockCoord)
+        {
+            List<int> m = new();
+            foreach (float2 coord in mockCoord)
+                m.Add((int)(Grid.Height * coord.y + coord.x));
+            MockID = m;
         }
 
         public void EvaluateIntersection(Intersection intersection)
@@ -186,7 +192,7 @@ public class BuildManagerTest
 
         public float3 GetPos()
         {
-            return Grid.GetPosByID(MockPos[count++]);
+            return Grid.GetPosByID(MockID[count++]);
         }
 
         public void InstantiateRoad(Road road)
@@ -194,5 +200,4 @@ public class BuildManagerTest
             return;
         }
     }
-
 }

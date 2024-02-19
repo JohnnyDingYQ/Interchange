@@ -1,4 +1,3 @@
-using log4net.Appender;
 using Unity.Mathematics;
 using UnityEngine;
 
