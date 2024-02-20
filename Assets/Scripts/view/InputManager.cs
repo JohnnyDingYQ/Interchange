@@ -11,6 +11,8 @@ public class InputManager: MonoBehaviour
     public event Action Build1Lane;
     public event Action Build2Lane;
     public event Action Build3Lane;
+    public event Action SaveGame;
+    public event Action LoadGame;
 
     void Update()
     {
@@ -24,11 +26,15 @@ public class InputManager: MonoBehaviour
             MoveCameraDown.Invoke();
         if (Input.GetKey(KeyCode.D))
             MoveCameraRight.Invoke();
-        if (Input.GetKey(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
             Build1Lane.Invoke();
-        if (Input.GetKey(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha2))
             Build2Lane.Invoke();
-        if (Input.GetKey(KeyCode.Alpha3))
+        if (Input.GetKeyDown(KeyCode.Alpha3))
             Build3Lane.Invoke();
+        if (Input.GetKeyDown(KeyCode.O))
+            SaveGame.Invoke();
+        if (Input.GetKeyDown(KeyCode.P))
+            LoadGame.Invoke();
     }
 }

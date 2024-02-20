@@ -490,6 +490,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Height: 100
   Width: 200
+  inputManager: {fileID: 745351445}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
