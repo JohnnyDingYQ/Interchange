@@ -4,7 +4,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
-public static class RoadView
+public static class RoadMesh
 {
     private const float DivergingPointLocatingPrecision = 0.025f;
     private const float LaneWidth = GlobalConstants.LaneWidth;
@@ -411,4 +411,5 @@ public static class RoadView
 
         return Extrude(leftVs, rightVs);
     }
+
 }

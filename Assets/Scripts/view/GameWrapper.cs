@@ -56,11 +56,13 @@ public class Main : MonoBehaviour
 
     void SaveGame()
     {
-        Game.SaveSystem.SaveGame();
+        Utility.Info.Log("Saving");
+        Game.SaveGame();
     }
 
     void LoadGame()
     {
-        Game.SaveSystem.LoadGame();
+        Utility.Info.Log("Loading");
+        Game.LoadGame();
     }
 }

@@ -200,5 +200,10 @@ public class BuildManagerTest
         {
             return;
         }
+
+        public void RedrawAllRoads()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

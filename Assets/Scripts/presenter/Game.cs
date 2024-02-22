@@ -10,5 +10,6 @@ public static class Game
     public static void LoadGame()
     {
         SaveSystem.LoadGame();
+        BuildManager.RedrawAllRoads();
     }
 }

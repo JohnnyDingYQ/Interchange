@@ -8,10 +8,8 @@ public class SaveSystem : ISaveSystemGateway
 {
     public void LoadGame()
     {
-        // Save the full path to the file.
         string saveFile = Application.persistentDataPath + "/save0.json";
 
-        // Does it exist?
         if (File.Exists(saveFile))
         {
             string fileContents = File.ReadAllText(saveFile);
@@ -25,7 +23,6 @@ public class SaveSystem : ISaveSystemGateway
 
     public void SaveGame()
     {
-        List<Road> roads = new(BuildManager.RoadWatcher.Values);
         var s = JsonConvert.SerializeObject(BuildManager.RoadWatcher, Formatting.Indented, new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.Objects

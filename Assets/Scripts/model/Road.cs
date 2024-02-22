@@ -10,7 +10,7 @@ public class Road
     public Intersection StartIx { get; set; } // Ix is shorthand for intersection
     public Intersection EndIx { get; set; }
     public int Id { get; set; }
-    
+
     [JsonIgnore]
     public RoadGameObject RoadGameObject { get; set; }
 
@@ -18,9 +18,11 @@ public class Road
     public Spline Spline { get; set; }
 
     public List<Lane> Lanes { get; set; }
-    public int StartNode {get; set;}
-    public int PivotNode {get; set;}
-    public int EndNode {get; set;}
+    public int StartNode { get; set; }
+    public int PivotNode { get; set; }
+    public int EndNode { get; set; }
+
+    public int SplineKnotCount { get; set; }
 
     public Road()
     {

@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
-using UnityEditor.VersionControl;
 
 public class SaveSystemTest
 {
+    SaveSystem saveSystem;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -14,7 +14,7 @@ public class SaveSystemTest
         Grid.Width = 200;
         Grid.Dim = 1;
         Grid.Level = 0;
-        Game.SaveSystem = new SaveSystem();
+        saveSystem = new();
     }
 
     [SetUp]
@@ -29,9 +29,9 @@ public class SaveSystemTest
         BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90 });
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        Game.SaveGame();
+        saveSystem.SaveGame();
         BuildManager.Reset();
-        Game.LoadGame();
+        saveSystem.LoadGame();
 
         Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
         Road road = BuildManager.RoadWatcher.Values.First();
@@ -62,9 +62,9 @@ public class SaveSystemTest
         BuildManager.LaneCount = 3;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        Game.SaveGame();
+        saveSystem.SaveGame();
         BuildManager.Reset();
-        Game.LoadGame();
+        saveSystem.LoadGame();
 
         Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
         Road road = BuildManager.RoadWatcher.Values.First();
@@ -96,9 +96,9 @@ public class SaveSystemTest
         BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 120, 150, 180 });
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
-        Game.SaveGame();
+        saveSystem.SaveGame();
         BuildManager.Reset();
-        Game.LoadGame();
+        saveSystem.LoadGame();
 
         Assert.AreEqual(2, BuildManager.RoadWatcher.Count);
         Road road0 = BuildManager.RoadWatcher[0];
@@ -117,9 +117,9 @@ public class SaveSystemTest
         BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150 });
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
-        Game.SaveGame();
+        saveSystem.SaveGame();
         BuildManager.Reset();
-        Game.LoadGame();
+        saveSystem.LoadGame();
 
         Assert.AreEqual(2, BuildManager.RoadWatcher.Count);
         Road road0 = BuildManager.RoadWatcher[0];
@@ -153,9 +153,9 @@ public class SaveSystemTest
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        Game.SaveGame();
+        saveSystem.SaveGame();
         BuildManager.Reset();
-        Game.LoadGame();
+        saveSystem.LoadGame();
         
         Assert.AreEqual(3, BuildManager.RoadWatcher.Count);
         Road road0 = BuildManager.RoadWatcher[0];
@@ -199,6 +199,11 @@ public class SaveSystemTest
         public void InstantiateRoad(Road road)
         {
             return;
+        }
+
+        public void RedrawAllRoads()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

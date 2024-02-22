@@ -66,4 +66,13 @@ public static class Utility
         Debug.DrawLine(delimiter.LeftBound, delimiter.LeftBound + delimiter.UpVector, color, duration);
         Debug.DrawLine(delimiter.RightBound, delimiter.LeftBound + delimiter.UpVector, color, duration);
     }
+
+    public static void DrawAllSplines()
+    {
+        foreach (Road road in BuildManager.RoadWatcher.Values)
+            foreach (Lane lane in road.Lanes)
+                {
+                    DrawSpline(lane.Spline, Color.white, 1000);
+                }
+    }
 }

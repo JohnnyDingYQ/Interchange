@@ -76,7 +76,7 @@ public static class BuildManager
         {
             endNode = hoveredNode;
             Utility.Info.Log($"Road Manager: Tile C loaded");
-            BuildRoad();
+            BuildRoad(startNode, pivotNode, endNode);
 
             startNode = -1;
             pivotNode = -1;
@@ -98,14 +98,14 @@ public static class BuildManager
         }
     }
 
-    static void BuildRoad()
+    static void BuildRoad(int startNode, int pivotNode, int endNode)
     {
         Vector3 posA = Grid.GetPosByID(startNode);
         Vector3 posB = Grid.GetPosByID(pivotNode);
         Vector3 posC = Grid.GetPosByID(endNode);
 
         float linearLength = Vector3.Distance(posA, posB) + Vector3.Distance(posB, posC);
-        int segCount = (int)(linearLength * SplineResolution + 1);
+        int knotCount = (int)(linearLength * SplineResolution + 1);
 
         Lane connectedLaneStart = CheckConnection(startNode);
         Lane connectedLaneEnd = CheckConnection(endNode);
@@ -113,9 +113,8 @@ public static class BuildManager
         {
             posA = connectedLaneStart != null ? connectedLaneStart.Spline.EvaluatePosition(1) : posA;
             posC = connectedLaneEnd != null ? connectedLaneEnd.Spline.EvaluatePosition(0) : posC;
-            Spline spline = BuildSplineQuadraticInterpolation(posA, posB, posC, segCount);
             Utility.Info.Log("Road Manager: Connecting Roads");
-            Road road = InitiateRoad(spline);
+            Road road = InitiateRoad(startNode, pivotNode, endNode, knotCount);
             Road connectedRoad;
             Intersection intersection = null;
             if (connectedLaneEnd != null)
@@ -139,23 +138,23 @@ public static class BuildManager
         }
         if (connectedLaneStart == null)
         {
-            Spline spline = BuildSplineQuadraticInterpolation(posA, posB, posC, segCount);
-            Road road = InitiateRoad(spline);
+            Road road = InitiateRoad(startNode, pivotNode, endNode, knotCount);
             road.InitiateStartIntersection();
             road.InitiateEndIntersection();
         }
     }
 
-    static Road InitiateRoad(Spline spline)
+    static Road InitiateRoad(int startNode, int pivotNode, int endNode, int knotCount)
     {
-
+        Spline roadSpline = BuildSplineQuadraticInterpolation(startNode, pivotNode, endNode, knotCount);
         Road road = new()
         {
             Id = NextAvailableId++,
-            Spline = spline,
+            Spline = roadSpline,
             StartNode = startNode,
             PivotNode = pivotNode,
-            EndNode = endNode
+            EndNode = endNode,
+            SplineKnotCount = knotCount
         };
         RoadWatcher.Add(road.Id, road);
 
@@ -164,22 +163,44 @@ public static class BuildManager
 
         PathGraph.Graph.AddVertex(startNode);
         PathGraph.Graph.AddVertex(endNode);
-        PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(startNode, endNode, spline));
+        PathGraph.Graph.AddEdge(new TaggedEdge<int, Spline>(startNode, endNode, roadSpline));
 
         Client.InstantiateRoad(road);
         return road;
     }
 
-    static Spline BuildSplineQuadraticInterpolation(Vector3 posA, Vector3 posB, Vector3 posC, int nodeCount)
+    static void ReloadAllSpline()
     {
+        foreach (Road road in RoadWatcher.Values)
+        {
+            road.Spline = BuildSplineQuadraticInterpolation(
+                road.StartNode,
+                road.PivotNode,
+                road.EndNode,
+                road.SplineKnotCount
+            );
+
+            int index = 0;
+            int laneCount = road.Lanes.Count;
+            foreach (Lane lane in road.Lanes)
+                lane.Spline = GetLaneSpline(road.Spline, laneCount, index++);
+        }
+    }
+
+    static Spline BuildSplineQuadraticInterpolation(int startNode, int pivotNode, int endNode, int knotCount)
+    {
+        Vector3 posA = Grid.GetPosByID(startNode);
+        Vector3 posB = Grid.GetPosByID(pivotNode);
+        Vector3 posC = Grid.GetPosByID(endNode);
+
         Spline spline = new();
         Vector3 AB, BC, AB_BC;
-        nodeCount -= 1;
-        for (int i = 0; i <= nodeCount; i++)
+        knotCount -= 1;
+        for (int i = 0; i <= knotCount; i++)
         {
-            AB = Vector3.Lerp(posA, posB, 1 / (float)nodeCount * i);
-            BC = Vector3.Lerp(posB, posC, 1 / (float)nodeCount * i);
-            AB_BC = Vector3.Lerp(AB, BC, 1 / (float)nodeCount * i);
+            AB = Vector3.Lerp(posA, posB, 1 / (float)knotCount * i);
+            BC = Vector3.Lerp(posB, posC, 1 / (float)knotCount * i);
+            AB_BC = Vector3.Lerp(AB, BC, 1 / (float)knotCount * i);
             spline.Add(new BezierKnot(AB_BC), TangentMode.AutoSmooth);
         }
         return spline;
@@ -216,42 +237,42 @@ public static class BuildManager
         {
             lanes.Add(new()
             {
-                Spline = new(),
+                Spline = GetLaneSpline(road.Spline, laneCount, i),
                 Road = road,
                 Start = Grid.GetIdByPos(GetLanePosition(spline, 0, laneCount, i)),
                 End = Grid.GetIdByPos(GetLanePosition(spline, 1, laneCount, i))
             });
         }
+        return lanes;
+    }
 
-        int segCount = spline.Knots.Count() - 1;
+    public static Spline GetLaneSpline(Spline roadSpline, int laneCount, int laneNumber)
+    {
+        int segCount = roadSpline.Knots.Count() - 1;
+        Spline laneSpline = new();
 
         // Iterate by distance on curve
         for (int i = 0; i <= segCount; i++)
         {
             float t = 1 / (float)segCount * i;
 
-            // Iterate by each lane
-            for (int j = 0; j < laneCount; j++)
-            {
-                float3 pos = GetLanePosition(spline, t, laneCount, j);
-                lanes[j].Spline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
-            }
+            float3 pos = GetLanePosition(roadSpline, t, laneCount, laneNumber);
+            laneSpline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
         }
-        return lanes;
+        return laneSpline;
+    }
 
-        float3 GetLanePosition(Spline spline, float t, int laneCount, int lane)
-        {
-            float3 normal = GetNormal(spline, t);
-            float3 position = spline.EvaluatePosition(t);
-            return position + normal * LaneWidth * ((float)laneCount / 2 - 0.5f) - lane * normal * LaneWidth;
-        }
-        float3 GetNormal(Spline spline, float t)
-        {
-            float3 tangent = spline.EvaluateTangent(t);
-            float3 upVector = spline.EvaluateUpVector(t);
-            return Vector3.Cross(tangent, upVector).normalized;
-        }
-
+    private static float3 GetLanePosition(Spline spline, float t, int laneCount, int lane)
+    {
+        float3 normal = GetNormal(spline, t);
+        float3 position = spline.EvaluatePosition(t);
+        return position + normal * LaneWidth * ((float)laneCount / 2 - 0.5f) - lane * normal * LaneWidth;
+    }
+    private static float3 GetNormal(Spline spline, float t)
+    {
+        float3 tangent = spline.EvaluateTangent(t);
+        float3 upVector = spline.EvaluateUpVector(t);
+        return Vector3.Cross(tangent, upVector).normalized;
     }
 
     static List<BuildTarget> GetBuildTarget(int target, int count)
@@ -278,7 +299,7 @@ public static class BuildManager
             {
                 BuildTargets.Add(null);
             }
-            
+
         }
         return BuildTargets;
 
@@ -303,4 +324,9 @@ public static class BuildManager
         }
     }
 
+    public static void RedrawAllRoads()
+    {
+        ReloadAllSpline();
+        Client.RedrawAllRoads();
+    }
 }

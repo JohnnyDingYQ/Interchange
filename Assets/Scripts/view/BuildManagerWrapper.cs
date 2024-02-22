@@ -56,10 +56,10 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
     public void InstantiateRoad(Road road)
     {
         RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-        roadGameObject.name = $"Road-{BuildManager.NextAvailableId}";
+        roadGameObject.name = $"Road-{road.Id}";
         road.RoadGameObject = roadGameObject;
 
-        Mesh mesh = RoadView.CreateMesh(road, BuildManager.LaneCount);
+        Mesh mesh = RoadMesh.CreateMesh(road, road.Lanes.Count);
         roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
         roadGameObject.OriginalMesh = Instantiate(mesh);
 
@@ -73,6 +73,20 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
 
     public void EvaluateIntersection(Intersection intersection)
     {
-        RoadView.EvaluateIntersection(intersection);
+        RoadMesh.EvaluateIntersection(intersection);
+    }
+
+    public void RedrawAllRoads()
+    {
+        while (roads.transform.childCount > 0) {
+            DestroyImmediate(roads.transform.GetChild(0).gameObject);
+        }
+
+        foreach (Road road in BuildManager.RoadWatcher.Values)
+        {
+            InstantiateRoad(road);
+            EvaluateIntersection(road.StartIx);
+            EvaluateIntersection(road.EndIx);
+        }
     }
 }

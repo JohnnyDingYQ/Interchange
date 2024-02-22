@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -13,10 +14,13 @@ public class RoadsSplineVisualCheck
     static MockClient client;
 
     private const int Offset = 10;
+    private static bool MeshOn;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
+        MeshOn = false;
+
         Grid.Height = 100;
         Grid.Width = 200;
         BuildManager.Reset();
@@ -97,7 +101,7 @@ public class RoadsSplineVisualCheck
     [UnityTest]
     public IEnumerator Blocker()
     {
-        Visualizer.DrawAllSplines();
+        Utility.DrawAllSplines();
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
     }
 
@@ -124,7 +128,7 @@ public class RoadsSplineVisualCheck
             }
             var road = assetBundle.LoadAsset<GameObject>("Road");
             if (road == null)
-                Debug.Log("WTFFFF");
+                throw new InvalidOperationException("Road asset not found from assetbundle");
             roadPrefab = road.GetComponent<RoadGameObject>();
             client = this;
             finished = true;
@@ -141,7 +145,9 @@ public class RoadsSplineVisualCheck
 
         public void EvaluateIntersection(Intersection intersection)
         {
-            RoadView.EvaluateIntersection(intersection);
+            if (!MeshOn)
+                return;
+            RoadMesh.EvaluateIntersection(intersection);
         }
 
         public float3 GetPos()
@@ -151,15 +157,22 @@ public class RoadsSplineVisualCheck
 
         public void InstantiateRoad(Road road)
         {
+            if (!MeshOn)
+                return;
             RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
             roadGameObject.name = $"Road-{BuildManager.NextAvailableId}";
             road.RoadGameObject = roadGameObject;
 
-            Mesh mesh = RoadView.CreateMesh(road, BuildManager.LaneCount);
+            Mesh mesh = RoadMesh.CreateMesh(road, BuildManager.LaneCount);
             roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
             roadGameObject.OriginalMesh = Instantiate(mesh);
 
             roadGameObject.Road = road;
+        }
+
+        public void RedrawAllRoads()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
