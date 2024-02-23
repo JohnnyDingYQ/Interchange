@@ -62,6 +62,8 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
         Mesh mesh = RoadMesh.CreateMesh(road, road.Lanes.Count);
         roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
         roadGameObject.OriginalMesh = Instantiate(mesh);
+        MeshCollider meshCollider = roadGameObject.GetComponent<MeshCollider>();
+        meshCollider.sharedMesh = mesh;
 
         roadGameObject.Road = road;
     }
@@ -85,6 +87,9 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
         foreach (Road road in BuildManager.RoadWatcher.Values)
         {
             InstantiateRoad(road);
+        }
+        foreach (Road road in BuildManager.RoadWatcher.Values)
+        {
             EvaluateIntersection(road.StartIx);
             EvaluateIntersection(road.EndIx);
         }

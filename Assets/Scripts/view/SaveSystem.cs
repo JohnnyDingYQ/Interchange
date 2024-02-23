@@ -13,7 +13,7 @@ public class SaveSystem : ISaveSystemGateway
         if (File.Exists(saveFile))
         {
             string fileContents = File.ReadAllText(saveFile);
-            BuildManager.RoadWatcher = JsonConvert.DeserializeObject<Dictionary<int, Road>>(fileContents);
+            BuildManager.RoadWatcher = JsonConvert.DeserializeObject<SortedDictionary<int, Road>>(fileContents);
         }
         else
         {
