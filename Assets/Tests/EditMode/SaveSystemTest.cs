@@ -35,13 +35,13 @@ public class SaveSystemTest
 
         Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
         Road road = BuildManager.RoadWatcher.Values.First();
-        Assert.AreEqual(30, road.StartNode);
-        Assert.AreEqual(60, road.PivotNode);
-        Assert.AreEqual(90, road.EndNode);
+        Assert.AreEqual(30, road.StartPos);
+        Assert.AreEqual(60, road.PivotPos);
+        Assert.AreEqual(90, road.EndPos);
         Assert.AreEqual(1, road.Lanes.Count);
         Lane lane = road.Lanes.First();
-        Assert.AreEqual(30, lane.Start);
-        Assert.AreEqual(90, lane.End);
+        Assert.AreEqual(30, lane.StartPos);
+        Assert.AreEqual(90, lane.EndPos);
         Assert.NotNull(road.StartIx);
         Assert.NotNull(road.EndIx);
         Intersection startIx = road.StartIx;
@@ -68,13 +68,13 @@ public class SaveSystemTest
 
         Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
         Road road = BuildManager.RoadWatcher.Values.First();
-        Assert.AreEqual(30, road.StartNode);
-        Assert.AreEqual(60, road.PivotNode);
-        Assert.AreEqual(90, road.EndNode);
+        Assert.AreEqual(30, road.StartPos);
+        Assert.AreEqual(60, road.PivotPos);
+        Assert.AreEqual(90, road.EndPos);
         Assert.AreEqual(3, road.Lanes.Count);
         Lane lane = road.Lanes[1];
-        Assert.AreEqual(30, lane.Start);
-        Assert.AreEqual(90, lane.End);
+        Assert.AreEqual(30, lane.StartPos);
+        Assert.AreEqual(90, lane.EndPos);
         Assert.NotNull(road.StartIx);
         Assert.NotNull(road.EndIx);
         Intersection startIx = road.StartIx;
@@ -102,13 +102,13 @@ public class SaveSystemTest
 
         Assert.AreEqual(2, BuildManager.RoadWatcher.Count);
         Road road0 = BuildManager.RoadWatcher[0];
-        Assert.AreEqual(30, road0.StartNode);
-        Assert.AreEqual(60, road0.PivotNode);
-        Assert.AreEqual(90, road0.EndNode);
+        Assert.AreEqual(30, road0.StartPos);
+        Assert.AreEqual(60, road0.PivotPos);
+        Assert.AreEqual(90, road0.EndPos);
         Road road1 = BuildManager.RoadWatcher[1];
-        Assert.AreEqual(120, road1.StartNode);
-        Assert.AreEqual(150, road1.PivotNode);
-        Assert.AreEqual(180, road1.EndNode);
+        Assert.AreEqual(120, road1.StartPos);
+        Assert.AreEqual(150, road1.PivotPos);
+        Assert.AreEqual(180, road1.EndPos);
     }
 
     [Test]
@@ -123,13 +123,13 @@ public class SaveSystemTest
 
         Assert.AreEqual(2, BuildManager.RoadWatcher.Count);
         Road road0 = BuildManager.RoadWatcher[0];
-        Assert.AreEqual(30, road0.StartNode);
-        Assert.AreEqual(60, road0.PivotNode);
-        Assert.AreEqual(90, road0.EndNode);
+        Assert.AreEqual(30, road0.StartPos);
+        Assert.AreEqual(60, road0.PivotPos);
+        Assert.AreEqual(90, road0.EndPos);
         Road road1 = BuildManager.RoadWatcher[1];
-        Assert.AreEqual(90, road1.StartNode);
-        Assert.AreEqual(120, road1.PivotNode);
-        Assert.AreEqual(150, road1.EndNode);
+        Assert.AreEqual(90, road1.StartPos);
+        Assert.AreEqual(120, road1.PivotPos);
+        Assert.AreEqual(150, road1.EndPos);
         Intersection ix = road0.EndIx;
         Assert.AreSame(ix, road1.StartIx);
         Assert.AreEqual(2, ix.Roads.Count);

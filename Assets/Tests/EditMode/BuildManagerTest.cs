@@ -5,6 +5,12 @@ using Unity.Mathematics;
 
 public class BuildManagerTest
 {
+    float3 pos1 = new(10, 10, 10);
+    float3 pos2 = new(30, 12, 30);
+    float3 pos3 = new(60, 14, 60);
+    float3 pos4 = new(90, 16, 90);
+    float3 pos5 = new(90, 16, 90);
+    float3 pos6 = new(120, 8, 120);
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
@@ -31,7 +37,7 @@ public class BuildManagerTest
     [Test]
     public void BuildOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
         Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
@@ -41,14 +47,14 @@ public class BuildManagerTest
         Assert.IsNotNull(road.Spline);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.AreEqual(1, road.StartIx.NodeWithLane.Count);
-        Assert.AreEqual(30, road.Lanes.First().Start);
-        Assert.AreEqual(90, road.Lanes.First().End);
+        Assert.AreEqual(pos1, road.Lanes.First().StartPos);
+        Assert.AreEqual(pos3, road.Lanes.First().EndPos);
     }
 
     [Test]
     public void BuildTwoLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
@@ -65,33 +71,42 @@ public class BuildManagerTest
     [Test]
     public void BuildingOnEndCreatesConnection_OneLane()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
         BuildManager.LaneCount = 1;
 
-        BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(30, 90);
+        BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
 
     [Test]
     public void BuildingOnStartCreatesConnection_OneLane()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 90, 120, 150, 30, 60, 90 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos3, pos4, pos5, pos1, pos2, pos3 });
         BuildManager.LaneCount = 1;
 
-        BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(30, 90);
+        BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
 
     [Test]
     public void SnappingCreatesIntersection_OneLane()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90 + (int)(GlobalConstants.SnapDistance - 1), 120, 150 });
-        BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(30, 90);
+        BuildManager.Client = new MockClient(
+            new List<float3>() {
+                pos1,
+                pos2,
+                pos3,
+                pos3 + new float3(GlobalConstants.SnapDistance - 1, 0, 0),
+                pos4,
+                pos5
+            }
+        );
+        BuildManagerTestHelper.CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
 
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        int exitingRoadStartNode = 90 + (int)(GlobalConstants.SnapDistance + 1);
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, exitingRoadStartNode, 120, 150 });
+        float3 exitingRoadStartNode = pos3 + new float3(GlobalConstants.SnapDistance + 1, 0, 0);
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, exitingRoadStartNode, pos4, pos5 });
         BuildManager.LaneCount = 1;
         for (int i = 0; i < 6; i++)
         {
@@ -99,7 +114,6 @@ public class BuildManagerTest
         }
 
         Road roadA = FindRoadWithStartNode(30);
-        Road roadB = FindRoadWithStartNode(exitingRoadStartNode);
         Intersection intersection = roadA.EndIx;
         Assert.AreEqual(1, intersection.Roads.Count);
     }
@@ -108,7 +122,7 @@ public class BuildManagerTest
     // [Test]
     public void BuildingOnEndCreatesConnection_TwoLanes()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 6; i++)
         {
@@ -125,8 +139,8 @@ public class BuildManagerTest
         HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
         HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
 
-        Assert.True(expectedLanes0.SetEquals(intersection.NodeWithLane[lane11.End]));
-        Assert.True(expectedLanes1.SetEquals(intersection.NodeWithLane[lane12.End]));
+        Assert.True(expectedLanes0.SetEquals(intersection.NodeWithLane[lane11.EndNode]));
+        Assert.True(expectedLanes1.SetEquals(intersection.NodeWithLane[lane12.EndNode]));
 
     }
 
@@ -134,7 +148,7 @@ public class BuildManagerTest
     public void BuildingOnStartCreatesConnection_TwoLanes()
     {
         BuildManager.Client = new MockClient(
-            new List<int>() { 90, 120, 150, 30, 60, 90 });
+            new List<float3>() { pos3, pos4, pos5, pos1, pos2, pos3 });
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 6; i++)
         {
@@ -151,8 +165,8 @@ public class BuildManagerTest
         HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
         HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
 
-        Assert.AreEqual(expectedLanes0, intersection.NodeWithLane[lane11.End]);
-        Assert.AreEqual(expectedLanes1, intersection.NodeWithLane[lane12.End]);
+        Assert.AreEqual(expectedLanes0, intersection.NodeWithLane[lane11.EndNode]);
+        Assert.AreEqual(expectedLanes1, intersection.NodeWithLane[lane12.EndNode]);
 
     }
 
@@ -170,20 +184,12 @@ public class BuildManagerTest
 
     private class MockClient : IBuildManagerBoundary
     {
-        readonly List<int> MockID;
+        readonly List<float3> MockPos;
         int count = 0;
 
-        public MockClient(List<int> mockPos)
+        public MockClient(List<float3> mockCoord)
         {
-            MockID = mockPos;
-        }
-
-        public MockClient(List<float2> mockCoord)
-        {
-            List<int> m = new();
-            foreach (float2 coord in mockCoord)
-                m.Add((int)(Grid.Height * coord.y + coord.x));
-            MockID = m;
+            MockPos = mockCoord;
         }
 
         public void EvaluateIntersection(Intersection intersection)
@@ -193,7 +199,7 @@ public class BuildManagerTest
 
         public float3 GetPos()
         {
-            return Grid.GetPosByID(MockID[count++]);
+            return MockPos[count++];
         }
 
         public void InstantiateRoad(Road road)

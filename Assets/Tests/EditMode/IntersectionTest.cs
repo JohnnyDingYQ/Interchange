@@ -9,25 +9,25 @@ public class IntersectionTest
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        lane11 = new() { Start = 0, End = 1, Road = road1 };
-        lane12 = new() { Start = 2, End = 3, Road = road1 };
+        lane11 = new() { StartNode = 0, EndNode = 1, Road = road1 };
+        lane12 = new() { StartNode = 2, EndNode = 3, Road = road1 };
 
         road1.Lanes = new() { lane11, lane12 };
 
-        lane21 = new() { Start = 1, End = 4, Road = road2 };
-        lane22 = new() { Start = 3, End = 11, Road = road2 };
+        lane21 = new() { StartNode = 1, EndNode = 4, Road = road2 };
+        lane22 = new() { StartNode = 3, EndNode = 11, Road = road2 };
 
         road2.Lanes = new() { lane21, lane22 };
 
-        lane31 = new() { Start = 1, End = 10, Road = road3 };
+        lane31 = new() { StartNode = 1, EndNode = 10, Road = road3 };
         road3.Lanes = new() { lane31 };
 
-        lane41 = new() { Start = 3, End = 15, Road = road4 };
+        lane41 = new() { StartNode = 3, EndNode = 15, Road = road4 };
         road4.Lanes = new() { lane41 };
 
-        lane51 = new() { Start = 0, End = 1, Road = road5 };
-        lane52 = new() { Start = 0, End = 3, Road = road5 };
-        lane53 = new() { Start = 0, End = 5, Road = road5 };
+        lane51 = new() { StartNode = 0, EndNode = 1, Road = road5 };
+        lane52 = new() { StartNode = 0, EndNode = 3, Road = road5 };
+        lane53 = new() { StartNode = 0, EndNode = 5, Road = road5 };
         road5.Lanes = new() { lane51, lane52, lane53 };
     }
 
@@ -47,6 +47,7 @@ public class IntersectionTest
         List<int> nodes = intersection.GetNodes();
         nodes.Sort();
         Assert.AreEqual(new List<int>() { 1 }, nodes);
+        Assert.AreEqual(lane11.EndNode, lane21.StartNode);
 
         void CreateIntersection()
         {
@@ -70,6 +71,8 @@ public class IntersectionTest
         List<int> nodes = intersection.GetNodes();
         nodes.Sort();
         Assert.AreEqual(new List<int>() { 1, 3 }, nodes);
+        Assert.AreEqual(lane11.EndNode, lane21.StartNode);
+        Assert.AreEqual(lane12.EndNode, lane22.StartNode);
 
         void CreateIntersection()
         {
@@ -97,6 +100,8 @@ public class IntersectionTest
         Assert.AreEqual(new List<int>() { 1, 3 }, nodes);
         Assert.AreSame(road3, intersection.GetMinorRoadofNode(1));
         Assert.AreSame(road4, intersection.GetMinorRoadofNode(3));
+        Assert.AreEqual(lane11.EndNode, lane31.StartNode);
+        Assert.AreEqual(lane12.EndNode, lane41.StartNode);
 
         void CreateIntersection()
         {

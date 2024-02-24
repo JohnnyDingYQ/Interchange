@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Security.Permissions;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -16,14 +15,14 @@ public class RoadTest
         road = new();
         lane1 = new()
         {
-            Start = 0,
-            End = 1
+            StartNode = 0,
+            EndNode = 1
         };
 
         lane2 = new()
         {
-            Start = 2,
-            End = 3,
+            StartNode = 2,
+            EndNode = 3,
         };
     }
 

@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Unity.Mathematics;
 
 public static class BuildManagerTestHelper
 {
-    public static void CheckTwoOneLaneRoadsConnection(int enteringRoadStartNode, int exitingRoadStartNode)
+    public static void CheckTwoOneLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
     {
         BuildManager.LaneCount = 1;
         for (int i = 0; i < 6; i++)
@@ -12,8 +13,8 @@ public static class BuildManagerTestHelper
             BuildManager.HandleBuildCommand();
         }
 
-        Road roadA = FindRoadWithStartNode(enteringRoadStartNode);
-        Road roadB = FindRoadWithStartNode(exitingRoadStartNode);
+        Road roadA = FindRoadWithStartPos(enteringRoadStartPos);
+        Road roadB = FindRoadWithStartPos(exitingRoadStartPos);
         Intersection intersection = roadA.EndIx;
         HashSet<Lane> expectedLanes = new() { roadA.Lanes.First(), roadB.Lanes.First() };
 
@@ -26,11 +27,11 @@ public static class BuildManagerTestHelper
         Assert.True(intersection.NodeWithLane.Values.First().SetEquals(expectedLanes));
     }
 
-    static Road FindRoadWithStartNode(int start)
+    static Road FindRoadWithStartPos(float3 startPos)
     {
         foreach (var (key, value) in BuildManager.RoadWatcher)
         {
-            if (value.StartIx.GetNodes().Contains(start))
+            if (value.StartPos.Equals(startPos))
             {
                 return value;
             }

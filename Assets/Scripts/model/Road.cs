@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -18,9 +19,9 @@ public class Road
     public Spline Spline { get; set; }
 
     public List<Lane> Lanes { get; set; }
-    public int StartNode { get; set; }
-    public int PivotNode { get; set; }
-    public int EndNode { get; set; }
+    public float3 StartPos { get; set; }
+    public float3 PivotPos { get; set; }
+    public float3 EndPos { get; set; }
 
     public int SplineKnotCount { get; set; }
 
@@ -37,7 +38,7 @@ public class Road
         Dictionary<int, HashSet<Lane>> nodeWithLane = new();
         foreach (Lane lane in Lanes)
         {
-            nodeWithLane[lane.Start] = new() { lane };
+            nodeWithLane[lane.StartNode] = new() { lane };
         }
         StartIx = new Intersection()
         {
@@ -53,7 +54,7 @@ public class Road
         Dictionary<int, HashSet<Lane>> nodeWithLane = new();
         foreach (Lane lane in Lanes)
         {
-            nodeWithLane[lane.End] = new() { lane };
+            nodeWithLane[lane.EndNode] = new() { lane };
         }
         EndIx = new Intersection()
         {

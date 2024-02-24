@@ -160,7 +160,7 @@ public class RoadsSplineVisualCheck
             if (!MeshOn)
                 return;
             RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-            roadGameObject.name = $"Road-{BuildManager.NextAvailableId}";
+            roadGameObject.name = $"Road-{road.Id}";
             road.RoadGameObject = roadGameObject;
 
             Mesh mesh = RoadMesh.CreateMesh(road, BuildManager.LaneCount);

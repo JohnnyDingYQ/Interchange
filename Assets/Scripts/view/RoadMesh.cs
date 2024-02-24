@@ -72,7 +72,7 @@ public static class RoadMesh
             Road lesserRoad = lesserLane.Road;
             Spline combinedSpline = new();
             bool reversed = false;
-            if (!(mainLane.End == lesserLane.Start))
+            if (!(mainLane.EndNode == lesserLane.StartNode))
             {
                 (mainLane, lesserLane) = (lesserLane, mainLane);
                 reversed = true;

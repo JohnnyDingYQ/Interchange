@@ -90,11 +90,11 @@ public class Intersection
     {
         foreach (var(key, value) in nodeWithLane)
         {
-            if (key == road.Lanes[0].End)
+            if (key == road.Lanes[0].EndNode)
             {
                 return true;
             }
-            if (key == road.Lanes[0].Start)
+            if (key == road.Lanes[0].StartNode)
             {
                 return false;
             }
