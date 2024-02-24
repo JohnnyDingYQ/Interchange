@@ -30,6 +30,20 @@ public static class BuildManager
             roadWatcher = value;
         }
     }
+    
+    private static SortedDictionary<int, HashSet<Lane>> nodeWithLane;
+    /// <summary>
+    /// Key: node, Value: Lane connected to it
+    /// </summary>
+    public static SortedDictionary<int, HashSet<Lane>> NodeWithLane {
+        get {
+            nodeWithLane ??= new();
+            return nodeWithLane;
+        }
+        set {
+            nodeWithLane = value;
+        }
+    }
     private static List<BuildTarget> startTargets = null;
     private static List<BuildTarget> endTargets = null;
 
@@ -46,6 +60,7 @@ public static class BuildManager
         LaneCount = 1;
         pivotPosAssigned = false;
         RoadWatcher = new();
+        NodeWithLane = new();
         Client = null;
         nextAvailableId = 0;
         nextAvailableNodeID = 0;
@@ -85,8 +100,6 @@ public static class BuildManager
         float3 startPos = startTargets[0].Pos;
         float3 endPos = endTargets[0].Pos;
 
-
-
         float linearLength = Vector3.Distance(startPos, pivotPos) + Vector3.Distance(pivotPos, endPos);
         int knotCount = (int)(linearLength * SplineResolution + 1);
 
@@ -94,32 +107,41 @@ public static class BuildManager
         {
             Utility.Info.Log("Road Manager: Connecting Roads");
             Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount);
-            Road connectedRoad;
-            Intersection intersection = null;
             if (startTargets[0].Node != -1)
             {
-                connectedRoad = startTargets[0].Lane.Road;
-                intersection = connectedRoad.StartIx;
-                intersection.NodeWithLane[road.Lanes[0].StartNode].Add(road.Lanes[0]);
-                road.EndIx = intersection;
-                road.InitiateStartIntersection();
+                NodeWithLane[startTargets[0].Node].Add(road.Lanes[0]);
+                road.Lanes[0].StartNode = startTargets[0].Node;
             }
             else if (endTargets[0].Node != -1)
             {
-                connectedRoad = endTargets[0].Lane.Road;
-                intersection = connectedRoad.EndIx;
-                intersection.NodeWithLane[road.Lanes[0].EndNode].Add(road.Lanes[0]);
-                road.StartIx = intersection;
-                road.InitiateEndIntersection();
+                NodeWithLane[endTargets[0].Node].Add(road.Lanes[0]);
+                road.Lanes[0].EndNode = endTargets[0].Node;
             }
-            intersection.Roads.Add(road);
-            Client.EvaluateIntersection(intersection);
+            AutoAssignNodeNumber(road);
         }
         else
         {
             Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount);
-            road.InitiateStartIntersection();
-            road.InitiateEndIntersection();
+            AutoAssignNodeNumber(road);
+        }
+    }
+
+    static void AutoAssignNodeNumber(Road road)
+    {
+        foreach (Lane lane in road.Lanes)
+        {
+            if (lane.StartNode == -1)
+            {
+                NodeWithLane[nextAvailableNodeID] = new HashSet<Lane>() { lane };
+                lane.StartNode = nextAvailableNodeID++;
+            }
+                
+            if (lane.EndNode == -1)
+            {
+                NodeWithLane[nextAvailableNodeID] = new HashSet<Lane>() { lane };
+                lane.EndNode = nextAvailableNodeID++;
+            }
+                
         }
     }
 
@@ -189,10 +211,10 @@ public static class BuildManager
             {
                 Spline = GetLaneSpline(road.Spline, laneCount, i),
                 Road = road,
-                StartPos = GetLanePosition(spline, 0, laneCount, i),
-                EndPos = GetLanePosition(spline, 1, laneCount, i),
-                StartNode = nextAvailableNodeID++,
-                EndNode = nextAvailableNodeID++,
+                StartPos = InterpolateLanePos(spline, 0, laneCount, i),
+                EndPos = InterpolateLanePos(spline, 1, laneCount, i),
+                StartNode = -1,
+                EndNode = -1,
             });
         }
         return lanes;
@@ -208,13 +230,13 @@ public static class BuildManager
         {
             float t = 1 / (float)segCount * i;
 
-            float3 pos = GetLanePosition(roadSpline, t, laneCount, laneNumber);
+            float3 pos = InterpolateLanePos(roadSpline, t, laneCount, laneNumber);
             laneSpline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
         }
         return laneSpline;
     }
 
-    private static float3 GetLanePosition(Spline spline, float t, int laneCount, int lane)
+    private static float3 InterpolateLanePos(Spline spline, float t, int laneCount, int lane)
     {
         float3 normal = GetNormal(spline, t);
         float3 position = spline.EvaluatePosition(t);

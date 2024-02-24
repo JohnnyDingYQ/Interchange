@@ -6,7 +6,5 @@ public interface IBuildManagerBoundary
 
     float3 GetPos();
 
-    void EvaluateIntersection(Intersection intersection);
-
     void RedrawAllRoads();
 }

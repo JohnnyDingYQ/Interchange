@@ -20,9 +20,6 @@ public class RoadsSplineVisualCheck
     public void OneTimeSetUp()
     {
         MeshOn = false;
-
-        Grid.Height = 100;
-        Grid.Width = 200;
         BuildManager.Reset();
         SceneManager.LoadScene("Build");
     }
@@ -107,7 +104,7 @@ public class RoadsSplineVisualCheck
 
     private class MockClient : MonoBehaviour, IBuildManagerBoundary, IMonoBehaviourTest
     {
-        List<int> MockID;
+        readonly List<float3> MockPos;
         int count = 0;
         bool finished = false;
         public bool IsTestFinished
@@ -134,45 +131,24 @@ public class RoadsSplineVisualCheck
             finished = true;
         }
 
-        public void LoadCoordinates(List<float2> mockCoord)
+        public MockClient(List<float3> mockCoord)
         {
-            List<int> m = new();
-            foreach (float2 coord in mockCoord)
-                m.Add((int)(Grid.Height * coord.y + coord.x));
-            MockID = m;
-            count = 0;
-        }
-
-        public void EvaluateIntersection(Intersection intersection)
-        {
-            if (!MeshOn)
-                return;
-            RoadMesh.EvaluateIntersection(intersection);
+            MockPos = mockCoord;
         }
 
         public float3 GetPos()
         {
-            return Grid.GetPosByID(MockID[count++]);
+            return MockPos[count++];
         }
 
         public void InstantiateRoad(Road road)
         {
-            if (!MeshOn)
-                return;
-            RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-            roadGameObject.name = $"Road-{road.Id}";
-            road.RoadGameObject = roadGameObject;
-
-            Mesh mesh = RoadMesh.CreateMesh(road, BuildManager.LaneCount);
-            roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
-            roadGameObject.OriginalMesh = Instantiate(mesh);
-
-            roadGameObject.Road = road;
+            throw new NotImplementedException();
         }
 
         public void RedrawAllRoads()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
