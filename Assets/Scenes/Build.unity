@@ -235,7 +235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 897ce98926cb2ab4299f7ed35a46cb88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carPreFab: {fileID: -4061830835622979109, guid: 51d4519652a8ba245a79387051e75515, type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

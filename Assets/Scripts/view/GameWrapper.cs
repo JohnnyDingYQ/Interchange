@@ -10,21 +10,8 @@ public class Main : MonoBehaviour
     {
         Utility.Info.logEnabled = true;
 
-        Grid.Height = Height;
-        Grid.Width = Width;
-        Grid.Dim = 1;
-        Grid.Level = 1;
-        Utility.DrawGridBounds();
-
         Application.targetFrameRate = 165;
 
-        Camera.main.transform.position =
-            new Vector3(
-                ((float)Grid.Width) / 2 * Grid.Dim,
-                Camera.main.transform.position.y,
-                ((float)Grid.Height) / 2 * Grid.Dim
-            );
-        
         Game.SaveSystem = new SaveSystem();
 
         if (inputManager != null)
@@ -40,7 +27,7 @@ public class Main : MonoBehaviour
     {
         MouseWorldPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {
-            z = Camera.main.transform.position.y - Grid.Level
+            z = Camera.main.transform.position.y -0
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
     }

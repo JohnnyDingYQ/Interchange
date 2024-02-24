@@ -2,18 +2,20 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
-
+using UnityEngine;
 public class SaveSystemTest
 {
     SaveSystem saveSystem;
+    Vector3 pos1 = new(10, 10, 10);
+    Vector3 pos2 = new(30, 12, 30);
+    Vector3 pos3 = new(60, 14, 60);
+    Vector3 pos4 = new(90, 16, 90);
+    Vector3 pos5 = new(120, 16, 120);
+    Vector3 pos6 = new(150, 16, 150);
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        Grid.Height = 100;
-        Grid.Width = 200;
-        Grid.Dim = 1;
-        Grid.Level = 0;
         saveSystem = new();
     }
 
@@ -21,44 +23,38 @@ public class SaveSystemTest
     public void SetUp()
     {
         BuildManager.Reset();
+        Game.WipeGameState();
     }
 
     [Test]
     public void RecoverSingleOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
         saveSystem.SaveGame();
         BuildManager.Reset();
         saveSystem.LoadGame();
 
-        Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
-        Road road = BuildManager.RoadWatcher.Values.First();
-        Assert.AreEqual(30, road.StartPos);
-        Assert.AreEqual(60, road.PivotPos);
-        Assert.AreEqual(90, road.EndPos);
+        Assert.AreEqual(1, Game.RoadWatcher.Count);
+        Road road = Game.RoadWatcher.Values.First();
+        Assert.AreEqual(pos1, road.StartPos);
+        Assert.AreEqual(pos2, road.PivotPos);
+        Assert.AreEqual(pos3, road.EndPos);
         Assert.AreEqual(1, road.Lanes.Count);
         Lane lane = road.Lanes.First();
-        Assert.AreEqual(30, lane.StartPos);
-        Assert.AreEqual(90, lane.EndPos);
-        Assert.NotNull(road.StartIx);
-        Assert.NotNull(road.EndIx);
-        Intersection startIx = road.StartIx;
-        Intersection endIx = road.EndIx;
-        Assert.AreSame(road, startIx.Roads.First());
-        Assert.AreSame(road, endIx.Roads.First());
-        Assert.IsTrue(startIx.NodeWithLane.ContainsKey(30));
-        Assert.IsTrue(endIx.NodeWithLane.ContainsKey(90));
-        HashSet<Lane> expected = new() {lane};
-        Assert.True(startIx.NodeWithLane[30].SetEquals(expected));
-        Assert.True(endIx.NodeWithLane[90].SetEquals(expected));
+        Assert.AreEqual(pos1, lane.StartPos);
+        Assert.AreEqual(pos3, lane.EndPos);
+        HashSet<Lane> expected = new() { lane };
+        Assert.AreEqual(2, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[0].SetEquals(expected));
+        Assert.True(Game.NodeWithLane[1].SetEquals(expected));
     }
 
     [Test]
     public void RecoverSingleThreeLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
         BuildManager.LaneCount = 3;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
@@ -66,84 +62,83 @@ public class SaveSystemTest
         BuildManager.Reset();
         saveSystem.LoadGame();
 
-        Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
-        Road road = BuildManager.RoadWatcher.Values.First();
-        Assert.AreEqual(30, road.StartPos);
-        Assert.AreEqual(60, road.PivotPos);
-        Assert.AreEqual(90, road.EndPos);
+        Assert.AreEqual(1, Game.RoadWatcher.Count);
+        Road road = Game.RoadWatcher.Values.First();
+        Assert.AreEqual(pos1, road.StartPos);
+        Assert.AreEqual(pos2, road.PivotPos);
+        Assert.AreEqual(pos3, road.EndPos);
         Assert.AreEqual(3, road.Lanes.Count);
         Lane lane = road.Lanes[1];
-        Assert.AreEqual(30, lane.StartPos);
-        Assert.AreEqual(90, lane.EndPos);
-        Assert.NotNull(road.StartIx);
-        Assert.NotNull(road.EndIx);
-        Intersection startIx = road.StartIx;
-        Intersection endIx = road.EndIx;
-        Assert.AreSame(road, startIx.Roads.First());
-        Assert.AreSame(road, endIx.Roads.First());
-        Assert.IsTrue(startIx.NodeWithLane.ContainsKey(30));
-        Assert.IsTrue(endIx.NodeWithLane.ContainsKey(90));
-        Assert.AreEqual(3, startIx.NodeWithLane.Count);
-        Assert.AreEqual(3, endIx.NodeWithLane.Count);
-        HashSet<Lane> expected = new() {lane};
-        Assert.True(startIx.NodeWithLane[30].SetEquals(expected));
-        Assert.True(endIx.NodeWithLane[90].SetEquals(expected));
+        Assert.AreEqual(pos1, lane.StartPos);
+        Assert.AreEqual(pos3, lane.EndPos);
+        Assert.AreEqual(6, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[0].SetEquals(new HashSet<Lane> { road.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[1].SetEquals(new HashSet<Lane> { road.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[2].SetEquals(new HashSet<Lane> { road.Lanes[1] }));
+        Assert.True(Game.NodeWithLane[3].SetEquals(new HashSet<Lane> { road.Lanes[1] }));
+        Assert.True(Game.NodeWithLane[4].SetEquals(new HashSet<Lane> { road.Lanes[2] }));
+        Assert.True(Game.NodeWithLane[5].SetEquals(new HashSet<Lane> { road.Lanes[2] }));
+
     }
 
     [Test]
     public void RecoverTwoDisconnectedOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 120, 150, 180 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos4, pos5, pos6 });
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
         saveSystem.SaveGame();
         BuildManager.Reset();
         saveSystem.LoadGame();
 
-        Assert.AreEqual(2, BuildManager.RoadWatcher.Count);
-        Road road0 = BuildManager.RoadWatcher[0];
-        Assert.AreEqual(30, road0.StartPos);
-        Assert.AreEqual(60, road0.PivotPos);
-        Assert.AreEqual(90, road0.EndPos);
-        Road road1 = BuildManager.RoadWatcher[1];
-        Assert.AreEqual(120, road1.StartPos);
-        Assert.AreEqual(150, road1.PivotPos);
-        Assert.AreEqual(180, road1.EndPos);
+        Assert.AreEqual(2, Game.RoadWatcher.Count);
+        Road road0 = Game.RoadWatcher[0];
+        Assert.AreEqual(pos1, road0.StartPos);
+        Assert.AreEqual(pos2, road0.PivotPos);
+        Assert.AreEqual(pos3, road0.EndPos);
+        Road road1 = Game.RoadWatcher[1];
+        Assert.AreEqual(pos4, road1.StartPos);
+        Assert.AreEqual(pos5, road1.PivotPos);
+        Assert.AreEqual(pos6, road1.EndPos);
+        Assert.AreEqual(4, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[0].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[1].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[2].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[3].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
     }
 
     [Test]
     public void RecoverTwoConnectedOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
         saveSystem.SaveGame();
         BuildManager.Reset();
         saveSystem.LoadGame();
 
-        Assert.AreEqual(2, BuildManager.RoadWatcher.Count);
-        Road road0 = BuildManager.RoadWatcher[0];
-        Assert.AreEqual(30, road0.StartPos);
-        Assert.AreEqual(60, road0.PivotPos);
-        Assert.AreEqual(90, road0.EndPos);
-        Road road1 = BuildManager.RoadWatcher[1];
-        Assert.AreEqual(90, road1.StartPos);
-        Assert.AreEqual(120, road1.PivotPos);
-        Assert.AreEqual(150, road1.EndPos);
-        Intersection ix = road0.EndIx;
-        Assert.AreSame(ix, road1.StartIx);
-        Assert.AreEqual(2, ix.Roads.Count);
-        Assert.AreEqual(1, ix.NodeWithLane.Count);
+        Assert.AreEqual(2, Game.RoadWatcher.Count);
+        Road road0 = Game.RoadWatcher[0];
+        Assert.AreEqual(pos1, road0.StartPos);
+        Assert.AreEqual(pos2, road0.PivotPos);
+        Assert.AreEqual(pos3, road0.EndPos);
+        Road road1 = Game.RoadWatcher[1];
+        Assert.AreEqual(pos3, road1.StartPos);
+        Assert.AreEqual(pos4, road1.PivotPos);
+        Assert.AreEqual(pos5, road1.EndPos);
         Lane lane0 = road0.Lanes[0];
         Lane lane1 = road1.Lanes[0];
-        Assert.True(ix.NodeWithLane[90].SetEquals(new HashSet<Lane>() {lane0, lane1}));
+        Assert.AreEqual(3, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[0].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[1].SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
+        Assert.True(Game.NodeWithLane[2].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
     }
 
     // TODO: Complete further testing
     // [Test]
     public void RecoverConnectedLanes_ThreetoOneTwo()
     {
-        BuildManager.Client = new MockClient(new List<int>() { 30, 60, 90, 90, 120, 150, 90, 130, 160 });
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5, pos3, 130, 160 });
         BuildManager.LaneCount = 3;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
@@ -156,44 +151,26 @@ public class SaveSystemTest
         saveSystem.SaveGame();
         BuildManager.Reset();
         saveSystem.LoadGame();
-        
-        Assert.AreEqual(3, BuildManager.RoadWatcher.Count);
-        Road road0 = BuildManager.RoadWatcher[0];
-        Road road1 = BuildManager.RoadWatcher[1];
-        Road road2 = BuildManager.RoadWatcher[2];
-        Intersection ix = road0.EndIx;
-        Assert.AreSame(ix, road1.StartIx);
-        Assert.AreSame(ix, road2.StartIx);
-        Assert.AreSame(ix.GetMainRoad(), road0);
-        Assert.True(ix.NodeWithLane[90].SetEquals(new HashSet<Lane>() {road0.Lanes[1], road2.Lanes[0]}));
+
+        Assert.AreEqual(3, Game.RoadWatcher.Count);
+        Road road0 = Game.RoadWatcher[0];
+        Road road1 = Game.RoadWatcher[1];
+        Road road2 = Game.RoadWatcher[2];
     }
 
     private class MockClient : IBuildManagerBoundary
     {
-        readonly List<int> MockID;
+        readonly List<float3> MockPos;
         int count = 0;
 
-        public MockClient(List<int> mockPos)
+        public MockClient(List<float3> mockCoord)
         {
-            MockID = mockPos;
-        }
-
-        public MockClient(List<float2> mockCoord)
-        {
-            List<int> m = new();
-            foreach (float2 coord in mockCoord)
-                m.Add((int)(Grid.Height * coord.y + coord.x));
-            MockID = m;
-        }
-
-        public void EvaluateIntersection(Intersection intersection)
-        {
-            return;
+            MockPos = mockCoord;
         }
 
         public float3 GetPos()
         {
-            return Grid.GetPosByID(MockID[count++]);
+            return MockPos[count++];
         }
 
         public void InstantiateRoad(Road road)
@@ -206,4 +183,5 @@ public class SaveSystemTest
             throw new System.NotImplementedException();
         }
     }
+
 }

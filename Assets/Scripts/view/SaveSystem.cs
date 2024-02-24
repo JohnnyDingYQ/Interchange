@@ -13,7 +13,7 @@ public class SaveSystem : ISaveSystemGateway
         if (File.Exists(saveFile))
         {
             string fileContents = File.ReadAllText(saveFile);
-            BuildManager.RoadWatcher = JsonConvert.DeserializeObject<SortedDictionary<int, Road>>(fileContents);
+            Game.GameState = JsonConvert.DeserializeObject<GameState>(fileContents);
         }
         else
         {
@@ -23,7 +23,7 @@ public class SaveSystem : ISaveSystemGateway
 
     public void SaveGame()
     {
-        var s = JsonConvert.SerializeObject(BuildManager.RoadWatcher, Formatting.Indented, new JsonSerializerSettings
+        string s = JsonConvert.SerializeObject(Game.GameState, Formatting.Indented, new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.Objects
         });

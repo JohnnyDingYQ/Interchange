@@ -2,26 +2,26 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using UnityEngine;
 
 public class BuildManagerTest
 {
-    float3 pos1 = new(10, 10, 10);
-    float3 pos2 = new(30, 12, 30);
-    float3 pos3 = new(60, 14, 60);
-    float3 pos4 = new(90, 16, 90);
-    float3 pos5 = new(90, 16, 90);
+    Vector3 pos1 = new(10, 10, 10);
+    Vector3 pos2 = new(30, 12, 30);
+    Vector3 pos3 = new(60, 14, 60);
+    Vector3 pos4 = new(90, 16, 90);
+    Vector3 pos5 = new(90, 16, 90);
     
     [SetUp]
     public void SetUp()
     {
         BuildManager.Reset();
+        Game.WipeGameState();
     }
 
     [Test]
     public void ResetSuccessful()
     {
-        Assert.AreEqual(0, BuildManager.RoadWatcher.Count);
-        Assert.AreEqual(0, BuildManager.NodeWithLane.Count);
         Assert.IsNull(BuildManager.Client);
         Assert.AreEqual(1, BuildManager.LaneCount);
     }
@@ -32,16 +32,16 @@ public class BuildManagerTest
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
-        Road road = BuildManager.RoadWatcher.Values.First();
+        Assert.AreEqual(1, Game.RoadWatcher.Count);
+        Road road = Game.RoadWatcher.Values.First();
         Assert.IsNotNull(road.Spline);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.AreEqual(pos1, road.Lanes[0].StartPos);
         Assert.AreEqual(pos3, road.Lanes[0].EndPos);
-        Assert.True(BuildManager.NodeWithLane.ContainsKey(0));
-        Assert.True(BuildManager.NodeWithLane.ContainsKey(1));
-        Assert.AreSame(road.Lanes[0], BuildManager.NodeWithLane[0].First());
-        Assert.AreSame(road.Lanes[0], BuildManager.NodeWithLane[1].First());
+        Assert.True(Game.NodeWithLane.ContainsKey(0));
+        Assert.True(Game.NodeWithLane.ContainsKey(1));
+        Assert.AreSame(road.Lanes[0], Game.NodeWithLane[0].First());
+        Assert.AreSame(road.Lanes[0], Game.NodeWithLane[1].First());
     }
 
     [Test]
@@ -52,20 +52,20 @@ public class BuildManagerTest
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
 
-        Assert.AreEqual(1, BuildManager.RoadWatcher.Count);
-        Road road = BuildManager.RoadWatcher.Values.First();
+        Assert.AreEqual(1, Game.RoadWatcher.Count);
+        Road road = Game.RoadWatcher.Values.First();
         Assert.IsNotNull(road.Spline);
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(pos1, road.StartPos);
         Assert.AreEqual(pos3, road.EndPos);
-        Assert.True(BuildManager.NodeWithLane.ContainsKey(0));
-        Assert.True(BuildManager.NodeWithLane.ContainsKey(1));
-        Assert.True(BuildManager.NodeWithLane.ContainsKey(2));
-        Assert.True(BuildManager.NodeWithLane.ContainsKey(3));
-        Assert.AreSame(road.Lanes[0], BuildManager.NodeWithLane[0].First());
-        Assert.AreSame(road.Lanes[0], BuildManager.NodeWithLane[1].First());
-        Assert.AreSame(road.Lanes[1], BuildManager.NodeWithLane[2].First());
-        Assert.AreSame(road.Lanes[1], BuildManager.NodeWithLane[3].First());
+        Assert.True(Game.NodeWithLane.ContainsKey(0));
+        Assert.True(Game.NodeWithLane.ContainsKey(1));
+        Assert.True(Game.NodeWithLane.ContainsKey(2));
+        Assert.True(Game.NodeWithLane.ContainsKey(3));
+        Assert.AreSame(road.Lanes[0], Game.NodeWithLane[0].First());
+        Assert.AreSame(road.Lanes[0], Game.NodeWithLane[1].First());
+        Assert.AreSame(road.Lanes[1], Game.NodeWithLane[2].First());
+        Assert.AreSame(road.Lanes[1], Game.NodeWithLane[3].First());
     }
 
     [Test]
@@ -94,7 +94,7 @@ public class BuildManagerTest
                 pos1,
                 pos2,
                 pos3,
-                pos3 + new float3(GlobalConstants.SnapDistance - 1, 0, 0),
+                pos3 + new Vector3(GlobalConstants.SnapDistance - 1, 0, 0),
                 pos4,
                 pos5
             }
@@ -105,7 +105,7 @@ public class BuildManagerTest
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        float3 exitingRoadStartPos = pos3 + new float3(GlobalConstants.SnapDistance + 1, 0, 0);
+        float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.SnapDistance + 1, 0, 0);
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, exitingRoadStartPos, pos4, pos5 });
         BuildManager.LaneCount = 1;
         for (int i = 0; i < 6; i++)
@@ -115,8 +115,8 @@ public class BuildManagerTest
 
         Road enteringRoad = FindRoadWithStartPos(pos1);
         Road exitingRoad = FindRoadWithStartPos(exitingRoadStartPos);
-        Assert.AreEqual(1, BuildManager.NodeWithLane[enteringRoad.Lanes[0].EndNode].Count);
-        Assert.AreEqual(1, BuildManager.NodeWithLane[exitingRoad.Lanes[0].StartNode].Count);
+        Assert.AreEqual(1, Game.NodeWithLane[enteringRoad.Lanes[0].EndNode].Count);
+        Assert.AreEqual(1, Game.NodeWithLane[exitingRoad.Lanes[0].StartNode].Count);
     }
 
     // TODO: Complete Further Testing
@@ -130,8 +130,8 @@ public class BuildManagerTest
             BuildManager.HandleBuildCommand();
         }
 
-        Road road1 = BuildManager.RoadWatcher[0];
-        Road road2 = BuildManager.RoadWatcher[1];
+        Road road1 = Game.RoadWatcher[0];
+        Road road2 = Game.RoadWatcher[1];
         Lane lane11 = road1.Lanes.First();
         Lane lane12 = road1.Lanes.Last();
         Lane lane21 = road2.Lanes.First();
@@ -177,12 +177,12 @@ public class BuildManagerTest
 
         Assert.NotNull(enteringRoad);
         Assert.NotNull(exitingRoad);
-        Assert.True(BuildManager.NodeWithLane[enteringRoad.Lanes[0].EndNode].SetEquals(expectedLanes));
+        Assert.True(Game.NodeWithLane[enteringRoad.Lanes[0].EndNode].SetEquals(expectedLanes));
     }
 
     static Road FindRoadWithStartPos(float3 startPos)
     {
-        foreach (var (key, value) in BuildManager.RoadWatcher)
+        foreach (var (key, value) in Game.RoadWatcher)
         {
             if (value.StartPos.Equals(startPos))
             {

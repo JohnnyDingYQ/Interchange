@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QuikGraph;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -17,33 +18,6 @@ public static class BuildManager
     private static int nextAvailableNodeID;
     public static IBuildManagerBoundary Client;
     private const float SnapDistance = GlobalConstants.SnapDistance;
-    private static SortedDictionary<int, Road> roadWatcher;
-    public static SortedDictionary<int, Road> RoadWatcher
-    {
-        get
-        {
-            roadWatcher ??= new();
-            return roadWatcher;
-        }
-        set
-        {
-            roadWatcher = value;
-        }
-    }
-    
-    private static SortedDictionary<int, HashSet<Lane>> nodeWithLane;
-    /// <summary>
-    /// Key: node, Value: Lane connected to it
-    /// </summary>
-    public static SortedDictionary<int, HashSet<Lane>> NodeWithLane {
-        get {
-            nodeWithLane ??= new();
-            return nodeWithLane;
-        }
-        set {
-            nodeWithLane = value;
-        }
-    }
     private static List<BuildTarget> startTargets = null;
     private static List<BuildTarget> endTargets = null;
 
@@ -59,8 +33,6 @@ public static class BuildManager
     {
         LaneCount = 1;
         pivotPosAssigned = false;
-        RoadWatcher = new();
-        NodeWithLane = new();
         Client = null;
         nextAvailableId = 0;
         nextAvailableNodeID = 0;
@@ -109,12 +81,12 @@ public static class BuildManager
             Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount);
             if (startTargets[0].Node != -1)
             {
-                NodeWithLane[startTargets[0].Node].Add(road.Lanes[0]);
+                Game.NodeWithLane[startTargets[0].Node].Add(road.Lanes[0]);
                 road.Lanes[0].StartNode = startTargets[0].Node;
             }
             else if (endTargets[0].Node != -1)
             {
-                NodeWithLane[endTargets[0].Node].Add(road.Lanes[0]);
+                Game.NodeWithLane[endTargets[0].Node].Add(road.Lanes[0]);
                 road.Lanes[0].EndNode = endTargets[0].Node;
             }
             AutoAssignNodeNumber(road);
@@ -132,13 +104,13 @@ public static class BuildManager
         {
             if (lane.StartNode == -1)
             {
-                NodeWithLane[nextAvailableNodeID] = new HashSet<Lane>() { lane };
+                Game.NodeWithLane[nextAvailableNodeID] = new HashSet<Lane>() { lane };
                 lane.StartNode = nextAvailableNodeID++;
             }
                 
             if (lane.EndNode == -1)
             {
-                NodeWithLane[nextAvailableNodeID] = new HashSet<Lane>() { lane };
+                Game.NodeWithLane[nextAvailableNodeID] = new HashSet<Lane>() { lane };
                 lane.EndNode = nextAvailableNodeID++;
             }
                 
@@ -157,18 +129,19 @@ public static class BuildManager
             EndPos = endPos,
             SplineKnotCount = knotCount
         };
-        RoadWatcher.Add(road.Id, road);
+        Game.RoadWatcher.Add(road.Id, road);
 
         List<Lane> lanes = InitiateLanes(road, LaneCount);
         road.Lanes = lanes;
 
         Client.InstantiateRoad(road);
+        Utility.DrawAllSplines();
         return road;
     }
 
     static void ReloadAllSpline()
     {
-        foreach (Road road in RoadWatcher.Values)
+        foreach (Road road in Game.RoadWatcher.Values)
         {
             road.Spline = BuildSplineQuadraticInterpolation(
                 road.StartPos,
@@ -253,21 +226,20 @@ public static class BuildManager
     {
         List<BuildTarget> BuildTargets = new();
         List<BuildTarget> candidates = new();
-        if (roadWatcher != null)
-            foreach (Road road in roadWatcher.Values)
-                foreach (Lane lane in road.Lanes)
+        foreach (Road road in Game.RoadWatcher.Values)
+            foreach (Lane lane in road.Lanes)
+            {
+                List<int> nodes = new() { lane.StartNode, lane.EndNode };
+                List<float3> pos = new() { lane.StartPos, lane.EndPos };
+                for (int i = 0; i < 2; i++)
                 {
-                    List<int> nodes = new() { lane.StartNode, lane.EndNode };
-                    List<float3> pos = new() { lane.StartPos, lane.EndPos };
-                    for (int i = 0; i < 2; i++)
+                    float distance = Vector3.Distance(clickPos, pos[i]);
+                    if (distance < SnapDistance)
                     {
-                        float distance = Vector3.Distance(clickPos, pos[i]);
-                        if (distance < SnapDistance)
-                        {
-                            candidates.Add(new BuildTarget(lane, nodes[i], distance, pos[i]));
-                        }
+                        candidates.Add(new BuildTarget(lane, nodes[i], distance, pos[i]));
                     }
                 }
+            }
 
         candidates.Sort();
         for (int i = 0; i < count; i++)
@@ -319,6 +291,12 @@ public static class BuildManager
     {
         ReloadAllSpline();
         Client.RedrawAllRoads();
-        nextAvailableId = RoadWatcher.Last().Key + 1;
+    }
+
+    public static void ComplyToNewGameState()
+    {
+        ReloadAllSpline();
+        nextAvailableId = Game.RoadWatcher.Last().Key + 1;
+        nextAvailableNodeID = Game.NodeWithLane.Last().Key + 1;
     }
 }

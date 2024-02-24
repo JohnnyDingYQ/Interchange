@@ -33,10 +33,10 @@ public class RoadsSplineVisualCheck
     [UnityTest, Order(1)]
     public IEnumerator DrawOneLaneRoad()
     {
-        float2 origin = new(0, 10);
-        client.LoadCoordinates(new List<float2>()
+        float3 origin = new(0, 1, 10);
+        client.LoadPosList(new List<float3>()
         {
-            origin, origin + new float2(Offset, 0), origin + new float2(Offset, Offset)
+            origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
         BuildManager.Client = client;
         BuildManager.LaneCount = 1;
@@ -48,10 +48,10 @@ public class RoadsSplineVisualCheck
     [UnityTest, Order(2)]
     public IEnumerator DrawTwoLanesRoad()
     {
-        float2 origin = new(20, 10);
-        client.LoadCoordinates(new List<float2>()
+        float3 origin = new(20, 1, 10);
+        client.LoadPosList(new List<float3>()
         {
-            origin, origin + new float2(Offset, 0), origin + new float2(Offset, Offset)
+            origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
         BuildManager.Client = client;
         BuildManager.LaneCount = 2;
@@ -63,10 +63,10 @@ public class RoadsSplineVisualCheck
     [UnityTest, Order(3)]
     public IEnumerator DrawThreeLanesRoad()
     {
-        float2 origin = new(40, 10);
-        client.LoadCoordinates(new List<float2>()
+        float3 origin = new(40, 1, 10);
+        client.LoadPosList(new List<float3>()
         {
-            origin, origin + new float2(Offset, 0), origin + new float2(Offset, Offset)
+            origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
         BuildManager.Client = client;
         BuildManager.LaneCount = 3;
@@ -78,15 +78,15 @@ public class RoadsSplineVisualCheck
     [UnityTest, Order(4)]
     public IEnumerator DrawOneLaneRepeated()
     {
-        float2 origin = new(0, 20);
-        client.LoadCoordinates(new List<float2>()
+        float3 origin = new(0, 1, 20);
+        client.LoadPosList(new List<float3>()
         {
             origin,
-            origin + new float2(Offset, 0),
-            origin + new float2(Offset, Offset),
-            origin + new float2(Offset, Offset),
-            origin + new float2(Offset, 2*Offset),
-            origin + new float2(0, 2*Offset)
+            origin + new float3(Offset, 0, 0),
+            origin + new float3(Offset, 0, Offset),
+            origin + new float3(Offset, 0, Offset),
+            origin + new float3(Offset, 0, 2*Offset),
+            origin + new float3(0, 0, 2*Offset)
         });
         BuildManager.Client = client;
         BuildManager.LaneCount = 1;
@@ -104,7 +104,7 @@ public class RoadsSplineVisualCheck
 
     private class MockClient : MonoBehaviour, IBuildManagerBoundary, IMonoBehaviourTest
     {
-        readonly List<float3> MockPos;
+        List<float3> MockPos;
         int count = 0;
         bool finished = false;
         public bool IsTestFinished
@@ -129,6 +129,11 @@ public class RoadsSplineVisualCheck
             roadPrefab = road.GetComponent<RoadGameObject>();
             client = this;
             finished = true;
+        }
+
+        public void LoadPosList(List<float3> pos)
+        {
+            MockPos = pos;
         }
 
         public MockClient(List<float3> mockCoord)

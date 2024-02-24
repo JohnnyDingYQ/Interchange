@@ -78,7 +78,7 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
             DestroyImmediate(roads.transform.GetChild(0).gameObject);
         }
 
-        foreach (Road road in BuildManager.RoadWatcher.Values)
+        foreach (Road road in Game.RoadWatcher.Values)
         {
             InstantiateRoad(road);
         }

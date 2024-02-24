@@ -1,11 +1,11 @@
 using UnityEngine.Splines;
 using Unity.Plastic.Newtonsoft.Json;
-using Unity.Mathematics;
+using UnityEngine;
 
 public class Lane
 {
-  public float3 StartPos { get; set; }
-  public float3 EndPos { get; set; }
+  public Vector3 StartPos { get; set; }
+  public Vector3 EndPos { get; set; }
 
   public int StartNode { get; set; }
   public int EndNode { get; set; }
