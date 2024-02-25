@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -119,8 +120,7 @@ public class BuildManagerTest
         Assert.AreEqual(1, Game.NodeWithLane[exitingRoad.Lanes[0].StartNode].Count);
     }
 
-    // TODO: Complete Further Testing
-    // [Test]
+    [Test]
     public void BuildingOnEndCreatesConnection_TwoLanes()
     {
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
@@ -132,16 +132,19 @@ public class BuildManagerTest
 
         Road road1 = Game.RoadWatcher[0];
         Road road2 = Game.RoadWatcher[1];
-        Lane lane11 = road1.Lanes.First();
-        Lane lane12 = road1.Lanes.Last();
-        Lane lane21 = road2.Lanes.First();
-        Lane lane22 = road2.Lanes.Last();
+        Lane lane11 = road1.Lanes[0];
+        Lane lane12 = road1.Lanes[1];
+        Lane lane21 = road2.Lanes[0];
+        Lane lane22 = road2.Lanes[1];
         HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
         HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
-
+        Assert.AreEqual(6, Game.NodeWithLane.Count);
+        Assert.AreEqual(2, Game.NodeWithLane[lane11.EndNode].Count);
+        Assert.True(Game.NodeWithLane[lane11.EndNode].SetEquals(expectedLanes0));
+        Assert.True(Game.NodeWithLane[lane12.EndNode].SetEquals(expectedLanes1));
     }
 
-    // [Test]
+    [Test]
     public void BuildingOnStartCreatesConnection_TwoLanes()
     {
         BuildManager.Client = new MockClient(
@@ -160,7 +163,64 @@ public class BuildManagerTest
         Lane lane22 = road2.Lanes.Last();
         HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
         HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
+        Assert.AreEqual(6, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[lane11.EndNode].SetEquals(expectedLanes0));
+        Assert.True(Game.NodeWithLane[lane12.EndNode].SetEquals(expectedLanes1));
+    }
 
+    [Test]
+    public void BuildingOnEndCreatesConnection_ThreeLanes()
+    {
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
+        BuildManager.LaneCount = 3;
+        for (int i = 0; i < 6; i++)
+        {
+            BuildManager.HandleBuildCommand();
+        }
+
+        Road road1 = Game.RoadWatcher[0];
+        Road road2 = Game.RoadWatcher[1];
+        Lane lane11 = road1.Lanes[0];
+        Lane lane12 = road1.Lanes[1];
+        Lane lane13 = road1.Lanes[2];
+        Lane lane21 = road2.Lanes[0];
+        Lane lane22 = road2.Lanes[1];
+        Lane lane23 = road2.Lanes[2];
+        HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
+        HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
+        HashSet<Lane> expectedLanes2 = new() { lane13, lane23 };
+        Assert.AreEqual(9, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[lane11.EndNode].SetEquals(expectedLanes0));
+        Assert.True(Game.NodeWithLane[lane12.EndNode].SetEquals(expectedLanes1));
+        Assert.True(Game.NodeWithLane[lane13.EndNode].SetEquals(expectedLanes2));
+    }
+
+    [Test]
+    public void BuildingOnStartCreatesConnection_ThreeLanes()
+    {
+        BuildManager.Client = new MockClient(
+            new List<float3>() { pos3, pos4, pos5, pos1, pos2, pos3 });
+        BuildManager.LaneCount = 3;
+        for (int i = 0; i < 6; i++)
+        {
+            BuildManager.HandleBuildCommand();
+        }
+
+        Road road1 = FindRoadWithStartPos(pos1);
+        Road road2 = FindRoadWithStartPos(pos3);
+        Lane lane11 = road1.Lanes[0];
+        Lane lane12 = road1.Lanes[1];
+        Lane lane13 = road1.Lanes[2];
+        Lane lane21 = road2.Lanes[0];
+        Lane lane22 = road2.Lanes[1];
+        Lane lane23 = road2.Lanes[2];
+        HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
+        HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
+        HashSet<Lane> expectedLanes2 = new() { lane13, lane23 };
+        Assert.AreEqual(9, Game.NodeWithLane.Count);
+        Assert.True(Game.NodeWithLane[lane11.EndNode].SetEquals(expectedLanes0));
+        Assert.True(Game.NodeWithLane[lane12.EndNode].SetEquals(expectedLanes1));
+        Assert.True(Game.NodeWithLane[lane13.EndNode].SetEquals(expectedLanes2));
     }
 
     public static void CheckTwoOneLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)

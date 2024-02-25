@@ -71,34 +71,43 @@ public static class BuildManager
 
     static void BuildRoad(List<BuildTarget> startTargets, float3 pivotPos, List<BuildTarget> endTargets)
     {
-        float3 startPos = startTargets != null ? startTargets[0].Pos : startClick;
-        float3 endPos = endTargets != null ? endTargets[0].Pos : endClick;
+        float3 startPos = startTargets != null ? GetMedianPoint(startTargets) : startClick;
+        float3 endPos = endTargets != null ? GetMedianPoint(endTargets) : endClick;
 
         float linearLength = Vector3.Distance(startPos, pivotPos) + Vector3.Distance(pivotPos, endPos);
         int knotCount = (int)(linearLength * SplineResolution + 1);
 
         Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount);
 
-        if (startTargets != null || endTargets != null)
+        if (startTargets != null)
         {
-            Utility.Info.Log("Road Manager: Connecting Roads");
-
-            if (startTargets != null)
+            for (int i = 0; i < startTargets.Count; i++)
             {
-                Game.NodeWithLane[startTargets[0].Node].Add(road.Lanes[0]);
-                road.Lanes[0].StartNode = startTargets[0].Node;
+                Game.NodeWithLane[startTargets[i].Node].Add(road.Lanes[i]);
+                road.Lanes[i].StartNode = startTargets[i].Node;
+                Utility.Info.Log("RoadManager: Connecting Start");
             }
-            else if (endTargets != null)
-            {
-                Game.NodeWithLane[endTargets[0].Node].Add(road.Lanes[0]);
-                road.Lanes[0].EndNode = endTargets[0].Node;
-            }
-
+            
         }
-        AutoAssignNodeNumber(road);
+        else if (endTargets != null)
+        {
+            for (int i = 0; i < endTargets.Count; i++)
+            {
+                Game.NodeWithLane[endTargets[i].Node].Add(road.Lanes[i]);
+                road.Lanes[i].EndNode = endTargets[i].Node;
+                Utility.Info.Log("RoadManager: Connecting End");
+            }
+        }
+
+        AssignUnassignedNodeNumber(road);
+
+        static float3 GetMedianPoint(List<BuildTarget> bts)
+        {
+            return Vector3.Lerp(bts.First().Pos, bts.Last().Pos, 0.5f);
+        }
     }
 
-    static void AutoAssignNodeNumber(Road road)
+    static void AssignUnassignedNodeNumber(Road road)
     {
         foreach (Lane lane in road.Lanes)
         {
@@ -188,6 +197,7 @@ public static class BuildManager
                 EndPos = InterpolateLanePos(spline, 1, laneCount, i),
                 StartNode = -1,
                 EndNode = -1,
+                LaneIndex = i
             });
         }
         return lanes;
@@ -262,7 +272,8 @@ public static class BuildManager
             }
 
         }
-        return candidates;
+        List<BuildTarget> sortedByLaneIndex = candidates.OrderBy(o=>o.Lane.LaneIndex).ToList();
+        return sortedByLaneIndex;
 
     }
 

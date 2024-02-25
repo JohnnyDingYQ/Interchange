@@ -67,7 +67,7 @@ public class RoadsSplineVisualCheck
     [UnityTest, Order(4)]
     public IEnumerator DrawOneLaneRepeated()
     {
-        float3 origin = new(0, 1, 20);
+        float3 origin = new(0, 1, 30);
         client.LoadPosList(new List<float3>()
         {
             origin,
@@ -86,7 +86,7 @@ public class RoadsSplineVisualCheck
     [UnityTest, Order(5)]
     public IEnumerator DrawTwoLaneRepeated()
     {
-        float3 origin = new(20, 1, 20);
+        float3 origin = new(20, 1, 30);
         client.LoadPosList(new List<float3>()
         {
             origin,
