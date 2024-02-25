@@ -4,7 +4,8 @@ public static class Game
 {
     public static ISaveSystemGateway SaveSystem { get; set; }
     private static GameState gameState;
-    public static GameState GameState {
+    public static GameState GameState
+    {
         get
         {
             gameState ??= new();
@@ -16,7 +17,8 @@ public static class Game
         }
     }
 
-    public static SortedDictionary<int, Road> RoadWatcher {
+    public static SortedDictionary<int, Road> RoadWatcher
+    {
         get
         {
             return GameState.RoadWatcher;
@@ -27,7 +29,8 @@ public static class Game
         }
     }
 
-    public static SortedDictionary<int, HashSet<Lane>> NodeWithLane {
+    public static SortedDictionary<int, HashSet<Lane>> NodeWithLane
+    {
         get
         {
             return GameState.NodeWithLane;
@@ -37,6 +40,19 @@ public static class Game
             GameState.NodeWithLane = value;
         }
     }
+
+    public static IEnumerable<Lane> GetLaneIterator()
+    {
+        foreach (Road r in RoadWatcher.Values)
+        {
+            foreach (Lane l in r.Lanes)
+            {
+                yield return l;
+            }
+        }
+
+    }
+
     public static void WipeGameState()
     {
         GameState = new();

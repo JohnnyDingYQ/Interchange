@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Main : MonoBehaviour
+public class GameWrapper : MonoBehaviour
 {
     public static Vector3 MouseWorldPos;
     [SerializeField] private int Height;

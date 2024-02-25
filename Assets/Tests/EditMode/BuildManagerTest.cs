@@ -94,7 +94,7 @@ public class BuildManagerTest
                 pos1,
                 pos2,
                 pos3,
-                pos3 + new Vector3(GlobalConstants.SnapDistance - 1, 0, 0),
+                pos3 + new Vector3(GlobalConstants.SnapTolerance - 1, 0, 0),
                 pos4,
                 pos5
             }
@@ -105,7 +105,7 @@ public class BuildManagerTest
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.SnapDistance + 1, 0, 0);
+        float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.SnapTolerance + GlobalConstants.LaneWidth + 1, 0, 0);
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, exitingRoadStartPos, pos4, pos5 });
         BuildManager.LaneCount = 1;
         for (int i = 0; i < 6; i++)
@@ -173,10 +173,10 @@ public class BuildManagerTest
 
         Road enteringRoad = FindRoadWithStartPos(enteringRoadStartPos);
         Road exitingRoad = FindRoadWithStartPos(exitingRoadStartPos);
-        HashSet<Lane> expectedLanes = new() { enteringRoad.Lanes.First(), exitingRoad.Lanes.First() };
-
         Assert.NotNull(enteringRoad);
         Assert.NotNull(exitingRoad);
+        HashSet<Lane> expectedLanes = new() { enteringRoad.Lanes.First(), exitingRoad.Lanes.First() };
+  
         Assert.True(Game.NodeWithLane[enteringRoad.Lanes[0].EndNode].SetEquals(expectedLanes));
     }
 

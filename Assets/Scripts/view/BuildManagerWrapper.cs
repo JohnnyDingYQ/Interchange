@@ -70,7 +70,7 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
 
     public float3 GetPos()
     {
-        return Main.MouseWorldPos;
+        return GameWrapper.MouseWorldPos;
     }
     public void RedrawAllRoads()
     {

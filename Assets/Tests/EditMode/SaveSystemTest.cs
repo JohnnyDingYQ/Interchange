@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using UnityEngine;
 public class SaveSystemTest
 {
-    SaveSystem saveSystem;
     Vector3 pos1 = new(10, 10, 10);
     Vector3 pos2 = new(30, 12, 30);
     Vector3 pos3 = new(60, 14, 60);
@@ -16,7 +15,7 @@ public class SaveSystemTest
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        saveSystem = new();
+        Game.SaveSystem = new SaveSystem();
     }
 
     [SetUp]
@@ -32,9 +31,9 @@ public class SaveSystemTest
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        saveSystem.SaveGame();
+        Game.SaveGame();
         BuildManager.Reset();
-        saveSystem.LoadGame();
+        Game.LoadGame();
 
         Assert.AreEqual(1, Game.RoadWatcher.Count);
         Road road = Game.RoadWatcher.Values.First();
@@ -58,9 +57,9 @@ public class SaveSystemTest
         BuildManager.LaneCount = 3;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        saveSystem.SaveGame();
+        Game.SaveGame();
         BuildManager.Reset();
-        saveSystem.LoadGame();
+        Game.LoadGame();
 
         Assert.AreEqual(1, Game.RoadWatcher.Count);
         Road road = Game.RoadWatcher.Values.First();
@@ -87,9 +86,9 @@ public class SaveSystemTest
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos4, pos5, pos6 });
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
-        saveSystem.SaveGame();
+        Game.SaveGame();
         BuildManager.Reset();
-        saveSystem.LoadGame();
+        Game.LoadGame();
 
         Assert.AreEqual(2, Game.RoadWatcher.Count);
         Road road0 = Game.RoadWatcher[0];
@@ -113,9 +112,9 @@ public class SaveSystemTest
         BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
-        saveSystem.SaveGame();
+        Game.SaveGame();
         BuildManager.Reset();
-        saveSystem.LoadGame();
+        Game.LoadGame();
 
         Assert.AreEqual(2, Game.RoadWatcher.Count);
         Road road0 = Game.RoadWatcher[0];
@@ -126,12 +125,29 @@ public class SaveSystemTest
         Assert.AreEqual(pos3, road1.StartPos);
         Assert.AreEqual(pos4, road1.PivotPos);
         Assert.AreEqual(pos5, road1.EndPos);
-        Lane lane0 = road0.Lanes[0];
-        Lane lane1 = road1.Lanes[0];
         Assert.AreEqual(3, Game.NodeWithLane.Count);
         Assert.True(Game.NodeWithLane[0].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(Game.NodeWithLane[1].SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
         Assert.True(Game.NodeWithLane[2].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+    }
+
+    [Test]
+    public void RecoverLanesSplines()
+    {
+        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
+        for (int i = 0; i < 6; i++)
+            BuildManager.HandleBuildCommand();
+        Game.SaveGame();
+        BuildManager.Reset();
+        Game.LoadGame();
+
+        foreach (Road road in Game.RoadWatcher.Values)
+        {
+            Assert.True(road.Spline != null);
+            foreach (Lane lane in road.Lanes)
+                Assert.True(lane.Spline != null);
+        }
+            
     }
 
     // TODO: Complete further testing
@@ -148,9 +164,9 @@ public class SaveSystemTest
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
-        saveSystem.SaveGame();
+        Game.SaveGame();
         BuildManager.Reset();
-        saveSystem.LoadGame();
+        Game.LoadGame();
 
         Assert.AreEqual(3, Game.RoadWatcher.Count);
         Road road0 = Game.RoadWatcher[0];

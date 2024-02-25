@@ -9,25 +9,16 @@ using UnityEngine.TestTools;
 
 public class RoadsSplineVisualCheck
 {
-    static GameObject roads;
-    static RoadGameObject roadPrefab;
-    static MockClient client;
+    MockClient client;
 
     private const int Offset = 10;
-    private static bool MeshOn;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        MeshOn = false;
-        BuildManager.Reset();
         SceneManager.LoadScene("Build");
-    }
-
-    [UnityTest, Order(0)]
-    public IEnumerator LoadClient()
-    {
-        return new MonoBehaviourTest<MockClient>();
+        BuildManager.Reset();
+        client = new MockClient();
     }
 
     [UnityTest, Order(1)]
@@ -53,7 +44,6 @@ public class RoadsSplineVisualCheck
         {
             origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
-        BuildManager.Client = client;
         BuildManager.LaneCount = 2;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
@@ -68,7 +58,6 @@ public class RoadsSplineVisualCheck
         {
             origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
-        BuildManager.Client = client;
         BuildManager.LaneCount = 3;
         for (int i = 0; i < 3; i++)
             BuildManager.HandleBuildCommand();
@@ -88,8 +77,26 @@ public class RoadsSplineVisualCheck
             origin + new float3(Offset, 0, 2*Offset),
             origin + new float3(0, 0, 2*Offset)
         });
-        BuildManager.Client = client;
         BuildManager.LaneCount = 1;
+        for (int i = 0; i < 6; i++)
+            BuildManager.HandleBuildCommand();
+        yield return null;
+    }
+
+    [UnityTest, Order(5)]
+    public IEnumerator DrawTwoLaneRepeated()
+    {
+        float3 origin = new(20, 1, 20);
+        client.LoadPosList(new List<float3>()
+        {
+            origin,
+            origin + new float3(Offset, 0, 0),
+            origin + new float3(Offset, 0, Offset),
+            origin + new float3(Offset, 0, Offset),
+            origin + new float3(Offset, 0, 2*Offset),
+            origin + new float3(0, 0, 2*Offset)
+        });
+        BuildManager.LaneCount = 2;
         for (int i = 0; i < 6; i++)
             BuildManager.HandleBuildCommand();
         yield return null;
@@ -102,43 +109,15 @@ public class RoadsSplineVisualCheck
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
     }
 
-    private class MockClient : MonoBehaviour, IBuildManagerBoundary, IMonoBehaviourTest
+    private class MockClient : IBuildManagerBoundary
     {
         List<float3> MockPos;
         int count = 0;
-        bool finished = false;
-        public bool IsTestFinished
-        {
-            get { return finished; }
-        }
-
-        void Start()
-        {
-            roads = GameObject.Find("Roads");
-            string path = System.IO.Path.Combine(Application.streamingAssetsPath, "AssetBundles");
-            path = System.IO.Path.Combine(path, "assetbundle");
-            AssetBundle assetBundle = AssetBundle.LoadFromFile(path);
-            if (assetBundle == null)
-            {
-                Debug.Log("Failed to load AssetBundle!");
-                return;
-            }
-            var road = assetBundle.LoadAsset<GameObject>("Road");
-            if (road == null)
-                throw new InvalidOperationException("Road asset not found from assetbundle");
-            roadPrefab = road.GetComponent<RoadGameObject>();
-            client = this;
-            finished = true;
-        }
 
         public void LoadPosList(List<float3> pos)
         {
+            count = 0;
             MockPos = pos;
-        }
-
-        public MockClient(List<float3> mockCoord)
-        {
-            MockPos = mockCoord;
         }
 
         public float3 GetPos()
@@ -148,7 +127,7 @@ public class RoadsSplineVisualCheck
 
         public void InstantiateRoad(Road road)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public void RedrawAllRoads()
