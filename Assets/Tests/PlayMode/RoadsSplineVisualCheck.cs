@@ -105,7 +105,7 @@ public class RoadsSplineVisualCheck
     [UnityTest]
     public IEnumerator Blocker()
     {
-        Utility.DrawAllSplines();
+        Utility.DrawAllRoads(1000);
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
     }
 

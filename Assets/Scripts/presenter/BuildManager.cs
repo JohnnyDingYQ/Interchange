@@ -71,15 +71,28 @@ public static class BuildManager
 
     static void BuildRoad(List<BuildTarget> startTargets, float3 pivotPos, List<BuildTarget> endTargets)
     {
-        float3 startPos = startTargets != null ? GetMedianPoint(startTargets) : startClick;
-        float3 endPos = endTargets != null ? GetMedianPoint(endTargets) : endClick;
+        float3 startPos = SnapSuccessful(startTargets) ? GetMedianPoint(startTargets) : startClick;
+        float3 endPos = SnapSuccessful(endTargets) ? GetMedianPoint(endTargets) : endClick;
 
         float linearLength = Vector3.Distance(startPos, pivotPos) + Vector3.Distance(pivotPos, endPos);
         int knotCount = (int)(linearLength * SplineResolution + 1);
 
-        Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount);
+        AlignPivotPos();
 
-        if (startTargets != null)
+        if (SnapSuccessful(startTargets))
+        {
+            Road other = GetConnectingRoad(startTargets);
+            pivotPos = (float3)Vector3.Project(pivotPos - startPos, other.Spline.EvaluateTangent(1)) + startPos;
+        }
+        if (SnapSuccessful(endTargets))
+        {
+            Road other = GetConnectingRoad(endTargets);
+            pivotPos = (float3)Vector3.Project(pivotPos - endPos, -1 * other.Spline.EvaluateTangent(0)) + endPos;
+        }
+
+        Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount); ;
+
+        if (SnapSuccessful(startTargets))
         {
             for (int i = 0; i < startTargets.Count; i++)
             {
@@ -87,9 +100,9 @@ public static class BuildManager
                 road.Lanes[i].StartNode = startTargets[i].Node;
                 Utility.Info.Log("RoadManager: Connecting Start");
             }
-            
+
         }
-        else if (endTargets != null)
+        if (SnapSuccessful(endTargets))
         {
             for (int i = 0; i < endTargets.Count; i++)
             {
@@ -104,6 +117,30 @@ public static class BuildManager
         static float3 GetMedianPoint(List<BuildTarget> bts)
         {
             return Vector3.Lerp(bts.First().Pos, bts.Last().Pos, 0.5f);
+        }
+
+        static bool SnapSuccessful(List<BuildTarget> bts)
+        {
+            return bts != null;
+        }
+
+        static Road GetConnectingRoad(List<BuildTarget> bts)
+        {
+            return bts.First().Lane.Road;
+        }
+
+        void AlignPivotPos()
+        {
+            if (SnapSuccessful(startTargets))
+            {
+                Road other = GetConnectingRoad(startTargets);
+                pivotPos = (float3)Vector3.Project(pivotPos - startPos, other.Spline.EvaluateTangent(1)) + startPos;
+            }
+            if (SnapSuccessful(endTargets))
+            {
+                Road other = GetConnectingRoad(endTargets);
+                pivotPos = (float3)Vector3.Project(pivotPos - endPos, -1 * other.Spline.EvaluateTangent(0)) + endPos;
+            }
         }
     }
 
@@ -144,7 +181,6 @@ public static class BuildManager
         road.Lanes = lanes;
 
         Client.InstantiateRoad(road);
-        Utility.DrawAllSplines();
         return road;
     }
 
@@ -272,7 +308,7 @@ public static class BuildManager
             }
 
         }
-        List<BuildTarget> sortedByLaneIndex = candidates.OrderBy(o=>o.Lane.LaneIndex).ToList();
+        List<BuildTarget> sortedByLaneIndex = candidates.OrderBy(o => o.Lane.LaneIndex).ToList();
         return sortedByLaneIndex;
 
     }

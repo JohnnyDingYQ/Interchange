@@ -19,7 +19,7 @@ public class GameWrapper : MonoBehaviour
             inputManager.SaveGame += SaveGame;
             inputManager.LoadGame += LoadGame;
         }
-
+        InvokeRepeating("Draw", 0f, 0.5f);
     }
 
     // Update is called once per frame
@@ -30,6 +30,11 @@ public class GameWrapper : MonoBehaviour
             z = Camera.main.transform.position.y -0
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
+    }
+
+    void Draw()
+    {
+        Utility.DrawAllRoads(0.5f);
     }
 
     void OnDestroy()

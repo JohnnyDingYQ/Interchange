@@ -123,7 +123,8 @@ public class SaveSystemTest
         Assert.AreEqual(pos3, road0.EndPos);
         Road road1 = Game.RoadWatcher[1];
         Assert.AreEqual(pos3, road1.StartPos);
-        Assert.AreEqual(pos4, road1.PivotPos);
+        // Assert.AreEqual(pos4, road1.PivotPos);
+        Assert.True(Vector3.Distance(pos4, road1.PivotPos) < 0.01f);
         Assert.AreEqual(pos5, road1.EndPos);
         Assert.AreEqual(3, Game.NodeWithLane.Count);
         Assert.True(Game.NodeWithLane[0].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
