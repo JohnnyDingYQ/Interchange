@@ -270,7 +270,7 @@ public static class BuildManager
 
     static List<BuildTarget> GetBuildTarget(float3 clickPos, int laneCount)
     {
-        float snapRadius = laneCount * LaneWidth + SnapTolerance;
+        float snapRadius = laneCount / 2 * LaneWidth + SnapTolerance;
         List<BuildTarget> candidates = new();
         foreach (Lane lane in Game.GetLaneIterator())
         {

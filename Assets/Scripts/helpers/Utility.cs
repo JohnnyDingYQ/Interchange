@@ -43,4 +43,27 @@ public static class Utility
             }
         }
     }
+
+    public static Road FindRoadWithStartPos(float3 startPos)
+    {
+        foreach (Road road in Game.RoadWatcher.Values)
+        {
+            if (road.StartPos.Equals(startPos))
+            {
+                return road;
+            }
+        }
+        return null;
+    }
+    public static Road FindRoadWithEndPos(float3 endPos)
+    {
+        foreach (Road road in Game.RoadWatcher.Values)
+        {
+            if (road.EndPos.Equals(endPos))
+            {
+                return road;
+            }
+        }
+        return null;
+    }
 }

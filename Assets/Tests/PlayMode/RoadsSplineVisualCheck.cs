@@ -9,7 +9,7 @@ using UnityEngine.TestTools;
 
 public class RoadsSplineVisualCheck
 {
-    MockClient client;
+    MockBuildClient client;
 
     private const int Offset = 10;
 
@@ -18,14 +18,13 @@ public class RoadsSplineVisualCheck
     {
         SceneManager.LoadScene("Build");
         BuildManager.Reset();
-        client = new MockClient();
     }
 
     [UnityTest, Order(1)]
     public IEnumerator DrawOneLaneRoad()
     {
         float3 origin = new(0, 1, 10);
-        client.LoadPosList(new List<float3>()
+        BuildManager.Client  = new MockBuildClient(new List<float3>()
         {
             origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
@@ -40,7 +39,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawTwoLanesRoad()
     {
         float3 origin = new(20, 1, 10);
-        client.LoadPosList(new List<float3>()
+        BuildManager.Client  = new MockBuildClient(new List<float3>()
         {
             origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
@@ -54,7 +53,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawThreeLanesRoad()
     {
         float3 origin = new(40, 1, 10);
-        client.LoadPosList(new List<float3>()
+        BuildManager.Client  = new MockBuildClient(new List<float3>()
         {
             origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
         });
@@ -68,7 +67,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawOneLaneRepeated()
     {
         float3 origin = new(0, 1, 30);
-        client.LoadPosList(new List<float3>()
+        BuildManager.Client  = new MockBuildClient(new List<float3>()
         {
             origin,
             origin + new float3(Offset, 0, 0),
@@ -87,7 +86,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawTwoLaneRepeated()
     {
         float3 origin = new(20, 1, 30);
-        client.LoadPosList(new List<float3>()
+        BuildManager.Client  = new MockBuildClient(new List<float3>()
         {
             origin,
             origin + new float3(Offset, 0, 0),
@@ -107,32 +106,5 @@ public class RoadsSplineVisualCheck
     {
         Utility.DrawAllRoads(1000);
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-    }
-
-    private class MockClient : IBuildManagerBoundary
-    {
-        List<float3> MockPos;
-        int count = 0;
-
-        public void LoadPosList(List<float3> pos)
-        {
-            count = 0;
-            MockPos = pos;
-        }
-
-        public float3 GetPos()
-        {
-            return MockPos[count++];
-        }
-
-        public void InstantiateRoad(Road road)
-        {
-            return;
-        }
-
-        public void RedrawAllRoads()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
