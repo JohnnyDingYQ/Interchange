@@ -34,7 +34,7 @@ public class BuildTargetTest
     }
 
     [Test]
-    public void RepeatingRoad_OneLaneOnEnd()
+    public void RepeatingOneLaneRoad_OnEnd()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         BuildTargets bt = new(pos3, 1);
@@ -52,7 +52,7 @@ public class BuildTargetTest
     }
 
     [Test]
-    public void RepeatingRoad_TwoLaneOnStart()
+    public void RepeatingTwoLaneRoad_OnStart()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         BuildTargets bt = new(pos1, 2);
@@ -75,12 +75,12 @@ public class BuildTargetTest
     }
 
     [Test]
-    public void MergeAndBranch_TwotoOneOnEnd()
+    public void AttachOneLaneToTwoLane_OnEnd()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Road road = RoadWatcher.Values.First();
         Lane lane  = road.Lanes[0];
-        BuildTargets bt = new(lane.EndPos, 1);
+        BuildTargets bt = new(lane.EndPos + 0.9f * GlobalConstants.SnapTolerance * Vector3.back, 1);
         Assert.AreEqual(1, bt.BuildNodes.Count);
         BuildNode bn = bt.BuildNodes[0];
         
@@ -92,5 +92,36 @@ public class BuildTargetTest
         Assert.AreEqual(lane.EndNode, bn.Node);
         Assert.AreEqual(lane.EndPos, (Vector3) bn.Pos);
         Assert.AreSame(lane, bn.Lane);
+    }
+
+    [Test]
+    public void AttachTwoLaneToThreeLane_OnStart()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        Road road = RoadWatcher.Values.First();
+        Lane lane0  = road.Lanes[0];
+        Lane lane1  = road.Lanes[1];
+        Vector3 midPoint = Vector3.Lerp(lane0.StartPos, lane1.StartPos, 0.5f);
+        BuildTargets bt = new(midPoint + 0.9f * GlobalConstants.SnapTolerance * Vector3.left, 2);
+        Assert.AreEqual(2, bt.BuildNodes.Count);
+        BuildNode bn0 = bt.BuildNodes[0];
+        BuildNode bn1 = bt.BuildNodes[1];
+
+        Assert.AreSame(road, bt.Road);
+        Assert.True(bt.SnapNotNull);
+        Assert.AreEqual(midPoint, (Vector3) bt.MedianPoint);
+        Assert.AreEqual(NodeType.StartNode, bt.NodeType);
+        Assert.AreEqual(lane0.StartNode, bn0.Node);
+        Assert.AreEqual(lane1.StartNode, bn1.Node);
+        Assert.AreEqual(lane0.StartPos, (Vector3) bn0.Pos);
+        Assert.AreEqual(lane1.StartPos, (Vector3) bn1.Pos);
+        Assert.AreSame(lane0, bn0.Lane);
+        Assert.AreSame(lane1, bn1.Lane);
+    }
+
+    [Test]
+    public void AttachTwoLaneToOneLane_OnEnd()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
     }
 }

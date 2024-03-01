@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using CodiceApp;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -47,12 +48,22 @@ public static class Utility
     {
         foreach (Road road in Game.RoadWatcher.Values)
         {
-            DrawCurve(road.Curve, Color.red, duration);
+            if (road.LaneCount % 2 == 0)
+            {
+                DrawCurve(road.Curve, Color.red, duration);
+            }
             int laneCount = road.Lanes.Count;
             foreach (Lane lane in road.Lanes)
             {
                 if ((lane.LaneIndex + 1) * 2 - 1 != laneCount)
+                {
                     DrawSpline(lane.Spline, Color.white, duration);
+                }
+                else
+                {
+                    DrawSpline(lane.Spline, Color.magenta, duration);
+                }
+                    
             }
         }
     }
