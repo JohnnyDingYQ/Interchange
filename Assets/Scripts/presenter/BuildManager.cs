@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuikGraph;
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -82,15 +80,15 @@ public static class BuildManager
         if (SnapSuccessful(startTargets))
         {
             Road other = GetConnectingRoad(startTargets);
-            pivotPos = (float3)Vector3.Project(pivotPos - startPos, other.Spline.EvaluateTangent(1)) + startPos;
+            pivotPos = (float3)Vector3.Project(pivotPos - startPos, CurveUtility.EvaluateTangent( other.Curve, 1)) + startPos;
         }
         if (SnapSuccessful(endTargets))
         {
             Road other = GetConnectingRoad(endTargets);
-            pivotPos = (float3)Vector3.Project(pivotPos - endPos, -1 * other.Spline.EvaluateTangent(0)) + endPos;
+            pivotPos = (float3)Vector3.Project(pivotPos - endPos, -1 * CurveUtility.EvaluateTangent( other.Curve, 0)) + endPos;
         }
 
-        Road road = InitiateRoad(startPos, pivotPos, endPos, knotCount); ;
+        Road road = InitRoad(startPos, pivotPos, endPos, knotCount); ;
 
         if (SnapSuccessful(startTargets))
         {
@@ -134,12 +132,12 @@ public static class BuildManager
             if (SnapSuccessful(startTargets))
             {
                 Road other = GetConnectingRoad(startTargets);
-                pivotPos = (float3)Vector3.Project(pivotPos - startPos, other.Spline.EvaluateTangent(1)) + startPos;
+                pivotPos = (float3) Vector3.Project(pivotPos - startPos, CurveUtility.EvaluateTangent( other.Curve, 1)) + startPos;
             }
             if (SnapSuccessful(endTargets))
             {
                 Road other = GetConnectingRoad(endTargets);
-                pivotPos = (float3)Vector3.Project(pivotPos - endPos, -1 * other.Spline.EvaluateTangent(0)) + endPos;
+                pivotPos = (float3) Vector3.Project(pivotPos - endPos, -1 * CurveUtility.EvaluateTangent( other.Curve, 0)) + endPos;
             }
         }
     }
@@ -163,109 +161,16 @@ public static class BuildManager
         }
     }
 
-    static Road InitiateRoad(float3 startPos, float3 pivotPos, float3 endPos, int knotCount)
+    static Road InitRoad(float3 startPos, float3 pivotPos, float3 endPos, int knotCount)
     {
-        Spline roadSpline = BuildSplineQuadraticInterpolation(startPos, pivotPos, endPos, knotCount);
-        Road road = new()
+        Road road = new(startPos, pivotPos, endPos, LaneCount)
         {
-            Id = nextAvailableId++,
-            Spline = roadSpline,
-            StartPos = startPos,
-            PivotPos = pivotPos,
-            EndPos = endPos,
-            SplineKnotCount = knotCount
+            Id = nextAvailableId++
         };
         Game.RoadWatcher.Add(road.Id, road);
 
-        List<Lane> lanes = InitiateLanes(road, LaneCount);
-        road.Lanes = lanes;
-
         Client.InstantiateRoad(road);
         return road;
-    }
-
-    static void ReloadAllSpline()
-    {
-        foreach (Road road in Game.RoadWatcher.Values)
-        {
-            road.Spline = BuildSplineQuadraticInterpolation(
-                road.StartPos,
-                road.PivotPos,
-                road.EndPos,
-                road.SplineKnotCount
-            );
-
-            int index = 0;
-            int laneCount = road.Lanes.Count;
-            foreach (Lane lane in road.Lanes)
-                lane.Spline = GetLaneSpline(road.Spline, laneCount, index++);
-        }
-    }
-
-    static Spline BuildSplineQuadraticInterpolation(float3 startPos, float3 pivotPos, float3 endPos, int knotCount)
-    {
-        Spline spline = new();
-        Vector3 AB, BC, AB_BC;
-        knotCount -= 1;
-        for (int i = 0; i <= knotCount; i++)
-        {
-            AB = Vector3.Lerp(startPos, pivotPos, 1 / (float)knotCount * i);
-            BC = Vector3.Lerp(pivotPos, endPos, 1 / (float)knotCount * i);
-            AB_BC = Vector3.Lerp(AB, BC, 1 / (float)knotCount * i);
-            spline.Add(new BezierKnot(AB_BC), TangentMode.AutoSmooth);
-        }
-        return spline;
-    }
-
-    static List<Lane> InitiateLanes(Road road, int laneCount)
-    {
-        Spline spline = road.Spline;
-
-        List<Lane> lanes = new();
-
-        for (int i = 0; i < laneCount; i++)
-        {
-            lanes.Add(new()
-            {
-                Spline = GetLaneSpline(road.Spline, laneCount, i),
-                Road = road,
-                StartPos = InterpolateLanePos(spline, 0, laneCount, i),
-                EndPos = InterpolateLanePos(spline, 1, laneCount, i),
-                StartNode = -1,
-                EndNode = -1,
-                LaneIndex = i
-            });
-        }
-        return lanes;
-    }
-
-    public static Spline GetLaneSpline(Spline roadSpline, int laneCount, int laneNumber)
-    {
-        int segCount = roadSpline.Knots.Count() - 1;
-        Spline laneSpline = new();
-
-        // Iterate by distance on curve
-        for (int i = 0; i <= segCount; i++)
-        {
-            float t = 1 / (float)segCount * i;
-
-            float3 pos = InterpolateLanePos(roadSpline, t, laneCount, laneNumber);
-            laneSpline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
-        }
-        return laneSpline;
-    }
-
-    private static float3 InterpolateLanePos(Spline spline, float t, int laneCount, int lane)
-    {
-        float3 normal = GetNormal(spline, t);
-        float3 position = spline.EvaluatePosition(t);
-        return position + normal * LaneWidth * ((float)laneCount / 2 - 0.5f) - lane * normal * LaneWidth;
-    }
-    private static float3 GetNormal(Spline spline, float t)
-    {
-        float3 tangent = spline.EvaluateTangent(t);
-        float3 upVector = spline.EvaluateUpVector(t);
-        return Vector3.Cross(tangent, upVector).normalized;
     }
 
     static List<BuildTarget> GetBuildTarget(float3 clickPos, int laneCount)
@@ -342,6 +247,15 @@ public static class BuildManager
         }
     }
 
+    static void ReloadAllSpline()
+    {
+        foreach (Road road in Game.RoadWatcher.Values)
+        {
+            road.InitCurve();
+            foreach (Lane lane in road.Lanes)
+                lane.InitSpline();
+        }
+    }
     public static void ComplyToNewGameState()
     {
         ReloadAllSpline();

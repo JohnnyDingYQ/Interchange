@@ -19,6 +19,19 @@ public static class Utility
             info = value;
         }
     }
+    public static void DrawCurve(BezierCurve curve, Color color, float duration)
+    {
+        int resolution = 32;
+        float3 pos1;
+        float3 pos2;
+        for (int i = 1; i <= resolution; i++)
+        {
+            pos1 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * (i-1));
+            pos2 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * i);
+            Debug.DrawLine(pos1, pos2, color, duration);
+        }
+    }
+
     public static void DrawSpline(Spline spline, Color color, float duration)
     {
         int count = 1;
@@ -34,7 +47,7 @@ public static class Utility
     {
         foreach (Road road in Game.RoadWatcher.Values)
         {
-            DrawSpline(road.Spline, Color.red, duration);
+            DrawCurve(road.Curve, Color.red, duration);
             int laneCount = road.Lanes.Count;
             foreach (Lane lane in road.Lanes)
             {

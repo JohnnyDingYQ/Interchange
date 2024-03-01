@@ -39,7 +39,7 @@ public class BuildManagerTest
 
         Assert.AreEqual(1, RoadWatcher.Count);
         Road road = RoadWatcher.Values.First();
-        Assert.IsNotNull(road.Spline);
+        Assert.IsNotNull(road.Curve);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.AreEqual(pos1, road.Lanes[0].StartPos);
         Assert.AreEqual(pos3, road.Lanes[0].EndPos);
@@ -56,7 +56,7 @@ public class BuildManagerTest
 
         Assert.AreEqual(1, RoadWatcher.Count);
         Road road = RoadWatcher.Values.First();
-        Assert.IsNotNull(road.Spline);
+        Assert.IsNotNull(road.Curve);
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(pos1, road.StartPos);
         Assert.AreEqual(pos3, road.EndPos);

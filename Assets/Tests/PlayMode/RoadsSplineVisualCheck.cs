@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -24,14 +22,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawOneLaneRoad()
     {
         float3 origin = new(0, 1, 10);
-        BuildManager.Client  = new MockBuildClient(new List<float3>()
-        {
-            origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
-        });
-        BuildManager.Client = client;
-        BuildManager.LaneCount = 1;
-        for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
+        TestBuilder.BuildRoad(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 1);
         yield return null;
     }
 
@@ -39,13 +30,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawTwoLanesRoad()
     {
         float3 origin = new(20, 1, 10);
-        BuildManager.Client  = new MockBuildClient(new List<float3>()
-        {
-            origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
-        });
-        BuildManager.LaneCount = 2;
-        for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
+        TestBuilder.BuildRoad(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 2);
         yield return null;
     }
 
@@ -53,13 +38,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawThreeLanesRoad()
     {
         float3 origin = new(40, 1, 10);
-        BuildManager.Client  = new MockBuildClient(new List<float3>()
-        {
-            origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset)
-        });
-        BuildManager.LaneCount = 3;
-        for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
+        TestBuilder.BuildRoad(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 3);
         yield return null;
     }
 
@@ -67,18 +46,15 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawOneLaneRepeated()
     {
         float3 origin = new(0, 1, 30);
-        BuildManager.Client  = new MockBuildClient(new List<float3>()
-        {
-            origin,
-            origin + new float3(Offset, 0, 0),
+        TestBuilder.BuildRoad(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 1);
+
+        TestBuilder.BuildRoad(
             origin + new float3(Offset, 0, Offset),
-            origin + new float3(Offset, 0, Offset),
-            origin + new float3(Offset, 0, 2*Offset),
-            origin + new float3(0, 0, 2*Offset)
-        });
-        BuildManager.LaneCount = 1;
-        for (int i = 0; i < 6; i++)
-            BuildManager.HandleBuildCommand();
+            origin + new float3(Offset, 0, 2 * Offset),
+            origin + new float3(0, 0, 2 * Offset),
+            1
+        );
+
         yield return null;
     }
 
@@ -86,25 +62,25 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawTwoLaneRepeated()
     {
         float3 origin = new(20, 1, 30);
-        BuildManager.Client  = new MockBuildClient(new List<float3>()
-        {
+
+        TestBuilder.BuildRoad(
             origin,
             origin + new float3(Offset, 0, 0),
+            origin + new float3(Offset, 0, Offset), 2
+        );
+        TestBuilder.BuildRoad(
             origin + new float3(Offset, 0, Offset),
-            origin + new float3(Offset, 0, Offset),
-            origin + new float3(Offset, 0, 2*Offset),
-            origin + new float3(0, 0, 2*Offset)
-        });
-        BuildManager.LaneCount = 2;
-        for (int i = 0; i < 6; i++)
-            BuildManager.HandleBuildCommand();
+            origin + new float3(Offset, 0, 2 * Offset),
+            origin + new float3(0, 0, 2 * Offset),
+            2
+        );
+
         yield return null;
     }
 
     [UnityTest]
     public IEnumerator Blocker()
     {
-        Utility.DrawAllRoads(1000);
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
     }
 }
