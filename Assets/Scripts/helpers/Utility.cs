@@ -57,6 +57,16 @@ public static class Utility
         }
     }
 
+    public static void DrawControlPoints(float duration)
+    {
+        foreach(Road road in Game.RoadWatcher.Values)
+        {
+            DebugExtension.DebugPoint(road.StartPos, Color.magenta, 1, duration);
+            DebugExtension.DebugPoint(road.PivotPos, Color.magenta, 1, duration);
+            DebugExtension.DebugPoint(road.EndPos, Color.magenta, 1, duration);
+        }
+    }
+
     public static Road FindRoadWithStartPos(float3 startPos)
     {
         foreach (Road road in Game.RoadWatcher.Values)

@@ -35,7 +35,7 @@ public class Lane
 
     private Spline GetLaneSpline(int laneNumber)
     {
-        int segCount = 32;
+        int segCount = 10;
         Spline laneSpline = new();
 
         // Iterate by distance on curve

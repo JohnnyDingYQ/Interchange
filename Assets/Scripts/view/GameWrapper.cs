@@ -35,6 +35,7 @@ public class GameWrapper : MonoBehaviour
     void Draw()
     {
         Utility.DrawAllRoads(0.5f);
+        Utility.DrawControlPoints(0.5f);
     }
 
     void OnDestroy()
