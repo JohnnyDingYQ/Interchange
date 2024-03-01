@@ -63,8 +63,8 @@ public static class BuildManager
 
     static void BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
     {
-        List<BuildNode> startNodes = startTarget.BuildPoints;
-        List<BuildNode> endNodes = endTarget.BuildPoints;
+        List<BuildNode> startNodes = startTarget.BuildNodes;
+        List<BuildNode> endNodes = endTarget.BuildNodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
 
@@ -99,12 +99,17 @@ public static class BuildManager
             if (startTarget.SnapNotNull)
             {
                 Road other = startTarget.Road;
-                pivotPos = (float3) Vector3.Project(pivotPos - startPos, CurveUtility.EvaluateTangent( other.Curve, 1)) + startPos;
+                pivotPos = (float3) Vector3.Project(pivotPos - startPos, other.Curve.Tangent1) + startPos;
             }
             if (endTarget.SnapNotNull && endTarget.NodeType == NodeType.StartNode)
             {
                 Road other = endTarget.Road;
-                pivotPos = (float3) Vector3.Project(pivotPos - endPos, -1 * CurveUtility.EvaluateTangent( other.Curve, 0)) + endPos;
+                pivotPos = (float3) Vector3.Project(pivotPos - endPos, other.Curve.Tangent0) + endPos;
+            }
+            else if (endTarget.SnapNotNull && endTarget.NodeType == NodeType.EndNode)
+            {
+                Road other = endTarget.Road;
+                pivotPos = (float3) Vector3.Project(pivotPos - endPos, other.Curve.Tangent1) + endPos;
             }
         }
     }

@@ -35,46 +35,50 @@ public class BuildManagerTest
     [Test]
     public void BuildOneLaneRoad()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
 
         Assert.AreEqual(1, RoadWatcher.Count);
         Road road = RoadWatcher.Values.First();
+        Lane lane = road.Lanes[0];
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(1, road.Lanes.Count);
-        Assert.AreEqual(pos1, road.Lanes[0].StartPos);
-        Assert.AreEqual(pos3, road.Lanes[0].EndPos);
-        Assert.True(NodeWithLane.ContainsKey(0));
-        Assert.True(NodeWithLane.ContainsKey(1));
-        Assert.AreSame(road.Lanes[0], NodeWithLane[0].First());
-        Assert.AreSame(road.Lanes[0], NodeWithLane[1].First());
+        Assert.AreEqual(pos1, lane.StartPos);
+        Assert.AreEqual(pos3, lane.EndPos);
+        Assert.True(NodeWithLane.ContainsKey(lane.StartNode));
+        Assert.True(NodeWithLane.ContainsKey(lane.EndNode));
+        Assert.AreSame(lane, NodeWithLane[lane.StartNode].First());
+        Assert.AreSame(lane, NodeWithLane[lane.StartNode].First());
     }
 
     [Test]
     public void BuildTwoLaneRoad()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
 
         Assert.AreEqual(1, RoadWatcher.Count);
         Road road = RoadWatcher.Values.First();
+        Lane lane0 = road.Lanes[0];
+        Lane lane1 = road.Lanes[1];
+
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(pos1, road.StartPos);
         Assert.AreEqual(pos3, road.EndPos);
-        Assert.True(NodeWithLane.ContainsKey(0));
-        Assert.True(NodeWithLane.ContainsKey(1));
-        Assert.True(NodeWithLane.ContainsKey(2));
-        Assert.True(NodeWithLane.ContainsKey(3));
-        Assert.AreSame(road.Lanes[0], NodeWithLane[0].First());
-        Assert.AreSame(road.Lanes[0], NodeWithLane[1].First());
-        Assert.AreSame(road.Lanes[1], NodeWithLane[2].First());
-        Assert.AreSame(road.Lanes[1], NodeWithLane[3].First());
+        Assert.True(NodeWithLane.ContainsKey(lane0.StartNode));
+        Assert.True(NodeWithLane.ContainsKey(lane0.EndNode));
+        Assert.True(NodeWithLane.ContainsKey(lane1.StartNode));
+        Assert.True(NodeWithLane.ContainsKey(lane1.EndNode));
+        Assert.AreSame(lane0, NodeWithLane[lane0.StartNode].First());
+        Assert.AreSame(lane0, NodeWithLane[lane0.EndNode].First());
+        Assert.AreSame(lane1, NodeWithLane[lane1.StartNode].First());
+        Assert.AreSame(lane1, NodeWithLane[lane1.EndNode].First());
     }
 
     [Test]
     public void ConnectionAtEnd_OneLane()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        TestBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
 
         CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
@@ -82,8 +86,8 @@ public class BuildManagerTest
     [Test]
     public void ConnectionAtStart_OneLane()
     {
-        TestBuilder.BuildRoad(pos3, pos4, pos5, 1);
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
 
         CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
@@ -91,8 +95,8 @@ public class BuildManagerTest
     [Test]
     public void SnapAtEnd_OneLane()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        TestBuilder.BuildRoad(pos3 + Vector3.right * (GlobalConstants.SnapTolerance - 1), pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3 + Vector3.right * (GlobalConstants.SnapTolerance - 1), pos4, pos5, 1);
 
         CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
@@ -101,8 +105,8 @@ public class BuildManagerTest
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
         float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.SnapTolerance + GlobalConstants.LaneWidth + 1, 0, 0);
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        TestBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
 
         Road enteringRoad = Utility.FindRoadWithStartPos(pos1);
         Road exitingRoad = Utility.FindRoadWithStartPos(exitingRoadStartPos);
@@ -113,8 +117,8 @@ public class BuildManagerTest
     [Test]
     public void ConnectionAtEnd_TwoLanes()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
-        TestBuilder.BuildRoad(pos3, pos4, pos5, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 2);
 
         CheckTwoTwoLaneRoadsConnection(pos1, pos3);
     }
@@ -122,8 +126,8 @@ public class BuildManagerTest
     [Test]
     public void ConnectionAtStart_TwoLanes()
     {
-        TestBuilder.BuildRoad(pos3, pos4, pos5, 2);
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
 
         CheckTwoTwoLaneRoadsConnection(pos1, pos3);
     }
@@ -131,8 +135,8 @@ public class BuildManagerTest
     [Test]
     public void ConnectionAtEnd_ThreeLanes()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 3);
-        TestBuilder.BuildRoad(pos3, pos4, pos5, 3);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
 
         CheckTwoThreeLaneRoadsConnection(pos1, pos3);
     }
@@ -140,8 +144,8 @@ public class BuildManagerTest
     [Test]
     public void ConnectionAtStart_ThreeLanes()
     {
-        TestBuilder.BuildRoad(pos3, pos4, pos5, 3);
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
 
         CheckTwoThreeLaneRoadsConnection(pos1, pos3);
     }

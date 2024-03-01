@@ -22,12 +22,12 @@ public class JuncitonTest
     [Test]
     public void TwoToOneOne_OnEnd()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].EndPos;
         Vector3 p2 = road.Lanes[1].EndPos;
-        TestBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
-        TestBuilder.BuildRoad(p2, p2 + Vector3.forward * 30, p2 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p2, p2 + Vector3.forward * 30, p2 + Vector3.forward * 60, 1);
         Road branch1 = Utility.FindRoadWithStartPos(p1);
         Road branch2 = Utility.FindRoadWithStartPos(p2);
 
@@ -43,12 +43,12 @@ public class JuncitonTest
     [Test]
     public void TwoToOneOne_OnStart()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].StartPos;
         Vector3 p2 = road.Lanes[1].StartPos;
-        TestBuilder.BuildRoad(p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
-        TestBuilder.BuildRoad(p2 - Vector3.forward * 60, p2 - Vector3.forward * 30, p2, 1);
+        RoadBuilder.BuildRoad(p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
+        RoadBuilder.BuildRoad(p2 - Vector3.forward * 60, p2 - Vector3.forward * 30, p2, 1);
         Road branch1 = Utility.FindRoadWithEndPos(p1);
         Road branch2 = Utility.FindRoadWithEndPos(p2);
 
@@ -64,10 +64,10 @@ public class JuncitonTest
     [Test]
     public void TwoToOne_OnEnd()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].EndPos;
-        TestBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
         Road branch1 = Utility.FindRoadWithStartPos(p1);
 
         Assert.AreEqual(5, NodeWithLane.Count);
@@ -81,10 +81,10 @@ public class JuncitonTest
     [Test]
     public void TwoToOne_OnStart()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].StartPos;
-        TestBuilder.BuildRoad( p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
+        RoadBuilder.BuildRoad( p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
         Road branch1 = Utility.FindRoadWithEndPos(p1);
 
         Assert.AreEqual(5, NodeWithLane.Count);
@@ -98,12 +98,12 @@ public class JuncitonTest
     [Test]
     public void ThreetoTwoOne_OnEnd()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].EndPos;
         Vector3 p2 = (road.Lanes[1].EndPos + road.Lanes[2].EndPos) / 2;
-        TestBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
-        TestBuilder.BuildRoad(p2, p2 + Vector3.forward * 30, p2 + Vector3.forward * 60, 2);
+        RoadBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p2, p2 + Vector3.forward * 30, p2 + Vector3.forward * 60, 2);
         Road branch1 = Utility.FindRoadWithStartPos(p1);
         Road branch2 = Utility.FindRoadWithStartPos(p2);
 
@@ -122,12 +122,12 @@ public class JuncitonTest
     [Test]
     public void ThreetoTwoOne_OnStart()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].StartPos;
         Vector3 p2 = (road.Lanes[1].StartPos + road.Lanes[2].StartPos) / 2;
-        TestBuilder.BuildRoad(p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
-        TestBuilder.BuildRoad(p2 - Vector3.forward * 60, p2 - Vector3.forward * 30, p2, 2);
+        RoadBuilder.BuildRoad(p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
+        RoadBuilder.BuildRoad(p2 - Vector3.forward * 60, p2 - Vector3.forward * 30, p2, 2);
         Road branch1 = Utility.FindRoadWithEndPos(p1);
         Road branch2 = Utility.FindRoadWithEndPos(p2);
 
@@ -145,14 +145,14 @@ public class JuncitonTest
     [Test]
     public void ThreetoOneOneOne_OnEnd()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].EndPos;
         Vector3 p2 = road.Lanes[1].EndPos;
         Vector3 p3 = road.Lanes[2].EndPos;
-        TestBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
-        TestBuilder.BuildRoad(p2, p2 + Vector3.forward * 30, p2 + Vector3.forward * 60, 1);
-        TestBuilder.BuildRoad(p3, p3 + Vector3.forward * 30, p3 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p2, p2 + Vector3.forward * 30, p2 + Vector3.forward * 60, 1);
+        RoadBuilder.BuildRoad(p3, p3 + Vector3.forward * 30, p3 + Vector3.forward * 60, 1);
         Road branch1 = Utility.FindRoadWithStartPos(p1);
         Road branch2 = Utility.FindRoadWithStartPos(p2);
         Road branch3 = Utility.FindRoadWithStartPos(p3);
@@ -172,14 +172,14 @@ public class JuncitonTest
     [Test]
     public void ThreetoOneOneOne_OnStart()
     {
-        TestBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
         Road road = RoadWatcher.Values.First();
         Vector3 p1 = road.Lanes[0].StartPos;
         Vector3 p2 = road.Lanes[1].StartPos;
         Vector3 p3 = road.Lanes[2].StartPos;
-        TestBuilder.BuildRoad(p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
-        TestBuilder.BuildRoad(p2 - Vector3.forward * 60, p2 - Vector3.forward * 30, p2, 1);
-        TestBuilder.BuildRoad(p3 - Vector3.forward * 60, p3 - Vector3.forward * 30, p3, 1);
+        RoadBuilder.BuildRoad(p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
+        RoadBuilder.BuildRoad(p2 - Vector3.forward * 60, p2 - Vector3.forward * 30, p2, 1);
+        RoadBuilder.BuildRoad(p3 - Vector3.forward * 60, p3 - Vector3.forward * 30, p3, 1);
         Road branch1 = Utility.FindRoadWithEndPos(p1);
         Road branch2 = Utility.FindRoadWithEndPos(p2);
         Road branch3 = Utility.FindRoadWithEndPos(p3);

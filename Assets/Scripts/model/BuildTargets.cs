@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BuildTargets
 {
-    public List<BuildNode> BuildPoints { get; set; }
+    public List<BuildNode> BuildNodes { get; set; }
     public Road Road { get; set; }
     public NodeType NodeType { get; set; }
     public float3 ClickPos { get; set; }
@@ -15,8 +15,8 @@ public class BuildTargets
 
     public BuildTargets(float3 clickPos, int laneCount)
     {
-        BuildPoints = GetBuildTarget(clickPos, laneCount);
-        if (BuildPoints == null)
+        BuildNodes = GetBuildTarget(clickPos, laneCount);
+        if (BuildNodes == null)
         {
             SnapNotNull = false;
             ClickPos = clickPos;
@@ -24,22 +24,11 @@ public class BuildTargets
         else
         {
             SnapNotNull = true;
-            Road = BuildPoints.First().Lane.Road;
-            if (BuildPoints.First().Pos.Equals((float3) BuildPoints.First().Lane.StartPos))
-            {
-                NodeType = NodeType.StartNode;
-            }
-            else if (BuildPoints.First().Pos.Equals((float3) BuildPoints.First().Lane.EndPos))
-            {
-                NodeType = NodeType.EndNode;
-            }
-            else
-            {
-                throw new InvalidOperationException("WRONG");
-            }
-            MedianPoint = Vector3.Lerp(BuildPoints.First().Pos, BuildPoints.Last().Pos, 0.5f);;
+            Road = BuildNodes.First().Lane.Road;
+            NodeType = BuildNodes.First().NodeType;
+            MedianPoint = Vector3.Lerp(BuildNodes.First().Pos, BuildNodes.Last().Pos, 0.5f); ;
         }
-        
+
     }
     List<BuildNode> GetBuildTarget(float3 clickPos, int laneCount)
     {
@@ -49,12 +38,13 @@ public class BuildTargets
         {
             List<int> nodes = new() { lane.StartNode, lane.EndNode };
             List<float3> pos = new() { lane.StartPos, lane.EndPos };
+            List<NodeType> nodeTypes = new() { NodeType.StartNode, NodeType.EndNode };
             for (int i = 0; i < 2; i++)
             {
                 float distance = Vector3.Distance(clickPos, pos[i]);
                 if (distance < snapRadius)
                 {
-                    candidates.Add(new BuildNode(lane, nodes[i], distance, pos[i]));
+                    candidates.Add(new BuildNode(lane, nodes[i], distance, pos[i], nodeTypes[i]));
                 }
             }
         }
@@ -97,13 +87,15 @@ public class BuildNode : IComparable<BuildNode>
     public Lane Lane { get; set; }
     public float Distance { get; set; }
     public float3 Pos { get; set; }
+    public NodeType NodeType { get; set; }
 
-    public BuildNode(Lane lane, int node, float distance, float3 pos)
+    public BuildNode(Lane lane, int node, float distance, float3 pos, NodeType nodeType)
     {
         Lane = lane;
         Node = node;
         Distance = distance;
         Pos = pos;
+        NodeType = nodeType;
     }
 
     public BuildNode(float3 clickPos)

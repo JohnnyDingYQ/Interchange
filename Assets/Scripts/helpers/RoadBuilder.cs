@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 
-public static class TestBuilder
+public static class RoadBuilder
 {
     public static void BuildRoad(float3 start, float3 pivot, float3 end, int LaneCount)
     {
