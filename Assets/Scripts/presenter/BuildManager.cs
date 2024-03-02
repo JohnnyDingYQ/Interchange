@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public static class BuildManager
 {
@@ -35,7 +34,7 @@ public static class BuildManager
         if (!startAssigned)
         {
             startAssigned = true;
-            startTarget = new BuildTargets(clickPos, LaneCount);
+            startTarget = new BuildTargets(clickPos, LaneCount, Side.Start);
         }
         else if (!pivotAssigned)
         {
@@ -44,7 +43,7 @@ public static class BuildManager
         }
         else
         {
-            endTarget = new BuildTargets(clickPos, LaneCount);
+            endTarget = new BuildTargets(clickPos, LaneCount, Side.End);
             BuildRoad(startTarget, pivotClick, endTarget);
             startAssigned = false;
             pivotAssigned = false;
@@ -58,7 +57,7 @@ public static class BuildManager
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-
+        
         AlignPivotPos();
 
         Road road = InitRoad(startPos, pivotPos, endPos);
@@ -85,21 +84,18 @@ public static class BuildManager
 
         void AlignPivotPos()
         {
-            // if (startTarget.SnapNotNull)
-            // {
-            //     Road other = startTarget.Road;
-            //     pivotPos = (float3) Vector3.Project(pivotPos - startPos, other.Curve.Tangent1) + startPos;
-            // }
-            // if (endTarget.SnapNotNull && endTarget.NodeType == NodeType.StartNode)
-            // {
-            //     Road other = endTarget.Road;
-            //     pivotPos = (float3) Vector3.Project(pivotPos - endPos, other.Curve.Tangent0) + endPos;
-            // }
-            // else if (endTarget.SnapNotNull && endTarget.NodeType == NodeType.EndNode)
-            // {
-            //     Road other = endTarget.Road;
-            //     pivotPos = (float3) Vector3.Project(pivotPos - endPos, other.Curve.Tangent1) + endPos;
-            // }
+            float oldY = pivotPos.y;
+            if (startTarget.SnapNotNull)
+            {
+                Node arbitaryNode = startNodes.First();
+                pivotPos = (float3) Vector3.Project(pivotPos - startPos, arbitaryNode.GetTangent()) + startPos;
+            }
+            if (endTarget.SnapNotNull)
+            {
+                Node arbitaryNode = endNodes.First();
+                pivotPos = (float3) Vector3.Project(pivotPos - endPos, arbitaryNode.GetTangent()) + endPos;
+            }
+            pivotPos.y = oldY;
         }
     }
 

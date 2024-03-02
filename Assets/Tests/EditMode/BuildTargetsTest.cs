@@ -7,9 +7,9 @@ using UnityEngine;
 
 public class BuildTargetTest
 {
-    float3 pos1 = new(10, 10, 10);
-    float3 pos2 = new(30, 12, 30);
-    float3 pos3 = new(60, 14, 60);
+    Vector3 pos1 = new(10, 10, 10);
+    Vector3 pos2 = new(30, 12, 30);
+    Vector3 pos3 = new(60, 14, 60);
     SortedDictionary<int, Road> Roads;
 
     [SetUp]
@@ -23,8 +23,8 @@ public class BuildTargetTest
     [Test]
     public void NoSnap()
     {
-        BuildTargets bt1 = new(pos1, 1);
-        BuildTargets bt2 = new(pos1, 2);
+        BuildTargets bt1 = new(pos1, 1, Side.Start);
+        BuildTargets bt2 = new(pos1, 2, Side.Start);
         Assert.False(bt1.SnapNotNull);
         Assert.False(bt2.SnapNotNull);
         Assert.AreEqual(pos1, bt1.ClickPos);
@@ -35,7 +35,7 @@ public class BuildTargetTest
     public void RepeatingOneLaneRoad_OnEnd()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        BuildTargets bt = new(pos3, 1);
+        BuildTargets bt = new(pos3, 1, Side.Start);
         Node node = bt.Nodes[0];
         Road road = Roads.Values.First();
         Lane lane  = road.Lanes[0];
@@ -49,7 +49,7 @@ public class BuildTargetTest
     public void RepeatingTwoLaneRoad_OnStart()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
-        BuildTargets bt = new(pos1, 2);
+        BuildTargets bt = new(pos1, 2, Side.End);
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
         Road road = Roads.Values.First();
@@ -68,13 +68,13 @@ public class BuildTargetTest
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Road road = Roads.Values.First();
         Lane lane  = road.Lanes[0];
-        BuildTargets bt = new(lane.EndPos + 0.9f * GlobalConstants.SnapTolerance * Vector3.back, 1);
+        BuildTargets bt = new(lane.EndPos + 0.9f * GlobalConstants.SnapTolerance * Vector3.back, 1, Side.Start);
         Assert.AreEqual(1, bt.Nodes.Count);
         Node node = bt.Nodes[0];
         
         
         Assert.True(bt.SnapNotNull);
-        Assert.AreEqual(lane.EndPos, (Vector3) bt.MedianPoint);
+        Assert.AreEqual(lane.EndPos, bt.MedianPoint);
         Assert.AreSame(lane.EndNode, node);
     }
 
@@ -86,13 +86,13 @@ public class BuildTargetTest
         Lane lane0  = road.Lanes[0];
         Lane lane1  = road.Lanes[1];
         Vector3 midPoint = Vector3.Lerp(lane0.StartPos, lane1.StartPos, 0.5f);
-        BuildTargets bt = new(midPoint + 0.9f * GlobalConstants.SnapTolerance * Vector3.left, 2);
+        BuildTargets bt = new(midPoint + 0.9f * GlobalConstants.SnapTolerance * Vector3.left, 2, Side.End);
         Assert.AreEqual(2, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
 
         Assert.True(bt.SnapNotNull);
-        Assert.AreEqual(midPoint, (Vector3) bt.MedianPoint);
+        Assert.AreEqual(midPoint, bt.MedianPoint);
         Assert.AreEqual(lane0.StartNode, node0);
         Assert.AreEqual(lane1.StartNode, node1);
     }
@@ -101,5 +101,14 @@ public class BuildTargetTest
     public void AttachTwoLaneToOneLane_OnEnd()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Vector3 buildPoint = pos3 + 0.9f * GlobalConstants.SnapTolerance * Vector3.forward;
+        BuildTargets bt = new(buildPoint, 2, Side.Start);
+        Assert.AreEqual(2, bt.Nodes.Count);
+        Node node0 = bt.Nodes[0];
+        Node node1 = bt.Nodes[1];
+        Lane lane = node1.Lanes.First();
+
+        Assert.AreEqual(lane.InterpolateLanePos(1, -1), (float3 )node0.Pos);
+        Assert.AreEqual(pos3, node1.Pos);
     }
 }

@@ -50,16 +50,18 @@ public class Lane
         {
             float t = 1 / (float)segCount * i;
 
-            float3 pos = CurveUtility.EvaluatePosition(Road.Curve, t) + InterpolateLaneOffset(t, laneNumber);
+            float3 pos = InterpolateLanePos(t, laneNumber);
             laneSpline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
         }
         return laneSpline;
     }
 
-    private float3 InterpolateLaneOffset(float t, int lane)
+    public float3 InterpolateLanePos(float t, int lane)
     {
         float3 normal = GetNormal(t);
-        return  normal * (GlobalConstants.LaneWidth * ((float) Road.LaneCount / 2 - 0.5f) - lane * GlobalConstants.LaneWidth);
+        float3 pos = CurveUtility.EvaluatePosition(Road.Curve, t);
+        float3 offset = normal * (GlobalConstants.LaneWidth * ((float) Road.LaneCount / 2 - 0.5f) - lane * GlobalConstants.LaneWidth);
+        return pos + offset;
     }
     private float3 GetNormal(float t)
     {

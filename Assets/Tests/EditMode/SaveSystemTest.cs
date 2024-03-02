@@ -46,8 +46,8 @@ public class SaveSystemTest
         Assert.AreEqual(pos3, lane.EndPos);
         HashSet<Lane> expected = new() { lane };
         Assert.AreEqual(2, Game.Nodes.Count);
-        // Assert.True(Game.Nodes[0].SetEquals(expected));
-        // Assert.True(Game.Nodes[1].SetEquals(expected));
+        Assert.True(lane.StartNode.Lanes.SetEquals(expected));
+        Assert.True(lane.EndNode.Lanes.SetEquals(expected));
     }
 
     [Test]
@@ -71,12 +71,12 @@ public class SaveSystemTest
         Assert.AreEqual(pos1, lane.StartPos);
         Assert.AreEqual(pos3, lane.EndPos);
         Assert.AreEqual(6, Game.Nodes.Count);
-        // Assert.True(Game.Nodes[0].SetEquals(new HashSet<Lane> { road.Lanes[0] }));
-        // Assert.True(Game.Nodes[1].SetEquals(new HashSet<Lane> { road.Lanes[0] }));
-        // Assert.True(Game.Nodes[2].SetEquals(new HashSet<Lane> { road.Lanes[1] }));
-        // Assert.True(Game.Nodes[3].SetEquals(new HashSet<Lane> { road.Lanes[1] }));
-        // Assert.True(Game.Nodes[4].SetEquals(new HashSet<Lane> { road.Lanes[2] }));
-        // Assert.True(Game.Nodes[5].SetEquals(new HashSet<Lane> { road.Lanes[2] }));
+        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
+        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
+        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[1] }));
+        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[1] }));
+        Assert.True(road.Lanes[2].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[2] }));
+        Assert.True(road.Lanes[2].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[2] }));
 
     }
 
@@ -100,10 +100,10 @@ public class SaveSystemTest
         Assert.AreEqual(pos5, road1.PivotPos);
         Assert.AreEqual(pos6, road1.EndPos);
         Assert.AreEqual(4, Game.Nodes.Count);
-        // Assert.True(Game.Nodes[0].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
-        // Assert.True(Game.Nodes[1].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
-        // Assert.True(Game.Nodes[2].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
-        // Assert.True(Game.Nodes[3].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+        Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
+        Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
+        Assert.True(road1.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+        Assert.True(road1.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
     }
 
     [Test]
@@ -123,12 +123,16 @@ public class SaveSystemTest
         Assert.AreEqual(pos3, road0.EndPos);
         Road road1 = Game.Roads[1];
         Assert.AreEqual(pos3, road1.StartPos);
+        Debug.Log(pos4);
+        Debug.Log(road1.PivotPos);
         Assert.True(Vector3.Distance(pos4, road1.PivotPos) < 0.01f);
+        
         Assert.AreEqual(pos5, road1.EndPos);
         Assert.AreEqual(3, Game.Nodes.Count);
-        // Assert.True(Game.Nodes[0].SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
-        // Assert.True(Game.Nodes[1].SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
-        // Assert.True(Game.Nodes[2].SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+        Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
+        Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
+        Assert.True(road1.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
+        Assert.True(road1.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
     }
 
     [Test]
