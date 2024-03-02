@@ -7,7 +7,6 @@ public class JuncitonTest
     Vector3 pos1 = new(0, 10, 0);
     Vector3 pos2 = new(0, 12, 30);
     Vector3 pos3 = new(0, 14, 60);
-    SortedDictionary<int, HashSet<Lane>> NodeWithLane;
     SortedDictionary<int, Road> RoadWatcher;
 
     [SetUp]
@@ -15,8 +14,7 @@ public class JuncitonTest
     {
         BuildManager.Reset();
         Game.WipeGameState();
-        NodeWithLane = Game.NodeWithLane;
-        RoadWatcher = Game.RoadWatcher;
+        RoadWatcher = Game.Roads;
     }
 
     [Test]
@@ -31,9 +29,8 @@ public class JuncitonTest
         Road branch1 = Utility.FindRoadWithStartPos(p1);
         Road branch2 = Utility.FindRoadWithStartPos(p2);
 
-        Assert.AreEqual(6, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].EndNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].EndNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].StartNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].StartNode));
         Assert.True(IsIsolatedNode(branch1.Lanes[0].EndNode));
@@ -52,9 +49,8 @@ public class JuncitonTest
         Road branch1 = Utility.FindRoadWithEndPos(p1);
         Road branch2 = Utility.FindRoadWithEndPos(p2);
 
-        Assert.AreEqual(6, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].StartNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].StartNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].EndNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].EndNode));
         Assert.True(IsIsolatedNode(branch1.Lanes[0].StartNode));
@@ -70,9 +66,8 @@ public class JuncitonTest
         RoadBuilder.BuildRoad(p1, p1 + Vector3.forward * 30, p1 + Vector3.forward * 60, 1);
         Road branch1 = Utility.FindRoadWithStartPos(p1);
 
-        Assert.AreEqual(5, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].EndNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].EndNode].SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
+        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].StartNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].StartNode));
         Assert.True(IsIsolatedNode(branch1.Lanes[0].EndNode));
@@ -87,9 +82,8 @@ public class JuncitonTest
         RoadBuilder.BuildRoad( p1 - Vector3.forward * 60, p1 - Vector3.forward * 30, p1, 1);
         Road branch1 = Utility.FindRoadWithEndPos(p1);
 
-        Assert.AreEqual(5, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].StartNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].StartNode].SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
+        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].EndNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].EndNode));
         Assert.True(IsIsolatedNode(branch1.Lanes[0].StartNode));
@@ -107,10 +101,9 @@ public class JuncitonTest
         Road branch1 = Utility.FindRoadWithStartPos(p1);
         Road branch2 = Utility.FindRoadWithStartPos(p2);
 
-        Assert.AreEqual(9, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].EndNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].EndNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(NodeWithLane[road.Lanes[2].EndNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[1], road.Lanes[2] }));
+        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.True(road.Lanes[2].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[1], road.Lanes[2] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].StartNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].StartNode));
         Assert.True(IsIsolatedNode(road.Lanes[2].StartNode));
@@ -131,10 +124,9 @@ public class JuncitonTest
         Road branch1 = Utility.FindRoadWithEndPos(p1);
         Road branch2 = Utility.FindRoadWithEndPos(p2);
 
-        Assert.AreEqual(9, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].StartNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].StartNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(NodeWithLane[road.Lanes[2].StartNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[1], road.Lanes[2] }));
+        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.True(road.Lanes[2].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[1], road.Lanes[2] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].EndNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].EndNode));
         Assert.True(IsIsolatedNode(road.Lanes[2].EndNode));
@@ -157,10 +149,9 @@ public class JuncitonTest
         Road branch2 = Utility.FindRoadWithStartPos(p2);
         Road branch3 = Utility.FindRoadWithStartPos(p3);
 
-        Assert.AreEqual(9, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].EndNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].EndNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(NodeWithLane[road.Lanes[2].EndNode].SetEquals(new HashSet<Lane>() { branch3.Lanes[0], road.Lanes[2] }));
+        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.True(road.Lanes[2].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch3.Lanes[0], road.Lanes[2] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].StartNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].StartNode));
         Assert.True(IsIsolatedNode(road.Lanes[2].StartNode));
@@ -184,10 +175,9 @@ public class JuncitonTest
         Road branch2 = Utility.FindRoadWithEndPos(p2);
         Road branch3 = Utility.FindRoadWithEndPos(p3);
 
-        Assert.AreEqual(9, NodeWithLane.Count);
-        Assert.True(NodeWithLane[road.Lanes[0].StartNode].SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(NodeWithLane[road.Lanes[1].StartNode].SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(NodeWithLane[road.Lanes[2].StartNode].SetEquals(new HashSet<Lane>() { branch3.Lanes[0], road.Lanes[2] }));
+        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
+        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.True(road.Lanes[2].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch3.Lanes[0], road.Lanes[2] }));
         Assert.True(IsIsolatedNode(road.Lanes[0].EndNode));
         Assert.True(IsIsolatedNode(road.Lanes[1].EndNode));
         Assert.True(IsIsolatedNode(road.Lanes[2].EndNode));
@@ -198,9 +188,9 @@ public class JuncitonTest
 
     # region Helpers
 
-    public bool IsIsolatedNode(int node)
+    public bool IsIsolatedNode(Node node)
     {
-        return NodeWithLane[node].Count == 1;
+        return node.Lanes.Count == 1;
     }
 
     # endregion

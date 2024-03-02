@@ -5,13 +5,20 @@ using Unity.Mathematics;
 
 public class Lane
 {
-    public Vector3 StartPos { get; set; }
-    public Vector3 EndPos { get; set; }
-    public int StartNode { get; set; }
-    public int EndNode { get; set; }
+    public Node StartNode { get; set; }
+    public Node EndNode { get; set; }
     [JsonIgnore]
     public Spline Spline { get; set; }
-
+    public Vector3 StartPos {
+        get {
+            return StartNode.Pos;
+        }
+    }
+    public Vector3 EndPos {
+        get {
+            return EndNode.Pos;
+        }
+    }
     public Road Road { get; set; }
     public int LaneIndex { get; set; }
 
@@ -21,11 +28,11 @@ public class Lane
     {
         LaneIndex = laneIndex;
         Road = road;
-        StartNode = -1;
-        EndNode = -1;
         InitSpline();
-        StartPos = Spline.EvaluatePosition(0);
-        EndPos = Spline.EvaluatePosition(1);
+        StartNode = new(Spline.EvaluatePosition(0), laneIndex);
+        EndNode = new(Spline.EvaluatePosition(1), laneIndex);
+        StartNode.Lanes.Add(this);
+        EndNode.Lanes.Add(this);
     }
 
     public void InitSpline()

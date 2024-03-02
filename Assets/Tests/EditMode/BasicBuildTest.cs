@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class BuildManagerTest
@@ -13,16 +14,16 @@ public class BuildManagerTest
     Vector3 pos5 = new(120, 16, 120);
     Vector3 pos6 = new(150, 16, 150);
     Vector3 pos7 = new(180, 16, 180);
-    SortedDictionary<int, HashSet<Lane>> NodeWithLane;
-    SortedDictionary<int, Road> RoadWatcher;
+    SortedDictionary<int, Node> Nodes;
+    SortedDictionary<int, Road> Roads;
 
     [SetUp]
     public void SetUp()
     {
         BuildManager.Reset();
         Game.WipeGameState();
-        NodeWithLane = Game.NodeWithLane;
-        RoadWatcher = Game.RoadWatcher;
+        Nodes = Game.Nodes;
+        Roads = Game.Roads;
     }
 
     [Test]
@@ -37,17 +38,17 @@ public class BuildManagerTest
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
 
-        Assert.AreEqual(1, RoadWatcher.Count);
-        Road road = RoadWatcher.Values.First();
+        Assert.AreEqual(1, Roads.Count);
+        Road road = Roads.Values.First();
         Lane lane = road.Lanes[0];
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(1, road.Lanes.Count);
-        Assert.AreEqual(pos1, lane.StartPos);
-        Assert.AreEqual(pos3, lane.EndPos);
-        Assert.True(NodeWithLane.ContainsKey(lane.StartNode));
-        Assert.True(NodeWithLane.ContainsKey(lane.EndNode));
-        Assert.AreSame(lane, NodeWithLane[lane.StartNode].First());
-        Assert.AreSame(lane, NodeWithLane[lane.StartNode].First());
+        Assert.AreEqual(pos1, lane.StartNode.Pos);
+        Assert.AreEqual(pos3, lane.EndNode.Pos);
+        Assert.True(Nodes.ContainsKey(lane.StartNode.Id));
+        Assert.True(Nodes.ContainsKey(lane.EndNode.Id));
+        Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
+        Assert.True(lane.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
     }
 
     [Test]
@@ -55,8 +56,8 @@ public class BuildManagerTest
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
 
-        Assert.AreEqual(1, RoadWatcher.Count);
-        Road road = RoadWatcher.Values.First();
+        Assert.AreEqual(1, Roads.Count);
+        Road road = Roads.Values.First();
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
@@ -64,14 +65,14 @@ public class BuildManagerTest
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(pos1, road.StartPos);
         Assert.AreEqual(pos3, road.EndPos);
-        Assert.True(NodeWithLane.ContainsKey(lane0.StartNode));
-        Assert.True(NodeWithLane.ContainsKey(lane0.EndNode));
-        Assert.True(NodeWithLane.ContainsKey(lane1.StartNode));
-        Assert.True(NodeWithLane.ContainsKey(lane1.EndNode));
-        Assert.AreSame(lane0, NodeWithLane[lane0.StartNode].First());
-        Assert.AreSame(lane0, NodeWithLane[lane0.EndNode].First());
-        Assert.AreSame(lane1, NodeWithLane[lane1.StartNode].First());
-        Assert.AreSame(lane1, NodeWithLane[lane1.EndNode].First());
+        Assert.True(Nodes.ContainsKey(lane0.StartNode.Id));
+        Assert.True(Nodes.ContainsKey(lane0.EndNode.Id));
+        Assert.True(Nodes.ContainsKey(lane1.StartNode.Id));
+        Assert.True(Nodes.ContainsKey(lane1.EndNode.Id));
+        Assert.True(lane0.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane0 }));
+        Assert.True(lane0.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane0 }));
+        Assert.True(lane1.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
+        Assert.True(lane1.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
     }
 
     [Test]
@@ -110,8 +111,8 @@ public class BuildManagerTest
 
         Road enteringRoad = Utility.FindRoadWithStartPos(pos1);
         Road exitingRoad = Utility.FindRoadWithStartPos(exitingRoadStartPos);
-        Assert.AreEqual(1, NodeWithLane[enteringRoad.Lanes[0].EndNode].Count);
-        Assert.AreEqual(1, NodeWithLane[exitingRoad.Lanes[0].StartNode].Count);
+        Assert.AreEqual(1, enteringRoad.Lanes[0].EndNode.Lanes.Count);
+        Assert.AreEqual(1, exitingRoad.Lanes[0].StartNode.Lanes.Count);
     }
 
     [Test]
@@ -168,9 +169,9 @@ public class BuildManagerTest
         Lane lane3 = road3.Lanes[0];
         HashSet<Lane> expectedLanes0 = new() { lane1, lane2 };
         HashSet<Lane> expectedLanes1 = new() { lane2, lane3 };
-        Assert.True(NodeWithLane[lane1.EndNode].SetEquals(expectedLanes0));
-        Assert.True(NodeWithLane[lane2.EndNode].SetEquals(expectedLanes1));
-        Assert.AreEqual(4, NodeWithLane.Count);
+        Assert.True(lane1.EndNode.Lanes.SetEquals(expectedLanes0));
+        Assert.True(lane2.EndNode.Lanes.SetEquals(expectedLanes1));
+        Assert.AreEqual(4, Nodes.Count);
     }
 
     # region Helpers
@@ -182,7 +183,7 @@ public class BuildManagerTest
         Assert.NotNull(exitingRoad);
         HashSet<Lane> expectedLanes = new() { enteringRoad.Lanes.First(), exitingRoad.Lanes.First() };
 
-        Assert.True(NodeWithLane[enteringRoad.Lanes[0].EndNode].SetEquals(expectedLanes));
+        Assert.True(enteringRoad.Lanes[0].EndNode.Lanes.SetEquals(expectedLanes));
     }
 
     public void CheckTwoTwoLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
@@ -195,10 +196,10 @@ public class BuildManagerTest
         Lane lane22 = road2.Lanes[1];
         HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
         HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
-        Assert.AreEqual(6, NodeWithLane.Count);
-        Assert.AreEqual(2, NodeWithLane[lane11.EndNode].Count);
-        Assert.True(NodeWithLane[lane11.EndNode].SetEquals(expectedLanes0));
-        Assert.True(NodeWithLane[lane12.EndNode].SetEquals(expectedLanes1));
+        Assert.AreEqual(6, Nodes.Count);
+        Assert.AreEqual(2, lane11.EndNode.Lanes.Count);
+        Assert.True(lane11.EndNode.Lanes.SetEquals(expectedLanes0));
+        Assert.True(lane12.EndNode.Lanes.SetEquals(expectedLanes1));
     }
 
     public void CheckTwoThreeLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
@@ -214,10 +215,10 @@ public class BuildManagerTest
         HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
         HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
         HashSet<Lane> expectedLanes2 = new() { lane13, lane23 };
-        Assert.AreEqual(9, NodeWithLane.Count);
-        Assert.True(NodeWithLane[lane11.EndNode].SetEquals(expectedLanes0));
-        Assert.True(NodeWithLane[lane12.EndNode].SetEquals(expectedLanes1));
-        Assert.True(NodeWithLane[lane13.EndNode].SetEquals(expectedLanes2));
+        Assert.AreEqual(9, Nodes.Count);
+        Assert.True(lane11.EndNode.Lanes.SetEquals(expectedLanes0));
+        Assert.True(lane12.EndNode.Lanes.SetEquals(expectedLanes1));
+        Assert.True(lane13.EndNode.Lanes.SetEquals(expectedLanes2));
     }
     #endregion
 }

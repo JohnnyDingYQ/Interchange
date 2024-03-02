@@ -2,27 +2,36 @@ using System.Collections.Generic;
 
 public class GameState
 {
-    private SortedDictionary<int, Road> roadWatcher;
-    public SortedDictionary<int, Road> RoadWatcher
+    private SortedDictionary<int, Road> roads;
+    public SortedDictionary<int, Road> Roads
     {
         get
         {
-            roadWatcher ??= new();
-            return roadWatcher;
+            roads ??= new();
+            return roads;
         }
         set
         {
-            roadWatcher = value;
+            roads = value;
         }
     }
-    private SortedDictionary<int, HashSet<Lane>> nodeWithLane;
-    public SortedDictionary<int, HashSet<Lane>> NodeWithLane {
+    private SortedDictionary<int, Node> nodes;
+    public SortedDictionary<int, Node> Nodes {
         get {
-            nodeWithLane ??= new();
-            return nodeWithLane;
+            nodes ??= new();
+            return nodes;
         }
         set {
-            nodeWithLane = value;
+            nodes = value;
         }
+    }
+
+    public int NextAvailableRoadId { get; set; }
+    public int NextAvailableNodeId { get; set; }
+
+    public GameState()
+    {
+        NextAvailableNodeId = 0;
+        NextAvailableRoadId = 0;
     }
 }

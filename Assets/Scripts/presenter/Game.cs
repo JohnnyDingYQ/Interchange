@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Codice.CM.Triggers;
 
 public static class Game
 {
@@ -17,40 +18,49 @@ public static class Game
         }
     }
 
-    public static SortedDictionary<int, Road> RoadWatcher
+    public static SortedDictionary<int, Road> Roads
     {
         get
         {
-            return GameState.RoadWatcher;
+            return GameState.Roads;
         }
         set
         {
-            GameState.RoadWatcher = value;
+            GameState.Roads = value;
         }
     }
 
-    public static SortedDictionary<int, HashSet<Lane>> NodeWithLane
+    public static SortedDictionary<int, Node> Nodes
     {
         get
         {
-            return GameState.NodeWithLane;
+            return GameState.Nodes;
         }
         set
         {
-            GameState.NodeWithLane = value;
+            GameState.Nodes = value;
         }
     }
 
-    public static IEnumerable<Lane> GetLaneIterator()
-    {
-        foreach (Road r in RoadWatcher.Values)
+    public static int NextAvailableNodeId {
+        get
         {
-            foreach (Lane l in r.Lanes)
-            {
-                yield return l;
-            }
+            return GameState.NextAvailableNodeId;
         }
-
+        set
+        {
+            GameState.NextAvailableNodeId = value;
+        }
+    }
+    public static int NextAvailableRoadId {
+        get
+        {
+            return GameState.NextAvailableRoadId;
+        }
+        set
+        {
+            GameState.NextAvailableRoadId = value;
+        }
     }
 
     public static void WipeGameState()
