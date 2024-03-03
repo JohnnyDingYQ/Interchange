@@ -40,6 +40,9 @@ public class Lane
         Spline = GetLaneSpline(LaneIndex);
     }
 
+    /// <summary>
+    /// Requirement: Lane knows it parent road
+    /// </summary>
     private Spline GetLaneSpline(int laneNumber)
     {
         int segCount = 10;
@@ -50,24 +53,10 @@ public class Lane
         {
             float t = 1 / (float)segCount * i;
 
-            float3 pos = InterpolateLanePos(t, laneNumber);
+            float3 pos = Road.InterpolateLanePos(t, laneNumber);
             laneSpline.Add(new BezierKnot(pos), TangentMode.AutoSmooth);
         }
         return laneSpline;
-    }
-
-    public float3 InterpolateLanePos(float t, int lane)
-    {
-        float3 normal = GetNormal(t);
-        float3 pos = CurveUtility.EvaluatePosition(Road.Curve, t);
-        float3 offset = normal * (GlobalConstants.LaneWidth * ((float) Road.LaneCount / 2 - 0.5f) - lane * GlobalConstants.LaneWidth);
-        return pos + offset;
-    }
-    private float3 GetNormal(float t)
-    {
-        float3 tangent = CurveUtility.EvaluateTangent(Road.Curve, t);
-        tangent.y = 0;
-        return Vector3.Cross(tangent, Vector3.up).normalized;
     }
 
     public override string ToString()

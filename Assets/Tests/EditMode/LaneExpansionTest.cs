@@ -30,7 +30,7 @@ public class LaneExpansionTest
         Lane lane11 = road1.Lanes[1];
 
         Assert.AreSame(lane00.EndNode, lane11.StartNode);
-        Assert.AreNotEqual(-1, lane10.StartNode.Id);
+        Assert.True(lane10.StartNode.IsRegistered());
         Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
         Assert.True(lane00.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane11 }));
     }
@@ -50,9 +50,67 @@ public class LaneExpansionTest
 
         Assert.AreSame(lane00.EndNode, lane10.StartNode);
         Assert.AreSame(lane01.EndNode, lane11.StartNode);
-        Assert.AreNotEqual(-1, lane12.StartNode.Id);
+        Assert.True(lane12.StartNode.IsRegistered());
         Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
-        Assert.True(lane00.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane10 }));
-        Assert.True(lane01.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane01, lane11 }));
+        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane10 }));
+        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane01, lane11 }));
+    }
+
+    [Test]
+    public void OneLaneToThreeLane_Mid()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
+        Road road0 = Utility.FindRoadWithStartPos(pos1);
+        Road road1 = Utility.FindRoadWithEndPos(pos5);
+        Lane lane00 = road0.Lanes[0];
+        Lane lane10 = road1.Lanes[0];
+        Lane lane11 = road1.Lanes[1];
+        Lane lane12 = road1.Lanes[2];
+
+        Assert.AreSame(lane00.EndNode, lane11.StartNode);
+        Assert.True(lane10.StartNode.IsRegistered());
+        Assert.True(lane12.StartNode.IsRegistered());
+        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
+        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
+        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
+    }
+
+    [Test]
+    public void OneLaneToThreeLane_Left()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3 + 1.5f * GlobalConstants.SnapTolerance * Vector3.left, pos4, pos5, 3);
+        Road road0 = Utility.FindRoadWithStartPos(pos1);
+        Road road1 = Utility.FindRoadWithEndPos(pos5);
+        Lane lane00 = road0.Lanes[0];
+        Lane lane10 = road1.Lanes[0];
+        Lane lane11 = road1.Lanes[1];
+        Lane lane12 = road1.Lanes[2];
+        Assert.AreSame(lane00.EndNode, lane12.StartNode);
+        Assert.True(lane11.StartNode.IsRegistered());
+        Assert.True(lane10.StartNode.IsRegistered());
+        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
+        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11 }));
+        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12, lane00 }));
+    }
+
+    [Test]
+    public void OneLaneToThreeLane_Right()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3 + 1.5f * GlobalConstants.SnapTolerance * Vector3.right, pos4, pos5, 3);
+        Road road0 = Utility.FindRoadWithStartPos(pos1);
+        Road road1 = Utility.FindRoadWithEndPos(pos5);
+        Lane lane00 = road0.Lanes[0];
+        Lane lane10 = road1.Lanes[0];
+        Lane lane11 = road1.Lanes[1];
+        Lane lane12 = road1.Lanes[2];
+        Assert.AreSame(lane00.EndNode, lane10.StartNode);
+        Assert.True(lane11.StartNode.IsRegistered());
+        Assert.True(lane10.StartNode.IsRegistered());
+        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10, lane00 }));
+        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11 }));
+        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
     }
 }

@@ -26,7 +26,6 @@ public class Node : IComparable<Node>
     /// <summary>
     /// Implicit assumption: all lanes at the node has the same tangnet because of pivot adjustment
     /// </summary>
-    /// <returns></returns>
     public float3 GetTangent()
     {
         if (Lanes.Count == 0)

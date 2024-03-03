@@ -35,6 +35,21 @@ public class Road
         Curve = new BezierCurve(StartPos, PivotPos, EndPos);
     }
 
+    public float3 InterpolateLanePos(float t, int lane)
+    {
+        float3 normal = GetNormal(t);
+        float3 pos = CurveUtility.EvaluatePosition(Curve, t);
+        float3 offset = normal * (GlobalConstants.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * GlobalConstants.LaneWidth);
+        return pos + offset;
+    }
+
+        private float3 GetNormal(float t)
+    {
+        float3 tangent = CurveUtility.EvaluateTangent(Curve, t);
+        tangent.y = 0;
+        return Vector3.Cross(tangent, Vector3.up).normalized;
+    }
+
     private void InitLanes()
     {
 

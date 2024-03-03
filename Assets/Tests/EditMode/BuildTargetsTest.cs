@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class BuildTargetTest
@@ -108,7 +107,7 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
         Lane lane = node1.Lanes.First();
 
-        Assert.AreEqual(lane.InterpolateLanePos(1, -1), (float3)node0.Pos);
+        Assert.AreEqual(lane.Road.InterpolateLanePos(1, -1), (float3)node0.Pos);
         Assert.AreEqual(pos3, node1.Pos);
     }
 
@@ -123,7 +122,7 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
         Lane lane = node0.Lanes.First();
 
-        Assert.AreEqual(lane.InterpolateLanePos(1, 1), (float3)node1.Pos);
+        Assert.AreEqual(lane.Road.InterpolateLanePos(1, 1), (float3)node1.Pos);
         Assert.AreEqual(pos3, node0.Pos);
     }
 
@@ -141,9 +140,9 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.AreEqual(lane0.InterpolateLanePos(1, -1), (float3)node0.Pos);
-        Assert.AreEqual(lane0.EndPos, node1.Pos);
-        Assert.AreEqual(lane1.EndPos, node2.Pos);
+        Assert.AreEqual(road.InterpolateLanePos(1, -1), (float3)node0.Pos);
+        Assert.AreSame(lane0.EndNode, node1);
+        Assert.AreSame(lane1.EndNode, node2);
     }
 
     [Test]
@@ -160,9 +159,59 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.AreEqual(lane0.InterpolateLanePos(1, 2), (float3)node2.Pos);
+        Assert.AreEqual(road.InterpolateLanePos(1, 2), (float3)node2.Pos);
         Assert.AreEqual(lane0.EndPos, node0.Pos);
         Assert.AreEqual(lane1.EndPos, node1.Pos);
-        Assert.AreEqual(node0, lane0.EndNode);
+        Assert.AreSame(node0, lane0.EndNode);
+    }
+
+    [Test]
+    public void LaneExpansionOneLaneToThreeLane_Mid()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        BuildTargets bt = new(pos3, 3, Side.Start);
+        Assert.AreEqual(3, bt.Nodes.Count);
+        Node node0 = bt.Nodes[0];
+        Node node1 = bt.Nodes[1];
+        Node node2 = bt.Nodes[2];
+        Road road = node1.Lanes.First().Road;
+
+        Assert.AreEqual(road.InterpolateLanePos(1, -1), (float3)node0.Pos);
+        Assert.AreSame(road.Lanes[0].EndNode, node1);
+        Assert.AreEqual(road.InterpolateLanePos(1, 1), (float3)node2.Pos);
+    }
+
+    [Test]
+    public void LaneExpansionOneLaneToThreeLane_Left()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Vector3 buildPoint = pos3 + 1.5f * GlobalConstants.SnapTolerance * Vector3.left;
+        BuildTargets bt = new(buildPoint, 3, Side.Start);
+        Assert.AreEqual(3, bt.Nodes.Count);
+        Node node0 = bt.Nodes[0];
+        Node node1 = bt.Nodes[1];
+        Node node2 = bt.Nodes[2];
+        Road road = node2.Lanes.First().Road;
+
+        Assert.AreEqual(road.InterpolateLanePos(1, -2), (float3)node0.Pos);
+        Assert.AreEqual(road.InterpolateLanePos(1, -1), (float3)node1.Pos);
+        Assert.AreSame(road.Lanes[0].EndNode, node2);
+    }
+
+    [Test]
+    public void LaneExpansionOneLaneToThreeLane_Right()
+    {
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Vector3 buildPoint = pos3 + 1.5f * GlobalConstants.SnapTolerance * Vector3.right;
+        BuildTargets bt = new(buildPoint, 3, Side.Start);
+        Assert.AreEqual(3, bt.Nodes.Count);
+        Node node0 = bt.Nodes[0];
+        Node node1 = bt.Nodes[1];
+        Node node2 = bt.Nodes[2];
+        Road road = node0.Lanes.First().Road;
+
+        Assert.AreEqual(road.InterpolateLanePos(1, 1), (float3)node1.Pos);
+        Assert.AreEqual(road.InterpolateLanePos(1, 2), (float3)node2.Pos);
+        Assert.AreSame(road.Lanes[0].EndNode, node0);
     }
 }

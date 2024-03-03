@@ -44,17 +44,10 @@ public class BuildTargets
         {
             return nodes;
         }
-        else if (nodes.Count > 0 && Side == Side.Start)
+        else if (ShouldCheckLaneExpansion())
         {
-            Lane lane = nodes.First().Lanes.First();
-            float3 interpolatedPosLeft = lane.InterpolateLanePos(1, -1);
-            float3 interpolatedPosRight = lane.InterpolateLanePos(1, lane.Road.LaneCount);
-            Node interpolatedNodeLeft = new(interpolatedPosLeft, -1);
-            Node interpolatedNodeRight = new(interpolatedPosRight, lane.Road.LaneCount);
-            candidates = new();
-            AddNodeIfWithinSnap(interpolatedNodeLeft);
-            AddNodeIfWithinSnap(interpolatedNodeRight);
-            candidates.Sort();
+            Road road = nodes.First().Lanes.First().Road;
+            GetInterpolatedCandidates(road, 2);
             if (candidates.Count + nodes.Count < laneCount)
             {
                 return null;
@@ -82,6 +75,24 @@ public class BuildTargets
                 result.Add(candidates[i].Node);
             }
             return result;
+        }
+
+        bool ShouldCheckLaneExpansion()
+        {
+            return nodes.Count > 0 && Side == Side.Start;
+        }
+
+        void GetInterpolatedCandidates(Road road, int interpolationReach)
+        {
+            candidates = new();
+            for (int i = 0; i < interpolationReach; i++)
+            {
+                float3 left = road.InterpolateLanePos(1, -(1 + i));
+                float3 right = road.InterpolateLanePos(1, road.LaneCount + i);
+                AddNodeIfWithinSnap(new(left, -(1 + i)));
+                AddNodeIfWithinSnap(new(right, road.LaneCount + i));
+            }
+            candidates.Sort();
         }
 
         void AddNodeIfWithinSnap(Node n)
