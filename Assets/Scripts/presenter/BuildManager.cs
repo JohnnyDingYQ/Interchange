@@ -66,6 +66,7 @@ public static class BuildManager
         {
             for (int i = 0; i < startNodes.Count; i++)
             {
+                Debug.Log(startNodes[i].Order);
                 startNodes[i].Lanes.Add(road.Lanes[i]);
                 road.Lanes[i].StartNode = startNodes[i];
             }
@@ -87,15 +88,27 @@ public static class BuildManager
             float oldY = pivotPos.y;
             if (startTarget.SnapNotNull)
             {
-                Node arbitaryNode = startNodes.First();
-                pivotPos = (float3) Vector3.Project(pivotPos - startPos, arbitaryNode.GetTangent()) + startPos;
+                Node arbitraryNode = GetArbitraryRegisteredNode(startNodes);
+                pivotPos = (float3) Vector3.Project(pivotPos - startPos, arbitraryNode.GetTangent()) + startPos;
             }
             if (endTarget.SnapNotNull)
             {
-                Node arbitaryNode = endNodes.First();
-                pivotPos = (float3) Vector3.Project(pivotPos - endPos, arbitaryNode.GetTangent()) + endPos;
+                Node arbitraryNode = GetArbitraryRegisteredNode(endNodes);
+                pivotPos = (float3) Vector3.Project(pivotPos - endPos, arbitraryNode.GetTangent()) + endPos;
             }
             pivotPos.y = oldY;
+        }
+
+        Node GetArbitraryRegisteredNode(List<Node> nodes)
+        {
+            foreach(Node node in nodes)
+            {
+                if (node.IsRegistered())
+                {
+                    return node;
+                }
+            }
+            return null;
         }
     }
 
@@ -104,13 +117,13 @@ public static class BuildManager
         foreach (Lane lane in road.Lanes)
         {
             
-            if (lane.StartNode.Id == -1)
+            if (!lane.StartNode.IsRegistered())
             {
                 lane.StartNode.Id = Game.NextAvailableNodeId++;
                 Game.Nodes[lane.StartNode.Id] = lane.StartNode;
             }
 
-            if (lane.EndNode.Id == -1)
+            if (!lane.EndNode.IsRegistered())
             {
                 lane.EndNode.Id = Game.NextAvailableNodeId++;
                 Game.Nodes[lane.EndNode.Id] = lane.EndNode;

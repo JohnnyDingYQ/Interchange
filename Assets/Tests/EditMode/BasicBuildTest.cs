@@ -2,10 +2,9 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
-public class BuildManagerTest
+public class BasicBuildTest
 {
     Vector3 pos1 = new(10, 10, 10);
     Vector3 pos2 = new(30, 12, 30);

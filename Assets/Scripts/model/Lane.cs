@@ -72,7 +72,7 @@ public class Lane
 
     public override string ToString()
     {
-        return "<Lane " + LaneIndex + " of Road " + Road.Id + ">";
+        return "Lane " + LaneIndex + " of Road " + Road.Id;
     }
 
 }

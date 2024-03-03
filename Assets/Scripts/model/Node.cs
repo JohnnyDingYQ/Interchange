@@ -54,4 +54,15 @@ public class Node : IComparable<Node>
     {
         return Order.CompareTo(other.Order);
     }
+
+    public bool IsRegistered()
+    {
+        return Id != -1;
+    }
+
+        public override string ToString()
+    {
+        return "Node " + Id;
+    }
+
 }
