@@ -7,15 +7,13 @@ using UnityEngine.TestTools;
 
 public class RoadsSplineVisualCheck
 {
-    MockBuildClient client;
-
     private const int Offset = 10;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         SceneManager.LoadScene("Build");
-        BuildManager.Reset();
+        BuildHandler.Reset();
     }
 
     [UnityTest, Order(1)]

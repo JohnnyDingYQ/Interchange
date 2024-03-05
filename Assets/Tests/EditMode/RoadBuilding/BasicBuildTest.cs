@@ -19,7 +19,7 @@ public class BasicBuildTest
     [SetUp]
     public void SetUp()
     {
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.WipeGameState();
         Nodes = Game.Nodes;
         Roads = Game.Roads;
@@ -28,8 +28,8 @@ public class BasicBuildTest
     [Test]
     public void ResetSuccessful()
     {
-        Assert.IsNull(BuildManager.Client);
-        Assert.AreEqual(1, BuildManager.LaneCount);
+        Assert.IsNull(BuildHandler.Client);
+        Assert.AreEqual(1, BuildHandler.LaneCount);
     }
 
     [Test]
@@ -40,6 +40,7 @@ public class BasicBuildTest
         Assert.AreEqual(1, Roads.Count);
         Road road = Roads.Values.First();
         Lane lane = road.Lanes[0];
+
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.AreEqual(pos1, lane.StartNode.Pos);
@@ -153,13 +154,10 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtBothSides_OneLane()
     {
-        BuildManager.Client = new MockBuildClient(
-            new List<float3>() { pos1, pos2, pos3, pos5, pos6, pos7, pos3, pos4, pos5, });
-        BuildManager.LaneCount = 1;
-        for (int i = 0; i < 9; i++)
-        {
-            BuildManager.HandleBuildCommand();
-        }
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos5, pos6, pos7, 1);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+
         Road road1 = Utility.FindRoadWithStartPos(pos1);
         Road road2 = Utility.FindRoadWithStartPos(pos3);
         Road road3 = Utility.FindRoadWithStartPos(pos5);
@@ -168,9 +166,24 @@ public class BasicBuildTest
         Lane lane3 = road3.Lanes[0];
         HashSet<Lane> expectedLanes0 = new() { lane1, lane2 };
         HashSet<Lane> expectedLanes1 = new() { lane2, lane3 };
+
         Assert.True(lane1.EndNode.Lanes.SetEquals(expectedLanes0));
         Assert.True(lane2.EndNode.Lanes.SetEquals(expectedLanes1));
         Assert.AreEqual(4, Nodes.Count);
+    }
+
+
+    [Test]
+    public void RoadShorterThanMinimumLengthShouldNotBuild()
+    {
+        RoadBuilder.BuildRoad(
+            new(0, 0, 0),
+            new(0, 0, GlobalConstants.MinimumRoadLength / 2),
+            new(0, 0, GlobalConstants.MinimumRoadLength - 0.01f),
+            1
+        );
+
+        Assert.AreEqual(0, Roads.Count);
     }
 
     # region Helpers

@@ -14,7 +14,7 @@ public class LaneExpansionTest
     [SetUp]
     public void SetUp()
     {
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.WipeGameState();
     }
 

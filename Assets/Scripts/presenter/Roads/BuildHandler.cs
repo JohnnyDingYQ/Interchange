@@ -2,17 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Splines;
 
-public static class BuildManager
+public static class BuildHandler
 {
     private static float3 pivotClick;
     private static bool startAssigned, pivotAssigned;
     public static int LaneCount { get; set; }
     public static IBuildManagerBoundary Client;
+    public static IDataInputBoundary dataInputBoundary;
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
 
-    static BuildManager()
+    static BuildHandler()
     {
         LaneCount = 1;
         startAssigned = false;
@@ -29,7 +31,7 @@ public static class BuildManager
 
     public static void HandleBuildCommand()
     {
-        float3 clickPos = Client.GetPos();
+        float3 clickPos = dataInputBoundary.GetCursorPos();
 
         if (!startAssigned)
         {
@@ -60,6 +62,14 @@ public static class BuildManager
         
         AlignPivotPos();
 
+        BezierCurve curve = new(startPos, pivotPos, endPos);
+        float length = CurveUtility.CalculateLength(curve);
+        if (length < GlobalConstants.MinimumRoadLength)
+        {
+            Debug.Log("Road length of " + length + " is less than minimum road length " + GlobalConstants.MinimumRoadLength);
+            return;
+        }
+            
         Road road = InitRoad(startPos, pivotPos, endPos);
 
         if (startTarget.SnapNotNull)
@@ -83,6 +93,7 @@ public static class BuildManager
 
         AssignNodeNumber(road);
 
+        # region extracted funcitons
         void AlignPivotPos()
         {
             float oldY = pivotPos.y;
@@ -110,6 +121,7 @@ public static class BuildManager
             }
             return null;
         }
+        #endregion
     }
 
     static void AssignNodeNumber(Road road)
@@ -140,7 +152,6 @@ public static class BuildManager
         };
         Game.Roads.Add(road.Id, road);
 
-        Client.InstantiateRoad(road);
         return road;
     }
     static void ReloadAllSpline()

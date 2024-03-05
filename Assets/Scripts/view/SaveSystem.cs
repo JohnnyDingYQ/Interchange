@@ -4,7 +4,7 @@ using System.IO;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
-public class SaveSystem : ISaveSystemGateway
+public class SaveSystem : ISaveSystemBoundary
 {
     public void LoadGame()
     {

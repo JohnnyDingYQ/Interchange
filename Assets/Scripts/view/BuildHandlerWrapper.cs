@@ -1,7 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
+public class BuildHandlerWrapper : MonoBehaviour, IBuildManagerBoundary
 {
     [SerializeField] private GameObject roads;
     [SerializeField] private RoadGameObject roadPrefab;
@@ -9,7 +9,8 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
 
     void Start()
     {
-        BuildManager.Client = this;
+        BuildHandler.Client = this;
+        BuildHandler.dataInputBoundary = new DataInputImpl();
 
         if (inputManager != null)
         {
@@ -35,29 +36,30 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
 
     void HandleBuildCommand()
     {
-        BuildManager.HandleBuildCommand();
+        BuildHandler.HandleBuildCommand();
     }
 
     void BuildMode_OneLane()
     {
-        BuildManager.LaneCount = 1;
+        BuildHandler.LaneCount = 1;
     }
 
     void BuildMode_TwoLanes()
     {
-        BuildManager.LaneCount = 2;
+        BuildHandler.LaneCount = 2;
     }
 
     void BuildMode_ThreeLanes()
     {
-        BuildManager.LaneCount = 3;
+        BuildHandler.LaneCount = 3;
     }
 
     public void InstantiateRoad(Road road)
     {
-        RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-        roadGameObject.name = $"Road-{road.Id}";
-        road.RoadGameObject = roadGameObject;
+        return;
+        // RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
+        // roadGameObject.name = $"Road-{road.Id}";
+        // road.RoadGameObject = roadGameObject;
 
         // Mesh mesh = RoadMesh.CreateMesh(road, road.Lanes.Count);
         // roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
@@ -65,13 +67,9 @@ public class BuildManagerWrapper : MonoBehaviour, IBuildManagerBoundary
         // MeshCollider meshCollider = roadGameObject.GetComponent<MeshCollider>();
         // meshCollider.sharedMesh = mesh;
 
-        roadGameObject.Road = road;
+        // roadGameObject.Road = road;
     }
 
-    public float3 GetPos()
-    {
-        return GameWrapper.MouseWorldPos;
-    }
     public void RedrawAllRoads()
     {
         while (roads.transform.childCount > 0) {

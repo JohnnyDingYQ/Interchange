@@ -3,7 +3,7 @@ using Codice.CM.Triggers;
 
 public static class Game
 {
-    public static ISaveSystemGateway SaveSystem { get; set; }
+    public static ISaveSystemBoundary SaveSystem { get; set; }
     private static GameState gameState;
     public static GameState GameState
     {
@@ -76,6 +76,6 @@ public static class Game
     public static void LoadGame()
     {
         SaveSystem.LoadGame();
-        BuildManager.ComplyToNewGameState();
+        BuildHandler.ComplyToNewGameState();
     }
 }

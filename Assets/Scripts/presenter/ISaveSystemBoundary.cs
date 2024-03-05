@@ -1,4 +1,4 @@
-public interface ISaveSystemGateway
+public interface ISaveSystemBoundary
 {
     void SaveGame();
     void LoadGame();

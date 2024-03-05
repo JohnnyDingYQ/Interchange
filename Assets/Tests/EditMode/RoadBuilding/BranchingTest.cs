@@ -12,7 +12,7 @@ public class JuncitonTest
     [SetUp]
     public void SetUp()
     {
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.WipeGameState();
         Roads = Game.Roads;
     }

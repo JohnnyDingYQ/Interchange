@@ -21,18 +21,16 @@ public class SaveSystemTest
     [SetUp]
     public void SetUp()
     {
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.WipeGameState();
     }
 
     [Test]
     public void RecoverSingleOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
-        for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         Game.SaveGame();
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
@@ -53,12 +51,9 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleThreeLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3 });
-        BuildManager.LaneCount = 3;
-        for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
         Game.SaveGame();
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
@@ -83,11 +78,10 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoDisconnectedOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos4, pos5, pos6 });
-        for (int i = 0; i < 6; i++)
-            BuildManager.HandleBuildCommand();
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos4, pos5, pos6, 1);
         Game.SaveGame();
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
@@ -109,11 +103,10 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoConnectedOneLaneRoad()
     {
-        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
-        for (int i = 0; i < 6; i++)
-            BuildManager.HandleBuildCommand();
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
         Game.SaveGame();
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
@@ -123,11 +116,9 @@ public class SaveSystemTest
         Assert.AreEqual(pos3, road0.EndPos);
         Road road1 = Game.Roads[1];
         Assert.AreEqual(pos3, road1.StartPos);
-        Debug.Log(pos4);
-        Debug.Log(road1.PivotPos);
         Assert.True(Vector3.Distance(pos4, road1.PivotPos) < 0.01f);
-        
         Assert.AreEqual(pos5, road1.EndPos);
+        
         Assert.AreEqual(3, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
@@ -138,11 +129,10 @@ public class SaveSystemTest
     [Test]
     public void RecoverLanesSplines()
     {
-        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5 });
-        for (int i = 0; i < 6; i++)
-            BuildManager.HandleBuildCommand();
+        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
         Game.SaveGame();
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.LoadGame();
 
         foreach (Road road in Game.Roads.Values)
@@ -158,50 +148,23 @@ public class SaveSystemTest
     // [Test]
     public void RecoverConnectedLanes_ThreetoOneTwo()
     {
-        BuildManager.Client = new MockClient(new List<float3>() { pos1, pos2, pos3, pos3, pos4, pos5, pos3, 130, 160 });
-        BuildManager.LaneCount = 3;
+        BuildHandler.LaneCount = 3;
         for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
-        BuildManager.LaneCount = 1;
+            BuildHandler.HandleBuildCommand();
+        BuildHandler.LaneCount = 1;
         for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
-        BuildManager.LaneCount = 2;
+            BuildHandler.HandleBuildCommand();
+        BuildHandler.LaneCount = 2;
         for (int i = 0; i < 3; i++)
-            BuildManager.HandleBuildCommand();
+            BuildHandler.HandleBuildCommand();
         Game.SaveGame();
-        BuildManager.Reset();
+        BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(3, Game.Roads.Count);
         Road road0 = Game.Roads[0];
         Road road1 = Game.Roads[1];
         Road road2 = Game.Roads[2];
-    }
-
-    private class MockClient : IBuildManagerBoundary
-    {
-        readonly List<float3> MockPos;
-        int count = 0;
-
-        public MockClient(List<float3> mockCoord)
-        {
-            MockPos = mockCoord;
-        }
-
-        public float3 GetPos()
-        {
-            return MockPos[count++];
-        }
-
-        public void InstantiateRoad(Road road)
-        {
-            return;
-        }
-
-        public void RedrawAllRoads()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 
 }
