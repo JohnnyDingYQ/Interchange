@@ -12,10 +12,17 @@ public class BuildTargets
     public Vector3 MedianPoint { get; set; }
     public Side Side { get; set; }
 
-    public BuildTargets(float3 clickPos, int laneCount, Side side)
+    /// <summary>
+    /// Determine nodes selected by a buildcommand and its properties
+    /// </summary>
+    /// <param name="clickPos">The click position</param>
+    /// <param name="laneCount">How many lanes the road will have</param>
+    /// <param name="side">Which side of the raod does the clickPos define</param>
+    /// <param name="GameNodes">Nodes eligible for consideration</param>
+    public BuildTargets(float3 clickPos, int laneCount, Side side, IEnumerable<Node> GameNodes)
     {
         Side = side;
-        Nodes = GetBuildNodes(clickPos, laneCount);
+        Nodes = GetBuildNodes(clickPos, laneCount, GameNodes);
         if (Nodes == null)
         {
             SnapNotNull = false;
@@ -27,17 +34,25 @@ public class BuildTargets
             MedianPoint = Vector3.Lerp(Nodes.First().Pos, Nodes.Last().Pos, 0.5f); ;
         }
     }
-    List<Node> GetBuildNodes(float3 clickPos, int laneCount)
+    List<Node> GetBuildNodes(float3 clickPos, int laneCount, IEnumerable<Node> GameNodes)
     {
-        float snapRadius = laneCount / 2 * GlobalConstants.LaneWidth + GlobalConstants.SnapTolerance;
-        List<Candidate> candidates = new();
-        foreach (Node node in Game.Nodes.Values)
+        float snapRadius = laneCount / 2 * GlobalConstants.LaneWidth + GlobalConstants.BuildSnapTolerance;
+        List<FloatContainer> floatContainers = new();
+        foreach (Node node in GameNodes)
         {
             AddNodeIfWithinSnap(node);
         }
-        candidates.Sort();
 
-        List<Node> nodes = UnwrapCandidates(candidates);
+        // this sorts nodes with ascending order of distance (descending proximity)
+        floatContainers.Sort();
+
+        List<Node> nodes = FloatContainer.Unwrap<Node>(floatContainers);
+        while (nodes.Count > laneCount)
+        {
+            nodes.Remove(nodes.Last());
+        }
+
+        // this sorts nodes with their order in the road, left to right in the direction of the roads
         nodes.Sort();
 
         if (nodes.Count == laneCount)
@@ -48,14 +63,14 @@ public class BuildTargets
         {
             Road road = nodes.First().Lanes.First().Road;
             GetInterpolatedCandidates(road, 2);
-            if (candidates.Count + nodes.Count < laneCount)
+            if (floatContainers.Count + nodes.Count < laneCount)
             {
                 return null;
             }
             int i = 0;
             while (nodes.Count < laneCount)
             {
-                nodes.Add(candidates[i++].Node);
+                nodes.Add((Node) floatContainers[i++].Object);
             }
             nodes.Sort();
             return nodes;
@@ -66,17 +81,6 @@ public class BuildTargets
         }
 
         # region extracted functions
-        // Attempt to copy laneCount candidates into resulting list
-        List<Node> UnwrapCandidates(List<Candidate> candidates)
-        {
-            List<Node> result = new();
-            for (int i = 0; i < Math.Min(laneCount, candidates.Count); i++)
-            {
-                result.Add(candidates[i].Node);
-            }
-            return result;
-        }
-
         bool ShouldCheckLaneExpansion()
         {
             return nodes.Count > 0 && Side == Side.Start;
@@ -84,7 +88,7 @@ public class BuildTargets
 
         void GetInterpolatedCandidates(Road road, int interpolationReach)
         {
-            candidates = new();
+            floatContainers = new();
             for (int i = 0; i < interpolationReach; i++)
             {
                 float3 left = road.InterpolateLanePos(1, -(1 + i));
@@ -92,7 +96,7 @@ public class BuildTargets
                 AddNodeIfWithinSnap(new(left, -(1 + i)));
                 AddNodeIfWithinSnap(new(right, road.LaneCount + i));
             }
-            candidates.Sort();
+            floatContainers.Sort();
         }
 
         void AddNodeIfWithinSnap(Node n)
@@ -100,26 +104,12 @@ public class BuildTargets
             float distance = Vector3.Distance(clickPos, n.Pos);
             if (distance < snapRadius)
             {
-                candidates.Add(new(distance, n));
+                floatContainers.Add(new(distance, n));
             }
         }
         #endregion
     }
-    private class Candidate : IComparable<Candidate>
-    {
-        public float Distance { get; set; }
-        public Node Node { get; set; }
-        public Candidate(float distance, Node node)
-        {
-            Distance = distance;
-            Node = node;
-        }
-
-        public int CompareTo(Candidate other)
-        {
-            return Distance.CompareTo(other.Distance);
-        }
-    }
+    
 }
 
 public enum Side

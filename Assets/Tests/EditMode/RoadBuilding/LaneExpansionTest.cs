@@ -22,7 +22,7 @@ public class LaneExpansionTest
     public void OneLaneToTwoLane_Left()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + 0.9f * GlobalConstants.SnapTolerance * Vector3.forward, pos4, pos5, 2);
+        RoadBuilder.BuildRoad(pos3 + 0.9f * GlobalConstants.BuildSnapTolerance * Vector3.forward, pos4, pos5, 2);
         Road road0 = Utility.FindRoadWithStartPos(pos1);
         Road road1 = Utility.FindRoadWithEndPos(pos5);
         Lane lane00 = road0.Lanes[0];
@@ -39,7 +39,7 @@ public class LaneExpansionTest
     public void TwoLaneToThreeLane_Right()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
-        RoadBuilder.BuildRoad(pos3 + 0.9f * GlobalConstants.SnapTolerance * Vector3.right, pos4, pos5, 3);
+        RoadBuilder.BuildRoad(pos3 + 0.9f * GlobalConstants.BuildSnapTolerance * Vector3.right, pos4, pos5, 3);
         Road road0 = Utility.FindRoadWithStartPos(pos1);
         Road road1 = Utility.FindRoadWithEndPos(pos5);
         Lane lane00 = road0.Lanes[0];
@@ -80,7 +80,7 @@ public class LaneExpansionTest
     public void OneLaneToThreeLane_Left()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + 1.5f * GlobalConstants.SnapTolerance * Vector3.left, pos4, pos5, 3);
+        RoadBuilder.BuildRoad(pos3 + 1.5f * GlobalConstants.BuildSnapTolerance * Vector3.left, pos4, pos5, 3);
         Road road0 = Utility.FindRoadWithStartPos(pos1);
         Road road1 = Utility.FindRoadWithEndPos(pos5);
         Lane lane00 = road0.Lanes[0];
@@ -99,7 +99,7 @@ public class LaneExpansionTest
     public void OneLaneToThreeLane_Right()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + 1.5f * GlobalConstants.SnapTolerance * Vector3.right, pos4, pos5, 3);
+        RoadBuilder.BuildRoad(pos3 + 1.5f * GlobalConstants.BuildSnapTolerance * Vector3.right, pos4, pos5, 3);
         Road road0 = Utility.FindRoadWithStartPos(pos1);
         Road road1 = Utility.FindRoadWithEndPos(pos5);
         Lane lane00 = road0.Lanes[0];

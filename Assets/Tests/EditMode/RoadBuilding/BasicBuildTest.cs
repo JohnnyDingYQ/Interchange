@@ -97,7 +97,7 @@ public class BasicBuildTest
     public void SnapAtEnd_OneLane()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + Vector3.right * (GlobalConstants.SnapTolerance - 1), pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos3 + Vector3.right * (GlobalConstants.BuildSnapTolerance - 1), pos4, pos5, 1);
 
         CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
@@ -105,7 +105,7 @@ public class BasicBuildTest
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.SnapTolerance + GlobalConstants.LaneWidth + 1, 0, 0);
+        float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.BuildSnapTolerance + GlobalConstants.LaneWidth + 1, 0, 0);
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
 

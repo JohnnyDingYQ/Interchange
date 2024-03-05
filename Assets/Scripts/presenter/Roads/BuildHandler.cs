@@ -36,7 +36,7 @@ public static class BuildHandler
         if (!startAssigned)
         {
             startAssigned = true;
-            startTarget = new BuildTargets(clickPos, LaneCount, Side.Start);
+            startTarget = new BuildTargets(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
         }
         else if (!pivotAssigned)
         {
@@ -45,7 +45,7 @@ public static class BuildHandler
         }
         else
         {
-            endTarget = new BuildTargets(clickPos, LaneCount, Side.End);
+            endTarget = new BuildTargets(clickPos, LaneCount, Side.End, Game.Nodes.Values);
             BuildRoad(startTarget, pivotClick, endTarget);
             startAssigned = false;
             pivotAssigned = false;
@@ -76,7 +76,6 @@ public static class BuildHandler
         {
             for (int i = 0; i < startNodes.Count; i++)
             {
-                Debug.Log(startNodes[i].Order);
                 startNodes[i].Lanes.Add(road.Lanes[i]);
                 road.Lanes[i].StartNode = startNodes[i];
             }
