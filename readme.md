@@ -1,5 +1,22 @@
 # Description and Motivation
-Interchange is a indie game in which you build highways and interchanges! This game was inspired by Cities: Skylines and Mini Motorways. I love building highways in Cities: Skylines, but I am less intrigued by the city planning and simulation aspect of the game. The economy system of Cities: Skylines 2 is broken and bugged anyway (as of March 6, 2024). As a result, I decided to make an indie game that does one thing and one thing well: building highways! The game will generate incrementing traffic demand (similar to Mini Motorways), and the players' job is to build highways to satisfy the increasing demand. Players will build on the terrain of famous locations such as NYC and Shanghai. It will be possible to open Google Maps along with the game and emulate the real world highway network. In my opinion, this is why the game idea is exciting.
+Interchange is a indie game in which you **build highways and interchanges**! This game was inspired by **Cities: Skylines** and **Mini Motorways**. I love building highways in Cities: Skylines, but I am less intrigued by the city planning and simulation aspect of the game. The economy system of Cities: Skylines 2 is broken and bugged anyway (as of March 6, 2024). As a result, I decided to make an indie game that does one thing and one thing well: building highways! The game will generate incrementing traffic demand (similar to Mini Motorways), and the players' job is to build highways to satisfy the **increasing demand**. Players will build on the terrain of **famous locations** such as NYC and Shanghai. It will be possible to open Google Maps along with the game and **emulate the real world highway network**. In my opinion, this is why the game idea is exciting.
+
+# Programming Architecture
+This project employs a custom version of Model View Presenter (MVP) as the primary architecture. One of the main outcome is the sepration of gameplay logic (also known as buisness logic) from user interface (Unity Game Engine)
+
+## Model
+Model contains classes which defines how data is structured, organized, manipulated, and accessed in the game. Field and properties define structure and organization, while methods define manipulation and access.
+
+## Presenter
+Presenter defines gameplay logic, operating model class objects and calling their methods to implement a meaningful game.
+
+It is worth noting that the Model and Presenter layer has minimal dependency on Unity. The code will still work without Unity as long as one provides alternative implementations for Bezier Curves, Splines, and Vector3. This is **sepration of concern**, which is made possible by **dependency inversion**. Presenter provides **boundary interfaces** which specifies required input and output.
+
+## View
+Unity specific code that handles input (from player) and output (rendering) of the game. Classes that implements Monobehavior lives exclusively in View.
+
+View provides implementation of **boundary interfaces** to provide input and output to the Presenter layer.
+
 # Roadmap and Milestones
 ## Highway Building (WIP)
 
