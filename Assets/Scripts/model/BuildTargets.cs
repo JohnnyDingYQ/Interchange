@@ -31,12 +31,12 @@ public class BuildTargets
         else
         {
             SnapNotNull = true;
-            MedianPoint = Vector3.Lerp(Nodes.First().Pos, Nodes.Last().Pos, 0.5f); ;
+            MedianPoint = Vector3.Lerp(Nodes.First().Pos, Nodes.Last().Pos, 0.5f);
         }
     }
     List<Node> GetBuildNodes(float3 clickPos, int laneCount, IEnumerable<Node> GameNodes)
     {
-        float snapRadius = laneCount / 2 * GlobalConstants.LaneWidth + GlobalConstants.BuildSnapTolerance;
+        float snapRadius = laneCount / 2 * GConsts.LaneWidth + GConsts.BuildSnapTolerance;
         List<FloatContainer> floatContainers = new();
         foreach (Node node in GameNodes)
         {

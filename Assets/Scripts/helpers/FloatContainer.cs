@@ -4,11 +4,11 @@ using System.Collections.Generic;
 /// <summary>
 /// Package an object with a float so that it can be sorted with respect to the float
 /// </summary>
-public class FloatContainer : IComparable<FloatContainer>
+public readonly struct FloatContainer : IComparable<FloatContainer>
 {
-    public float Float { get; set; }
-    public object Object { get; set; }
-    public FloatContainer(float f, Node o)
+    public float Float { get; }
+    public object Object { get; }
+    public FloatContainer(float f, object o)
     {
         Float = f;
         Object = o;

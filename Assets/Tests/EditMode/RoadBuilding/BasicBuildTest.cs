@@ -6,13 +6,13 @@ using UnityEngine;
 
 public class BasicBuildTest
 {
-    Vector3 pos1 = new(10, 10, 10);
-    Vector3 pos2 = new(30, 12, 30);
-    Vector3 pos3 = new(60, 14, 60);
-    Vector3 pos4 = new(90, 16, 90);
-    Vector3 pos5 = new(120, 16, 120);
-    Vector3 pos6 = new(150, 16, 150);
-    Vector3 pos7 = new(180, 16, 180);
+    Vector3 pos1 = new(0, 0, 0);
+    Vector3 pos2 = GConsts.MinimumRoadLength * new Vector3(1, 0, 1);
+    Vector3 pos3 = GConsts.MinimumRoadLength * 2 * new Vector3(1, 0, 1);
+    Vector3 pos4 = GConsts.MinimumRoadLength * 3 * new Vector3(1, 0, 1);
+    Vector3 pos5 = GConsts.MinimumRoadLength * 4 * new Vector3(1, 0, 1);
+    Vector3 pos6 = GConsts.MinimumRoadLength * 5 * new Vector3(1, 0, 1);
+    Vector3 pos7 = GConsts.MinimumRoadLength * 6 * new Vector3(1, 0, 1);
     SortedDictionary<int, Node> Nodes;
     SortedDictionary<int, Road> Roads;
 
@@ -43,8 +43,8 @@ public class BasicBuildTest
 
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(1, road.Lanes.Count);
-        Assert.AreEqual(pos1, lane.StartNode.Pos);
-        Assert.AreEqual(pos3, lane.EndNode.Pos);
+        Assert.True(Utility.AreNumericallyEqual(pos1, lane.StartNode.Pos));
+        Assert.True(Utility.AreNumericallyEqual(pos3, lane.EndNode.Pos));
         Assert.True(Nodes.ContainsKey(lane.StartNode.Id));
         Assert.True(Nodes.ContainsKey(lane.EndNode.Id));
         Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
@@ -97,7 +97,7 @@ public class BasicBuildTest
     public void SnapAtEnd_OneLane()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + Vector3.right * (GlobalConstants.BuildSnapTolerance - 1), pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos3 + Vector3.right * (GConsts.BuildSnapTolerance - 1), pos4, pos5, 1);
 
         CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
@@ -105,7 +105,7 @@ public class BasicBuildTest
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        float3 exitingRoadStartPos = pos3 + new Vector3(GlobalConstants.BuildSnapTolerance + GlobalConstants.LaneWidth + 1, 0, 0);
+        float3 exitingRoadStartPos = pos3 + new Vector3(GConsts.BuildSnapTolerance + GConsts.LaneWidth + 1, 0, 0);
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
 
@@ -178,15 +178,29 @@ public class BasicBuildTest
     {
         RoadBuilder.BuildRoad(
             new(0, 0, 0),
-            new(0, 0, GlobalConstants.MinimumRoadLength / 2),
-            new(0, 0, GlobalConstants.MinimumRoadLength - 0.01f),
+            new(0, 0, GConsts.MinimumRoadLength / 2),
+            new(0, 0, GConsts.MinimumRoadLength - 0.01f),
             1
         );
 
         Assert.AreEqual(0, Roads.Count);
     }
 
-    # region Helpers
+    [Test]
+    public void RoadLongerThanMaximumLengthShouldNotBuild()
+    {
+        RoadBuilder.BuildRoad(
+            new(0, 0, 0),
+            new(0, 0, GConsts.MaximumRoadLength / 2),
+            new(0, 0, GConsts.MaximumRoadLength + 0.01f),
+            1
+        );
+        Assert.AreEqual(0, Roads.Count);
+    }
+
+
+
+    #region Helpers
     public void CheckTwoOneLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
     {
         Road enteringRoad = Utility.FindRoadWithStartPos(enteringRoadStartPos);

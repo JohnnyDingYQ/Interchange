@@ -82,7 +82,7 @@ public static class Utility
     {
         foreach (Road road in Game.Roads.Values)
         {
-            if (road.StartPos.Equals(startPos))
+            if (AreNumericallyEqual(road.StartPos, startPos))
             {
                 return road;
             }
@@ -93,11 +93,16 @@ public static class Utility
     {
         foreach (Road road in Game.Roads.Values)
         {
-            if (road.EndPos.Equals(endPos))
+            if (AreNumericallyEqual(road.EndPos, endPos))
             {
                 return road;
             }
         }
         return null;
+    }
+
+    public static bool AreNumericallyEqual(float3 a, float3 b)
+    {
+        return Vector3.Distance(a, b) < 0.01f;
     }
 }

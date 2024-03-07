@@ -39,7 +39,7 @@ public class Road
     {
         float3 normal = GetNormal(t);
         float3 pos = CurveUtility.EvaluatePosition(Curve, t);
-        float3 offset = normal * (GlobalConstants.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * GlobalConstants.LaneWidth);
+        float3 offset = normal * (GConsts.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * GConsts.LaneWidth);
         return pos + offset;
     }
 

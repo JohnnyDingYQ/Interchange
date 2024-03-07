@@ -64,9 +64,9 @@ public static class BuildHandler
 
         BezierCurve curve = new(startPos, pivotPos, endPos);
         float length = CurveUtility.CalculateLength(curve);
-        if (length < GlobalConstants.MinimumRoadLength)
+        if (length < GConsts.MinimumRoadLength || length > GConsts.MaximumRoadLength)
         {
-            Debug.Log("Road length of " + length + " is less than minimum road length " + GlobalConstants.MinimumRoadLength);
+            Debug.Log("Road length of " + length + " is not between " + GConsts.MinimumRoadLength + " and " + GConsts.MaximumRoadLength);
             return;
         }
             

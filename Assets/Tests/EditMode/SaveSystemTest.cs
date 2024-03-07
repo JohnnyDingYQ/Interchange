@@ -5,12 +5,12 @@ using Unity.Mathematics;
 using UnityEngine;
 public class SaveSystemTest
 {
-    Vector3 pos1 = new(10, 10, 10);
-    Vector3 pos2 = new(30, 12, 30);
-    Vector3 pos3 = new(60, 14, 60);
-    Vector3 pos4 = new(90, 16, 90);
-    Vector3 pos5 = new(120, 16, 120);
-    Vector3 pos6 = new(150, 16, 150);
+    Vector3 pos1 = new(0, 0, 0);
+    Vector3 pos2 = new(GConsts.MinimumRoadLength, 0, 0);
+    Vector3 pos3 = new(GConsts.MinimumRoadLength * 2, 0, 0);
+    Vector3 pos4 = new(GConsts.MinimumRoadLength * 3, 0, 0);
+    Vector3 pos5 = new(GConsts.MinimumRoadLength * 4, 0, 0);
+    Vector3 pos6 = new(GConsts.MinimumRoadLength * 5, 0, 0);
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
