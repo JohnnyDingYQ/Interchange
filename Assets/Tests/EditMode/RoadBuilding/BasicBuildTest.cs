@@ -6,13 +6,13 @@ using UnityEngine;
 
 public class BasicBuildTest
 {
-    Vector3 pos1 = new(0, 0, 0);
-    Vector3 pos2 = GConsts.MinimumRoadLength * new Vector3(1, 0, 1);
-    Vector3 pos3 = GConsts.MinimumRoadLength * 2 * new Vector3(1, 0, 1);
-    Vector3 pos4 = GConsts.MinimumRoadLength * 3 * new Vector3(1, 0, 1);
-    Vector3 pos5 = GConsts.MinimumRoadLength * 4 * new Vector3(1, 0, 1);
-    Vector3 pos6 = GConsts.MinimumRoadLength * 5 * new Vector3(1, 0, 1);
-    Vector3 pos7 = GConsts.MinimumRoadLength * 6 * new Vector3(1, 0, 1);
+    float3 pos1 = new(0, 0, 0);
+    float3 pos2 = GConsts.MinimumRoadLength * new float3(1, 0, 1);
+    float3 pos3 = GConsts.MinimumRoadLength * 2 * new float3(1, 0, 1);
+    float3 pos4 = GConsts.MinimumRoadLength * 3 * new float3(1, 0, 1);
+    float3 pos5 = GConsts.MinimumRoadLength * 4 * new float3(1, 0, 1);
+    float3 pos6 = GConsts.MinimumRoadLength * 5 * new float3(1, 0, 1);
+    float3 pos7 = GConsts.MinimumRoadLength * 6 * new float3(1, 0, 1);
     SortedDictionary<int, Node> Nodes;
     SortedDictionary<int, Road> Roads;
 
@@ -97,7 +97,7 @@ public class BasicBuildTest
     public void SnapAtEnd_OneLane()
     {
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + Vector3.right * (GConsts.BuildSnapTolerance - 1), pos4, pos5, 1);
+        RoadBuilder.BuildRoad(pos3 + new float3(1, 0, 0) * (GConsts.BuildSnapTolerance - 1), pos4, pos5, 1);
 
         CheckTwoOneLaneRoadsConnection(pos1, pos3);
     }
@@ -105,7 +105,7 @@ public class BasicBuildTest
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        float3 exitingRoadStartPos = pos3 + new Vector3(GConsts.BuildSnapTolerance + GConsts.LaneWidth + 1, 0, 0);
+        float3 exitingRoadStartPos = pos3 + new float3(GConsts.BuildSnapTolerance + GConsts.LaneWidth + 1, 0, 0);
         RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
 

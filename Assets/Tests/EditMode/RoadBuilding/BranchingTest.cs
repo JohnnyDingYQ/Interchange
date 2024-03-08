@@ -135,6 +135,7 @@ public class BranchingTest
         Assert.True(IsIsolatedNode(branch2.Lanes[0].StartNode));
         Assert.True(IsIsolatedNode(branch2.Lanes[1].StartNode));
     }
+    
     [Test]
     public void ThreetoOneOneOne_OnEnd()
     {

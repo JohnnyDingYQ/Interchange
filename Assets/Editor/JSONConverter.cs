@@ -1,20 +1,21 @@
 using System;
+using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
-public class Vector3Converter : JsonConverter<Vector3>
+public class Float3Converter : JsonConverter<float3>
 {
-    public override void WriteJson(JsonWriter writer, Vector3 value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, float3 value, JsonSerializer serializer)
     {
         JObject obj = new JObject() { ["x"] = value.x, ["y"] = value.y, ["z"] = value.z };
         obj.WriteTo(writer);
     }
-    public override Vector3 ReadJson(JsonReader reader, Type objectType, Vector3 existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override float3 ReadJson(JsonReader reader, Type objectType, float3 existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         JObject obj = JObject.Load(reader);
-        return new Vector3((float)obj.GetValue("x"), (float)obj.GetValue("y"), (float)obj.GetValue("z"));
+        return new float3((float)obj.GetValue("x"), (float)obj.GetValue("y"), (float)obj.GetValue("z"));
     }
 }
 
@@ -25,7 +26,7 @@ public static class JsonCustomSettings
         JsonConvert.DefaultSettings = () =>
         {
             var settings = new JsonSerializerSettings();
-            settings.Converters.Add(new Vector3Converter());
+            settings.Converters.Add(new Float3Converter());
             return settings;
         };
     }

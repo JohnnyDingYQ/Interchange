@@ -10,7 +10,7 @@ public class Node : IComparable<Node>
 {
     public int Id { get; set; }
     public HashSet<Lane> Lanes { get; set; }
-    public Vector3 Pos { get; set; }
+    public float3 Pos { get; set; }
     public int Order { get; set; }
 
     public Node() {}

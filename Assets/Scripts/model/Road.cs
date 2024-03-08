@@ -13,9 +13,9 @@ public class Road
     public BezierCurve Curve { get; set; }
     public List<Lane> Lanes { get; set; }
     public int LaneCount { get; set; }
-    public Vector3 StartPos { get; set; }
-    public Vector3 PivotPos { get; set; }
-    public Vector3 EndPos { get; set; }
+    public float3 StartPos { get; set; }
+    public float3 PivotPos { get; set; }
+    public float3 EndPos { get; set; }
 
     public Road() {}
 

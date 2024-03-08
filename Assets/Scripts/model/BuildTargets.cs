@@ -7,9 +7,9 @@ using UnityEngine;
 public class BuildTargets
 {
     public List<Node> Nodes { get; set; }
-    public Vector3 ClickPos { get; set; }
+    public float3 ClickPos { get; set; }
     public bool SnapNotNull { get; set; }
-    public Vector3 MedianPoint { get; set; }
+    public float3 MedianPoint { get; set; }
     public Side Side { get; set; }
 
     /// <summary>

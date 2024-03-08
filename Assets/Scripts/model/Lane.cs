@@ -9,12 +9,12 @@ public class Lane
     public Node EndNode { get; set; }
     [JsonIgnore]
     public Spline Spline { get; set; }
-    public Vector3 StartPos {
+    public float3 StartPos {
         get {
             return StartNode.Pos;
         }
     }
-    public Vector3 EndPos {
+    public float3 EndPos {
         get {
             return EndNode.Pos;
         }
