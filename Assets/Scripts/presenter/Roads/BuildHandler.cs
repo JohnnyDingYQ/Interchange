@@ -9,8 +9,6 @@ public static class BuildHandler
     private static float3 pivotClick;
     private static bool startAssigned, pivotAssigned;
     public static int LaneCount { get; set; }
-    public static IBuildManagerBoundary Client;
-    public static IDataInputBoundary dataInputBoundary;
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
 
@@ -26,13 +24,10 @@ public static class BuildHandler
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
-        Client = null;
     }
 
-    public static void HandleBuildCommand()
+    public static void HandleBuildCommand(float3 clickPos)
     {
-        float3 clickPos = dataInputBoundary.GetCursorPos();
-
         if (!startAssigned)
         {
             startAssigned = true;
@@ -145,11 +140,8 @@ public static class BuildHandler
 
     static Road InitRoad(float3 startPos, float3 pivotPos, float3 endPos)
     {
-        Road road = new(startPos, pivotPos, endPos, LaneCount)
-        {
-            Id = Game.NextAvailableRoadId++
-        };
-        Game.Roads.Add(road.Id, road);
+        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        Game.RegisterRoad(road);
 
         return road;
     }

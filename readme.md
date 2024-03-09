@@ -10,7 +10,7 @@ Model contains classes which defines how data is structured, organized, manipula
 ## Presenter
 Presenter defines gameplay logic, operating model class objects and calling their methods to implement a meaningful game.
 
-It is worth noting that the Model and Presenter layer has minimal dependency on Unity. The code will still work without Unity as long as one provides alternative implementations for Bezier Curves, Splines, and Vector3. This is **sepration of concern**, which is made possible by **dependency inversion**. Presenter provides **boundary interfaces** which specifies required input and output.
+It is worth noting that the Model and Presenter layer has minimal dependency on Unity. The code will still work without Unity as long as one provides alternative implementations for Bezier Curves, Splines, and Vector3. This follows the **sepration of concern** principle.
 
 ## View
 Unity specific code that handles input (from player) and output (rendering) of the game. Classes that implements Monobehavior lives exclusively in View.

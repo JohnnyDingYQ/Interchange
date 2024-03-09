@@ -15,14 +15,14 @@ public class SaveSystemTest
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        Game.SaveSystem = new SaveSystem();
+        Game.SaveSystem = new SaveSystemImpl();
     }
 
     [SetUp]
     public void SetUp()
     {
         BuildHandler.Reset();
-        Game.WipeGameState();
+        Game.WipeState();
     }
 
     [Test]
@@ -148,23 +148,7 @@ public class SaveSystemTest
     // [Test]
     public void RecoverConnectedLanes_ThreetoOneTwo()
     {
-        BuildHandler.LaneCount = 3;
-        for (int i = 0; i < 3; i++)
-            BuildHandler.HandleBuildCommand();
-        BuildHandler.LaneCount = 1;
-        for (int i = 0; i < 3; i++)
-            BuildHandler.HandleBuildCommand();
-        BuildHandler.LaneCount = 2;
-        for (int i = 0; i < 3; i++)
-            BuildHandler.HandleBuildCommand();
-        Game.SaveGame();
-        BuildHandler.Reset();
-        Game.LoadGame();
 
-        Assert.AreEqual(3, Game.Roads.Count);
-        Road road0 = Game.Roads[0];
-        Road road1 = Game.Roads[1];
-        Road road2 = Game.Roads[2];
     }
 
 }

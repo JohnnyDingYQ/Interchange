@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class InputManager: MonoBehaviour
@@ -13,6 +14,8 @@ public class InputManager: MonoBehaviour
     public event Action Build3Lane;
     public event Action SaveGame;
     public event Action LoadGame;
+    public event Action DividRoad;
+    public static float3 MouseWorldPos;
 
     void Update()
     {
@@ -36,5 +39,13 @@ public class InputManager: MonoBehaviour
             SaveGame.Invoke();
         if (Input.GetKeyDown(KeyCode.P))
             LoadGame.Invoke();
+        if (Input.GetMouseButtonDown(1))
+            DividRoad.Invoke();
+        
+        MouseWorldPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
+        {
+            z = Camera.main.transform.position.y -0
+        };
+        MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
     }
 }

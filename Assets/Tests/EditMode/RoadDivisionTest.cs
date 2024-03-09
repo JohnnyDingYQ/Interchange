@@ -14,6 +14,6 @@ public class RoadDivisionTest
     public void SetUp()
     {
         BuildHandler.Reset();
-        Game.WipeGameState();
+        Game.WipeState();
     }
 }

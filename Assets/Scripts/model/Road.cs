@@ -17,6 +17,7 @@ public class Road
     public float3 PivotPos { get; set; }
     public float3 EndPos { get; set; }
 
+    // Empty constructor for JSON.Net deserialization
     public Road() {}
 
     public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount)
@@ -27,6 +28,16 @@ public class Road
         LaneCount = laneCount;
         InitCurve();
 
+        InitLanes();
+    }
+
+    public Road(BezierCurve curve, int laneCount)
+    {
+        Curve = curve;
+        StartPos = curve.P0;
+        PivotPos = curve.P1;
+        EndPos = curve.P3;
+        LaneCount = laneCount;
         InitLanes();
     }
 

@@ -20,7 +20,7 @@ public class BasicBuildTest
     public void SetUp()
     {
         BuildHandler.Reset();
-        Game.WipeGameState();
+        Game.WipeState();
         Nodes = Game.Nodes;
         Roads = Game.Roads;
     }
@@ -28,7 +28,6 @@ public class BasicBuildTest
     [Test]
     public void ResetSuccessful()
     {
-        Assert.IsNull(BuildHandler.Client);
         Assert.AreEqual(1, BuildHandler.LaneCount);
     }
 

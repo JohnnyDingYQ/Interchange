@@ -63,7 +63,7 @@ public static class Game
         }
     }
 
-    public static void WipeGameState()
+    public static void WipeState()
     {
         GameState = new();
     }
@@ -77,5 +77,16 @@ public static class Game
     {
         SaveSystem.LoadGame();
         BuildHandler.ComplyToNewGameState();
+    }
+
+    public static void RegisterRoad(Road road)
+    {
+        road.Id = NextAvailableRoadId++;
+        Roads.Add(road.Id, road);
+    }
+
+    public static void RemoveRoad(Road road)
+    {
+        Roads.Remove(road.Id);
     }
 }

@@ -1,7 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class BuildHandlerWrapper : MonoBehaviour, IBuildManagerBoundary
+public class Roads : MonoBehaviour
 {
     [SerializeField] private GameObject roads;
     [SerializeField] private RoadGameObject roadPrefab;
@@ -9,15 +9,13 @@ public class BuildHandlerWrapper : MonoBehaviour, IBuildManagerBoundary
 
     void Start()
     {
-        BuildHandler.Client = this;
-        BuildHandler.dataInputBoundary = new DataInputImpl();
-
         if (inputManager != null)
         {
             inputManager.BuildRoad += HandleBuildCommand;
             inputManager.Build1Lane += BuildMode_OneLane;
             inputManager.Build2Lane += BuildMode_TwoLanes;
             inputManager.Build3Lane += BuildMode_ThreeLanes;
+            inputManager.DividRoad += DivideRoad;
         }
 
 
@@ -31,12 +29,18 @@ public class BuildHandlerWrapper : MonoBehaviour, IBuildManagerBoundary
             inputManager.Build1Lane -= BuildMode_OneLane;
             inputManager.Build2Lane -= BuildMode_TwoLanes;
             inputManager.Build3Lane -= BuildMode_ThreeLanes;
+            inputManager.DividRoad -= DivideRoad;
         }
     }
 
     void HandleBuildCommand()
     {
-        BuildHandler.HandleBuildCommand();
+        BuildHandler.HandleBuildCommand(InputManager.MouseWorldPos);
+    }
+
+    void DivideRoad()
+    {
+        DivideHandler.HandleDivideCommand(InputManager.MouseWorldPos);
     }
 
     void BuildMode_OneLane()
@@ -54,6 +58,7 @@ public class BuildHandlerWrapper : MonoBehaviour, IBuildManagerBoundary
         BuildHandler.LaneCount = 3;
     }
 
+    # region legacy code
     public void InstantiateRoad(Road road)
     {
         return;
@@ -81,4 +86,5 @@ public class BuildHandlerWrapper : MonoBehaviour, IBuildManagerBoundary
             InstantiateRoad(road);
         }
     }
+    #endregion
 }

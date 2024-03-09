@@ -22,6 +22,7 @@ public class Lane
     public Road Road { get; set; }
     public int LaneIndex { get; set; }
 
+    // Empty constructor for JSON.Net deserialization
     public Lane() {}
 
     public Lane(Road road, int laneIndex)

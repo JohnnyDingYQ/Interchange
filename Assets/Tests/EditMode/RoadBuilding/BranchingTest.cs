@@ -14,7 +14,7 @@ public class BranchingTest
     public void SetUp()
     {
         BuildHandler.Reset();
-        Game.WipeGameState();
+        Game.WipeState();
         Roads = Game.Roads;
     }
 

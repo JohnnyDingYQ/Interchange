@@ -15,7 +15,7 @@ public class BuildTargetTest
     public void SetUp()
     {
         BuildHandler.Reset();
-        Game.WipeGameState();
+        Game.WipeState();
         Roads = Game.Roads;
     }
 

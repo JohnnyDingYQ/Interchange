@@ -4,11 +4,12 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
-public class DivisionTargets
+public class DivideTargets
 {
     public Road Road { get; set; }
     public float Interpolation { get; set; }
-    public DivisionTargets(float3 clickPos, IEnumerable<Road> GameRoads)
+    public bool IsValid { get; set; }
+    public DivideTargets(float3 clickPos, IEnumerable<Road> GameRoads)
     {
         List<FloatContainer> floatContainers = new();
         foreach (Road road in GameRoads)
@@ -20,11 +21,17 @@ public class DivisionTargets
             {
                 floatContainers.Add(new(distance, new RoadNearestPoint(road, interpolation)));
             }
-            floatContainers.Sort();
-            RoadNearestPoint target = FloatContainer.Unwrap<RoadNearestPoint>(floatContainers).First();
-            Road = target.Road;
-            Interpolation = target.Interpolation;
         }
+        if (floatContainers.Count == 0)
+        {
+            IsValid = false;
+            return;
+        }
+        floatContainers.Sort();
+        RoadNearestPoint target = FloatContainer.Unwrap<RoadNearestPoint>(floatContainers).First();
+        Road = target.Road;
+        Interpolation = target.Interpolation;
+        IsValid = true;
     }
 
     private readonly struct RoadNearestPoint

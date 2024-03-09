@@ -3,30 +3,11 @@ using Unity.Mathematics;
 
 public static class RoadBuilder
 {
-    public static void BuildRoad(float3 start, float3 pivot, float3 end, int LaneCount)
+    public static void BuildRoad(float3 start, float3 pivot, float3 end, int laneCount)
     {
-        MockDataInputImpl c = new(new List<float3> { start, pivot, end });
-        BuildHandler.dataInputBoundary = c;
-        BuildHandler.LaneCount = LaneCount;
-        for (int i = 0; i < 3; i++)
-        {
-            BuildHandler.HandleBuildCommand();
-        }
-
-    }
-
-    private class MockDataInputImpl : IDataInputBoundary
-    {
-        private readonly List<float3> posList;
-        private int index;
-        public MockDataInputImpl(List<float3> pos)
-        {
-            posList = pos;
-            index = 0;
-        }
-        public float3 GetCursorPos()
-        {
-            return posList[index++];
-        }
+        BuildHandler.LaneCount = laneCount;
+        BuildHandler.HandleBuildCommand(start);
+        BuildHandler.HandleBuildCommand(pivot);
+        BuildHandler.HandleBuildCommand(end);
     }
 }
