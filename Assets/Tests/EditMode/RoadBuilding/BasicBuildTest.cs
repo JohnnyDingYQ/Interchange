@@ -34,12 +34,10 @@ public class BasicBuildTest
     [Test]
     public void BuildOneLaneRoad()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-
-        Assert.AreEqual(1, Roads.Count);
-        Road road = Roads.Values.First();
+        Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         Lane lane = road.Lanes[0];
 
+        Assert.AreEqual(1, Roads.Count);
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.True(Utility.AreNumericallyEqual(pos1, lane.StartNode.Pos));
@@ -53,13 +51,11 @@ public class BasicBuildTest
     [Test]
     public void BuildTwoLaneRoad()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
-
-        Assert.AreEqual(1, Roads.Count);
-        Road road = Roads.Values.First();
+        Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
+        Assert.AreEqual(1, Roads.Count);
         Assert.IsNotNull(road.Curve);
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(pos1, road.StartPos);
@@ -77,39 +73,37 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtEnd_OneLane()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
 
-        CheckTwoOneLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road0, road1, 1);
     }
 
     [Test]
     public void ConnectionAtStart_OneLane()
     {
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road road0 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        Road road1 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
 
-        CheckTwoOneLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road1, road0, 1);
     }
 
     [Test]
     public void SnapAtEnd_OneLane()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3 + new float3(1, 0, 0) * (GConsts.BuildSnapTolerance - 1), pos4, pos5, 1);
+        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.BuildRoad(pos3 + new float3(1, 0, 0) * (GConsts.BuildSnapTolerance - 1), pos4, pos5, 1);
 
-        CheckTwoOneLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road0, road1, 1);
     }
 
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
         float3 exitingRoadStartPos = pos3 + new float3(GConsts.BuildSnapTolerance + GConsts.LaneWidth + 1, 0, 0);
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
-
-        Road enteringRoad = Utility.FindRoadWithStartPos(pos1);
-        Road exitingRoad = Utility.FindRoadWithStartPos(exitingRoadStartPos);
+        Road enteringRoad = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road exitingRoad =  RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
+        
         Assert.AreEqual(1, enteringRoad.Lanes[0].EndNode.Lanes.Count);
         Assert.AreEqual(1, exitingRoad.Lanes[0].StartNode.Lanes.Count);
     }
@@ -117,49 +111,45 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtEnd_TwoLanes()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 2);
+        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        Road road1 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 2);
 
-        CheckTwoTwoLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road0, road1, 2);
     }
 
     [Test]
     public void ConnectionAtStart_TwoLanes()
     {
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 2);
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
+        Road road0 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 2);
+        Road road1 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
 
-        CheckTwoTwoLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road1, road0, 2);
     }
 
     [Test]
     public void ConnectionAtEnd_ThreeLanes()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
+        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        Road road1 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
 
-        CheckTwoThreeLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road0, road1, 3);
     }
 
     [Test]
     public void ConnectionAtStart_ThreeLanes()
     {
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        Road road0 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 3);
+        Road road1 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
 
-        CheckTwoThreeLaneRoadsConnection(pos1, pos3);
+        CheckLanesConnection(road1, road0, 3);
     }
 
     [Test]
     public void ConnectionAtBothSides_OneLane()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos5, pos6, pos7, 1);
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
-
-        Road road1 = Utility.FindRoadWithStartPos(pos1);
-        Road road2 = Utility.FindRoadWithStartPos(pos3);
-        Road road3 = Utility.FindRoadWithStartPos(pos5);
+        Road road1 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road road2 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        Road road3 = RoadBuilder.BuildRoad(pos5, pos6, pos7, 1);
         Lane lane1 = road1.Lanes[0];
         Lane lane2 = road2.Lanes[0];
         Lane lane3 = road3.Lanes[0];
@@ -197,53 +187,19 @@ public class BasicBuildTest
         Assert.AreEqual(0, Roads.Count);
     }
 
-
-
     #region Helpers
-    public void CheckTwoOneLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
+    public void CheckLanesConnection(Road enteringRoad, Road exitingRoad, int laneCount)
     {
-        Road enteringRoad = Utility.FindRoadWithStartPos(enteringRoadStartPos);
-        Road exitingRoad = Utility.FindRoadWithStartPos(exitingRoadStartPos);
         Assert.NotNull(enteringRoad);
         Assert.NotNull(exitingRoad);
-        HashSet<Lane> expectedLanes = new() { enteringRoad.Lanes.First(), exitingRoad.Lanes.First() };
-
-        Assert.True(enteringRoad.Lanes[0].EndNode.Lanes.SetEquals(expectedLanes));
-    }
-
-    public void CheckTwoTwoLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
-    {
-        Road road1 = Utility.FindRoadWithStartPos(enteringRoadStartPos);
-        Road road2 = Utility.FindRoadWithStartPos(exitingRoadStartPos);
-        Lane lane11 = road1.Lanes[0];
-        Lane lane12 = road1.Lanes[1];
-        Lane lane21 = road2.Lanes[0];
-        Lane lane22 = road2.Lanes[1];
-        HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
-        HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
-        Assert.AreEqual(6, Nodes.Count);
-        Assert.AreEqual(2, lane11.EndNode.Lanes.Count);
-        Assert.True(lane11.EndNode.Lanes.SetEquals(expectedLanes0));
-        Assert.True(lane12.EndNode.Lanes.SetEquals(expectedLanes1));
-    }
-
-    public void CheckTwoThreeLaneRoadsConnection(float3 enteringRoadStartPos, float3 exitingRoadStartPos)
-    {
-        Road road1 = Utility.FindRoadWithStartPos(enteringRoadStartPos);
-        Road road2 = Utility.FindRoadWithStartPos(exitingRoadStartPos);
-        Lane lane11 = road1.Lanes[0];
-        Lane lane12 = road1.Lanes[1];
-        Lane lane13 = road1.Lanes[2];
-        Lane lane21 = road2.Lanes[0];
-        Lane lane22 = road2.Lanes[1];
-        Lane lane23 = road2.Lanes[2];
-        HashSet<Lane> expectedLanes0 = new() { lane11, lane21 };
-        HashSet<Lane> expectedLanes1 = new() { lane12, lane22 };
-        HashSet<Lane> expectedLanes2 = new() { lane13, lane23 };
-        Assert.AreEqual(9, Nodes.Count);
-        Assert.True(lane11.EndNode.Lanes.SetEquals(expectedLanes0));
-        Assert.True(lane12.EndNode.Lanes.SetEquals(expectedLanes1));
-        Assert.True(lane13.EndNode.Lanes.SetEquals(expectedLanes2));
+        Assert.AreEqual(laneCount * 3, Nodes.Count);
+        for (int i = 0; i < laneCount; i++)
+        {
+            Lane enteringLane = enteringRoad.Lanes[i];
+            Lane exitingLane = exitingRoad.Lanes[i];
+            HashSet<Lane> expectedLanes = new() { enteringLane, exitingLane };
+            Assert.True(enteringLane.EndNode.Lanes.SetEquals(expectedLanes));
+        }
     }
     #endregion
 }

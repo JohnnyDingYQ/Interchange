@@ -78,18 +78,17 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoDisconnectedOneLaneRoad()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos4, pos5, pos6, 1);
+        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.BuildRoad(pos4, pos5, pos6, 1);
+        
         Game.SaveGame();
         BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Road road0 = Utility.FindRoadWithStartPos(pos1);
         Assert.AreEqual(pos1, road0.StartPos);
         Assert.AreEqual(pos2, road0.PivotPos);
         Assert.AreEqual(pos3, road0.EndPos);
-        Road road1 = Utility.FindRoadWithStartPos(pos4);
         Assert.AreEqual(pos4, road1.StartPos);
         Assert.AreEqual(pos5, road1.PivotPos);
         Assert.AreEqual(pos6, road1.EndPos);
@@ -103,22 +102,20 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoConnectedOneLaneRoad()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        
         Game.SaveGame();
         BuildHandler.Reset();
         Game.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Road road0 = Utility.FindRoadWithStartPos(pos1);
         Assert.AreEqual(pos1, road0.StartPos);
         Assert.AreEqual(pos2, road0.PivotPos);
         Assert.AreEqual(pos3, road0.EndPos);
-        Road road1 = Utility.FindRoadWithStartPos(pos3);
         Assert.AreEqual(pos3, road1.StartPos);
         Assert.True(Vector3.Distance(pos4, road1.PivotPos) < 0.01f);
         Assert.AreEqual(pos5, road1.EndPos);
-        
         Assert.AreEqual(3, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));

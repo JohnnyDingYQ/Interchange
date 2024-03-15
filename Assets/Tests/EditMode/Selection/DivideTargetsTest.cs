@@ -70,10 +70,17 @@ public class DivideTargetsTest
     [Test]
     public void SnapsToNearerRoad()
     {
-        RoadBuilder.BuildRoad(0, GConsts.MinimumRoadLength * direction, 2 * GConsts.MinimumRoadLength * direction, 1);
-        RoadBuilder.BuildRoad(offset, GConsts.MinimumRoadLength * direction + offset, 2 * GConsts.MinimumRoadLength * direction + offset, 1);
-        Road road1 = Utility.FindRoadWithStartPos(0);
-        Road road2 = Utility.FindRoadWithStartPos(offset);
+        Road road1 = RoadBuilder.BuildRoad(
+            0, GConsts.MinimumRoadLength * direction,
+            2 * GConsts.MinimumRoadLength * direction,
+            1
+        );
+        Road road2 = RoadBuilder.BuildRoad(
+            offset,
+            GConsts.MinimumRoadLength * direction + offset,
+            2 * GConsts.MinimumRoadLength * direction + offset,
+            1
+        );
         DivideTargets dt;
 
         dt = new(0.4f * offset, Game.Roads.Values);

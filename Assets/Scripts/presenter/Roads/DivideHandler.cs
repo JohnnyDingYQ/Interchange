@@ -18,28 +18,32 @@ public static class DivideHandler
         Game.RemoveRoad(road);
         int laneCount = road.LaneCount;
         CurveUtility.Split(road.Curve, interpolation, out BezierCurve left, out BezierCurve right);
-        Road roadLeft = new(left, laneCount);
-        Road roadRight = new(right, laneCount);
+        Road lRoad = new(left, laneCount);
+        Road rRoad = new(right, laneCount);
+        OperateNodes();
 
-        for (int i = 0; i < roadLeft.LaneCount; i++)
+        return new SubRoads(lRoad, rRoad);
+
+        void OperateNodes()
         {
-            Lane laneLeft = roadLeft.Lanes[i];
-            Lane laneRight = roadRight.Lanes[i];
-            Lane lane = road.Lanes[i];
-            laneLeft.EndNode = laneRight.StartNode;
-            laneLeft.EndNode.Lanes.Add(laneLeft);
-            Game.RegisterNode(laneLeft.EndNode);
+            for (int i = 0; i < lRoad.LaneCount; i++)
+            {
+                Lane laneLeft = lRoad.Lanes[i];
+                Lane laneRight = rRoad.Lanes[i];
+                Lane lane = road.Lanes[i];
+                laneLeft.EndNode = laneRight.StartNode;
+                laneLeft.EndNode.Lanes.Add(laneLeft);
+                Game.RegisterNode(laneLeft.EndNode);
 
-            laneLeft.StartNode = lane.StartNode;
-            lane.StartNode.Lanes.Add(laneLeft);
+                laneLeft.StartNode = lane.StartNode;
+                lane.StartNode.Lanes.Add(laneLeft);
 
-            laneRight.EndNode = lane.EndNode;
-            lane.EndNode.Lanes.Add(laneRight);
-            Game.RegisterNode(laneLeft.StartNode);
-            Game.RegisterNode(laneRight.EndNode);
+                laneRight.EndNode = lane.EndNode;
+                lane.EndNode.Lanes.Add(laneRight);
+                Game.RegisterNode(laneLeft.StartNode);
+                Game.RegisterNode(laneRight.EndNode);
+            }
         }
-
-        return new SubRoads(roadLeft, roadRight);
     }
 }
 
