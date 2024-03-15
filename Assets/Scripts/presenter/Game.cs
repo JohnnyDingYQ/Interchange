@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Codice.CM.Triggers;
 
 public static class Game
 {
@@ -42,7 +41,8 @@ public static class Game
         }
     }
 
-    public static int NextAvailableNodeId {
+    public static int NextAvailableNodeId
+    {
         get
         {
             return GameState.NextAvailableNodeId;
@@ -52,7 +52,8 @@ public static class Game
             GameState.NextAvailableNodeId = value;
         }
     }
-    public static int NextAvailableRoadId {
+    public static int NextAvailableRoadId
+    {
         get
         {
             return GameState.NextAvailableRoadId;
@@ -85,8 +86,24 @@ public static class Game
         Roads.Add(road.Id, road);
     }
 
-    public static void RemoveRoad(Road road)
+    public static void RegisterNode(Node node)
     {
+        node.Id = NextAvailableNodeId++;
+        Nodes[node.Id] = node;
+    }
+
+    public static bool RemoveRoad(Road road)
+    {
+        if (!Roads.ContainsKey(road.Id))
+            return false;
         Roads.Remove(road.Id);
+        foreach (Lane lane in road.Lanes)
+            foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
+            {
+                node.Lanes.Remove(lane);
+                if (node.Lanes.Count == 0)
+                    Nodes.Remove(node.Id);
+            }
+        return true;
     }
 }

@@ -26,29 +26,31 @@ public static class BuildHandler
         pivotAssigned = false;
     }
 
-    public static void HandleBuildCommand(float3 clickPos)
+    public static Road HandleBuildCommand(float3 clickPos)
     {
         if (!startAssigned)
         {
             startAssigned = true;
             startTarget = new BuildTargets(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
+            return null;
         }
         else if (!pivotAssigned)
         {
             pivotAssigned = true;
             pivotClick = clickPos;
+            return null;
         }
         else
         {
             endTarget = new BuildTargets(clickPos, LaneCount, Side.End, Game.Nodes.Values);
-            BuildRoad(startTarget, pivotClick, endTarget);
             startAssigned = false;
             pivotAssigned = false;
+            return BuildRoad(startTarget, pivotClick, endTarget);
         }
 
     }
 
-    static void BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
+    static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
     {
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
@@ -62,7 +64,7 @@ public static class BuildHandler
         if (length < GConsts.MinimumRoadLength || length > GConsts.MaximumRoadLength)
         {
             Debug.Log("Road length of " + length + " is not between " + GConsts.MinimumRoadLength + " and " + GConsts.MaximumRoadLength);
-            return;
+            return null;
         }
             
         Road road = InitRoad(startPos, pivotPos, endPos);
@@ -85,7 +87,8 @@ public static class BuildHandler
             }
         }
 
-        AssignNodeNumber(road);
+        RegisterNodes(road);
+        return road;
 
         # region extracted funcitons
         void AlignPivotPos()
@@ -118,31 +121,21 @@ public static class BuildHandler
         #endregion
     }
 
-    static void AssignNodeNumber(Road road)
+    static void RegisterNodes(Road road)
     {
         foreach (Lane lane in road.Lanes)
         {
-            
             if (!lane.StartNode.IsRegistered())
-            {
-                lane.StartNode.Id = Game.NextAvailableNodeId++;
-                Game.Nodes[lane.StartNode.Id] = lane.StartNode;
-            }
+                Game.RegisterNode(lane.StartNode);
 
             if (!lane.EndNode.IsRegistered())
-            {
-                lane.EndNode.Id = Game.NextAvailableNodeId++;
-                Game.Nodes[lane.EndNode.Id] = lane.EndNode;
-            }
-
+                Game.RegisterNode(lane.EndNode);
         }
     }
 
     static Road InitRoad(float3 startPos, float3 pivotPos, float3 endPos)
     {
         Road road = new(startPos, pivotPos, endPos, LaneCount);
-        Game.RegisterRoad(road);
-
         return road;
     }
     static void ReloadAllSpline()

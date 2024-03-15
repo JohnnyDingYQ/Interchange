@@ -27,8 +27,8 @@ public class Road
         EndPos = endPos;
         LaneCount = laneCount;
         InitCurve();
-
         InitLanes();
+        Game.RegisterRoad(this);
     }
 
     public Road(BezierCurve curve, int laneCount)
@@ -39,6 +39,7 @@ public class Road
         EndPos = curve.P3;
         LaneCount = laneCount;
         InitLanes();
+        Game.RegisterRoad(this);
     }
 
     public void InitCurve()

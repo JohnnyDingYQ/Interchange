@@ -31,7 +31,7 @@ public class GameState
 
     public GameState()
     {
-        NextAvailableNodeId = 0;
-        NextAvailableRoadId = 0;
+        NextAvailableNodeId = 1;
+        NextAvailableRoadId = 1;
     }
 }

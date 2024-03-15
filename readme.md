@@ -27,6 +27,8 @@ Connecting one lane highway to another highway | ✅ | [5fdd129](https://github.
 Connecting multi lane highway to another highway <br> with more or equal lanes | ✅ | [9f82bd7](https://github.com/JohnnyDingYQ/Interchange/commit/9f82bd7e4b01982f32a4749ebb24edd74ea92d4c) | Feb 25 2024
 Enfore smooth highway connections | ✅ | [de89b6d](https://github.com/JohnnyDingYQ/Interchange/commit/de89b6ddcc8bebc2b23774c62e6e19739ea8e9cf) | Feb 26 2024
 Highway lane expansion | ✅ | [bbbcf2c](https://github.com/JohnnyDingYQ/Interchange/commit/bbbcf2cf8037e79f3738ed81f23d5bb28946dd2f) | Mar 03 2024
+Max and Min highway lengths | ✅  []
+Delete highway | WIP
 Highway division | WIP
 
 

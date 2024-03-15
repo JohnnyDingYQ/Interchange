@@ -85,11 +85,11 @@ public class SaveSystemTest
         Game.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Road road0 = Game.Roads[0];
+        Road road0 = Utility.FindRoadWithStartPos(pos1);
         Assert.AreEqual(pos1, road0.StartPos);
         Assert.AreEqual(pos2, road0.PivotPos);
         Assert.AreEqual(pos3, road0.EndPos);
-        Road road1 = Game.Roads[1];
+        Road road1 = Utility.FindRoadWithStartPos(pos4);
         Assert.AreEqual(pos4, road1.StartPos);
         Assert.AreEqual(pos5, road1.PivotPos);
         Assert.AreEqual(pos6, road1.EndPos);
@@ -110,11 +110,11 @@ public class SaveSystemTest
         Game.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Road road0 = Game.Roads[0];
+        Road road0 = Utility.FindRoadWithStartPos(pos1);
         Assert.AreEqual(pos1, road0.StartPos);
         Assert.AreEqual(pos2, road0.PivotPos);
         Assert.AreEqual(pos3, road0.EndPos);
-        Road road1 = Game.Roads[1];
+        Road road1 = Utility.FindRoadWithStartPos(pos3);
         Assert.AreEqual(pos3, road1.StartPos);
         Assert.True(Vector3.Distance(pos4, road1.PivotPos) < 0.01f);
         Assert.AreEqual(pos5, road1.EndPos);
