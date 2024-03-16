@@ -18,11 +18,11 @@ public class BuildTargets
     /// <param name="clickPos">The click position</param>
     /// <param name="laneCount">How many lanes the road will have</param>
     /// <param name="side">Which side of the raod does the clickPos define</param>
-    /// <param name="GameNodes">Nodes eligible for consideration</param>
-    public BuildTargets(float3 clickPos, int laneCount, Side side, IEnumerable<Node> GameNodes)
+    /// <param name="gameNodes">Nodes eligible for consideration</param>
+    public BuildTargets(float3 clickPos, int laneCount, Side side, IEnumerable<Node> gameNodes)
     {
         Side = side;
-        Nodes = GetBuildNodes(clickPos, laneCount, GameNodes);
+        Nodes = GetBuildNodes(clickPos, laneCount, gameNodes);
         if (Nodes == null)
         {
             SnapNotNull = false;
@@ -36,7 +36,7 @@ public class BuildTargets
     }
     List<Node> GetBuildNodes(float3 clickPos, int laneCount, IEnumerable<Node> GameNodes)
     {
-        float snapRadius = laneCount / 2 * GConsts.LaneWidth + GConsts.BuildSnapTolerance;
+        float snapRadius = (laneCount * GConsts.LaneWidth + GConsts.BuildSnapTolerance) / 2;
         List<FloatContainer> floatContainers = new();
         foreach (Node node in GameNodes)
         {
@@ -54,15 +54,15 @@ public class BuildTargets
 
         // this sorts nodes with their order in the road, left to right in the direction of the roads
         nodes.Sort();
-
+        Debug.Log(nodes.Count);
         if (nodes.Count == laneCount)
         {
             return nodes;
         }
-        else if (ShouldCheckLaneExpansion())
+        else if (nodes.Count > 0)
         {
             Road road = nodes.First().Lanes.First().Road;
-            GetInterpolatedCandidates(road, 2);
+            GetInterpolatedCandidates(road, 2, Side);
             if (floatContainers.Count + nodes.Count < laneCount)
             {
                 return null;
@@ -81,18 +81,14 @@ public class BuildTargets
         }
 
         # region extracted functions
-        bool ShouldCheckLaneExpansion()
-        {
-            return nodes.Count > 0 && Side == Side.Start;
-        }
-
-        void GetInterpolatedCandidates(Road road, int interpolationReach)
+        void GetInterpolatedCandidates(Road road, int interpolationReach, Side side)
         {
             floatContainers = new();
+            float t = side == Side.Start ? 1 : 0;
             for (int i = 0; i < interpolationReach; i++)
             {
-                float3 left = road.InterpolateLanePos(1, -(1 + i));
-                float3 right = road.InterpolateLanePos(1, road.LaneCount + i);
+                float3 left = road.InterpolateLanePos(t, -(1 + i));
+                float3 right = road.InterpolateLanePos(t, road.LaneCount + i);
                 AddNodeIfWithinSnap(new(left, -(1 + i)));
                 AddNodeIfWithinSnap(new(right, road.LaneCount + i));
             }

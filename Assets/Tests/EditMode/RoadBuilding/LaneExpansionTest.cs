@@ -9,12 +9,13 @@ public class LaneExpansionTest
     Vector3 pos3 = new(0, 14, GConsts.MinimumRoadLength * 2);
     Vector3 pos4 = new(0, 16, GConsts.MinimumRoadLength * 3);
     Vector3 pos5 = new(0, 16, GConsts.MinimumRoadLength * 4);
+    SortedDictionary<int, Node> Nodes;
 
     [SetUp]
     public void SetUp()
     {
-        BuildHandler.Reset();
         Game.WipeState();
+        Nodes = Game.Nodes;
     }
 
     [Test]
@@ -27,7 +28,7 @@ public class LaneExpansionTest
         Lane lane11 = road1.Lanes[1];
 
         Assert.AreSame(lane00.EndNode, lane11.StartNode);
-        Assert.True(lane10.StartNode.IsRegistered());
+        Assert.AreEqual(5, Game.Nodes.Count);
         Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
         Assert.True(lane00.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane11 }));
     }
@@ -45,7 +46,7 @@ public class LaneExpansionTest
 
         Assert.AreSame(lane00.EndNode, lane10.StartNode);
         Assert.AreSame(lane01.EndNode, lane11.StartNode);
-        Assert.True(lane12.StartNode.IsRegistered());
+        Assert.AreEqual(8, Game.Nodes.Count);
         Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
         Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane10 }));
         Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane01, lane11 }));
@@ -62,8 +63,7 @@ public class LaneExpansionTest
         Lane lane12 = road1.Lanes[2];
 
         Assert.AreSame(lane00.EndNode, lane11.StartNode);
-        Assert.True(lane10.StartNode.IsRegistered());
-        Assert.True(lane12.StartNode.IsRegistered());
+        Assert.AreEqual(7, Game.Nodes.Count);
         Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
         Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
         Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
@@ -79,8 +79,7 @@ public class LaneExpansionTest
         Lane lane11 = road1.Lanes[1];
         Lane lane12 = road1.Lanes[2];
         Assert.AreSame(lane00.EndNode, lane12.StartNode);
-        Assert.True(lane11.StartNode.IsRegistered());
-        Assert.True(lane10.StartNode.IsRegistered());
+        Assert.AreEqual(7, Game.Nodes.Count);
         Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
         Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11 }));
         Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12, lane00 }));
@@ -96,8 +95,7 @@ public class LaneExpansionTest
         Lane lane11 = road1.Lanes[1];
         Lane lane12 = road1.Lanes[2];
         Assert.AreSame(lane00.EndNode, lane10.StartNode);
-        Assert.True(lane11.StartNode.IsRegistered());
-        Assert.True(lane10.StartNode.IsRegistered());
+        Assert.AreEqual(7, Game.Nodes.Count);
         Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10, lane00 }));
         Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11 }));
         Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));

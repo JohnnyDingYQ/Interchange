@@ -27,9 +27,10 @@ Connecting one lane highway to another highway | ✅ | [5fdd129](https://github.
 Connecting multi lane highway to another highway <br> with more or equal lanes | ✅ | [9f82bd7](https://github.com/JohnnyDingYQ/Interchange/commit/9f82bd7e4b01982f32a4749ebb24edd74ea92d4c) | Feb 25 2024
 Enfore smooth highway connections | ✅ | [de89b6d](https://github.com/JohnnyDingYQ/Interchange/commit/de89b6ddcc8bebc2b23774c62e6e19739ea8e9cf) | Feb 26 2024
 Highway lane expansion | ✅ | [bbbcf2c](https://github.com/JohnnyDingYQ/Interchange/commit/bbbcf2cf8037e79f3738ed81f23d5bb28946dd2f) | Mar 03 2024
-Max and Min highway lengths | ✅  []
-Delete highway | WIP
-Highway division | WIP
+Max and Min highway lengths | ✅ |  [7c8d073](https://github.com/JohnnyDingYQ/Interchange/commit/7c8d07310d0ab34f225301aca09070ebeb26a834) | Mar 05 2024
+Delete highway | ✅ | [5dac371](https://github.com/JohnnyDingYQ/Interchange/commit/5dac3718fc7f118fbd22a012a0619ccee86a23dc) | March 14 2024
+Highway division | ✅ | [b5a2e0b](https://github.com/JohnnyDingYQ/Interchange/commit/b5a2e0be83f40afbebcd8516bf08bb117eab8c68) | March 15 2024
+Highway Replacement | WIP |
 
 
 ## Save System & Game State Recovery (WIP)

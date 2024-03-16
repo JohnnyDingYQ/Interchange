@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -67,7 +66,7 @@ public static class BuildHandler
             return null;
         }
             
-        Road road = InitRoad(startPos, pivotPos, endPos);
+        Road road = InitRoad(startPos, pivotPos, endPos, length);
 
         if (startTarget.SnapNotNull)
         {
@@ -133,9 +132,9 @@ public static class BuildHandler
         }
     }
 
-    static Road InitRoad(float3 startPos, float3 pivotPos, float3 endPos)
+    static Road InitRoad(float3 startPos, float3 pivotPos, float3 endPos, float length)
     {
-        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        Road road = new(startPos, pivotPos, endPos, LaneCount, length);
         return road;
     }
     static void ReloadAllSpline()

@@ -40,7 +40,7 @@ public class Roads : MonoBehaviour
 
     void DivideRoad()
     {
-        DivideHandler.HandleDivideCommand(InputManager.MouseWorldPos);
+        
     }
 
     void BuildMode_OneLane()

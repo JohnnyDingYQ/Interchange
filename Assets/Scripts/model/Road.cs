@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Splines;
+using UnityEngine.UIElements;
 
 public class Road
 {
@@ -16,6 +17,7 @@ public class Road
     public float3 StartPos { get; set; }
     public float3 PivotPos { get; set; }
     public float3 EndPos { get; set; }
+    public float Length { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road() {}
@@ -27,6 +29,7 @@ public class Road
         EndPos = endPos;
         LaneCount = laneCount;
         InitCurve();
+        Length = CurveUtility.CalculateLength(Curve);
         InitLanes();
         Game.RegisterRoad(this);
     }
@@ -38,8 +41,15 @@ public class Road
         PivotPos = curve.P1;
         EndPos = curve.P3;
         LaneCount = laneCount;
+        Length = CurveUtility.CalculateLength(curve);
         InitLanes();
         Game.RegisterRoad(this);
+    }
+
+    public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount, float length) :
+    this(startPos, pivotPos, endPos, laneCount)
+    {
+        Length = length;
     }
 
     public void InitCurve()
