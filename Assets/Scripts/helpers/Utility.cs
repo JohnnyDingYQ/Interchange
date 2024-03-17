@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using CodiceApp;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -20,37 +19,48 @@ public static class Utility
             info = value;
         }
     }
-    public static void DrawCurve(BezierCurve curve, Color color, float duration)
+    public static void DrawBezierCurve(BezierCurve curve, float startT, float endT, Color color, float duration)
     {
         int resolution = 32;
         float3 pos1;
         float3 pos2;
         for (int i = 1; i <= resolution; i++)
         {
-            pos1 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * (i-1));
-            pos2 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * i);
+            pos1 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * (i-1) * (endT - startT) + startT);
+            pos2 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * i * (endT - startT) + startT);
+            Debug.DrawLine(pos1, pos2, color, duration);
+        }
+    }
+    public static void DrawBezierCurve(BezierCurve curve, Color color, float duration)
+    {
+        DrawBezierCurve(curve, 0, 1, color, duration);
+    }
+
+    public static void DrawSpline(Spline spline, float startT, float endT, Color color, float duration)
+    {
+        int resolution = 32;
+        float3 pos1;
+        float3 pos2;
+        for (int i = 1; i <= resolution; i++)
+        {
+            pos1 = spline.EvaluatePosition(1 / (float) resolution * (i-1) * (endT - startT) + startT);
+            pos2 = spline.EvaluatePosition(1 / (float) resolution * i * (endT - startT) + startT);
             Debug.DrawLine(pos1, pos2, color, duration);
         }
     }
 
     public static void DrawSpline(Spline spline, Color color, float duration)
     {
-        int count = 1;
-        IEnumerable<BezierKnot> k = spline.Knots;
-        while (count < k.Count())
-        {
-            Debug.DrawLine(k.ElementAt(count).Position, k.ElementAt(count - 1).Position, color, duration);
-            count += 1;
-        }
+        DrawSpline(spline, 0, 1, color, duration);
     }
 
-    public static void DrawAllRoads(float duration)
+    public static void DrawRoadsAndLanes(float duration)
     {
         foreach (Road road in Game.Roads.Values)
         {
             if (road.LaneCount % 2 == 0)
             {
-                DrawCurve(road.Curve, Color.red, duration);
+                DrawBezierCurve(road.BezierCurve, Color.red, duration);
             }
             int laneCount = road.Lanes.Count;
             foreach (Lane lane in road.Lanes)
@@ -68,6 +78,18 @@ public static class Utility
         }
     }
 
+    public static void DrawVertices(float duration)
+    {
+        foreach(Road road in Game.Roads.Values)
+        {
+            foreach(Lane lane in road.Lanes)
+            {
+                DebugExtension.DebugPoint(lane.StartVertex.Pos, Color.cyan, 1, duration);
+                DebugExtension.DebugPoint(lane.EndVertex.Pos, Color.cyan, 1, duration);
+            }
+        }
+    }
+
     public static void DrawControlPoints(float duration)
     {
         foreach(Road road in Game.Roads.Values)
@@ -78,27 +100,15 @@ public static class Utility
         }
     }
 
-    public static Road FindRoadWithStartPos(float3 startPos)
+    public static void DrawPaths(float duration)
     {
-        foreach (Road road in Game.Roads.Values)
+        foreach(Path path in Game.GameState.Paths)
         {
-            if (AreNumericallyEqual(road.StartPos, startPos))
+            foreach(ICurve curve in path.Curves)
             {
-                return road;
+                curve.Draw(duration);
             }
         }
-        return null;
-    }
-    public static Road FindRoadWithEndPos(float3 endPos)
-    {
-        foreach (Road road in Game.Roads.Values)
-        {
-            if (AreNumericallyEqual(road.EndPos, endPos))
-            {
-                return road;
-            }
-        }
-        return null;
     }
 
     public static bool AreNumericallyEqual(float3 a, float3 b)

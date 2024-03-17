@@ -26,6 +26,20 @@ public class GameState
         }
     }
 
+    private List<Path> paths;
+    public List<Path> Paths
+    {
+        get
+        {
+            paths ??= new();
+            return paths;
+        }
+        set
+        {
+            paths = value;
+        }
+    }
+
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
 

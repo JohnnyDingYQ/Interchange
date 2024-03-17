@@ -38,7 +38,7 @@ public class BasicBuildTest
         Lane lane = road.Lanes[0];
 
         Assert.AreEqual(1, Roads.Count);
-        Assert.IsNotNull(road.Curve);
+        Assert.IsNotNull(road.BezierCurve);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.True(Utility.AreNumericallyEqual(pos1, lane.StartNode.Pos));
         Assert.True(Utility.AreNumericallyEqual(pos3, lane.EndNode.Pos));
@@ -56,7 +56,7 @@ public class BasicBuildTest
         Lane lane1 = road.Lanes[1];
 
         Assert.AreEqual(1, Roads.Count);
-        Assert.IsNotNull(road.Curve);
+        Assert.IsNotNull(road.BezierCurve);
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(pos1, road.StartPos);
         Assert.AreEqual(pos3, road.EndPos);

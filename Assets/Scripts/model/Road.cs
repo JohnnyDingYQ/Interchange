@@ -10,7 +10,7 @@ public class Road
     [JsonIgnore]
     public RoadGameObject RoadGameObject { get; set; }
     [JsonIgnore]
-    public BezierCurve Curve { get; set; }
+    public BezierCurve BezierCurve { get; set; }
     public List<Lane> Lanes { get; set; }
     public int LaneCount { get; set; }
     public float3 StartPos { get; set; }
@@ -28,13 +28,13 @@ public class Road
         EndPos = endPos;
         LaneCount = laneCount;
         InitCurve();
-        Length = CurveUtility.CalculateLength(Curve);
+        Length = CurveUtility.CalculateLength(BezierCurve);
         InitLanes();
     }
 
     public Road(BezierCurve curve, int laneCount)
     {
-        Curve = curve;
+        BezierCurve = curve;
         StartPos = curve.P0;
         PivotPos = curve.P1;
         EndPos = curve.P3;
@@ -45,20 +45,20 @@ public class Road
 
     public void InitCurve()
     {
-        Curve = new BezierCurve(StartPos, PivotPos, EndPos);
+        BezierCurve = new BezierCurve(StartPos, PivotPos, EndPos);
     }
 
     public float3 InterpolateLanePos(float t, int lane)
     {
         float3 normal = GetNormal(t);
-        float3 pos = CurveUtility.EvaluatePosition(Curve, t);
+        float3 pos = CurveUtility.EvaluatePosition(BezierCurve, t);
         float3 offset = normal * (Constants.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * Constants.LaneWidth);
         return pos + offset;
     }
 
         private float3 GetNormal(float t)
     {
-        float3 tangent = CurveUtility.EvaluateTangent(Curve, t);
+        float3 tangent = CurveUtility.EvaluateTangent(BezierCurve, t);
         tangent.y = 0;
         return Vector3.Cross(tangent, Vector3.up).normalized;
     }

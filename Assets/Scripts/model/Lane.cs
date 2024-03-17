@@ -39,6 +39,7 @@ public class Lane
         InitSpline();
         InitNodes();
         Length = Spline.GetLength();
+        InitVertices();
     }
 
     public void InitSpline()
@@ -56,7 +57,12 @@ public class Lane
 
     void InitVertices()
     {
-
+        StartVertex = new(this, Side.Start);
+        EndVertex = new(this, Side.End);
+        // TODO: Remove me
+        Path path = new();
+        path.Curves.Add(new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation));
+        Game.GameState.Paths.Add(path);
     }
 
     /// <summary>

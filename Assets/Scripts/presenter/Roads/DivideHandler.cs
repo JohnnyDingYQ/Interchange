@@ -16,7 +16,7 @@ public static class DivideHandler
     {
         clickPos.y = 0;
         Ray ray = new(clickPos, Vector3.up);
-        float distance = CurveUtility.GetNearestPoint(road.Curve, ray, out float3 position, out float interpolation);
+        float distance = CurveUtility.GetNearestPoint(road.BezierCurve, ray, out float3 position, out float interpolation);
         return interpolation;
     }
 
@@ -26,7 +26,7 @@ public static class DivideHandler
             return null;
         Game.RemoveRoad(road);
         int laneCount = road.LaneCount;
-        CurveUtility.Split(road.Curve, interpolation, out BezierCurve left, out BezierCurve right);
+        CurveUtility.Split(road.BezierCurve, interpolation, out BezierCurve left, out BezierCurve right);
         Road LeftRoad = new(left, laneCount);
         Game.RegisterRoad(LeftRoad);
         Road RightRoad = new(right, laneCount);

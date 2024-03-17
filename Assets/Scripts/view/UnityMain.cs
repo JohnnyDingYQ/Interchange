@@ -5,6 +5,7 @@ public class UnityMain : MonoBehaviour
     [SerializeField] private int Height;
     [SerializeField] private int Width;
     [SerializeField] private InputManager inputManager;
+    private float drawDuration = 0.5f;
     void Awake()
     {
         Utility.Info.logEnabled = true;
@@ -18,13 +19,15 @@ public class UnityMain : MonoBehaviour
             inputManager.SaveGame += SaveGame;
             inputManager.LoadGame += LoadGame;
         }
-        InvokeRepeating("Draw", 0f, 0.5f);
+        InvokeRepeating("Draw", 0f, drawDuration);
     }
 
     void Draw()
     {
-        Utility.DrawAllRoads(0.5f);
-        Utility.DrawControlPoints(0.5f);
+        // Utility.DrawRoadsAndLanes(drawDuration);
+        Utility.DrawControlPoints(drawDuration);
+        Utility.DrawVertices(drawDuration);
+        Utility.DrawPaths(drawDuration);
     }
 
     void OnDestroy()

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class Path
 {
-    public List<ICurve> curves;
+    private List<ICurve> curves;
     public List<ICurve> Curves
     {
         get
@@ -15,4 +15,6 @@ public class Path
             curves = value;
         }
     }
+
+    public Path() {}
 }

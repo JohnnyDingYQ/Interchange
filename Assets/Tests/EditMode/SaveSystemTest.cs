@@ -134,7 +134,7 @@ public class SaveSystemTest
 
         foreach (Road road in Game.Roads.Values)
         {
-            Assert.True(road.Curve != null);
+            Assert.True(road.BezierCurve != null);
             foreach (Lane lane in road.Lanes)
                 Assert.True(lane.Spline != null);
         }
