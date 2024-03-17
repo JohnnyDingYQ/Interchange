@@ -30,7 +30,7 @@ Highway lane expansion | ✅ | [bbbcf2c](https://github.com/JohnnyDingYQ/Interch
 Max and Min highway lengths | ✅ |  [7c8d073](https://github.com/JohnnyDingYQ/Interchange/commit/7c8d07310d0ab34f225301aca09070ebeb26a834) | Mar 05 2024
 Delete highway | ✅ | [5dac371](https://github.com/JohnnyDingYQ/Interchange/commit/5dac3718fc7f118fbd22a012a0619ccee86a23dc) | March 14 2024
 Highway division | ✅ | [b5a2e0b](https://github.com/JohnnyDingYQ/Interchange/commit/b5a2e0be83f40afbebcd8516bf08bb117eab8c68) | March 15 2024
-Highway Replacement | WIP |
+Highway replacement | WIP |
 
 
 ## Save System & Game State Recovery (WIP)
@@ -40,6 +40,11 @@ Functionality  | Status    | Commit | Date
 Saving and loading highways |✅| [8fbc21e](https://github.com/JohnnyDingYQ/Interchange/commit/8fbc21ecaf96daacaffb463fc29b4b7a56e030ce) | Feb 23 2024
 
 ## Vehicle pathfinding (To do)
+
+Functionality  | Status    | Commit | Date
+-------------  | ------------- | ------ | -----
+Paths for vehicle | WIP |
+
 ## Highway Mesh (To do)
 ## Sample level (To do)
 ## Milestone: Prototype

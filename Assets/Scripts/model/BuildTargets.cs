@@ -36,7 +36,7 @@ public class BuildTargets
     }
     List<Node> GetBuildNodes(float3 clickPos, int laneCount, IEnumerable<Node> GameNodes)
     {
-        float snapRadius = (laneCount * GConsts.LaneWidth + GConsts.BuildSnapTolerance) / 2;
+        float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
         List<FloatContainer> floatContainers = new();
         foreach (Node node in GameNodes)
         {
@@ -54,7 +54,6 @@ public class BuildTargets
 
         // this sorts nodes with their order in the road, left to right in the direction of the roads
         nodes.Sort();
-        Debug.Log(nodes.Count);
         if (nodes.Count == laneCount)
         {
             return nodes;

@@ -5,9 +5,9 @@ using UnityEngine;
 public class BranchingTest
 {
     Vector3 pos1 = new(0, 0, 0);
-    Vector3 pos2 = GConsts.MinimumRoadLength * new Vector3(1, 0, 1);
-    Vector3 pos3 = GConsts.MinimumRoadLength * 2 * new Vector3(1, 0, 1);
-    Vector3 offset = GConsts.MinimumRoadLength * new Vector3(1, 0, 1);
+    Vector3 pos2 = Constants.MinimumLaneLength * new Vector3(1, 0, 1);
+    Vector3 pos3 = Constants.MinimumLaneLength * 2 * new Vector3(1, 0, 1);
+    Vector3 offset = Constants.MinimumLaneLength * new Vector3(1, 0, 1);
     SortedDictionary<int, Road> Roads;
 
     [SetUp]

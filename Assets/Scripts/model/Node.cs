@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.Splines;
 
 
@@ -30,7 +29,7 @@ public class Node : IComparable<Node>
     {
         if (Lanes.Count == 0)
         {
-            throw new  InvalidOperationException("Node has no lane... Cannot get tangent");
+            throw new InvalidOperationException("Node has no lane... Cannot get tangent");
         }
         Lane lane = Lanes.First();
         if (IsExitingLane(lane))

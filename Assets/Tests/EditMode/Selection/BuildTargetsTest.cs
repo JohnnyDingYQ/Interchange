@@ -7,8 +7,8 @@ using UnityEngine;
 public class BuildTargetTest
 {
     float3 pos1 = new(0, 0, 0);
-    float3 pos2 = new(GConsts.MinimumRoadLength, 0, 0);
-    float3 pos3 = new(GConsts.MinimumRoadLength * 2, 0, 0);
+    float3 pos2 = new(Constants.MinimumLaneLength, 0, 0);
+    float3 pos3 = new(Constants.MinimumLaneLength * 2, 0, 0);
     SortedDictionary<int, Road> Roads;
 
     [SetUp]
@@ -65,7 +65,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
         Lane lane = road.Lanes[0];
-        BuildTargets bt = new(lane.EndPos + 0.9f * GConsts.BuildSnapTolerance * new float3(1, 0, 0), 1, Side.Start, Game.Nodes.Values);
+        BuildTargets bt = new(lane.EndPos + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 1, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(1, bt.Nodes.Count);
         Node node = bt.Nodes[0];
 
@@ -82,7 +82,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
         float3 midPoint = Vector3.Lerp(lane0.StartPos, lane1.StartPos, 0.5f);
-        BuildTargets bt = new(midPoint + 0.9f * GConsts.BuildSnapTolerance * new float3(-1, 0, 0), 2, Side.End, Game.Nodes.Values);
+        BuildTargets bt = new(midPoint + 0.9f * Constants.BuildSnapTolerance * new float3(-1, 0, 0), 2, Side.End, Game.Nodes.Values);
         Assert.AreEqual(2, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
@@ -97,7 +97,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToTwoLane_Left()
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Vector3 buildPoint = pos3 + 0.9f * GConsts.BuildSnapTolerance * new float3(0, 0, 1);
+        Vector3 buildPoint = pos3 + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
         BuildTargets bt = new(buildPoint, 2, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(2, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
@@ -111,7 +111,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToTwoLane_Right()
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Vector3 buildPoint = pos3 + 0.9f * GConsts.BuildSnapTolerance * new float3(0, 0, -1);
+        Vector3 buildPoint = pos3 + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
         BuildTargets bt = new(buildPoint, 2, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(2, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
@@ -125,7 +125,7 @@ public class BuildTargetTest
     public void LaneExpansionTwoLaneToThreeLane_Left()
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
-        Vector3 buildPoint = pos3 + 0.9f * GConsts.BuildSnapTolerance * new float3(0, 0, 1);
+        Vector3 buildPoint = pos3 + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
         BuildTargets bt = new(buildPoint, 3, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(3, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
@@ -143,7 +143,7 @@ public class BuildTargetTest
     public void LaneExpansionTwoLaneToThreeLane_Right()
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 2);
-        Vector3 buildPoint = pos3 + 0.9f * GConsts.BuildSnapTolerance * new float3(0, 0, -1);
+        Vector3 buildPoint = pos3 + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
         BuildTargets bt = new(buildPoint, 3, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(3, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
@@ -177,7 +177,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Left()
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Vector3 buildPoint = pos3 + 1.5f * GConsts.BuildSnapTolerance * new float3(0, 0, 1);
+        Vector3 buildPoint = pos3 + 1.5f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
         BuildTargets bt = new(buildPoint, 3, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(3, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
@@ -193,7 +193,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Right()
     {
         Road road = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Vector3 buildPoint = pos3 + 1.5f * GConsts.BuildSnapTolerance * new float3(0, 0, -1);
+        Vector3 buildPoint = pos3 + 1.5f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
         BuildTargets bt = new(buildPoint, 3, Side.Start, Game.Nodes.Values);
         Assert.AreEqual(3, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];

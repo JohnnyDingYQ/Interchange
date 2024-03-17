@@ -7,12 +7,12 @@ using UnityEngine;
 public class BasicBuildTest
 {
     float3 pos1 = new(0, 0, 0);
-    float3 pos2 = GConsts.MinimumRoadLength * new float3(1, 0, 1);
-    float3 pos3 = GConsts.MinimumRoadLength * 2 * new float3(1, 0, 1);
-    float3 pos4 = GConsts.MinimumRoadLength * 3 * new float3(1, 0, 1);
-    float3 pos5 = GConsts.MinimumRoadLength * 4 * new float3(1, 0, 1);
-    float3 pos6 = GConsts.MinimumRoadLength * 5 * new float3(1, 0, 1);
-    float3 pos7 = GConsts.MinimumRoadLength * 6 * new float3(1, 0, 1);
+    float3 pos2 = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 pos3 = Constants.MinimumLaneLength * 2 * new float3(1, 0, 1);
+    float3 pos4 = Constants.MinimumLaneLength * 3 * new float3(1, 0, 1);
+    float3 pos5 = Constants.MinimumLaneLength * 4 * new float3(1, 0, 1);
+    float3 pos6 = Constants.MinimumLaneLength * 5 * new float3(1, 0, 1);
+    float3 pos7 = Constants.MinimumLaneLength * 6 * new float3(1, 0, 1);
     SortedDictionary<int, Node> Nodes;
     SortedDictionary<int, Road> Roads;
 
@@ -92,7 +92,7 @@ public class BasicBuildTest
     public void SnapAtEnd_OneLane()
     {
         Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.BuildRoad(pos3 + new float3(1, 0, 0) * (GConsts.BuildSnapTolerance - 1), pos4, pos5, 1);
+        Road road1 = RoadBuilder.BuildRoad(pos3 + new float3(1, 0, 0) * (Constants.BuildSnapTolerance - 1), pos4, pos5, 1);
 
         CheckLanesConnection(road0, road1, 1);
     }
@@ -100,7 +100,7 @@ public class BasicBuildTest
     [Test]
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
-        float3 exitingRoadStartPos = pos3 + new float3(GConsts.BuildSnapTolerance + GConsts.LaneWidth + 1, 0, 0);
+        float3 exitingRoadStartPos = pos3 + new float3(Constants.BuildSnapTolerance + Constants.LaneWidth + 1, 0, 0);
         Road enteringRoad = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
         Road exitingRoad =  RoadBuilder.BuildRoad(exitingRoadStartPos, pos4, pos5, 1);
         
@@ -163,12 +163,12 @@ public class BasicBuildTest
 
 
     [Test]
-    public void RoadShorterThanMinimumLengthShouldNotBuild()
+    public void LaneShorterThanMinimumLengthShouldNotBuild()
     {
         RoadBuilder.BuildRoad(
             new(0, 0, 0),
-            new(0, 0, GConsts.MinimumRoadLength / 2),
-            new(0, 0, GConsts.MinimumRoadLength - 0.01f),
+            new(0, 0, Constants.MinimumLaneLength / 2),
+            new(0, 0, Constants.MinimumLaneLength - 0.01f),
             1
         );
 
@@ -176,12 +176,12 @@ public class BasicBuildTest
     }
 
     [Test]
-    public void RoadLongerThanMaximumLengthShouldNotBuild()
+    public void LaneLongerThanMaximumLengthShouldNotBuild()
     {
         RoadBuilder.BuildRoad(
             new(0, 0, 0),
-            new(0, 0, GConsts.MaximumRoadLength / 2),
-            new(0, 0, GConsts.MaximumRoadLength + 0.01f),
+            new(0, 0, Constants.MaximumLaneLength / 2),
+            new(0, 0, Constants.MaximumLaneLength + 0.01f),
             1
         );
         Assert.AreEqual(0, Roads.Count);

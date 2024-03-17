@@ -7,7 +7,7 @@ using UnityEngine;
 public class DivideTest
 {
     float3 direction  = new(1, 0, 1);
-    float3 stride = GConsts.MinimumRoadLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
     SortedDictionary<int, Road> Roads;
     SortedDictionary<int, Node> Nodes;
 

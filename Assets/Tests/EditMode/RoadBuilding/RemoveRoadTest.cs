@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 public class RemoveRoadTest
 {
-    float3 direction = GConsts.MinimumRoadLength * new float3(1, 0, 1);
+    float3 direction = Constants.MinimumLaneLength * new float3(1, 0, 1);
     SortedDictionary<int, Road> Roads;
     SortedDictionary<int, Node> Nodes;
     [SetUp]

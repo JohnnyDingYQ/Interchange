@@ -5,40 +5,58 @@ using Unity.Mathematics;
 
 public class Lane
 {
+    public Vertex StartVertex { get; set; }
+    public Vertex EndVertex { get; set; }
     public Node StartNode { get; set; }
     public Node EndNode { get; set; }
     [JsonIgnore]
     public Spline Spline { get; set; }
-    public float3 StartPos {
-        get {
+    public float3 StartPos
+    {
+        get
+        {
             return StartNode.Pos;
         }
     }
-    public float3 EndPos {
-        get {
+    public float3 EndPos
+    {
+        get
+        {
             return EndNode.Pos;
         }
     }
     public Road Road { get; set; }
     public int LaneIndex { get; set; }
+    public float Length { get; set; }
 
     // Empty constructor for JSON.Net deserialization
-    public Lane() {}
+    public Lane() { }
 
     public Lane(Road road, int laneIndex)
     {
         LaneIndex = laneIndex;
         Road = road;
         InitSpline();
-        StartNode = new(Spline.EvaluatePosition(0), laneIndex);
-        EndNode = new(Spline.EvaluatePosition(1), laneIndex);
-        StartNode.Lanes.Add(this);
-        EndNode.Lanes.Add(this);
+        InitNodes();
+        Length = Spline.GetLength();
     }
 
     public void InitSpline()
     {
         Spline = GetLaneSpline(LaneIndex);
+    }
+
+    void InitNodes()
+    {
+        StartNode = new(Spline.EvaluatePosition(0), LaneIndex);
+        EndNode = new(Spline.EvaluatePosition(1), LaneIndex);
+        StartNode.Lanes.Add(this);
+        EndNode.Lanes.Add(this);
+    }
+
+    void InitVertices()
+    {
+
     }
 
     /// <summary>

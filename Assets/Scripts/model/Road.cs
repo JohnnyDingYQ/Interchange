@@ -3,7 +3,6 @@ using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Splines;
-using UnityEngine.UIElements;
 
 public class Road
 {
@@ -31,7 +30,6 @@ public class Road
         InitCurve();
         Length = CurveUtility.CalculateLength(Curve);
         InitLanes();
-        Game.RegisterRoad(this);
     }
 
     public Road(BezierCurve curve, int laneCount)
@@ -43,13 +41,6 @@ public class Road
         LaneCount = laneCount;
         Length = CurveUtility.CalculateLength(curve);
         InitLanes();
-        Game.RegisterRoad(this);
-    }
-
-    public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount, float length) :
-    this(startPos, pivotPos, endPos, laneCount)
-    {
-        Length = length;
     }
 
     public void InitCurve()
@@ -61,7 +52,7 @@ public class Road
     {
         float3 normal = GetNormal(t);
         float3 pos = CurveUtility.EvaluatePosition(Curve, t);
-        float3 offset = normal * (GConsts.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * GConsts.LaneWidth);
+        float3 offset = normal * (Constants.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * Constants.LaneWidth);
         return pos + offset;
     }
 

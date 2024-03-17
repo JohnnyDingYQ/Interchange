@@ -55,18 +55,21 @@ public static class BuildHandler
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-        
+
         AlignPivotPos();
 
-        BezierCurve curve = new(startPos, pivotPos, endPos);
-        float length = CurveUtility.CalculateLength(curve);
-        if (length < GConsts.MinimumRoadLength || length > GConsts.MaximumRoadLength)
+        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        foreach (Lane lane in road.Lanes)
         {
-            Debug.Log("Road length of " + length + " is not between " + GConsts.MinimumRoadLength + " and " + GConsts.MaximumRoadLength);
-            return null;
+            float length = lane.Length;
+            if (length < Constants.MinimumLaneLength || length > Constants.MaximumLaneLength)
+            {
+                Debug.Log("Lane length of " + length + " is not between " + Constants.MinimumLaneLength + " and " + Constants.MaximumLaneLength);
+                return null;
+            }
         }
-            
-        Road road = InitRoad(startPos, pivotPos, endPos, length);
+
+        Game.RegisterRoad(road);
 
         if (startTarget.SnapNotNull)
         {
@@ -96,19 +99,19 @@ public static class BuildHandler
             if (startTarget.SnapNotNull)
             {
                 Node arbitraryNode = GetArbitraryRegisteredNode(startNodes);
-                pivotPos = (float3) Vector3.Project(pivotPos - startPos, arbitraryNode.GetTangent()) + startPos;
+                pivotPos = (float3)Vector3.Project(pivotPos - startPos, arbitraryNode.GetTangent()) + startPos;
             }
             if (endTarget.SnapNotNull)
             {
                 Node arbitraryNode = GetArbitraryRegisteredNode(endNodes);
-                pivotPos = (float3) Vector3.Project(pivotPos - endPos, arbitraryNode.GetTangent()) + endPos;
+                pivotPos = (float3)Vector3.Project(pivotPos - endPos, arbitraryNode.GetTangent()) + endPos;
             }
             pivotPos.y = oldY;
         }
 
         Node GetArbitraryRegisteredNode(List<Node> nodes)
         {
-            foreach(Node node in nodes)
+            foreach (Node node in nodes)
             {
                 if (node.IsRegistered())
                 {
@@ -132,11 +135,6 @@ public static class BuildHandler
         }
     }
 
-    static Road InitRoad(float3 startPos, float3 pivotPos, float3 endPos, float length)
-    {
-        Road road = new(startPos, pivotPos, endPos, LaneCount, length);
-        return road;
-    }
     static void ReloadAllSpline()
     {
         foreach (Road road in Game.Roads.Values)
