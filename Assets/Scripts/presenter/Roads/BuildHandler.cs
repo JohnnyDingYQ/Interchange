@@ -73,9 +73,10 @@ public static class BuildHandler
 
         if (startTarget.SnapNotNull)
         {
-            for (int i = 0; i < startNodes.Count; i++)
+            BuildAllPaths(road.Lanes, startNodes, Side.Start);
+            for (int i = 0; i < LaneCount; i++)
             {
-                startNodes[i].Lanes.Add(road.Lanes[i]);
+                startNodes[i].AddLane(road.Lanes[i], Direction.Out);
                 road.Lanes[i].StartNode = startNodes[i];
             }
 
@@ -84,8 +85,8 @@ public static class BuildHandler
         {
             for (int i = 0; i < endNodes.Count; i++)
             {
-                endNodes[i].Lanes.Add(road.Lanes[i]);
                 road.Lanes[i].EndNode = endNodes[i];
+                endNodes[i].AddLane(road.Lanes[i], Direction.In);
             }
         }
 
@@ -93,6 +94,7 @@ public static class BuildHandler
         return road;
 
         # region extracted funcitons
+
         void AlignPivotPos()
         {
             float oldY = pivotPos.y;
@@ -121,6 +123,59 @@ public static class BuildHandler
             return null;
         }
         #endregion
+    }
+    static void BuildAllPaths(List<Lane> to, List<Node> from, Side side)
+    {
+        BuildStraightPath(to, from, side);
+        BuildRightLaneChangePath(to, from, side);
+        BuildLeftLaneChangePath(to, from, side);
+
+        static void BuildStraightPath(List<Lane> to, List<Node> from, Side side)
+        {
+            for (int i = 0; i < LaneCount; i++)
+                foreach (Lane lane in from[i].GetLanes(Direction.In))
+                {
+                    // TODO: Remove me
+                    Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
+                }
+        }
+        static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Side side)
+        {
+            for (int i = 1; i < LaneCount; i++)
+                foreach (Lane lane in from[i - 1].GetLanes(Direction.In))
+                {
+                    // TODO: Remove me
+                    Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
+                }
+        }
+        static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Side side)
+        {
+            for (int i = 0; i < LaneCount - 1; i++)
+                foreach (Lane lane in from[i + 1].GetLanes(Direction.In))
+                {
+                    // TODO: Remove me
+                    Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
+                }
+        }
+    }
+
+    static Path BuildPath(Lane l1, Lane l2, Side side)
+    {
+        Path path;
+        if (side == Side.Start)
+            path = BuildPath(l1.EndVertex, l2.StartVertex);
+        else
+            path = BuildPath(l1.StartVertex, l2.EndVertex);
+        return path;
+    }
+    static Path BuildPath(Vertex start, Vertex end)
+    {
+        float3 pos1 = start.Pos + Constants.MinimumLaneLength / 4 * start.Tangent;
+        float3 pos2 = end.Pos - Constants.MinimumLaneLength / 4 * end.Tangent;
+        BezierCurve bezierCurve = new(start.Pos, pos1, pos2, end.Pos);
+        Path p = new();
+        p.Curves.Add(new BezierCurveAdapter(bezierCurve, 0, 1));
+        return p;
     }
 
     static void RegisterNodes(Road road)

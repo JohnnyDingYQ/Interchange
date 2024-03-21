@@ -1,8 +1,10 @@
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Splines;
 
 public class BezierCurveAdapter : ICurve
 {
+    [JsonIgnore]
     public BezierCurve BezierCurve { get; set; }
     public float StartInterpolation { get; set; }
     public float EndInterpolation { get; set; }

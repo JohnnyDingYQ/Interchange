@@ -127,9 +127,7 @@ public class DivideTest
         {
             Node lNode = left.Lanes[i].EndNode;
             Node rNode = subLeft.Lanes[i].StartNode;
-            HashSet<Lane> expected = lNode.Lanes;
-            expected.Remove(left.Lanes[i]);
-            expected.Add(subLeft.Lanes[i]);
+            HashSet<Lane> expected = new() { left.Lanes[i], subLeft.Lanes[i] };
             Assert.AreSame(lNode, rNode);
             Assert.True(lNode.Lanes.SetEquals(expected));
         }
@@ -139,9 +137,7 @@ public class DivideTest
         {
             Node lNode = subRight.Lanes[i].EndNode;
             Node rNode = right.Lanes[i].StartNode;
-            HashSet<Lane> expected = lNode.Lanes;
-            expected.Remove(right.Lanes[i]);
-            expected.Add(subRight.Lanes[i]);
+            HashSet<Lane> expected = new() { right.Lanes[i], subRight.Lanes[i] };
             Assert.AreSame(lNode, rNode);
             Assert.True(lNode.Lanes.SetEquals(expected));
         }

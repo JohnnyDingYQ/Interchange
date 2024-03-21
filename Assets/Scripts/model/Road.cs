@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
@@ -19,7 +20,7 @@ public class Road
     public float Length { get; set; }
 
     // Empty constructor for JSON.Net deserialization
-    public Road() {}
+    public Road() { }
 
     public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount)
     {
@@ -52,11 +53,11 @@ public class Road
     {
         float3 normal = GetNormal(t);
         float3 pos = CurveUtility.EvaluatePosition(BezierCurve, t);
-        float3 offset = normal * (Constants.LaneWidth * ((float) LaneCount / 2 - 0.5f) - lane * Constants.LaneWidth);
+        float3 offset = normal * (Constants.LaneWidth * ((float)LaneCount / 2 - 0.5f) - lane * Constants.LaneWidth);
         return pos + offset;
     }
 
-        private float3 GetNormal(float t)
+    private float3 GetNormal(float t)
     {
         float3 tangent = CurveUtility.EvaluateTangent(BezierCurve, t);
         tangent.y = 0;

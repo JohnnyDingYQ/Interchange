@@ -106,9 +106,3 @@ public class BuildTargets
     }
     
 }
-
-public enum Side
-{
-    Start,
-    End
-}

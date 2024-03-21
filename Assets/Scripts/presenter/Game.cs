@@ -100,7 +100,7 @@ public static class Game
         foreach (Lane lane in road.Lanes)
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
-                node.Lanes.Remove(lane);
+                node.RemoveLane(lane);
                 if (node.Lanes.Count == 0)
                     Nodes.Remove(node.Id);
             }

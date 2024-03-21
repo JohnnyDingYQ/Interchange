@@ -1,6 +1,5 @@
 using UnityEngine.Splines;
 using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 using Unity.Mathematics;
 
 public class Lane
@@ -11,6 +10,7 @@ public class Lane
     public Node EndNode { get; set; }
     [JsonIgnore]
     public Spline Spline { get; set; }
+    [JsonIgnore]
     public float3 StartPos
     {
         get
@@ -18,6 +18,7 @@ public class Lane
             return StartNode.Pos;
         }
     }
+    [JsonIgnore]
     public float3 EndPos
     {
         get
@@ -51,8 +52,8 @@ public class Lane
     {
         StartNode = new(Spline.EvaluatePosition(0), LaneIndex);
         EndNode = new(Spline.EvaluatePosition(1), LaneIndex);
-        StartNode.Lanes.Add(this);
-        EndNode.Lanes.Add(this);
+        StartNode.AddLane(this, Direction.Out);
+        EndNode.AddLane(this, Direction.In);
     }
 
     void InitVertices()

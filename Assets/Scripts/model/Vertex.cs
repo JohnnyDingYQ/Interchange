@@ -7,6 +7,7 @@ public class Vertex
     public int Id { get; set; }
     public float3 Pos { get; set; }
     public float Interpolation { get; set; }
+    public float3 Tangent { get; set; }
 
     public Vertex() { }
 
@@ -23,5 +24,6 @@ public class Vertex
             Interpolation = (lane.Length - Constants.MinimumLaneLength / 2) / lane.Length;
         }
         Pos = lane.Spline.EvaluatePosition(Interpolation);
+        Tangent = math.normalizesafe(lane.Spline.EvaluateTangent(Interpolation));
     }
 }

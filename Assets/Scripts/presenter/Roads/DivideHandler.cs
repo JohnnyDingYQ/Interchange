@@ -43,14 +43,15 @@ public static class DivideHandler
                 Lane laneRight = RightRoad.Lanes[i];
                 Lane lane = road.Lanes[i];
                 laneLeft.EndNode = laneRight.StartNode;
-                laneLeft.EndNode.Lanes.Add(laneLeft);
+                laneLeft.EndNode.AddLane(laneLeft, Direction.In);
                 Game.RegisterNode(laneLeft.EndNode);
 
                 laneLeft.StartNode = lane.StartNode;
-                lane.StartNode.Lanes.Add(laneLeft);
+                lane.StartNode.AddLane(laneLeft, Direction.Out);
 
                 laneRight.EndNode = lane.EndNode;
-                lane.EndNode.Lanes.Add(laneRight);
+                lane.EndNode.AddLane(laneRight, Direction.In);
+
                 Game.RegisterNode(laneLeft.StartNode);
                 Game.RegisterNode(laneRight.EndNode);
             }
