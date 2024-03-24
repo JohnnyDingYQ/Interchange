@@ -15,6 +15,8 @@ public class InputManager: MonoBehaviour
     public event Action SaveGame;
     public event Action LoadGame;
     public event Action DividRoad;
+    public event Action ShowPaths;
+    public event Action ShowRoadAndLanes;
     public static float3 MouseWorldPos;
 
     void Update()
@@ -41,6 +43,10 @@ public class InputManager: MonoBehaviour
             LoadGame.Invoke();
         if (Input.GetMouseButtonDown(1))
             DividRoad.Invoke();
+        if (Input.GetKeyDown(KeyCode.Keypad1))
+            ShowRoadAndLanes.Invoke();
+        if (Input.GetKeyDown(KeyCode.Keypad2))
+            ShowPaths.Invoke();
         
         MouseWorldPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {

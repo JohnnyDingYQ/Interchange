@@ -83,6 +83,7 @@ public static class BuildHandler
         }
         if (endTarget.SnapNotNull)
         {
+            BuildAllPaths(road.Lanes, endNodes, Side.End);
             for (int i = 0; i < endNodes.Count; i++)
             {
                 road.Lanes[i].EndNode = endNodes[i];
@@ -132,8 +133,9 @@ public static class BuildHandler
 
         static void BuildStraightPath(List<Lane> to, List<Node> from, Side side)
         {
+            Direction direction = side == Side.Start ? Direction.In : Direction.Out;
             for (int i = 0; i < LaneCount; i++)
-                foreach (Lane lane in from[i].GetLanes(Direction.In))
+                foreach (Lane lane in from[i].GetLanes(direction))
                 {
                     // TODO: Remove me
                     Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
@@ -141,8 +143,9 @@ public static class BuildHandler
         }
         static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Side side)
         {
+            Direction direction = side == Side.Start ? Direction.In : Direction.Out;
             for (int i = 1; i < LaneCount; i++)
-                foreach (Lane lane in from[i - 1].GetLanes(Direction.In))
+                foreach (Lane lane in from[i - 1].GetLanes(direction))
                 {
                     // TODO: Remove me
                     Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
@@ -150,8 +153,9 @@ public static class BuildHandler
         }
         static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Side side)
         {
+            Direction direction = side == Side.Start ? Direction.In : Direction.Out;
             for (int i = 0; i < LaneCount - 1; i++)
-                foreach (Lane lane in from[i + 1].GetLanes(Direction.In))
+                foreach (Lane lane in from[i + 1].GetLanes(direction))
                 {
                     // TODO: Remove me
                     Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
@@ -165,7 +169,7 @@ public static class BuildHandler
         if (side == Side.Start)
             path = BuildPath(l1.EndVertex, l2.StartVertex);
         else
-            path = BuildPath(l1.StartVertex, l2.EndVertex);
+            path = BuildPath(l2.EndVertex, l1.StartVertex);
         return path;
     }
     static Path BuildPath(Vertex start, Vertex end)

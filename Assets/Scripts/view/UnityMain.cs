@@ -5,6 +5,8 @@ public class UnityMain : MonoBehaviour
     [SerializeField] private int Height;
     [SerializeField] private int Width;
     [SerializeField] private InputManager inputManager;
+    private bool showRoadAndLanes = true;
+    private bool showPaths = true;
     private float drawDuration = 0.5f;
     void Awake()
     {
@@ -18,16 +20,27 @@ public class UnityMain : MonoBehaviour
         {
             inputManager.SaveGame += SaveGame;
             inputManager.LoadGame += LoadGame;
+            inputManager.ShowRoadAndLanes += () =>
+            {
+                showRoadAndLanes = !showRoadAndLanes;
+            };
+            inputManager.ShowPaths += () =>
+            {
+                showPaths = !showPaths;
+            };
         }
         InvokeRepeating("Draw", 0f, drawDuration);
     }
 
     void Draw()
     {
-        // Utility.DrawRoadsAndLanes(drawDuration);
+        if (showPaths)
+            Utility.DrawPaths(drawDuration);
+        if (showRoadAndLanes)
+            Utility.DrawRoadsAndLanes(drawDuration);
         Utility.DrawControlPoints(drawDuration);
         Utility.DrawVertices(drawDuration);
-        Utility.DrawPaths(drawDuration);
+        
     }
 
     void OnDestroy()
