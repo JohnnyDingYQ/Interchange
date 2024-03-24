@@ -100,12 +100,9 @@ public static class Utility
 
     public static void DrawPaths(float duration)
     {
-        foreach(Path path in Game.GameState.Paths)
+        foreach(Path path in Game.Graph.Edges)
         {
-            foreach(ICurve curve in path.Curves)
-            {
-                curve.Draw(duration);
-            }
+            path.Curve.Draw(duration);
         }
     }
 

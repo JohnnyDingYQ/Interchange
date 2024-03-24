@@ -1,20 +1,20 @@
 using System.Collections.Generic;
+using QuikGraph;
 
-public class Path
+public class Path : IEdge<Vertex>
 {
-    private List<ICurve> curves;
-    public List<ICurve> Curves
-    {
-        get
-        {
-            curves ??= new();
-            return curves;
-        }
-        set
-        {
-            curves = value;
-        }
-    }
+    public ICurve Curve { get; set; }
 
-    public Path() {}
+    public Vertex Source { get; set; }
+
+    public Vertex Target { get; set; }
+
+    public Path() { }
+
+    public Path(ICurve curve, Vertex source, Vertex target)
+    {
+        Curve = curve;
+        Source = source;
+        Target = target;
+    }
 }

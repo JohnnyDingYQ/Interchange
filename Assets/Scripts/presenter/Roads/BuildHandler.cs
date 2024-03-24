@@ -137,8 +137,7 @@ public static class BuildHandler
             for (int i = 0; i < LaneCount; i++)
                 foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
                 {
-                    // TODO: Remove me
-                    Game.GameState.Paths.Add(BuildPath(lane, to[i], laneDirection));
+                    BuildPath(lane, to[i], laneDirection);
                 }
         }
         static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
@@ -146,8 +145,7 @@ public static class BuildHandler
             for (int i = 1; i < LaneCount; i++)
                 foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(laneDirection)))
                 {
-                    // TODO: Remove me
-                    Game.GameState.Paths.Add(BuildPath(lane, to[i], laneDirection));
+                    BuildPath(lane, to[i], laneDirection);
                 }
         }
         static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
@@ -155,8 +153,7 @@ public static class BuildHandler
             for (int i = 0; i < LaneCount - 1; i++)
                 foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(laneDirection)))
                 {
-                    // TODO: Remove me
-                    Game.GameState.Paths.Add(BuildPath(lane, to[i], laneDirection));
+                    BuildPath(lane, to[i], laneDirection);
                 }
         }
         static Direction InvertDirection(Direction direction)
@@ -181,8 +178,9 @@ public static class BuildHandler
         float3 pos1 = start.Pos + Constants.MinimumLaneLength / 4 * start.Tangent;
         float3 pos2 = end.Pos - Constants.MinimumLaneLength / 4 * end.Tangent;
         BezierCurve bezierCurve = new(start.Pos, pos1, pos2, end.Pos);
-        Path p = new();
-        p.Curves.Add(new BezierCurveAdapter(bezierCurve, 0, 1));
+        ICurve curve = new BezierCurveAdapter(bezierCurve, 0, 1);
+        Path p = new(curve, start, end);
+        Game.AddEdge(p);
         return p;
     }
 

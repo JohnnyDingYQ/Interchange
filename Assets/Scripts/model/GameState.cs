@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using QuikGraph;
 
 public class GameState
 {
@@ -16,33 +17,34 @@ public class GameState
         }
     }
     private SortedDictionary<int, Node> nodes;
-    public SortedDictionary<int, Node> Nodes {
-        get {
+    public SortedDictionary<int, Node> Nodes
+    {
+        get
+        {
             nodes ??= new();
             return nodes;
         }
-        set {
+        set
+        {
             nodes = value;
         }
     }
 
-    private List<Path> paths;
-    public List<Path> Paths
+    private static AdjacencyGraph<Vertex, Path> graph;
+    public static AdjacencyGraph<Vertex, Path> Graph
     {
         get
         {
-            paths ??= new();
-            return paths;
+            graph ??= new();
+            return graph;
         }
         set
         {
-            paths = value;
+            graph = value;
         }
     }
-
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
-
     public GameState()
     {
         NextAvailableNodeId = 1;

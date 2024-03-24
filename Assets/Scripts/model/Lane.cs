@@ -1,6 +1,7 @@
 using UnityEngine.Splines;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Mathematics;
+using System.IO;
 
 public class Lane
 {
@@ -60,10 +61,11 @@ public class Lane
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
-        // TODO: Remove me
-        Path path = new();
-        path.Curves.Add(new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation));
-        Game.GameState.Paths.Add(path);
+        ICurve curve = new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation);
+        Path path = new(curve, StartVertex, EndVertex);
+        Game.AddVertex(StartVertex);
+        Game.AddVertex(EndVertex);
+        Game.AddEdge(path);
     }
 
     /// <summary>
