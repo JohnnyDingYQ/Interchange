@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using QuikGraph.Predicates;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -73,7 +74,7 @@ public static class BuildHandler
 
         if (startTarget.SnapNotNull)
         {
-            BuildAllPaths(road.Lanes, startNodes, Side.Start);
+            BuildAllPaths(road.Lanes, startNodes, Direction.Out);
             for (int i = 0; i < LaneCount; i++)
             {
                 startNodes[i].AddLane(road.Lanes[i], Direction.Out);
@@ -83,7 +84,7 @@ public static class BuildHandler
         }
         if (endTarget.SnapNotNull)
         {
-            BuildAllPaths(road.Lanes, endNodes, Side.End);
+            BuildAllPaths(road.Lanes, endNodes, Direction.In);
             for (int i = 0; i < endNodes.Count; i++)
             {
                 road.Lanes[i].EndNode = endNodes[i];
@@ -125,48 +126,51 @@ public static class BuildHandler
         }
         #endregion
     }
-    static void BuildAllPaths(List<Lane> to, List<Node> from, Side side)
+    static void BuildAllPaths(List<Lane> to, List<Node> from, Direction laneDirection)
     {
-        BuildStraightPath(to, from, side);
-        BuildRightLaneChangePath(to, from, side);
-        BuildLeftLaneChangePath(to, from, side);
+        BuildStraightPath(to, from, laneDirection);
+        BuildRightLaneChangePath(to, from, laneDirection);
+        BuildLeftLaneChangePath(to, from, laneDirection);
 
-        static void BuildStraightPath(List<Lane> to, List<Node> from, Side side)
+        static void BuildStraightPath(List<Lane> to, List<Node> from, Direction laneDirection)
         {
-            Direction direction = side == Side.Start ? Direction.In : Direction.Out;
             for (int i = 0; i < LaneCount; i++)
-                foreach (Lane lane in from[i].GetLanes(direction))
+                foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
                 {
                     // TODO: Remove me
-                    Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
+                    Game.GameState.Paths.Add(BuildPath(lane, to[i], laneDirection));
                 }
         }
-        static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Side side)
+        static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
         {
-            Direction direction = side == Side.Start ? Direction.In : Direction.Out;
             for (int i = 1; i < LaneCount; i++)
-                foreach (Lane lane in from[i - 1].GetLanes(direction))
+                foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(laneDirection)))
                 {
                     // TODO: Remove me
-                    Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
+                    Game.GameState.Paths.Add(BuildPath(lane, to[i], laneDirection));
                 }
         }
-        static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Side side)
+        static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
         {
-            Direction direction = side == Side.Start ? Direction.In : Direction.Out;
             for (int i = 0; i < LaneCount - 1; i++)
-                foreach (Lane lane in from[i + 1].GetLanes(direction))
+                foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(laneDirection)))
                 {
                     // TODO: Remove me
-                    Game.GameState.Paths.Add(BuildPath(lane, to[i], side));
+                    Game.GameState.Paths.Add(BuildPath(lane, to[i], laneDirection));
                 }
+        }
+        static Direction InvertDirection(Direction direction)
+        {
+            if (direction == Direction.In)
+                return Direction.Out;
+            return Direction.In;
         }
     }
 
-    static Path BuildPath(Lane l1, Lane l2, Side side)
+    static Path BuildPath(Lane l1, Lane l2, Direction l1Direction)
     {
         Path path;
-        if (side == Side.Start)
+        if (l1Direction == Direction.Out)
             path = BuildPath(l1.EndVertex, l2.StartVertex);
         else
             path = BuildPath(l2.EndVertex, l1.StartVertex);
