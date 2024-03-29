@@ -99,22 +99,37 @@ public static class Game
             return false;
         Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
+        {
+            Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && e.Target == lane.StartVertex);
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);
                 if (node.Lanes.Count == 0)
                     Nodes.Remove(node.Id);
             }
+        }
         return true;
     }
 
     public static void AddVertex(Vertex vertex)
     {
-        GameState.Graph.AddVertex(vertex);
+        Graph.AddVertex(vertex);
     }
 
     public static void AddEdge(Path path)
     {
-        GameState.Graph.AddEdge(path);
+        Graph.AddEdge(path);
+    }
+
+    public static bool HasEdge(Lane from, Lane to)
+    {
+        return HasEdge(from.EndVertex, to.StartVertex);
+    }
+
+    public static bool HasEdge(Vertex from, Vertex to)
+    {
+        if (Graph.ContainsEdge(from, to))
+            return true;
+        return false;
     }
 }

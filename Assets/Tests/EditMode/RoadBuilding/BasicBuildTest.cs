@@ -175,18 +175,6 @@ public class BasicBuildTest
         Assert.AreEqual(0, Roads.Count);
     }
 
-    [Test]
-    public void LaneLongerThanMaximumLengthShouldNotBuild()
-    {
-        RoadBuilder.BuildRoad(
-            new(0, 0, 0),
-            new(0, 0, Constants.MaximumLaneLength / 2),
-            new(0, 0, Constants.MaximumLaneLength + 0.01f),
-            1
-        );
-        Assert.AreEqual(0, Roads.Count);
-    }
-
     #region Helpers
     public void CheckLanesConnection(Road enteringRoad, Road exitingRoad, int laneCount)
     {

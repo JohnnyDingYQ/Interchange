@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
+using UnityEngine;
 
 public class RemoveRoadTest
 {
@@ -44,5 +44,15 @@ public class RemoveRoadTest
         Assert.AreEqual(4, Nodes.Count);
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
         Assert.True(road0.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[1] }));
+    }
+
+    [Test]
+    public void RemovePathConnections()
+    {
+        Road road = RoadBuilder.BuildRoad(0, direction, 2 * direction, 1);
+        Assert.True(Game.RemoveRoad(road));
+        Game.WipeState();
+        Debug.Log(Game.Graph.VertexCount);
+        Assert.True(Game.Graph.IsEdgesEmpty);
     }
 }

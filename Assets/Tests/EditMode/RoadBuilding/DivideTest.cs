@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class DivideTest
 {
-    float3 direction  = new(1, 0, 1);
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
     SortedDictionary<int, Road> Roads;
     SortedDictionary<int, Node> Nodes;
@@ -166,5 +165,20 @@ public class DivideTest
         Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
         Assert.True(Math.Abs(subRoads.Left.Length / subRoads.Right.Length) - 1 < 0.2);
+    }
+
+    [Test]
+    public void SubRoadsPathConnected()
+    {
+        Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 3);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
+        for (int i = 0; i < 3; i++)
+        {
+            if (i - 1 >= 0)
+                Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i - 1]));
+            Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i]));
+            if (i + 1 < 3)
+                Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i + 1]));
+        }
     }
 }

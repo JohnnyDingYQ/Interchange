@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using QuikGraph.Predicates;
 using Unity.Mathematics;
@@ -60,14 +61,11 @@ public static class BuildHandler
         AlignPivotPos();
 
         Road road = new(startPos, pivotPos, endPos, LaneCount);
-        foreach (Lane lane in road.Lanes)
+
+        if (HasLaneShorterThanMinimumLaneLength(road))
         {
-            float length = lane.Length;
-            if (length < Constants.MinimumLaneLength || length > Constants.MaximumLaneLength)
-            {
-                Debug.Log("Lane length of " + length + " is not between " + Constants.MinimumLaneLength + " and " + Constants.MaximumLaneLength);
-                return null;
-            }
+            Debug.Log("Lane length is less than " + Constants.MinimumLaneLength);
+            return null;
         }
 
         Game.RegisterRoad(road);
@@ -91,8 +89,8 @@ public static class BuildHandler
                 endNodes[i].AddLane(road.Lanes[i], Direction.In);
             }
         }
-
         RegisterNodes(road);
+        AutoDivideRoad(road);
         return road;
 
         # region extracted funcitons
@@ -113,6 +111,41 @@ public static class BuildHandler
             pivotPos.y = oldY;
         }
 
+        static bool HasLaneShorterThanMinimumLaneLength(Road road)
+        {
+            foreach (Lane lane in road.Lanes)
+                if (lane.Length < Constants.MinimumLaneLength)
+                    return true;
+            return false;
+        }
+
+        static float GetLongestLaneLength(Road road)
+        {
+            float length = 0;
+            foreach (Lane lane in road.Lanes)
+                length = Math.Max(length, lane.Length);
+            return length;
+        }
+
+        static void AutoDivideRoad(Road road)
+        {
+            float longestLength = GetLongestLaneLength(road);
+            if (longestLength <= Constants.MaximumLaneLength)
+                return;
+            int divisions = 2;
+            while (longestLength / divisions > Constants.MaximumLaneLength)
+                divisions++;
+            RecursiveRoadDivision(road, divisions);
+        }
+
+        static void RecursiveRoadDivision(Road road, int divisions)
+        {
+            if (divisions == 1)
+                return;
+            SubRoads subRoads = DivideHandler.DivideRoad(road, 1 / (float)divisions);
+            RecursiveRoadDivision(subRoads.Right, divisions - 1);
+        }
+
         Node GetArbitraryRegisteredNode(List<Node> nodes)
         {
             foreach (Node node in nodes)
@@ -126,7 +159,7 @@ public static class BuildHandler
         }
         #endregion
     }
-    static void BuildAllPaths(List<Lane> to, List<Node> from, Direction laneDirection)
+    public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction laneDirection)
     {
         BuildStraightPath(to, from, laneDirection);
         BuildRightLaneChangePath(to, from, laneDirection);
@@ -136,25 +169,19 @@ public static class BuildHandler
         {
             for (int i = 0; i < LaneCount; i++)
                 foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
-                {
                     BuildPath(lane, to[i], laneDirection);
-                }
         }
         static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
         {
             for (int i = 1; i < LaneCount; i++)
                 foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(laneDirection)))
-                {
                     BuildPath(lane, to[i], laneDirection);
-                }
         }
         static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
         {
             for (int i = 0; i < LaneCount - 1; i++)
                 foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(laneDirection)))
-                {
                     BuildPath(lane, to[i], laneDirection);
-                }
         }
         static Direction InvertDirection(Direction direction)
         {

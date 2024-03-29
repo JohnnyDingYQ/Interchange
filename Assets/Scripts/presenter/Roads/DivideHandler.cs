@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -32,6 +33,7 @@ public static class DivideHandler
         Road RightRoad = new(right, laneCount);
         Game.RegisterRoad(RightRoad);
         OperateNodes();
+        OperatePaths();
 
         return new SubRoads(LeftRoad, RightRoad);
 
@@ -55,6 +57,26 @@ public static class DivideHandler
                 Game.RegisterNode(laneLeft.StartNode);
                 Game.RegisterNode(laneRight.EndNode);
             }
+        }
+
+        void OperatePaths()
+        {
+            List<Node> nodes = new();
+            List<Lane> lanes = new();
+            for (int i = 0; i < LeftRoad.LaneCount; i++)
+            {
+                Lane laneLeft = LeftRoad.Lanes[i];
+                Lane laneRight = RightRoad.Lanes[i];
+                Lane lane = road.Lanes[i];
+                laneLeft.StartVertex = lane.StartVertex;
+                Game.AddVertex(laneLeft.EndVertex);
+                Game.AddVertex(laneRight.StartVertex);
+                laneRight.EndVertex = lane.EndVertex;
+
+                nodes.Add(laneLeft.EndNode);
+                lanes.Add(laneRight);
+            }
+            BuildHandler.BuildAllPaths(lanes, nodes, Direction.Out);
         }
     }
 }

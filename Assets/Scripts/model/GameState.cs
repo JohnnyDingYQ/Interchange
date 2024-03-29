@@ -30,8 +30,8 @@ public class GameState
         }
     }
 
-    private static AdjacencyGraph<Vertex, Path> graph;
-    public static AdjacencyGraph<Vertex, Path> Graph
+    private AdjacencyGraph<Vertex, Path> graph;
+    public AdjacencyGraph<Vertex, Path> Graph
     {
         get
         {
