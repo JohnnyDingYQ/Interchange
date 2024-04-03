@@ -36,12 +36,6 @@ public static class DivideHandler
         OperateNodes();
         OperatePaths();
 
-        Debug.Log("I sper");
-        foreach(Road r in Game.Roads.Values)
-        {
-            Debug.Log(r.Length);
-        }
-
         return new SubRoads(LeftRoad, RightRoad);
 
         void OperateNodes()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using QuikGraph.Predicates;
 using Unity.Mathematics;
 using UnityEngine;
@@ -159,29 +160,49 @@ public static class BuildHandler
         }
         #endregion
     }
+
     public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction laneDirection)
     {
-        BuildStraightPath(to, from, laneDirection);
-        BuildRightLaneChangePath(to, from, laneDirection);
-        BuildLeftLaneChangePath(to, from, laneDirection);
-
-        static void BuildStraightPath(List<Lane> to, List<Node> from, Direction laneDirection)
+        BuildStraightPath();
+        BuildRightLaneChangePath();
+        BuildLeftLaneChangePath();
+        BuildSidePaths();
+        
+        void BuildStraightPath()
         {
             for (int i = 0; i < LaneCount; i++)
                 foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
                     BuildPath(lane, to[i], laneDirection);
         }
-        static void BuildRightLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
+        void BuildRightLaneChangePath()
         {
             for (int i = 1; i < LaneCount; i++)
                 foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(laneDirection)))
                     BuildPath(lane, to[i], laneDirection);
         }
-        static void BuildLeftLaneChangePath(List<Lane> to, List<Node> from, Direction laneDirection)
+        void BuildLeftLaneChangePath()
         {
             for (int i = 0; i < LaneCount - 1; i++)
                 foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(laneDirection)))
                     BuildPath(lane, to[i], laneDirection);
+        }
+        void BuildSidePaths()
+        {
+            int leftNodeOrder = from.First().Order - 1;
+            int rightNodeOrder = from.Last().Order + 1;
+            HashSet<Road> roads = new();
+            for (int i = 0; i < LaneCount; i++)
+                foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
+                    roads.Add(lane.Road);
+            foreach (Road road in roads)
+                foreach (Lane lane in road.Lanes)
+                {
+                    Node node = laneDirection == Direction.Out ? lane.EndNode : lane.StartNode;
+                    if (node.Order == leftNodeOrder)
+                        BuildPath(lane, to.First(), laneDirection);
+                    else if (node.Order == rightNodeOrder)
+                        BuildPath(lane, to.Last(), laneDirection);
+                }
         }
         static Direction InvertDirection(Direction direction)
         {
@@ -191,10 +212,10 @@ public static class BuildHandler
         }
     }
 
-    static Path BuildPath(Lane l1, Lane l2, Direction l1Direction)
+    static Path BuildPath(Lane l1, Lane l2, Direction l2Direction)
     {
         Path path;
-        if (l1Direction == Direction.Out)
+        if (l2Direction == Direction.Out)
             path = BuildPath(l1.EndVertex, l2.StartVertex);
         else
             path = BuildPath(l2.EndVertex, l1.StartVertex);
