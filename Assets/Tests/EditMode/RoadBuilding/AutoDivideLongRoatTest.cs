@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
 
@@ -39,5 +40,30 @@ public class AutoDivideLongRoadTest
             1
         );
         Assert.AreEqual(5, Roads.Count);
+        float length = Roads.Values.First().Length;
+        foreach (Road road in Roads.Values)
+        {
+            Assert.True(Utility.AreNumericallyEqual(length, road.Length));
+            length = road.Length;
+        }
+            
+    }
+
+    [Test]
+    public void CurvedRoadDividedEvenly()
+    {
+        float targetLength = Constants.MaximumLaneLength * 5 - 0.3f;
+        RoadBuilder.BuildRoad(
+            0,
+            targetLength / 2 * new float3(1, 0, 0),
+            direction * targetLength * new float3(0, 0, 1),
+            1
+        );
+        float length = Roads.Values.First().Length;
+        foreach (Road road in Roads.Values)
+        {
+            Assert.True(Utility.AreNumericallyEqual(length, road.Length, Constants.RoadDivisionLengthTestTolerance));
+            length = road.Length;
+        }
     }
 }

@@ -27,6 +27,7 @@ public static class DivideHandler
             return null;
         Game.RemoveRoad(road);
         int laneCount = road.LaneCount;
+        interpolation = CurveUtility.GetDistanceToInterpolation(road.BezierCurve, road.Length * interpolation);
         CurveUtility.Split(road.BezierCurve, interpolation, out BezierCurve left, out BezierCurve right);
         Road LeftRoad = new(left, laneCount);
         Game.RegisterRoad(LeftRoad);
@@ -34,6 +35,12 @@ public static class DivideHandler
         Game.RegisterRoad(RightRoad);
         OperateNodes();
         OperatePaths();
+
+        Debug.Log("I sper");
+        foreach(Road r in Game.Roads.Values)
+        {
+            Debug.Log(r.Length);
+        }
 
         return new SubRoads(LeftRoad, RightRoad);
 

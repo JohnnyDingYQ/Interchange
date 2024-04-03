@@ -1,3 +1,4 @@
+using System;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -24,8 +25,8 @@ public static class Utility
         float3 pos2;
         for (int i = 1; i <= resolution; i++)
         {
-            pos1 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * (i-1) * (endT - startT) + startT);
-            pos2 = CurveUtility.EvaluatePosition(curve, 1 / (float) resolution * i * (endT - startT) + startT);
+            pos1 = CurveUtility.EvaluatePosition(curve, 1 / (float)resolution * (i - 1) * (endT - startT) + startT);
+            pos2 = CurveUtility.EvaluatePosition(curve, 1 / (float)resolution * i * (endT - startT) + startT);
             Debug.DrawLine(pos1, pos2, color, duration);
         }
     }
@@ -41,8 +42,8 @@ public static class Utility
         float3 pos2;
         for (int i = 1; i <= resolution; i++)
         {
-            pos1 = spline.EvaluatePosition(1 / (float) resolution * (i-1) * (endT - startT) + startT);
-            pos2 = spline.EvaluatePosition(1 / (float) resolution * i * (endT - startT) + startT);
+            pos1 = spline.EvaluatePosition(1 / (float)resolution * (i - 1) * (endT - startT) + startT);
+            pos2 = spline.EvaluatePosition(1 / (float)resolution * i * (endT - startT) + startT);
             Debug.DrawLine(pos1, pos2, color, duration);
         }
     }
@@ -71,16 +72,16 @@ public static class Utility
                 {
                     DrawSpline(lane.Spline, Color.magenta, duration);
                 }
-                    
+
             }
         }
     }
 
     public static void DrawVertices(float duration)
     {
-        foreach(Road road in Game.Roads.Values)
+        foreach (Road road in Game.Roads.Values)
         {
-            foreach(Lane lane in road.Lanes)
+            foreach (Lane lane in road.Lanes)
             {
                 DebugExtension.DebugPoint(lane.StartVertex.Pos, Color.cyan, 1, duration);
                 DebugExtension.DebugPoint(lane.EndVertex.Pos, Color.cyan, 1, duration);
@@ -90,7 +91,7 @@ public static class Utility
 
     public static void DrawControlPoints(float duration)
     {
-        foreach(Road road in Game.Roads.Values)
+        foreach (Road road in Game.Roads.Values)
         {
             DebugExtension.DebugPoint(road.StartPos, Color.magenta, 1, duration);
             DebugExtension.DebugPoint(road.PivotPos, Color.magenta, 1, duration);
@@ -100,7 +101,7 @@ public static class Utility
 
     public static void DrawPaths(float duration)
     {
-        foreach(Path path in Game.Graph.Edges)
+        foreach (Path path in Game.Graph.Edges)
         {
             path.Curve.Draw(duration);
         }
@@ -109,5 +110,14 @@ public static class Utility
     public static bool AreNumericallyEqual(float3 a, float3 b)
     {
         return Vector3.Distance(a, b) < 0.01f;
+    }
+    public static bool AreNumericallyEqual(float a, float b)
+    {
+        return Math.Abs(a - b) < 0.01f;
+    }
+
+    public static bool AreNumericallyEqual(float a, float b, float tolerance)
+    {
+        return Math.Abs(a - b) < tolerance;
     }
 }

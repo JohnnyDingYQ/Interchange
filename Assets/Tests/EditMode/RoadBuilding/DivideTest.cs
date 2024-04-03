@@ -164,7 +164,7 @@ public class DivideTest
     {
         Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        Assert.True(Math.Abs(subRoads.Left.Length / subRoads.Right.Length) - 1 < 0.2);
+        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
     }
 
     [Test]
@@ -180,5 +180,18 @@ public class DivideTest
             if (i + 1 < 3)
                 Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i + 1]));
         }
+    }
+
+    [Test]
+    public void CurvedRoadDividedEvenly()
+    {
+        Road road = RoadBuilder.BuildRoad(
+            0,
+            Constants.MinimumLaneLength * new float3(1, 0, 0),
+            2 * Constants.MinimumLaneLength * new float3(0, 0, 1),
+            3
+        );
+        SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
+        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
     }
 }

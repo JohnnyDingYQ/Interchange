@@ -29,7 +29,8 @@ Enfore smooth highway connections | ✅ | [de89b6d](https://github.com/JohnnyDin
 Highway lane expansion | ✅ | [bbbcf2c](https://github.com/JohnnyDingYQ/Interchange/commit/bbbcf2cf8037e79f3738ed81f23d5bb28946dd2f) | Mar 03 2024
 Max and Min highway lengths | ✅ |  [7c8d073](https://github.com/JohnnyDingYQ/Interchange/commit/7c8d07310d0ab34f225301aca09070ebeb26a834) | Mar 05 2024
 Delete highway | ✅ | [5dac371](https://github.com/JohnnyDingYQ/Interchange/commit/5dac3718fc7f118fbd22a012a0619ccee86a23dc) | March 14 2024
-Highway division | ✅ | [b5a2e0b](https://github.com/JohnnyDingYQ/Interchange/commit/b5a2e0be83f40afbebcd8516bf08bb117eab8c68) | March 15 2024
+Highway division | ✅ | [b5a2e0b](https://github.com/JohnnyDingYQ/Interchange/commit/b5a2e0be83f40afbebcd8516bf08bb117eab8c68) | March 15 
+Auto split long highways | ✅ | | March 29 2024
 Highway replacement | WIP |
 
 
@@ -43,7 +44,7 @@ Saving and loading highways |✅| [8fbc21e](https://github.com/JohnnyDingYQ/Inte
 
 Functionality  | Status    | Commit | Date
 -------------  | ------------- | ------ | -----
-Paths for vehicle | WIP |
+Paths for vehicle | ✅ | [f0dd2ae](https://github.com/JohnnyDingYQ/Interchange/commit/f0dd2ae56e9afc36e000597a5b1266fef662f94f) | March 24 2024
 
 ## Highway Mesh (To do)
 ## Sample level (To do)
