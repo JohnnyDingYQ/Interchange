@@ -4,19 +4,7 @@ using QuikGraph;
 public static class Game
 {
     public static ISaveSystemBoundary SaveSystem { get; set; }
-    private static GameState gameState;
-    public static GameState GameState
-    {
-        get
-        {
-            gameState ??= new();
-            return gameState;
-        }
-        set
-        {
-            gameState = value;
-        }
-    }
+    public static GameState GameState { get; set; }
 
     public static SortedDictionary<int, Road> Roads
     {
@@ -63,6 +51,11 @@ public static class Game
         {
             GameState.NextAvailableRoadId = value;
         }
+    }
+
+    static Game()
+    {
+        GameState = new();
     }
 
     public static void WipeState()

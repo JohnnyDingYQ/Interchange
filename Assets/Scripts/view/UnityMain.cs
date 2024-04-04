@@ -7,12 +7,12 @@ public class UnityMain : MonoBehaviour
     [SerializeField] private InputManager inputManager;
     private bool showRoadAndLanes = true;
     private bool showPaths = true;
-    private float drawDuration = 0.5f;
+    private const float DrawDuration = 0.5f;
     void Awake()
     {
         Utility.Info.logEnabled = true;
 
-        Application.targetFrameRate = 165;
+        Application.targetFrameRate = 60;
 
         Game.SaveSystem = new SaveSystemImpl();
 
@@ -29,17 +29,18 @@ public class UnityMain : MonoBehaviour
                 showPaths = !showPaths;
             };
         }
-        InvokeRepeating("Draw", 0f, drawDuration);
+        InvokeRepeating("Draw", 0f, DrawDuration);
     }
 
     void Draw()
     {
         if (showPaths)
-            Utility.DrawPaths(drawDuration);
+            Utility.DrawPaths(DrawDuration);
         if (showRoadAndLanes)
-            Utility.DrawRoadsAndLanes(drawDuration);
-        Utility.DrawControlPoints(drawDuration);
-        Utility.DrawVertices(drawDuration);
+            Utility.DrawRoadsAndLanes(DrawDuration);
+        Utility.DrawControlPoints(DrawDuration);
+        Utility.DrawVertices(DrawDuration);
+        Utility.DrawOutline(DrawDuration);
         
     }
 

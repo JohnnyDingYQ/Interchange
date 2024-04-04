@@ -5,4 +5,5 @@ public static class Constants
     public const float MinimumLaneLength = 10f;
     public const float MaximumLaneLength = 75f;
     public const float RoadDivisionLengthTestTolerance = 1f;
+    public const float MeshResolution = 1f;
 }

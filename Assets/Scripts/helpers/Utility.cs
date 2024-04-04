@@ -107,6 +107,19 @@ public static class Utility
         }
     }
 
+    public static void DrawOutline(float duration)
+    {
+        foreach (Road road in Game.Roads.Values)
+        {
+            for (int i = 1; i < road.LeftInnerOutline.Count; i++)
+            {
+                Debug.DrawLine(road.LeftInnerOutline[i - 1], road.LeftInnerOutline[i], Color.green, duration);
+                Debug.DrawLine(road.RightInnerOutline[i - 1], road.RightInnerOutline[i], Color.green, duration);
+            }
+            
+        }
+    }
+
     public static bool AreNumericallyEqual(float3 a, float3 b)
     {
         return Vector3.Distance(a, b) < 0.01f;

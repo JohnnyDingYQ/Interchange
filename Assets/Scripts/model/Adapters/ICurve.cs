@@ -1,7 +1,11 @@
+using Unity.Mathematics;
+
 public interface ICurve
 {
-    float StartInterpolation { get; set; }
-    float EndInterpolation { get; set; }
+    float StartT { get; set; }
+    float EndT { get; set; }
 
     void Draw(float duration);
+    float3 EvaluatePosition(float t);
+    float3 EvaluateNormal(float t);
 }

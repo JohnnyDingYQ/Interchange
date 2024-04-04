@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using QuikGraph;
+using Unity.Mathematics;
 
 public class Path : IEdge<Vertex>
 {
@@ -16,5 +17,14 @@ public class Path : IEdge<Vertex>
         Curve = curve;
         Source = source;
         Target = target;
+    }
+    public float3 EvaluatePosition(float t)
+    {
+        return Curve.EvaluatePosition(t);
+    }
+
+        public float3 EvaluateNormal(float t)
+    {
+        return Curve.EvaluateNormal(t);
     }
 }

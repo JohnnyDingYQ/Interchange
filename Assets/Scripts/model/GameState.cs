@@ -3,50 +3,16 @@ using QuikGraph;
 
 public class GameState
 {
-    private SortedDictionary<int, Road> roads;
-    public SortedDictionary<int, Road> Roads
-    {
-        get
-        {
-            roads ??= new();
-            return roads;
-        }
-        set
-        {
-            roads = value;
-        }
-    }
-    private SortedDictionary<int, Node> nodes;
-    public SortedDictionary<int, Node> Nodes
-    {
-        get
-        {
-            nodes ??= new();
-            return nodes;
-        }
-        set
-        {
-            nodes = value;
-        }
-    }
-
-    private AdjacencyGraph<Vertex, Path> graph;
-    public AdjacencyGraph<Vertex, Path> Graph
-    {
-        get
-        {
-            graph ??= new();
-            return graph;
-        }
-        set
-        {
-            graph = value;
-        }
-    }
+    public SortedDictionary<int, Road> Roads { get; set; }
+    public SortedDictionary<int, Node> Nodes { get; set; }
+    public AdjacencyGraph<Vertex, Path> Graph { get; set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
     public GameState()
     {
+        Roads = new();
+        Nodes = new();
+        Graph = new();
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
     }

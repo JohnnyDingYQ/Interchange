@@ -18,6 +18,8 @@ public class Road
     public float3 PivotPos { get; set; }
     public float3 EndPos { get; set; }
     public float Length { get; set; }
+    public List<float3> LeftInnerOutline { get; set; }
+    public List<float3> RightInnerOutline { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road() { }

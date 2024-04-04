@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QuikGraph.Predicates;
 using Unity.Mathematics;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -91,6 +92,7 @@ public static class BuildHandler
             }
         }
         RegisterNodes(road);
+        OutlineMesh(road);
         AutoDivideRoad(road);
         return road;
 
@@ -161,13 +163,43 @@ public static class BuildHandler
         #endregion
     }
 
+    static void OutlineMesh(Road road)
+    {
+        OutlineInnerRoad();
+
+        # region extracted functions
+        void OutlineInnerRoad()
+        {
+            int numPoints = (int)(road.Length * Constants.MeshResolution);
+            road.LeftInnerOutline = new();
+            road.RightInnerOutline = new();
+            Lane leftmost = road.Lanes.First();
+            Lane rightmost = road.Lanes.Last();
+            if (Game.Graph.TryGetEdge(leftmost.StartVertex, leftmost.EndVertex, out Path left)
+                && Game.Graph.TryGetEdge(rightmost.StartVertex, rightmost.EndVertex, out Path right))
+                for (int i = 0; i <= numPoints; i++)
+                {
+                    float t = (float)i / numPoints;
+                    float3 leftNormal = left.EvaluateNormal(t) * Constants.LaneWidth / 2;
+                    leftNormal.y = 0;
+                    float3 rightNormal = right.EvaluateNormal(t) * Constants.LaneWidth / 2;
+                    rightNormal.y = 0;
+                    road.LeftInnerOutline.Add(left.EvaluatePosition(t) + leftNormal);
+                    road.RightInnerOutline.Add(right.EvaluatePosition(t) - rightNormal);
+                }
+            else
+                throw new InvalidOperationException("fatal error: inner path not found");
+        }
+        # endregion
+    }
+
     public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction laneDirection)
     {
         BuildStraightPath();
         BuildRightLaneChangePath();
         BuildLeftLaneChangePath();
         BuildSidePaths();
-        
+
         void BuildStraightPath()
         {
             for (int i = 0; i < LaneCount; i++)
@@ -226,7 +258,7 @@ public static class BuildHandler
         float3 pos1 = start.Pos + Constants.MinimumLaneLength / 4 * start.Tangent;
         float3 pos2 = end.Pos - Constants.MinimumLaneLength / 4 * end.Tangent;
         BezierCurve bezierCurve = new(start.Pos, pos1, pos2, end.Pos);
-        ICurve curve = new BezierCurveAdapter(bezierCurve, 0, 1);
+        ICurve curve = new BezierCurveAdapter(bezierCurve);
         Path p = new(curve, start, end);
         Game.AddEdge(p);
         return p;
