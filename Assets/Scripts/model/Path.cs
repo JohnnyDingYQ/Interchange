@@ -23,8 +23,8 @@ public class Path : IEdge<Vertex>
         return Curve.EvaluatePosition(t);
     }
 
-        public float3 EvaluateNormal(float t)
+        public float3 Evaluate2DNormal(float t)
     {
-        return Curve.EvaluateNormal(t);
+        return Curve.Evaluate2DNormal(t);
     }
 }

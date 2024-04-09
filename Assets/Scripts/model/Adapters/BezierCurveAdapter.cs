@@ -27,8 +27,8 @@ public class BezierCurveAdapter : ICurve
         return CurveUtility.EvaluatePosition(BezierCurve, StartT + (EndT - StartT) * t);
     }
 
-    public float3 EvaluateNormal(float t)
+    public float3 Evaluate2DNormal(float t)
     {
-        throw new NotImplementedException();
+        return Vector3.Cross(CurveUtility.EvaluateTangent(BezierCurve, t), Vector3.up).normalized;
     }
 }

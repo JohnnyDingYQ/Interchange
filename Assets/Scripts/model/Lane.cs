@@ -28,7 +28,7 @@ public class Lane
         }
     }
     public Road Road { get; set; }
-    public int LaneIndex { get; set; }
+    public int Order { get; set; }
     public float Length { get; set; }
 
     // Empty constructor for JSON.Net deserialization
@@ -36,7 +36,7 @@ public class Lane
 
     public Lane(Road road, int laneIndex)
     {
-        LaneIndex = laneIndex;
+        Order = laneIndex;
         Road = road;
         InitSpline();
         InitNodes();
@@ -46,13 +46,13 @@ public class Lane
 
     public void InitSpline()
     {
-        Spline = GetLaneSpline(LaneIndex);
+        Spline = GetLaneSpline(Order);
     }
 
     void InitNodes()
     {
-        StartNode = new(Spline.EvaluatePosition(0), LaneIndex);
-        EndNode = new(Spline.EvaluatePosition(1), LaneIndex);
+        StartNode = new(Spline.EvaluatePosition(0), Order);
+        EndNode = new(Spline.EvaluatePosition(1), Order);
         StartNode.AddLane(this, Direction.Out);
         EndNode.AddLane(this, Direction.In);
     }
@@ -89,7 +89,7 @@ public class Lane
 
     public override string ToString()
     {
-        return "Lane " + LaneIndex + " of Road " + Road.Id;
+        return "Lane " + Order + " of Road " + Road.Id;
     }
 
 }

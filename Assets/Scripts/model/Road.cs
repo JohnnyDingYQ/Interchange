@@ -18,8 +18,8 @@ public class Road
     public float3 PivotPos { get; set; }
     public float3 EndPos { get; set; }
     public float Length { get; set; }
-    public List<float3> LeftInnerOutline { get; set; }
-    public List<float3> RightInnerOutline { get; set; }
+    public RoadOutline LeftOutline { get; set; }
+    public RoadOutline RightOutline { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road() { }
@@ -33,6 +33,8 @@ public class Road
         InitCurve();
         Length = CurveUtility.CalculateLength(BezierCurve);
         InitLanes();
+        LeftOutline = new();
+        RightOutline = new();
     }
 
     public Road(BezierCurve curve, int laneCount)
@@ -44,6 +46,8 @@ public class Road
         LaneCount = laneCount;
         Length = CurveUtility.CalculateLength(curve);
         InitLanes();
+        LeftOutline = new();
+        RightOutline = new();
     }
 
     public void InitCurve()

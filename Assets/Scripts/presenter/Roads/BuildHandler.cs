@@ -74,7 +74,7 @@ public static class BuildHandler
 
         if (startTarget.SnapNotNull)
         {
-            BuildAllPaths(road.Lanes, startNodes, Direction.Out);
+            PathHandler.BuildAllPaths(road.Lanes, startNodes, Direction.Out);
             for (int i = 0; i < LaneCount; i++)
             {
                 startNodes[i].AddLane(road.Lanes[i], Direction.Out);
@@ -84,7 +84,7 @@ public static class BuildHandler
         }
         if (endTarget.SnapNotNull)
         {
-            BuildAllPaths(road.Lanes, endNodes, Direction.In);
+            PathHandler.BuildAllPaths(road.Lanes, endNodes, Direction.In);
             for (int i = 0; i < endNodes.Count; i++)
             {
                 road.Lanes[i].EndNode = endNodes[i];
@@ -92,7 +92,7 @@ public static class BuildHandler
             }
         }
         RegisterNodes(road);
-        OutlineMesh(road);
+        RoadMeshAssist.OutlineMesh(road);
         AutoDivideRoad(road);
         return road;
 
@@ -163,106 +163,7 @@ public static class BuildHandler
         #endregion
     }
 
-    static void OutlineMesh(Road road)
-    {
-        OutlineInnerRoad();
-
-        # region extracted functions
-        void OutlineInnerRoad()
-        {
-            int numPoints = (int)(road.Length * Constants.MeshResolution);
-            road.LeftInnerOutline = new();
-            road.RightInnerOutline = new();
-            Lane leftmost = road.Lanes.First();
-            Lane rightmost = road.Lanes.Last();
-            if (Game.Graph.TryGetEdge(leftmost.StartVertex, leftmost.EndVertex, out Path left)
-                && Game.Graph.TryGetEdge(rightmost.StartVertex, rightmost.EndVertex, out Path right))
-                for (int i = 0; i <= numPoints; i++)
-                {
-                    float t = (float)i / numPoints;
-                    float3 leftNormal = left.EvaluateNormal(t) * Constants.LaneWidth / 2;
-                    leftNormal.y = 0;
-                    float3 rightNormal = right.EvaluateNormal(t) * Constants.LaneWidth / 2;
-                    rightNormal.y = 0;
-                    road.LeftInnerOutline.Add(left.EvaluatePosition(t) + leftNormal);
-                    road.RightInnerOutline.Add(right.EvaluatePosition(t) - rightNormal);
-                }
-            else
-                throw new InvalidOperationException("fatal error: inner path not found");
-        }
-        # endregion
-    }
-
-    public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction laneDirection)
-    {
-        BuildStraightPath();
-        BuildRightLaneChangePath();
-        BuildLeftLaneChangePath();
-        BuildSidePaths();
-
-        void BuildStraightPath()
-        {
-            for (int i = 0; i < LaneCount; i++)
-                foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
-                    BuildPath(lane, to[i], laneDirection);
-        }
-        void BuildRightLaneChangePath()
-        {
-            for (int i = 1; i < LaneCount; i++)
-                foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(laneDirection)))
-                    BuildPath(lane, to[i], laneDirection);
-        }
-        void BuildLeftLaneChangePath()
-        {
-            for (int i = 0; i < LaneCount - 1; i++)
-                foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(laneDirection)))
-                    BuildPath(lane, to[i], laneDirection);
-        }
-        void BuildSidePaths()
-        {
-            int leftNodeOrder = from.First().Order - 1;
-            int rightNodeOrder = from.Last().Order + 1;
-            HashSet<Road> roads = new();
-            for (int i = 0; i < LaneCount; i++)
-                foreach (Lane lane in from[i].GetLanes(InvertDirection(laneDirection)))
-                    roads.Add(lane.Road);
-            foreach (Road road in roads)
-                foreach (Lane lane in road.Lanes)
-                {
-                    Node node = laneDirection == Direction.Out ? lane.EndNode : lane.StartNode;
-                    if (node.Order == leftNodeOrder)
-                        BuildPath(lane, to.First(), laneDirection);
-                    else if (node.Order == rightNodeOrder)
-                        BuildPath(lane, to.Last(), laneDirection);
-                }
-        }
-        static Direction InvertDirection(Direction direction)
-        {
-            if (direction == Direction.In)
-                return Direction.Out;
-            return Direction.In;
-        }
-    }
-
-    static Path BuildPath(Lane l1, Lane l2, Direction l2Direction)
-    {
-        Path path;
-        if (l2Direction == Direction.Out)
-            path = BuildPath(l1.EndVertex, l2.StartVertex);
-        else
-            path = BuildPath(l2.EndVertex, l1.StartVertex);
-        return path;
-    }
-    static Path BuildPath(Vertex start, Vertex end)
-    {
-        float3 pos1 = start.Pos + Constants.MinimumLaneLength / 4 * start.Tangent;
-        float3 pos2 = end.Pos - Constants.MinimumLaneLength / 4 * end.Tangent;
-        BezierCurve bezierCurve = new(start.Pos, pos1, pos2, end.Pos);
-        ICurve curve = new BezierCurveAdapter(bezierCurve);
-        Path p = new(curve, start, end);
-        Game.AddEdge(p);
-        return p;
-    }
+    
 
     static void RegisterNodes(Road road)
     {

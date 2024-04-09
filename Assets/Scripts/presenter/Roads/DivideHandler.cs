@@ -77,7 +77,7 @@ public static class DivideHandler
                 nodes.Add(laneLeft.EndNode);
                 lanes.Add(laneRight);
             }
-            BuildHandler.BuildAllPaths(lanes, nodes, Direction.Out);
+            PathHandler.BuildAllPaths(lanes, nodes, Direction.Out);
         }
     }
 }

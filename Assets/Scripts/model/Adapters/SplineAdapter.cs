@@ -9,6 +9,7 @@ public class SplineAdapter : ICurve
     public Spline Spline { get; set; }
     public float StartT { get; set; }
     public float EndT { get; set; }
+    public float Length { get; set; }
 
     public SplineAdapter(Spline c, float startT, float endT)
     {
@@ -26,7 +27,7 @@ public class SplineAdapter : ICurve
         return Spline.EvaluatePosition(StartT + (EndT - StartT) * t);
     }
 
-    public float3 EvaluateNormal(float t)
+    public float3 Evaluate2DNormal(float t)
     {
         float3 forward = Spline.EvaluateTangent(StartT + (EndT - StartT) * t);
         float3 upVector = Spline.EvaluateUpVector(StartT + (EndT - StartT) * t);

@@ -64,7 +64,7 @@ public static class Utility
             int laneCount = road.Lanes.Count;
             foreach (Lane lane in road.Lanes)
             {
-                if ((lane.LaneIndex + 1) * 2 - 1 != laneCount)
+                if ((lane.Order + 1) * 2 - 1 != laneCount)
                 {
                     DrawSpline(lane.Spline, Color.white, duration);
                 }
@@ -111,10 +111,10 @@ public static class Utility
     {
         foreach (Road road in Game.Roads.Values)
         {
-            for (int i = 1; i < road.LeftInnerOutline.Count; i++)
+            for (int i = 1; i < road.LeftOutline.Mid.Count; i++)
             {
-                Debug.DrawLine(road.LeftInnerOutline[i - 1], road.LeftInnerOutline[i], Color.green, duration);
-                Debug.DrawLine(road.RightInnerOutline[i - 1], road.RightInnerOutline[i], Color.green, duration);
+                Debug.DrawLine(road.LeftOutline.Mid[i - 1], road.LeftOutline.Mid[i], Color.green, duration);
+                Debug.DrawLine(road.RightOutline.Mid[i - 1], road.RightOutline.Mid[i], Color.green, duration);
             }
             
         }

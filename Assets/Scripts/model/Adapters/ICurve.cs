@@ -7,5 +7,5 @@ public interface ICurve
 
     void Draw(float duration);
     float3 EvaluatePosition(float t);
-    float3 EvaluateNormal(float t);
+    float3 Evaluate2DNormal(float t);
 }

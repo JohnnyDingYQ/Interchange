@@ -2,12 +2,10 @@ using UnityEngine;
 
 public class UnityMain : MonoBehaviour
 {
-    [SerializeField] private int Height;
-    [SerializeField] private int Width;
     [SerializeField] private InputManager inputManager;
     private bool showRoadAndLanes = true;
     private bool showPaths = true;
-    private const float DrawDuration = 0.5f;
+    private const float DrawDuration = 0.2f;
     void Awake()
     {
         Utility.Info.logEnabled = true;
