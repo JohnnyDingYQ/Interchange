@@ -84,6 +84,17 @@ public class Node : IComparable<Node>
         return r;
     }
 
+    public IEnumerable<Road> GetRoads(Direction direction)
+    {
+        HashSet<Road> r = new();
+        foreach(Lane lane in directions.Keys)
+        {
+            if (directions[lane] == direction)
+                r.Add(lane.Road);
+        }
+        return r;
+    }
+
     public int CompareTo(Node other)
     {
         return Order.CompareTo(other.Order);

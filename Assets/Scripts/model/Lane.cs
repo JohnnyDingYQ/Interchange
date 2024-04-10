@@ -1,7 +1,6 @@
 using UnityEngine.Splines;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Mathematics;
-using System.IO;
 
 public class Lane
 {
@@ -12,21 +11,9 @@ public class Lane
     [JsonIgnore]
     public Spline Spline { get; set; }
     [JsonIgnore]
-    public float3 StartPos
-    {
-        get
-        {
-            return StartNode.Pos;
-        }
-    }
+    public float3 StartPos { get { return StartNode.Pos; } }
     [JsonIgnore]
-    public float3 EndPos
-    {
-        get
-        {
-            return EndNode.Pos;
-        }
-    }
+    public float3 EndPos { get { return EndNode.Pos; } }
     public Road Road { get; set; }
     public int Order { get; set; }
     public float Length { get; set; }
@@ -62,7 +49,7 @@ public class Lane
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
         ICurve curve = new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation);
-        Path path = new(curve, StartVertex, EndVertex);
+        Path path = new(curve, StartVertex, EndVertex, 0);
         Game.AddVertex(StartVertex);
         Game.AddVertex(EndVertex);
         Game.AddEdge(path);

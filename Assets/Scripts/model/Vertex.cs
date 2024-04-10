@@ -1,14 +1,16 @@
 using System;
 using Unity.Mathematics;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine.Splines;
 
-public class Vertex : IComparable<Vertex>
+public class Vertex
 {
     public int Id { get; set; }
     public float3 Pos { get; set; }
     public float Interpolation { get; set; }
     public float3 Tangent { get; set; }
     public Lane Lane { get; private set; }
+    [JsonIgnore]
     public Road Road { get { return Lane.Road; } }
 
     public Vertex() { }
@@ -28,10 +30,5 @@ public class Vertex : IComparable<Vertex>
         }
         Pos = lane.Spline.EvaluatePosition(Interpolation);
         Tangent = math.normalizesafe(lane.Spline.EvaluateTangent(Interpolation));
-    }
-
-    public int CompareTo(Vertex other)
-    {
-        return Lane.Order.CompareTo(other.Lane.Order);
     }
 }

@@ -116,6 +116,18 @@ public static class Utility
                 Debug.DrawLine(road.LeftOutline.Mid[i - 1], road.LeftOutline.Mid[i], Color.green, duration);
                 Debug.DrawLine(road.RightOutline.Mid[i - 1], road.RightOutline.Mid[i], Color.green, duration);
             }
+            if (road.LeftOutline.Right != null)
+                for (int i = 1; i < road.LeftOutline.Right.Count; i++)
+                {
+                    Debug.DrawLine(road.LeftOutline.Right[i - 1], road.LeftOutline.Right[i], Color.green, duration);
+                    Debug.DrawLine(road.RightOutline.Right[i - 1], road.RightOutline.Right[i], Color.green, duration);
+                }
+            if (road.LeftOutline.Left != null)
+                for (int i = 1; i < road.LeftOutline.Left.Count; i++)
+                {
+                    Debug.DrawLine(road.LeftOutline.Left[i - 1], road.LeftOutline.Left[i], Color.green, duration);
+                    Debug.DrawLine(road.LeftOutline.Left[i - 1], road.LeftOutline.Left[i], Color.green, duration);
+                }
             
         }
     }

@@ -1,10 +1,2 @@
-public enum Side
-{
-    Start,
-    End
-}
-public enum Direction
-{
-    In,
-    Out
-}
+public enum Side { Start, End }
+public enum Direction { In, Out }

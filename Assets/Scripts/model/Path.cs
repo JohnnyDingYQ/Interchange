@@ -1,22 +1,28 @@
+using System;
 using System.Collections.Generic;
 using QuikGraph;
 using Unity.Mathematics;
 
-public class Path : IEdge<Vertex>
+public class Path : IEdge<Vertex>, IComparable<Path>
 {
     public ICurve Curve { get; set; }
-
     public Vertex Source { get; set; }
-
     public Vertex Target { get; set; }
+    /// <summary>
+    /// straight path: Span = 0 ||
+    /// left turn path: Span = -1 ||
+    /// right turn path: Span = 1, 
+    /// </summary>
+    public int Span { get; set; }
 
     public Path() { }
 
-    public Path(ICurve curve, Vertex source, Vertex target)
+    public Path(ICurve curve, Vertex source, Vertex target, int span)
     {
         Curve = curve;
         Source = source;
         Target = target;
+        Span = span;
     }
     public float3 EvaluatePosition(float t)
     {
@@ -26,5 +32,10 @@ public class Path : IEdge<Vertex>
         public float3 Evaluate2DNormal(float t)
     {
         return Curve.Evaluate2DNormal(t);
+    }
+
+    public int CompareTo(Path other)
+    {
+        return Span.CompareTo(other.Span);
     }
 }
