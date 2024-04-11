@@ -10,8 +10,6 @@ public class Road
 {
     public int Id { get; set; }
     [JsonIgnore]
-    public RoadGameObject RoadGameObject { get; set; }
-    [JsonIgnore]
     public BezierCurve BezierCurve { get; set; }
     public List<Lane> Lanes { get; set; }
     public int LaneCount { get; set; }

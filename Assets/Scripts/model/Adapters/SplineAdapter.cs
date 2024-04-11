@@ -19,7 +19,7 @@ public class SplineAdapter : ICurve
     }
     public void Draw(float duration)
     {
-        Utility.DrawSpline(Spline, StartT, EndT, Color.yellow, duration);
+        Gizmos.DrawSpline(Spline, StartT, EndT, Color.yellow, duration);
     }
 
     public float3 EvaluatePosition(float t)

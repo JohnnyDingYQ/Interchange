@@ -3,54 +3,24 @@ using QuikGraph;
 
 public static class Game
 {
-    public static ISaveSystemBoundary SaveSystem { get; set; }
+    public static IGameEngine Unity { get; set; }
     public static GameState GameState { get; set; }
 
-    public static SortedDictionary<int, Road> Roads
-    {
-        get
-        {
-            return GameState.Roads;
-        }
-    }
+    public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
 
-    public static SortedDictionary<int, Node> Nodes
-    {
-        get
-        {
-            return GameState.Nodes;
-        }
-    }
+    public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
 
-    public static AdjacencyGraph<Vertex, Path> Graph
-    {
-        get
-        {
-            return GameState.Graph;
-        }
-    }
+    public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
 
     public static int NextAvailableNodeId
     {
-        get
-        {
-            return GameState.NextAvailableNodeId;
-        }
-        set
-        {
-            GameState.NextAvailableNodeId = value;
-        }
+        get { return GameState.NextAvailableNodeId; }
+        set { GameState.NextAvailableNodeId = value; }
     }
     public static int NextAvailableRoadId
     {
-        get
-        {
-            return GameState.NextAvailableRoadId;
-        }
-        set
-        {
-            GameState.NextAvailableRoadId = value;
-        }
+        get { return GameState.NextAvailableRoadId; }
+        set { GameState.NextAvailableRoadId = value; }
     }
 
     static Game()
@@ -65,12 +35,12 @@ public static class Game
 
     public static void SaveGame()
     {
-        SaveSystem.SaveGame();
+        Unity.SaveGame();
     }
 
     public static void LoadGame()
     {
-        SaveSystem.LoadGame();
+        Unity.LoadGame();
         BuildHandler.ComplyToNewGameState();
     }
 

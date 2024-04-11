@@ -15,7 +15,7 @@ public class SaveSystemTest
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        Game.SaveSystem = new SaveSystemImpl();
+        Game.Unity = new SaveSystemImpl();
     }
 
     [SetUp]

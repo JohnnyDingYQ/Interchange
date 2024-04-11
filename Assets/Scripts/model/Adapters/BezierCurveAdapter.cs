@@ -19,7 +19,7 @@ public class BezierCurveAdapter : ICurve
     }
     public void Draw(float duration)
     {
-        Utility.DrawBezierCurve(BezierCurve, StartT, EndT, Color.yellow, duration);
+        Gizmos.DrawBezierCurve(BezierCurve, StartT, EndT, Color.yellow, duration);
     }
 
     public float3 EvaluatePosition(float t)

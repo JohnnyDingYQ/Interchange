@@ -8,11 +8,10 @@ public class UnityMain : MonoBehaviour
     private const float DrawDuration = 0.2f;
     void Awake()
     {
-        Utility.Info.logEnabled = true;
 
         Application.targetFrameRate = 60;
 
-        Game.SaveSystem = new SaveSystemImpl();
+        Game.Unity = new SaveSystemImpl();
 
         if (inputManager != null)
         {
@@ -33,12 +32,12 @@ public class UnityMain : MonoBehaviour
     void Draw()
     {
         if (showPaths)
-            Utility.DrawPaths(DrawDuration);
+            Gizmos.DrawPaths(DrawDuration);
         if (showRoadAndLanes)
-            Utility.DrawRoadsAndLanes(DrawDuration);
-        Utility.DrawControlPoints(DrawDuration);
-        Utility.DrawVertices(DrawDuration);
-        Utility.DrawOutline(DrawDuration);
+            Gizmos.DrawRoadsAndLanes(DrawDuration);
+        Gizmos.DrawControlPoints(DrawDuration);
+        Gizmos.DrawVertices(DrawDuration);
+        Gizmos.DrawOutline(DrawDuration);
         
     }
 
@@ -53,13 +52,11 @@ public class UnityMain : MonoBehaviour
 
     void SaveGame()
     {
-        Utility.Info.Log("Saving");
         Game.SaveGame();
     }
 
     void LoadGame()
     {
-        Utility.Info.Log("Loading");
         Game.LoadGame();
     }
 }

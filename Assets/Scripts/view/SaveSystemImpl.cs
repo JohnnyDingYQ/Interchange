@@ -4,7 +4,7 @@ using System.IO;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
-public class SaveSystemImpl : ISaveSystemBoundary
+public class SaveSystemImpl : IGameEngine
 {
     public void LoadGame()
     {

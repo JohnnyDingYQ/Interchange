@@ -4,7 +4,7 @@ using UnityEngine;
 public class Roads : MonoBehaviour
 {
     [SerializeField] private GameObject roads;
-    [SerializeField] private RoadGameObject roadPrefab;
+    // [SerializeField] private RoadGameObject roadPrefab;
     [SerializeField] private InputManager inputManager;
 
     void Start()
