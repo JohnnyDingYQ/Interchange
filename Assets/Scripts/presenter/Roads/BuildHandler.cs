@@ -73,12 +73,12 @@ public static class BuildHandler
         Game.RegisterRoad(road);
         if (startTarget.SnapNotNull)
         {
-            PathHandler.BuildAllPaths(road.Lanes, startNodes, Direction.Out);
             for (int i = 0; i < LaneCount; i++)
             {
                 startNodes[i].AddLane(road.Lanes[i], Direction.Out);
                 road.Lanes[i].StartNode = startNodes[i];
             }
+            PathHandler.BuildAllPaths(road.Lanes, startNodes, Direction.Out);
             HashSet<Road> inRoads = new();
             foreach (Node n in startNodes)
                 inRoads.UnionWith(n.GetRoads(Direction.In));
@@ -87,12 +87,12 @@ public static class BuildHandler
         }
         if (endTarget.SnapNotNull)
         {
-            PathHandler.BuildAllPaths(road.Lanes, endNodes, Direction.In);
             for (int i = 0; i < endNodes.Count; i++)
             {
                 endNodes[i].AddLane(road.Lanes[i], Direction.In);
                 road.Lanes[i].EndNode = endNodes[i];
             }
+            PathHandler.BuildAllPaths(road.Lanes, endNodes, Direction.In);
             road.UpdateInterRoadOutline();
         }
 

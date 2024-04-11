@@ -112,6 +112,7 @@ public class Road
     {
         if (Game.Graph.TryGetOutEdges(Lanes.First().EndVertex, out IEnumerable<Path> lEdges))
         {
+            Debug.Log(lEdges.Count());
             int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
             List<Path> l = new(lEdges);
             l.Sort();
