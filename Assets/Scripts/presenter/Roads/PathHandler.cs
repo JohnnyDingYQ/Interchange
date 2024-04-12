@@ -11,8 +11,7 @@ public static class PathHandler
     {
         int laneCount = to.Count;
         int span;
-
-        DeletePathWithSpanLargerThanOne();
+        bool branchExists = BranchExists();
 
         span = 0;
         BuildStraightPath();
@@ -21,12 +20,37 @@ public static class PathHandler
         span = -1;
         BuildLeftLaneChangePath();
 
-        if (!BranchExists())
-            BuildSidePaths();
-        else
+        if (branchExists)
             DeleteAllLaneChangingPaths();
+        else
+            BuildSidePaths();
+            
+        Patch();
 
         #region extracted functions
+        void Patch()
+        {
+            List<Node> nodes = GetRelevantNodes();
+            for (int i = 0; i < 2; i++)
+            {
+
+                if (!nodes.First().HasLanes(direction))
+                {
+                    Node connected = nodes.First();
+                    foreach (Node node in nodes)
+                        if (node.HasLanes(direction))
+                        {
+                            connected = node;
+                            break;
+                        }
+                    foreach (Lane l1 in nodes.First().GetLanes(InvertDirection(direction)))
+                        foreach (Lane l2 in connected.GetLanes(direction))
+                            BuildLanePath(l1, l2);
+                }
+                nodes.Reverse();
+            }
+        }
+
         void BuildStraightPath()
         {
             for (int i = 0; i < laneCount; i++)
@@ -51,15 +75,15 @@ public static class PathHandler
                 foreach (Lane lane in road.Lanes)
                 {
                     Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
+                    if (from.Contains(node))
+                        continue;
+
                     span = from.First().Order - node.Order;
-                    if (span > 1 && node.GetLanes(direction).Count == 0)
+                    if (span == 1)
                         BuildLanePath(lane, to.First());
-                    else if (span == 1)
-                        BuildLanePath(lane, to.First());
+
                     span = from.Last().Order - node.Order;
-                    if (span < -1 && node.GetLanes(direction).Count == 0)
-                        BuildLanePath(lane, to.Last());
-                    else if (span == -1)
+                    if (span == -1)
                         BuildLanePath(lane, to.Last());
                 }
         }
@@ -92,16 +116,14 @@ public static class PathHandler
             return p;
         }
 
-        void DeletePathWithSpanLargerThanOne()
+        void DeleteAllLaneChangingPaths()
         {
-            foreach (Node node in from)
-            {
-                foreach (Lane lane in node.GetLanes(InvertDirection(direction)))
+            foreach (Road road in GetRelevantRoads())
+                foreach (Lane lane in road.Lanes)
                     if (direction == Direction.Out)
-                        Game.Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && Math.Abs(e.Span) > 1);
+                        Game.Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && Math.Abs(e.Span) > 0);
                     else
-                        Game.Graph.RemoveEdgeIf(e => e.Target == lane.StartVertex && Math.Abs(e.Span) > 1);
-            }
+                        Game.Graph.RemoveEdgeIf(e => e.Target == lane.StartVertex && Math.Abs(e.Span) > 0);
         }
 
         bool BranchExists()
@@ -124,14 +146,19 @@ public static class PathHandler
                     roads.Add(lane.Road);
             return roads;
         }
-        void DeleteAllLaneChangingPaths()
+
+        List<Node> GetRelevantNodes()
         {
+            HashSet<Node> nodes = new();
             foreach (Road road in GetRelevantRoads())
                 foreach (Lane lane in road.Lanes)
-                    if (direction == Direction.Out)
-                        Game.Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && Math.Abs(e.Span) > 0);
-                    else
-                        Game.Graph.RemoveEdgeIf(e => e.Target == lane.StartVertex && Math.Abs(e.Span) > 0);
+                {
+                    Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
+                    nodes.Add(node);
+                }
+            List<Node> n = new(nodes);
+            n.Sort();
+            return n;
         }
         #endregion
     }

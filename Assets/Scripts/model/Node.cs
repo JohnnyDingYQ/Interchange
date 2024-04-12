@@ -13,13 +13,7 @@ public class Node : IComparable<Node>
     [JsonProperty]
     private readonly HashSet<Lane> lanes;
     [JsonIgnore]
-    public ReadOnlySet<Lane> Lanes
-    {
-        get
-        {
-            return lanes.AsReadOnly();
-        }
-    }
+    public ReadOnlySet<Lane> Lanes { get { return lanes.AsReadOnly(); } }
     public float3 Pos { get; set; }
     public int Order { get; set; }
     private readonly Dictionary<Lane, Direction> directions;
@@ -76,7 +70,7 @@ public class Node : IComparable<Node>
     public List<Lane> GetLanes(Direction direction)
     {
         List<Lane> r = new();
-        foreach(Lane lane in directions.Keys)
+        foreach (Lane lane in directions.Keys)
         {
             if (directions[lane] == direction)
                 r.Add(lane);
@@ -84,10 +78,15 @@ public class Node : IComparable<Node>
         return r;
     }
 
+    public bool HasLanes(Direction direction)
+    {
+        return GetLanes(direction).Count != 0;
+    }
+
     public IEnumerable<Road> GetRoads(Direction direction)
     {
         HashSet<Road> r = new();
-        foreach(Lane lane in directions.Keys)
+        foreach (Lane lane in directions.Keys)
         {
             if (directions[lane] == direction)
                 r.Add(lane.Road);
