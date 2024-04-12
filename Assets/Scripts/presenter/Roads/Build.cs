@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using QuikGraph.Predicates;
 using Unity.Mathematics;
-using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -78,12 +77,12 @@ public static class BuildHandler
                 startNodes[i].AddLane(road.Lanes[i], Direction.Out);
                 road.Lanes[i].StartNode = startNodes[i];
             }
-            PathHandler.BuildAllPaths(road.Lanes, startNodes, Direction.Out);
+            InterRoad.BuildAllPaths(road.Lanes, startNodes, Direction.Out);
             HashSet<Road> inRoads = new();
             foreach (Node n in startNodes)
                 inRoads.UnionWith(n.GetRoads(Direction.In));
             foreach (Road r in inRoads)
-                r.UpdateInterRoadOutline();
+                InterRoad.UpdateOutPath(r);
         }
         if (endTarget.SnapNotNull)
         {
@@ -92,8 +91,8 @@ public static class BuildHandler
                 endNodes[i].AddLane(road.Lanes[i], Direction.In);
                 road.Lanes[i].EndNode = endNodes[i];
             }
-            PathHandler.BuildAllPaths(road.Lanes, endNodes, Direction.In);
-            road.UpdateInterRoadOutline();
+            InterRoad.BuildAllPaths(road.Lanes, endNodes, Direction.In);
+            InterRoad.UpdateOutPath(road);
         }
 
         RegisterNodes(road);

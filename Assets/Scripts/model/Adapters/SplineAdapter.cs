@@ -31,6 +31,8 @@ public class SplineAdapter : ICurve
     {
         float3 forward = Spline.EvaluateTangent(StartT + (EndT - StartT) * t);
         float3 upVector = Spline.EvaluateUpVector(StartT + (EndT - StartT) * t);
-        return Vector3.Cross(forward, upVector).normalized;
+        float3 normal = Vector3.Cross(forward, upVector).normalized;
+        normal.y = 0;
+        return normal;
     }
 }

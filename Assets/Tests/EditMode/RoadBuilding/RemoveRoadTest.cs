@@ -52,7 +52,6 @@ public class RemoveRoadTest
         Road road = RoadBuilder.BuildRoad(0, direction, 2 * direction, 1);
         Assert.True(Game.RemoveRoad(road));
         Game.WipeState();
-        Debug.Log(Game.Graph.VertexCount);
         Assert.True(Game.Graph.IsEdgesEmpty);
     }
 }

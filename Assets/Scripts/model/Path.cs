@@ -29,9 +29,26 @@ public class Path : IEdge<Vertex>, IComparable<Path>
         return Curve.EvaluatePosition(t);
     }
 
-        public float3 Evaluate2DNormal(float t)
+    public float3 Evaluate2DNormal(float t)
     {
         return Curve.Evaluate2DNormal(t);
+    }
+
+    public List<float3> GetOutline(int numPoints, bool isLeft)
+    {
+        List<float3> results = new();
+
+        for (int i = 0; i <= numPoints; i++)
+        {
+            float t = (float)i / numPoints;
+            float3 normal = Evaluate2DNormal(t) * Constants.LaneWidth / 2;
+            if (isLeft)
+                results.Add(EvaluatePosition(t) + normal);
+            else
+                results.Add(EvaluatePosition(t) - normal);
+        }
+        return results;
+
     }
 
     public int CompareTo(Path other)

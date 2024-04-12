@@ -5,14 +5,13 @@ using Unity.Mathematics;
 using UnityEngine.Splines;
 using UnityEngine;
 
-public static class PathHandler
+public static class InterRoad
 {
     public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction direction)
     {
         int laneCount = to.Count;
         int span;
-        bool branchExists = BranchExists();
-
+        
         span = 0;
         BuildStraightPath();
         span = 1;
@@ -20,11 +19,11 @@ public static class PathHandler
         span = -1;
         BuildLeftLaneChangePath();
 
-        if (branchExists)
+        if (BranchExists())
             DeleteAllLaneChangingPaths();
         else
             BuildSidePaths();
-            
+
         Patch();
 
         #region extracted functions
@@ -107,6 +106,9 @@ public static class PathHandler
 
         Path BuildPath(Vertex start, Vertex end)
         {
+            Game.Graph.TryGetEdge(start, end, out Path edge);
+            if (edge != null)
+                return null;
             float3 pos1 = start.Pos + Constants.MinimumLaneLength / 4 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinimumLaneLength / 4 * end.Tangent;
             BezierCurve bezierCurve = new(start.Pos, pos1, pos2, end.Pos);
@@ -161,5 +163,23 @@ public static class PathHandler
             return n;
         }
         #endregion
+    }
+
+    public static void UpdateOutPath(Road road)
+    {
+        // if (Game.Graph.TryGetOutEdges(Lanes.First().EndVertex, out IEnumerable<Path> lEdges))
+        // {
+        //     int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
+        //     List<Path> l = new(lEdges);
+        //     l.Sort();
+        //     LeftOutline.Right = GetOutline(Lanes.First().EndVertex, l.First().Target, numPoints, true);
+        // }
+        // if (Game.Graph.TryGetOutEdges(Lanes.Last().EndVertex, out IEnumerable<Path> rEdges))
+        // {
+        //     int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
+        //     List<Path> l = new(rEdges);
+        //     l.Sort();
+        //     RightOutline.Right = GetOutline(Lanes.Last().EndVertex, l.Last().Target, numPoints, false);
+        // }
     }
 }

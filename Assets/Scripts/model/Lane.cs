@@ -17,6 +17,7 @@ public class Lane
     public Road Road { get; set; }
     public int Order { get; set; }
     public float Length { get; set; }
+    public Path InnerPath { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Lane() { }
@@ -53,6 +54,7 @@ public class Lane
         Game.AddVertex(StartVertex);
         Game.AddVertex(EndVertex);
         Game.AddEdge(path);
+        InnerPath = path;
     }
 
     /// <summary>
