@@ -21,13 +21,9 @@ public class Vertex
         if (lane.Spline == null)
             throw new InvalidOperationException("Lane spline is null");
         if (side == Side.Start)
-        {
             Interpolation = Constants.MinimumLaneLength / 2 / lane.Length;
-        }
         else
-        {
             Interpolation = (lane.Length - Constants.MinimumLaneLength / 2) / lane.Length;
-        }
         Pos = lane.Spline.EvaluatePosition(Interpolation);
         Tangent = math.normalizesafe(lane.Spline.EvaluateTangent(Interpolation));
     }

@@ -19,6 +19,8 @@ public class Road
     public float Length { get; set; }
     public RoadOutline LeftOutline { get; set; }
     public RoadOutline RightOutline { get; set; }
+    [JsonIgnore]
+    public Plane EndPlane { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road() { }
@@ -48,6 +50,7 @@ public class Road
     private void InitRoad()
     {
         InitLanes();
+        InitPlane();
         Length = CurveUtility.CalculateLength(BezierCurve);
         LeftOutline = new();
         RightOutline = new();
@@ -60,6 +63,11 @@ public class Road
     public void InitCurve()
     {
         BezierCurve = new BezierCurve(StartPos, PivotPos, EndPos);
+    }
+
+    public void InitPlane()
+    {
+        EndPlane = new(EndPos, EndPos + GetNormal(1), EndPos - new float3(0, 1, 0));
     }
 
     public float3 InterpolateLanePos(float t, int lane)

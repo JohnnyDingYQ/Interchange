@@ -21,8 +21,8 @@ public class LaneContractionTest
     [Test]
     public void ThreeLaneToOneLane_Mid()
     {
-        Road road0 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
-        Road road1 = RoadBuilder.BuildRoad(pos1, pos2 , pos3, 3);
+        Road road0 = RoadBuilder.Build(pos3, pos4, pos5, 1);
+        Road road1 = RoadBuilder.Build(pos1, pos2 , pos3, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];

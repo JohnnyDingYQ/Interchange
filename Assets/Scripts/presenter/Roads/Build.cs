@@ -62,14 +62,15 @@ public static class BuildHandler
         AlignPivotPos();
 
         Road road = new(startPos, pivotPos, endPos, LaneCount);
+        Game.RegisterRoad(road);
 
         if (HasLaneShorterThanMinimumLaneLength(road))
         {
             Debug.Log("Lane length is less than " + Constants.MinimumLaneLength);
+            Game.RemoveRoad(road);
             return null;
         }
 
-        Game.RegisterRoad(road);
         if (startTarget.SnapNotNull)
         {
             for (int i = 0; i < LaneCount; i++)
@@ -81,8 +82,8 @@ public static class BuildHandler
             HashSet<Road> inRoads = new();
             foreach (Node n in startNodes)
                 inRoads.UnionWith(n.GetRoads(Direction.In));
-            foreach (Road r in inRoads)
-                InterRoad.UpdateOutPath(r);
+            // foreach (Road r in inRoads)
+            InterRoad.UpdateOutline(inRoads.First());
         }
         if (endTarget.SnapNotNull)
         {
@@ -92,7 +93,7 @@ public static class BuildHandler
                 road.Lanes[i].EndNode = endNodes[i];
             }
             InterRoad.BuildAllPaths(road.Lanes, endNodes, Direction.In);
-            InterRoad.UpdateOutPath(road);
+            InterRoad.UpdateOutline(road);
         }
 
         RegisterNodes(road);
@@ -180,17 +181,18 @@ public static class BuildHandler
         }
     }
 
-    static void ReloadAllSpline()
+    static void ReloadRoad()
     {
         foreach (Road road in Game.Roads.Values)
         {
             road.InitCurve();
+            road.InitPlane();
             foreach (Lane lane in road.Lanes)
                 lane.InitSpline();
         }
     }
     public static void ComplyToNewGameState()
     {
-        ReloadAllSpline();
+        ReloadRoad();
     }
 }

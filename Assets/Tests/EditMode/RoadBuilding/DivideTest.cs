@@ -33,7 +33,7 @@ public class DivideTest
     [Test]
     public void DividingCreatesTwoRoads()
     {
-        Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 1);
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 1);
 
         Assert.AreEqual(1, Roads.Count);
         DivideHandler.DivideRoad(road, 0.5f);
@@ -43,7 +43,7 @@ public class DivideTest
     [Test]
     public void SubRoadsRetainsStartAndEndPos()
     {
-        Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 1);
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 1);
         SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
 
         Assert.AreEqual(road.StartPos, subRoads.Left.StartPos);
@@ -55,7 +55,7 @@ public class DivideTest
     {
         for (int i = 1; i <= 3; i++)
         {
-            Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, i);
+            Road road = RoadBuilder.Build(0, stride, 2 * stride, i);
             SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
             Road leftRoad = subRoads.Left;
             Road rightRoad = subRoads.Right;
@@ -73,7 +73,7 @@ public class DivideTest
     {
         for (int i = 1; i <= 3; i++)
         {
-            Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, i); ;
+            Road road = RoadBuilder.Build(0, stride, 2 * stride, i); ;
             SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
             Road leftRoad = subRoads.Left;
             Road rightRoad = subRoads.Right;
@@ -96,7 +96,7 @@ public class DivideTest
     {
         for (int i = 1; i <= 3; i++)
         {
-            Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, i);
+            Road road = RoadBuilder.Build(0, stride, 2 * stride, i);
             DivideHandler.DivideRoad(road, 0.5f);
 
             Assert.AreEqual(3 * i, Nodes.Count);
@@ -112,9 +112,9 @@ public class DivideTest
     [Test]
     public void SubRoadsPreserveConnection()
     {
-        Road left = RoadBuilder.BuildRoad(0, stride, 2 * stride, 2);
-        Road mid = RoadBuilder.BuildRoad(2 * stride, 3 * stride, 4 * stride, 2);
-        Road right = RoadBuilder.BuildRoad(4 * stride, 5 * stride, 6 * stride, 2);
+        Road left = RoadBuilder.Build(0, stride, 2 * stride, 2);
+        Road mid = RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 2);
+        Road right = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 2);
         SubRoads subRoads = DivideHandler.DivideRoad(mid, 0.5f);
         Road subLeft = subRoads.Left;
         Road subRight = subRoads.Right;
@@ -145,12 +145,12 @@ public class DivideTest
     [Test]
     public void PreserveConnectionSpecificTest()
     {
-        Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 3);
         List<Road> connectedRoads = new();
         for (int i = 0; i < 3; i++)
         {
             float3 pos = road.Lanes[i].EndPos;
-            connectedRoads.Add(RoadBuilder.BuildRoad(pos, pos + stride, pos + 2 * stride, 1));
+            connectedRoads.Add(RoadBuilder.Build(pos, pos + stride, pos + 2 * stride, 1));
         }
         Road roadRight = DivideHandler.DivideRoad(road, 0.5f).Right;
         for (int i = 0; i < 3; i++)
@@ -162,7 +162,7 @@ public class DivideTest
     [Test]
     public void SubRoadsLengthBasicTest()
     {
-        Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
         Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
     }
@@ -170,7 +170,7 @@ public class DivideTest
     [Test]
     public void SubRoadsPathConnected()
     {
-        Road road = RoadBuilder.BuildRoad(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
         for (int i = 0; i < 3; i++)
         {
@@ -185,7 +185,7 @@ public class DivideTest
     [Test]
     public void CurvedRoadDividedEvenly()
     {
-        Road road = RoadBuilder.BuildRoad(
+        Road road = RoadBuilder.Build(
             0,
             Constants.MinimumLaneLength * new float3(1, 0, 0),
             2 * Constants.MinimumLaneLength * new float3(0, 0, 1),

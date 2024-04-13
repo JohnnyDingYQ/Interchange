@@ -19,7 +19,7 @@ public class RemoveRoadTest
     [Test]
     public void RoadToRemoveNotFound()
     {
-        RoadBuilder.BuildRoad(0, direction, 2 * direction, 1);
+        RoadBuilder.Build(0, direction, 2 * direction, 1);
         Road road = new();
         Assert.False(Game.RemoveRoad(road));
         Assert.AreEqual(1, Roads.Count);
@@ -28,7 +28,7 @@ public class RemoveRoadTest
     [Test]
     public void RemoveIsolatedRoad()
     {
-        Road road = RoadBuilder.BuildRoad(0, direction, 2 * direction, 1);
+        Road road = RoadBuilder.Build(0, direction, 2 * direction, 1);
         Assert.True(Game.RemoveRoad(road));
         Assert.AreEqual(0, Roads.Count);
         Assert.AreEqual(0, Nodes.Count);
@@ -37,8 +37,8 @@ public class RemoveRoadTest
     [Test]
     public void RemoveConnectedRoad()
     {
-        Road road0 = RoadBuilder.BuildRoad(0, direction, 2 * direction, 2);
-        Road road1 = RoadBuilder.BuildRoad(2 * direction, 3 * direction, 4 * direction, 2);
+        Road road0 = RoadBuilder.Build(0, direction, 2 * direction, 2);
+        Road road1 = RoadBuilder.Build(2 * direction, 3 * direction, 4 * direction, 2);
         Assert.AreEqual(6, Nodes.Count);
         Assert.True(Game.RemoveRoad(road0));
         Assert.AreEqual(4, Nodes.Count);
@@ -49,9 +49,8 @@ public class RemoveRoadTest
     [Test]
     public void RemovePathConnections()
     {
-        Road road = RoadBuilder.BuildRoad(0, direction, 2 * direction, 1);
+        Road road = RoadBuilder.Build(0, direction, 2 * direction, 1);
         Assert.True(Game.RemoveRoad(road));
-        Game.WipeState();
         Assert.True(Game.Graph.IsEdgesEmpty);
     }
 }

@@ -63,7 +63,7 @@ public static class Game
         Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
-            Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && e.Target == lane.StartVertex);
+            Graph.RemoveEdgeIf(e => e.Source == lane.StartVertex && e.Target == lane.EndVertex);
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);

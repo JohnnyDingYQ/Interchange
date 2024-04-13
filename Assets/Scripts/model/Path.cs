@@ -41,7 +41,7 @@ public class Path : IEdge<Vertex>, IComparable<Path>
         for (int i = 0; i <= numPoints; i++)
         {
             float t = (float)i / numPoints;
-            float3 normal = Evaluate2DNormal(t) * Constants.LaneWidth / 2;
+            float3 normal = Evaluate2DNormal(t) * Constants.RoadOutlineSeparation;
             if (isLeft)
                 results.Add(EvaluatePosition(t) + normal);
             else

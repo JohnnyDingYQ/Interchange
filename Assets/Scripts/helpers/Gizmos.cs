@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -99,28 +100,26 @@ public static class Gizmos
     {
         foreach (Road road in Game.Roads.Values)
         {
-            DebugExtension.DebugPoint(road.LeftOutline.Mid.First(), Color.green, 1, duration);
-            DebugExtension.DebugPoint(road.LeftOutline.Mid.Last(), Color.green, 1, duration);
-            DebugExtension.DebugPoint(road.RightOutline.Mid.First(), Color.green, 1, duration);
-            DebugExtension.DebugPoint(road.RightOutline.Mid.Last(), Color.green, 1, duration);
-            for (int i = 1; i < road.LeftOutline.Mid.Count; i++)
-            {
-                Debug.DrawLine(road.LeftOutline.Mid[i - 1], road.LeftOutline.Mid[i], Color.green, duration);
-                Debug.DrawLine(road.RightOutline.Mid[i - 1], road.RightOutline.Mid[i], Color.green, duration);
-            }
-            if (road.LeftOutline.Right != null)
-                for (int i = 1; i < road.LeftOutline.Right.Count; i++)
-                {
-                    Debug.DrawLine(road.LeftOutline.Right[i - 1], road.LeftOutline.Right[i], Color.green, duration);
-                    Debug.DrawLine(road.RightOutline.Right[i - 1], road.RightOutline.Right[i], Color.green, duration);
-                }
-            if (road.LeftOutline.Left != null)
-                for (int i = 1; i < road.LeftOutline.Left.Count; i++)
-                {
-                    Debug.DrawLine(road.LeftOutline.Left[i - 1], road.LeftOutline.Left[i], Color.green, duration);
-                    Debug.DrawLine(road.LeftOutline.Left[i - 1], road.LeftOutline.Left[i], Color.green, duration);
-                }
+            Color start = new(99.0f/255, 224.0f/255, 103.0f/255, 1);
+            Color mid = new(43.0f/255, 153.0f/255, 47.0f/255, 1);
+            Color end = new(16.0f/255, 99.0f/255, 19.0f/255, 1);
+            DrawListofPoints(road.LeftOutline.Mid, mid, duration);
+            DrawListofPoints(road.LeftOutline.Start, start, duration);
+            DrawListofPoints(road.LeftOutline.End, end, duration);
             
+            DrawListofPoints(road.RightOutline.Mid, mid, duration);
+            DrawListofPoints(road.RightOutline.Start, start, duration);
+            DrawListofPoints(road.RightOutline.End, end, duration);
         }
+    }
+
+    static void DrawListofPoints(List<float3> l, Color color, float duration)
+    {
+        if (l == null)
+            return;
+        if (l.Count == 1)
+            return;
+        for (int i = 1; i < l.Count; i++)
+            Debug.DrawLine(l[i-1], l[i], color, duration);
     }
 }

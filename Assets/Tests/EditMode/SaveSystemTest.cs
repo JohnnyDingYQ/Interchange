@@ -28,7 +28,7 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleOneLaneRoad()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
+        RoadBuilder.Build(pos1, pos2, pos3, 1);
         Game.SaveGame();
         BuildHandler.Reset();
         Game.LoadGame();
@@ -51,7 +51,7 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleThreeLaneRoad()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 3);
+        RoadBuilder.Build(pos1, pos2, pos3, 3);
         Game.SaveGame();
         BuildHandler.Reset();
         Game.LoadGame();
@@ -78,8 +78,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoDisconnectedOneLaneRoad()
     {
-        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.BuildRoad(pos4, pos5, pos6, 1);
+        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.Build(pos4, pos5, pos6, 1);
         
         Game.SaveGame();
         BuildHandler.Reset();
@@ -102,8 +102,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoConnectedOneLaneRoad()
     {
-        Road road0 = RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.Build(pos3, pos4, pos5, 1);
         
         Game.SaveGame();
         BuildHandler.Reset();
@@ -126,8 +126,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverLanesSplines()
     {
-        RoadBuilder.BuildRoad(pos1, pos2, pos3, 1);
-        RoadBuilder.BuildRoad(pos3, pos4, pos5, 1);
+        RoadBuilder.Build(pos1, pos2, pos3, 1);
+        RoadBuilder.Build(pos3, pos4, pos5, 1);
         Game.SaveGame();
         BuildHandler.Reset();
         Game.LoadGame();
