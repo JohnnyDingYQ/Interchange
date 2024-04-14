@@ -15,9 +15,15 @@ public static class InterRoad
 
         span = 0;
         BuildStraightPath();
-        span = 1;
+        if (direction == Direction.Out)
+            span = 1;
+        else
+            span = -1;
         BuildRightLaneChangePath();
-        span = -1;
+        if (direction == Direction.Out)
+            span = -1;
+        else
+            span = 1;
         BuildLeftLaneChangePath();
 
         if (BranchExists())
@@ -245,12 +251,7 @@ public static class InterRoad
 
             List<Path> paths = new(edges);
             paths.Sort();
-            if (isLeft)
-            {
-                // Debug.Log(paths.First().Span);
-                // Debug.Log(paths.Last().Span);
-                DebugExtension.DebugPoint(paths.First().Target.Pos, Color.white, 3, 1000);
-            }
+
             if (isLeft)
                 outline = paths.First().GetOutline(numPoints, true);
             else

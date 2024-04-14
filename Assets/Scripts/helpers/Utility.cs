@@ -6,11 +6,11 @@ public static class Utility
 {
     public static bool AreNumericallyEqual(float3 a, float3 b)
     {
-        return Vector3.Distance(a, b) < 0.01f;
+        return Vector3.Distance(a, b) < Constants.NumericallyEqualMaxTolerance;
     }
     public static bool AreNumericallyEqual(float a, float b)
     {
-        return Math.Abs(a - b) < 0.01f;
+        return Math.Abs(a - b) < Constants.NumericallyEqualMaxTolerance;
     }
 
     public static bool AreNumericallyEqual(float a, float b, float tolerance)

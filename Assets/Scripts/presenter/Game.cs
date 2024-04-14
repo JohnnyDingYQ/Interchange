@@ -86,7 +86,7 @@ public static class Game
 
     public static bool HasEdge(Lane from, Lane to)
     {
-        return HasEdge(from.EndVertex, to.StartVertex);
+        return HasEdge(from.EndVertex, to.StartVertex) || HasEdge(to.EndVertex, from.StartVertex);
     }
 
     public static bool HasEdge(Vertex from, Vertex to)
