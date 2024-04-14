@@ -34,7 +34,7 @@ public class Path : IEdge<Vertex>, IComparable<Path>
         return Curve.Evaluate2DNormal(t);
     }
 
-    public List<float3> GetOutline(int numPoints, bool isLeft)
+    public List<float3> GetOutline(int numPoints, Orientation orientation)
     {
         List<float3> results = new();
 
@@ -42,7 +42,7 @@ public class Path : IEdge<Vertex>, IComparable<Path>
         {
             float t = (float)i / numPoints;
             float3 normal = Evaluate2DNormal(t) * Constants.RoadOutlineSeparation;
-            if (isLeft)
+            if (orientation == Orientation.Left)
                 results.Add(EvaluatePosition(t) + normal);
             else
                 results.Add(EvaluatePosition(t) - normal);

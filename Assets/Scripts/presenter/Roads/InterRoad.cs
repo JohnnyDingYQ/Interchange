@@ -182,15 +182,10 @@ public static class InterRoad
         #endregion
     }
 
-    public static void UpdateOutline(Road road)
+    public static void UpdateOutline(NodeGroup nodeGroup)
     {
-        List<Node> nodes = road.Lanes.First().EndNode.GetNodeGroup();
-        HashSet<Road> outRoads = new();
-        HashSet<Road> inRoads = new();
-        foreach (Node node in nodes)
-            outRoads.UnionWith(node.GetRoads(Direction.Out));
-        foreach (Node node in nodes)
-            inRoads.UnionWith(node.GetRoads(Direction.In));
+        ReadOnlySet<Road> outRoads = nodeGroup.OutRoads;
+        ReadOnlySet<Road> inRoads = nodeGroup.InRoads;
 
         foreach (Road r in outRoads)
         {
@@ -203,48 +198,35 @@ public static class InterRoad
             r.RightOutline.End.Clear();
         }
 
-        int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
-        EvaluateSideOutline(true);
-        EvaluateSideOutline(false);
+        EvaluateSideOutline(Orientation.Left);
+        EvaluateSideOutline(Orientation.Right);
 
         foreach (Road r in outRoads)
         {
             if (r.LeftOutline.Start.Count == 0)
-                r.LeftOutline.Start = GetOutLine(r, true, Direction.Out);
+                r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Direction.Out);
             if (r.RightOutline.Start.Count == 0)
-                r.RightOutline.Start = GetOutLine(r, false, Direction.Out);
+                r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Direction.Out);
         }
         foreach (Road r in inRoads)
         {
             if (r.LeftOutline.End.Count == 0)
-                r.LeftOutline.End = GetOutLine(r, true, Direction.In);
+                r.LeftOutline.End = GetOutLineAtTwoEnds(r, Orientation.Left, Direction.In);
             if (r.RightOutline.End.Count == 0)
-                r.RightOutline.End = GetOutLine(r, false, Direction.In);
+                r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Direction.In);
         }
 
 
-        void EvaluateSideOutline(bool isLeft)
+        void EvaluateSideOutline(Orientation orientation)
         {
             IEnumerable<Path> edges;
             List<float3> outline;
-            Node firstNodeWithInRoad = null;
-            Node lastNodeWithInRoad = null;
-            foreach (Node n in nodes)
-                if (n.GetLanes(Direction.In).Count != 0)
-                {
-                    firstNodeWithInRoad = n;
-                    break;
-                }
-
-            for (int i = nodes.Count - 1; i >= 0; i --)
-                if (nodes[i].GetLanes(Direction.In).Count != 0)
-                {
-                    lastNodeWithInRoad = nodes[i];
-                    break;
-                }
+            Node firstNodeWithInRoad = nodeGroup.FirstWithInRoad();
+            Node lastNodeWithInRoad = nodeGroup.LastWithInRoad();
             Road leftmostRoad = firstNodeWithInRoad.GetRoads(Direction.In).First();
             Road rightmostRoad = lastNodeWithInRoad.GetRoads(Direction.In).First();
-            if (isLeft)
+
+            if (orientation == Orientation.Left)
                 Game.Graph.TryGetOutEdges(leftmostRoad.Lanes.First().EndVertex, out edges);
             else
                 Game.Graph.TryGetOutEdges(rightmostRoad.Lanes.Last().EndVertex, out edges);
@@ -252,37 +234,15 @@ public static class InterRoad
             List<Path> paths = new(edges);
             paths.Sort();
 
-            if (isLeft)
-                outline = paths.First().GetOutline(numPoints, true);
+            int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
+            if (orientation == Orientation.Left)
+                outline = paths.First().GetOutline(numPoints, orientation);
             else
-                outline = paths.Last().GetOutline(numPoints, false);
+                outline = paths.Last().GetOutline(numPoints, orientation);
 
+            SeparateOutlineWithEndofRoad(outline, out List<float3> outlineStart, out List<float3> outlineEnd);
 
-            List<float3> outlineStart = new();
-            List<float3> outlineEnd = new();
-            bool crossed = false;
-            float3 prevPt = 0;
-            foreach (float3 pt in outline)
-            {
-                if (!crossed)
-                    if (road.EndPlane.SameSide(pt, road.PivotPos))
-                        outlineEnd.Add(pt);
-                    else
-                    {
-                        crossed = true;
-                        Ray ray = new(pt, prevPt - pt);
-                        road.EndPlane.Raycast(ray, out float distance);
-                        float3 commonPt = ray.GetPoint(distance);
-                        outlineEnd.Add(commonPt);
-                        outlineStart.Add(commonPt);
-                        outlineStart.Add(pt);
-                    }
-                else
-                    outlineStart.Add(pt);
-                prevPt = pt;
-            }
-
-            if (isLeft)
+            if (orientation == Orientation.Left)
             {
                 leftmostRoad.LeftOutline.End = outlineEnd;
                 paths.First().Target.Road.LeftOutline.Start = outlineStart;
@@ -294,19 +254,19 @@ public static class InterRoad
             }
         }
 
-        List<float3> GetOutLine(Road road, bool isLeft, Direction direction)
+        List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Direction direction)
         {
             List<float3> results = new();
-            Lane lane = isLeft == true ? road.Lanes.First() : road.Lanes.Last();
-            float normalMultiplier = isLeft == true ? Constants.RoadOutlineSeparation: -Constants.RoadOutlineSeparation;
-            float roundedNumPoints = numPoints / 2;
-            for (int i = 0; i <= roundedNumPoints; i++)
+            Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
+            float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation: -Constants.RoadOutlineSeparation;
+            int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution / 2);
+            for (int i = 0; i <= numPoints; i++)
             {   
                 float t;
                 if (direction == Direction.Out)
-                    t = i / roundedNumPoints * lane.StartVertex.Interpolation;
+                    t = i / numPoints * lane.StartVertex.Interpolation;
                 else
-                    t = lane.EndVertex.Interpolation + (float)i / numPoints * 2 * (1 - lane.EndVertex.Interpolation);
+                    t = lane.EndVertex.Interpolation + (float)i / numPoints * (1 - lane.EndVertex.Interpolation);
                 float3 normal = Get2DNormal(lane.Spline, t);
                 results.Add(lane.Spline.EvaluatePosition(t) + normal * normalMultiplier);
             }
@@ -321,6 +281,32 @@ public static class InterRoad
             normal.y = 0;
             return normal;
         }
-    
+
+        void SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, out List<float3> outlineStart, out List<float3> outlineEnd)
+        {
+            outlineEnd = new();
+            outlineStart = new();
+            bool crossed = false;
+            float3 prevPt = 0;
+            foreach (float3 pt in interRoadOutline)
+            {
+                if (!crossed)
+                    if (nodeGroup.Plane.SameSide(pt, nodeGroup.PointOnInside))
+                        outlineEnd.Add(pt);
+                    else
+                    {
+                        crossed = true;
+                        Ray ray = new(pt, prevPt - pt);
+                        nodeGroup.Plane.Raycast(ray, out float distance);
+                        float3 commonPt = ray.GetPoint(distance);
+                        outlineEnd.Add(commonPt);
+                        outlineStart.Add(commonPt);
+                        outlineStart.Add(pt);
+                    }
+                else
+                    outlineStart.Add(pt);
+                prevPt = pt;
+            }
+        }
     }
 }

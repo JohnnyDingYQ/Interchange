@@ -83,7 +83,7 @@ public static class BuildHandler
             foreach (Node n in startNodes)
                 inRoads.UnionWith(n.GetRoads(Direction.In));
             // foreach (Road r in inRoads)
-            InterRoad.UpdateOutline(inRoads.First());
+            InterRoad.UpdateOutline(new(startNodes.First()));
         }
         if (endTarget.SnapNotNull)
         {
@@ -93,7 +93,7 @@ public static class BuildHandler
                 road.Lanes[i].EndNode = endNodes[i];
             }
             InterRoad.BuildAllPaths(road.Lanes, endNodes, Direction.In);
-            InterRoad.UpdateOutline(road);
+            InterRoad.UpdateOutline(new(endNodes.First()));
         }
 
         RegisterNodes(road);
@@ -184,13 +184,9 @@ public static class BuildHandler
     static void ReloadRoad()
     {
         foreach (Road road in Game.Roads.Values)
-        {
-            road.InitCurve();
-            road.InitPlane();
-            foreach (Lane lane in road.Lanes)
-                lane.InitSpline();
-        }
+            road.RestoreFromDeserialization();
     }
+    
     public static void ComplyToNewGameState()
     {
         ReloadRoad();

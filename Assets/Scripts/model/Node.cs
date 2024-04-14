@@ -104,21 +104,6 @@ public class Node : IComparable<Node>
         return Id != -1;
     }
 
-    public List<Node> GetNodeGroup()
-    {
-        HashSet<Node> nodes = new();
-        foreach (Road road in GetRoads(Direction.In))
-            foreach (Lane lane in road.Lanes)
-                nodes.Add(lane.EndNode);
-        foreach (Road road in GetRoads(Direction.Out))
-            foreach (Lane lane in road.Lanes)
-                nodes.Add(lane.StartNode);
-        List<Node> l = new(nodes);
-        l.Sort();
-        return l;
-            
-    }
-
     public override string ToString()
     {
         return "Node " + Id;

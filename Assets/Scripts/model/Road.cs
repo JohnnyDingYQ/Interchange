@@ -19,8 +19,6 @@ public class Road
     public float Length { get; set; }
     public RoadOutline LeftOutline { get; set; }
     public RoadOutline RightOutline { get; set; }
-    [JsonIgnore]
-    public Plane EndPlane { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road() { }
@@ -50,25 +48,27 @@ public class Road
     private void InitRoad()
     {
         InitLanes();
-        InitPlane();
         Length = CurveUtility.CalculateLength(BezierCurve);
         LeftOutline = new();
         RightOutline = new();
         int numPoints = (int)((Length - Constants.MinimumLaneLength) * Constants.MeshResolution);
 
-        LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(numPoints, true);
-        RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(numPoints, false);
+        LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(numPoints, Orientation.Left);
+        RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(numPoints, Orientation.Right);
+    }
+
+    public void RestoreFromDeserialization()
+    {
+        InitCurve();
+        foreach (Lane lane in Lanes)
+            lane.InitSpline();
     }
 
     public void InitCurve()
     {
-        BezierCurve = new BezierCurve(StartPos, PivotPos, EndPos);
+        BezierCurve = new(StartPos, PivotPos, EndPos);
     }
 
-    public void InitPlane()
-    {
-        EndPlane = new(EndPos, EndPos + GetNormal(1), EndPos - new float3(0, 1, 0));
-    }
 
     public float3 InterpolateLanePos(float t, int lane)
     {
@@ -78,7 +78,7 @@ public class Road
         return pos + offset;
     }
 
-    float3 GetNormal(float t)
+    public float3 GetNormal(float t)
     {
         float3 tangent = CurveUtility.EvaluateTangent(BezierCurve, t);
         tangent.y = 0;
