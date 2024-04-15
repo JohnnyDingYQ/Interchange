@@ -11,19 +11,10 @@ public static class InterRoad
     public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction direction)
     {
         int laneCount = to.Count;
-        int span;
+        ReadOnlySet<Road> roadsOnOtherside = GetRelevantRoads();
 
-        span = 0;
         BuildStraightPath();
-        if (direction == Direction.Out)
-            span = 1;
-        else
-            span = -1;
         BuildRightLaneChangePath();
-        if (direction == Direction.Out)
-            span = -1;
-        else
-            span = 1;
         BuildLeftLaneChangePath();
 
         if (BranchExists())
@@ -31,32 +22,33 @@ public static class InterRoad
         else
             BuildSidePaths();
 
-        Patch();
+        PatchSidePaths();
 
-        #region extracted functions
-        void Patch()
+        #region extracted 
+        void PatchSidePaths()
         {
-            List<Node> nodes = GetRelevantNodes();
-            for (int i = 0; i < 2; i++)
+            List<Node> nodes = new();
+            foreach (Road road in roadsOnOtherside)
             {
-
-                if (!nodes.First().HasLanes(direction))
+                nodes = direction == Direction.Out ? road.GetNodes(Side.End) : road.GetNodes(Side.Start);
+                for (int i = 0; i < 2; i++)
                 {
-                    Node connected = nodes.First();
-                    foreach (Node node in nodes)
-                        if (node.HasLanes(direction))
-                        {
-                            connected = node;
-                            break;
-                        }
-                    foreach (Lane l1 in nodes.First().GetLanes(InvertDirection(direction)))
-                        foreach (Lane l2 in connected.GetLanes(direction))
-                        {
-                            span = nodes.First().Order - connected.Order;
-                            BuildLanePath(l1, l2);
-                        }
+
+                    if (!nodes.First().HasLanes(direction))
+                    {
+                        Node connected = nodes.First();
+                        foreach (Node node in nodes)
+                            if (node.HasLanes(direction))
+                            {
+                                connected = node;
+                                break;
+                            }
+                        foreach (Lane l1 in nodes.First().GetLanes(InvertDirection(direction)))
+                            foreach (Lane l2 in connected.GetLanes(direction))
+                                BuildLanePath(l1, l2, nodes.First().Order - connected.Order);
+                    }
+                    nodes.Reverse();
                 }
-                nodes.Reverse();
             }
         }
 
@@ -64,43 +56,36 @@ public static class InterRoad
         {
             for (int i = 0; i < laneCount; i++)
                 foreach (Lane lane in from[i].GetLanes(InvertDirection(direction)))
-                    BuildLanePath(lane, to[i]);
+                    BuildLanePath(lane, to[i], 0);
         }
         void BuildRightLaneChangePath()
         {
             for (int i = 1; i < laneCount; i++)
                 foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(direction)))
-                    BuildLanePath(lane, to[i]);
+                    BuildLanePath(lane, to[i], direction == Direction.Out ? 1 : -1);
         }
         void BuildLeftLaneChangePath()
         {
             for (int i = 0; i < laneCount - 1; i++)
                 foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(direction)))
-                    BuildLanePath(lane, to[i]);
+                    BuildLanePath(lane, to[i], direction == Direction.Out ? -1 : 1);
         }
         void BuildSidePaths()
         {
-            foreach (Road road in GetRelevantRoads())
+            foreach (Road road in roadsOnOtherside)
                 foreach (Lane lane in road.Lanes)
                 {
                     Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
                     if (from.Contains(node))
                         continue;
 
-                    span = from.First().Order - node.Order;
+                    int span = from.First().Order - node.Order;
                     if (span == 1)
-                    {
-                        if (direction == Direction.In)
-                            span *= -1;
-                        BuildLanePath(lane, to.First());
-                    }
+                        BuildLanePath(lane, to.First(), direction == Direction.Out ? span : -span);
 
                     span = from.Last().Order - node.Order;
-                    if (span == -1) {
-                        if (direction == Direction.In)
-                                span *= -1;
-                        BuildLanePath(lane, to.Last());
-                    }
+                    if (span == -1)
+                        BuildLanePath(lane, to.Last(), direction == Direction.Out ? span : -span);
                 }
         }
 
@@ -111,17 +96,17 @@ public static class InterRoad
             return Direction.In;
         }
 
-        Path BuildLanePath(Lane l1, Lane l2)
+        Path BuildLanePath(Lane l1, Lane l2, int span)
         {
             Path path;
             if (direction == Direction.Out)
-                path = BuildPath(l1.EndVertex, l2.StartVertex);
+                path = BuildPath(l1.EndVertex, l2.StartVertex, span);
             else
-                path = BuildPath(l2.EndVertex, l1.StartVertex);
+                path = BuildPath(l2.EndVertex, l1.StartVertex, span);
             return path;
         }
 
-        Path BuildPath(Vertex start, Vertex end)
+        Path BuildPath(Vertex start, Vertex end, int span)
         {
             Game.Graph.TryGetEdge(start, end, out Path edge);
             if (edge != null)
@@ -137,7 +122,7 @@ public static class InterRoad
 
         void DeleteAllLaneChangingPaths()
         {
-            foreach (Road road in GetRelevantRoads())
+            foreach (Road road in roadsOnOtherside)
                 foreach (Lane lane in road.Lanes)
                     if (direction == Direction.Out)
                         Game.Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && Math.Abs(e.Span) > 0);
@@ -148,7 +133,7 @@ public static class InterRoad
         bool BranchExists()
         {
             HashSet<Road> seenRoads = new();
-            foreach (Road road in GetRelevantRoads())
+            foreach (Road road in roadsOnOtherside)
                 foreach (Lane lane in road.Lanes)
                 {
                     Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
@@ -157,27 +142,12 @@ public static class InterRoad
             return seenRoads.Count > 1;
         }
 
-        HashSet<Road> GetRelevantRoads()
+        ReadOnlySet<Road> GetRelevantRoads()
         {
-            HashSet<Road> roads = new();
-            for (int i = 0; i < laneCount; i++)
-                foreach (Lane lane in from[i].GetLanes(InvertDirection(direction)))
-                    roads.Add(lane.Road);
-            return roads;
-        }
-
-        List<Node> GetRelevantNodes()
-        {
-            HashSet<Node> nodes = new();
-            foreach (Road road in GetRelevantRoads())
-                foreach (Lane lane in road.Lanes)
-                {
-                    Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
-                    nodes.Add(node);
-                }
-            List<Node> n = new(nodes);
-            n.Sort();
-            return n;
+            NodeGroup nodeGroup = new(from.First());
+            if (direction == Direction.Out)
+                return nodeGroup.InRoads;
+            return nodeGroup.OutRoads;
         }
         #endregion
     }
@@ -204,19 +174,19 @@ public static class InterRoad
         foreach (Road r in outRoads)
         {
             if (r.LeftOutline.Start.Count == 0)
-                r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Direction.Out);
+                r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Side.Start);
             if (r.RightOutline.Start.Count == 0)
-                r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Direction.Out);
+                r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Side.Start);
         }
         foreach (Road r in inRoads)
         {
             if (r.LeftOutline.End.Count == 0)
-                r.LeftOutline.End = GetOutLineAtTwoEnds(r, Orientation.Left, Direction.In);
+                r.LeftOutline.End = GetOutLineAtTwoEnds(r, Orientation.Left, Side.End);
             if (r.RightOutline.End.Count == 0)
-                r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Direction.In);
+                r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
 
-
+        #region extracted
         void EvaluateSideOutline(Orientation orientation)
         {
             IEnumerable<Path> edges;
@@ -254,16 +224,16 @@ public static class InterRoad
             }
         }
 
-        List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Direction direction)
+        List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Side side)
         {
             List<float3> results = new();
             Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
-            float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation: -Constants.RoadOutlineSeparation;
+            float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation : -Constants.RoadOutlineSeparation;
             int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution / 2);
             for (int i = 0; i <= numPoints; i++)
-            {   
+            {
                 float t;
-                if (direction == Direction.Out)
+                if (side == Side.Start)
                     t = i / numPoints * lane.StartVertex.Interpolation;
                 else
                     t = lane.EndVertex.Interpolation + (float)i / numPoints * (1 - lane.EndVertex.Interpolation);
@@ -308,5 +278,6 @@ public static class InterRoad
                 prevPt = pt;
             }
         }
+        #endregion
     }
 }

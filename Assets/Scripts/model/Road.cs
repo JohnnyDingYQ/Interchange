@@ -85,6 +85,14 @@ public class Road
         return Vector3.Cross(tangent, Vector3.up).normalized;
     }
 
+    public List<Node> GetNodes(Side side)
+    {
+        List<Node> n = new();
+        foreach (Lane lane in Lanes)
+            n.Add(side == Side.Start ? lane.StartNode : lane.EndNode);
+        return n;
+    }
+
     void InitLanes()
     {
 
