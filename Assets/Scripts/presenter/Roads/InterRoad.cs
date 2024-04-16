@@ -234,7 +234,7 @@ public static class InterRoad
             {
                 float t;
                 if (side == Side.Start)
-                    t = i / numPoints * lane.StartVertex.Interpolation;
+                    t = (float) i / numPoints * lane.StartVertex.Interpolation;
                 else
                     t = lane.EndVertex.Interpolation + (float)i / numPoints * (1 - lane.EndVertex.Interpolation);
                 float3 normal = Get2DNormal(lane.Spline, t);

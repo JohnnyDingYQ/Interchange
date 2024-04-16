@@ -4,9 +4,9 @@ using System.IO;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
-public class SaveSystemImpl : IGameEngine
+public static class SaveSystem
 {
-    public void LoadGame()
+    public static void LoadGame()
     {
         string saveFile = Application.persistentDataPath + "/save0.json";
 
@@ -19,6 +19,8 @@ public class SaveSystemImpl : IGameEngine
             {
                 TypeNameHandling = TypeNameHandling.Auto
             });
+            foreach (Road road in Game.Roads.Values)
+                road.RestoreFromDeserialization();
         }
         else
         {
@@ -26,7 +28,7 @@ public class SaveSystemImpl : IGameEngine
         }
     }
 
-    public void SaveGame()
+    public static void SaveGame()
     {
         string s = JsonConvert.SerializeObject(Game.GameState, Formatting.Indented, new JsonSerializerSettings
         {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class UnityMain : MonoBehaviour
 {
-    [SerializeField] private InputManager inputManager;
+    [SerializeField] private InputSystem inputManager;
     private bool showRoadAndLanes = true;
     private bool showPaths = true;
     private const float DrawDuration = 0.2f;
@@ -10,13 +10,8 @@ public class UnityMain : MonoBehaviour
     {
 
         Application.targetFrameRate = 60;
-
-        Game.Unity = new SaveSystemImpl();
-
         if (inputManager != null)
         {
-            inputManager.SaveGame += SaveGame;
-            inputManager.LoadGame += LoadGame;
             inputManager.ShowRoadAndLanes += () =>
             {
                 showRoadAndLanes = !showRoadAndLanes;
@@ -39,24 +34,5 @@ public class UnityMain : MonoBehaviour
         Gizmos.DrawVertices(DrawDuration);
         Gizmos.DrawOutline(DrawDuration);
         
-    }
-
-    void OnDestroy()
-    {
-        if (inputManager != null)
-        {
-            inputManager.SaveGame -= SaveGame;
-            inputManager.LoadGame -= LoadGame;
-        }
-    }
-
-    void SaveGame()
-    {
-        Game.SaveGame();
-    }
-
-    void LoadGame()
-    {
-        Game.LoadGame();
     }
 }

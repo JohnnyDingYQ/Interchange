@@ -32,18 +32,7 @@ public static class Game
     {
         GameState = new();
     }
-
-    public static void SaveGame()
-    {
-        Unity.SaveGame();
-    }
-
-    public static void LoadGame()
-    {
-        Unity.LoadGame();
-        BuildHandler.ComplyToNewGameState();
-    }
-
+    
     public static void RegisterRoad(Road road)
     {
         road.Id = NextAvailableRoadId++;

@@ -11,17 +11,10 @@ public class SaveSystemTest
     float3 pos4 = new(Constants.MinimumLaneLength * 3, 0, 0);
     float3 pos5 = new(Constants.MinimumLaneLength * 4, 0, 0);
     float3 pos6 = new(Constants.MinimumLaneLength * 5, 0, 0);
-
-    [OneTimeSetUp]
-    public void OneTimeSetUp()
-    {
-        Game.Unity = new SaveSystemImpl();
-    }
-
+    
     [SetUp]
     public void SetUp()
     {
-        BuildHandler.Reset();
         Game.WipeState();
     }
 
@@ -29,9 +22,9 @@ public class SaveSystemTest
     public void RecoverSingleOneLaneRoad()
     {
         RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Game.SaveGame();
-        BuildHandler.Reset();
-        Game.LoadGame();
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
         Road road = Game.Roads.Values.First();
@@ -52,9 +45,9 @@ public class SaveSystemTest
     public void RecoverSingleThreeLaneRoad()
     {
         RoadBuilder.Build(pos1, pos2, pos3, 3);
-        Game.SaveGame();
-        BuildHandler.Reset();
-        Game.LoadGame();
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
         Road road = Game.Roads.Values.First();
@@ -81,9 +74,9 @@ public class SaveSystemTest
         Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
         Road road1 = RoadBuilder.Build(pos4, pos5, pos6, 1);
         
-        Game.SaveGame();
-        BuildHandler.Reset();
-        Game.LoadGame();
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
         Assert.AreEqual(pos1, road0.StartPos);
@@ -105,9 +98,9 @@ public class SaveSystemTest
         Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
         Road road1 = RoadBuilder.Build(pos3, pos4, pos5, 1);
         
-        Game.SaveGame();
-        BuildHandler.Reset();
-        Game.LoadGame();
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
         Assert.AreEqual(pos1, road0.StartPos);
@@ -128,9 +121,9 @@ public class SaveSystemTest
     {
         RoadBuilder.Build(pos1, pos2, pos3, 1);
         RoadBuilder.Build(pos3, pos4, pos5, 1);
-        Game.SaveGame();
-        BuildHandler.Reset();
-        Game.LoadGame();
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
 
         foreach (Road road in Game.Roads.Values)
         {

@@ -1,5 +1,5 @@
 public interface IGameEngine
 {
-    void SaveGame();
-    void LoadGame();
+    // void SaveGame();
+    // void LoadGame();
 }

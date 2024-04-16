@@ -180,15 +180,4 @@ public static class BuildHandler
                 Game.RegisterNode(lane.EndNode);
         }
     }
-
-    static void ReloadRoad()
-    {
-        foreach (Road road in Game.Roads.Values)
-            road.RestoreFromDeserialization();
-    }
-    
-    public static void ComplyToNewGameState()
-    {
-        ReloadRoad();
-    }
 }
