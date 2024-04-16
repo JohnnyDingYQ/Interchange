@@ -5,11 +5,8 @@ public static class Game
 {
     public static IGameEngine Unity { get; set; }
     public static GameState GameState { get; set; }
-
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
-
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
-
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
 
     public static int NextAvailableNodeId

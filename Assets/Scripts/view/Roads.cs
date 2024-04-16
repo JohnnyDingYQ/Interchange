@@ -5,13 +5,6 @@ public class Roads : MonoBehaviour
 {
     [SerializeField] private GameObject roads;
     // [SerializeField] private RoadGameObject roadPrefab;
-    [SerializeField] private InputSystem inputManager;
-
-
-    void HandleBuildCommand()
-    {
-        BuildHandler.HandleBuildCommand(InputSystem.MouseWorldPos);
-    }
 
     # region legacy code
     // public void InstantiateRoad(Road road)

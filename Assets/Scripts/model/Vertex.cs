@@ -9,7 +9,7 @@ public class Vertex
     public float3 Pos { get; set; }
     public float Interpolation { get; set; }
     public float3 Tangent { get; set; }
-    public Lane Lane { get; private set; }
+    public Lane Lane { get; set; }
     [JsonIgnore]
     public Road Road { get { return Lane.Road; } }
 

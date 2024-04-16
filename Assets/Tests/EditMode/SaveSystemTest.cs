@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using QuikGraph;
+using QuikGraph.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 public class SaveSystemTest
@@ -11,7 +13,7 @@ public class SaveSystemTest
     float3 pos4 = new(Constants.MinimumLaneLength * 3, 0, 0);
     float3 pos5 = new(Constants.MinimumLaneLength * 4, 0, 0);
     float3 pos6 = new(Constants.MinimumLaneLength * 5, 0, 0);
-    
+
     [SetUp]
     public void SetUp()
     {
@@ -73,7 +75,7 @@ public class SaveSystemTest
     {
         Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
         Road road1 = RoadBuilder.Build(pos4, pos5, pos6, 1);
-        
+
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -97,7 +99,7 @@ public class SaveSystemTest
     {
         Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
         Road road1 = RoadBuilder.Build(pos3, pos4, pos5, 1);
-        
+
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -131,8 +133,22 @@ public class SaveSystemTest
             foreach (Lane lane in road.Lanes)
                 Assert.True(lane.Spline != null);
         }
-            
+
     }
+
+    [Test]
+    public void RecoverPathGraph()
+    {
+        RoadBuilder.Build(pos1, pos2, pos3, 1);
+        RoadBuilder.Build(pos3, pos4, pos5, 1);
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
+
+        Assert.True(!Game.Graph.IsVerticesEmpty);
+        Assert.True(!Game.Graph.IsEdgesEmpty);
+    }
+
 
     // TODO: Complete further testing
     // [Test]
@@ -142,3 +158,11 @@ public class SaveSystemTest
     }
 
 }
+
+// public static class MyExtension
+// {
+//     public static void Help(this AdjacencyGraph<Vertex, Path> graph)
+//     {
+
+//     }
+// }

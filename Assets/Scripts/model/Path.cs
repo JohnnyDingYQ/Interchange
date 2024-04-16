@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using QuikGraph;
 using Unity.Mathematics;
+using Unity.Plastic.Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json.Serialization;
 
+[JsonObject]
 public class Path : IEdge<Vertex>, IComparable<Path>
 {
+    [JsonIgnore]
     public ICurve Curve { get; set; }
     public Vertex Source { get; set; }
     public Vertex Target { get; set; }
@@ -54,5 +59,11 @@ public class Path : IEdge<Vertex>, IComparable<Path>
     public int CompareTo(Path other)
     {
         return Span.CompareTo(other.Span);
+    }
+
+    [OnError]
+    internal void OnError(StreamingContext context, ErrorContext errorContext)
+    {
+        errorContext.Handled = true;
     }
 }

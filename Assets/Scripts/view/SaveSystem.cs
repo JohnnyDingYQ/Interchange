@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using QuikGraph;
+using QuikGraph.Collections;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
@@ -19,6 +22,8 @@ public static class SaveSystem
             {
                 TypeNameHandling = TypeNameHandling.Auto
             });
+            Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
+            
             foreach (Road road in Game.Roads.Values)
                 road.RestoreFromDeserialization();
         }
@@ -30,10 +35,12 @@ public static class SaveSystem
 
     public static void SaveGame()
     {
+        Game.GameState.GraphSave = Game.Graph.Edges.ToList();
+
         string s = JsonConvert.SerializeObject(Game.GameState, Formatting.Indented, new JsonSerializerSettings
         {
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            TypeNameHandling = TypeNameHandling.Auto
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
+            TypeNameHandling = TypeNameHandling.All
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
     }

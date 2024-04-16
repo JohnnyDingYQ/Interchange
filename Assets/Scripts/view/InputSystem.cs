@@ -9,10 +9,10 @@ public class InputSystem : MonoBehaviour
     private GameActions gameActions;
 
     private const int CameraSpeedMultiplier = 25;
-    private const float CameraZoomMultiplier = 0.1f;
+    private const float CameraZoomMultiplier = 0.3f;
     public event Action ShowPaths;
     public event Action ShowRoadAndLanes;
-    public static float3 MouseWorldPos;
+    public float3 MouseWorldPos { get; set; }
 
     void Awake()
     {
@@ -57,6 +57,7 @@ public class InputSystem : MonoBehaviour
             z = Camera.main.transform.position.y - 0
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
+        Debug.Log(MouseWorldPos);
     }
 
     void OnBuild(InputAction.CallbackContext context)
