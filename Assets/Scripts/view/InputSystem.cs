@@ -52,12 +52,11 @@ public class InputSystem : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Keypad2))
             ShowPaths.Invoke();
 
-        MouseWorldPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
+        float3 mouseWorldPos = new(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {
             z = Camera.main.transform.position.y - 0
         };
-        MouseWorldPos = Camera.main.ScreenToWorldPoint(MouseWorldPos);
-        Debug.Log(MouseWorldPos);
+        MouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
     }
 
     void OnBuild(InputAction.CallbackContext context)

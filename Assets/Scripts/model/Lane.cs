@@ -49,7 +49,7 @@ public class Lane
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
-        ICurve curve = new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation);
+        ICurve curve = new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation, this);
         Path path = new(curve, StartVertex, EndVertex, 0);
         Game.AddVertex(StartVertex);
         Game.AddVertex(EndVertex);
@@ -62,7 +62,8 @@ public class Lane
     /// </summary>
     private Spline GetLaneSpline(int laneNumber)
     {
-        int segCount = 10;
+        int segCount = (int) (Road.Length * Constants.LaneSplineResolution);
+        // int segCount = 10;
         Spline laneSpline = new();
 
         // Iterate by distance on curve

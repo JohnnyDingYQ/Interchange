@@ -47,8 +47,8 @@ public class Road
 
     private void InitRoad()
     {
-        InitLanes();
         Length = CurveUtility.CalculateLength(BezierCurve);
+        InitLanes();
         LeftOutline = new();
         RightOutline = new();
         int numPoints = (int)((Length - Constants.MinimumLaneLength) * Constants.MeshResolution);

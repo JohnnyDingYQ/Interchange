@@ -26,6 +26,8 @@ public static class SaveSystem
             
             foreach (Road road in Game.Roads.Values)
                 road.RestoreFromDeserialization();
+            foreach (Path path in Game.Graph.Edges)
+                path.Curve.RestoreFromDeserialization();
         }
         else
         {
@@ -40,7 +42,7 @@ public static class SaveSystem
         string s = JsonConvert.SerializeObject(Game.GameState, Formatting.Indented, new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.All,
-            TypeNameHandling = TypeNameHandling.All
+            TypeNameHandling = TypeNameHandling.Auto
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
     }

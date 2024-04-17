@@ -10,12 +10,16 @@ public class SplineAdapter : ICurve
     public float StartT { get; set; }
     public float EndT { get; set; }
     public float Length { get; set; }
+    public CurveType CurveType { get; set; }
+    public Lane Lane { get; set; }
 
-    public SplineAdapter(Spline c, float startT, float endT)
+    public SplineAdapter(Spline c, float startT, float endT, Lane lane)
     {
         StartT = startT;
         EndT = endT;
         Spline = c;
+        CurveType = CurveType.Spline;
+        Lane = lane;
     }
     public void Draw(float duration)
     {
@@ -34,5 +38,10 @@ public class SplineAdapter : ICurve
         float3 normal = Vector3.Cross(forward, upVector).normalized;
         normal.y = 0;
         return normal;
+    }
+
+    public void RestoreFromDeserialization()
+    {
+        Spline = Lane.Spline;
     }
 }

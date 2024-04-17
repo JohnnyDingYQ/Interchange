@@ -30,7 +30,6 @@ public static class BuildHandler
 
     public static Road HandleBuildCommand(float3 clickPos)
     {
-        Debug.Log(clickPos);
         if (!startAssigned)
         {
             startAssigned = true;
