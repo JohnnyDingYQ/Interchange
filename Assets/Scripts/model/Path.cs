@@ -10,7 +10,6 @@ using Unity.Plastic.Newtonsoft.Json.Serialization;
 public class Path : IEdge<Vertex>, IComparable<Path>
 {
     public ICurve Curve { get; set; }
-    public ICurveSaveData CurveSaveData { get; set; }
     public Vertex Source { get; set; }
     public Vertex Target { get; set; }
     /// <summary>

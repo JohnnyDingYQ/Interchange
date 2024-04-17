@@ -10,7 +10,6 @@ public class SplineAdapter : ICurve
     public float StartT { get; set; }
     public float EndT { get; set; }
     public float Length { get; set; }
-    public CurveType CurveType { get; set; }
     public Lane Lane { get; set; }
 
     public SplineAdapter(Spline c, float startT, float endT, Lane lane)
@@ -18,7 +17,6 @@ public class SplineAdapter : ICurve
         StartT = startT;
         EndT = endT;
         Spline = c;
-        CurveType = CurveType.Spline;
         Lane = lane;
     }
     public void Draw(float duration)

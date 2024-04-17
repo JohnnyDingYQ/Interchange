@@ -147,6 +147,8 @@ public class SaveSystemTest
 
         Assert.True(!Game.Graph.IsVerticesEmpty);
         Assert.True(!Game.Graph.IsEdgesEmpty);
+        foreach (Path path in Game.Graph.Edges)
+            Assert.NotNull(path.Curve);
     }
 
 

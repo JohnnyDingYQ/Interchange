@@ -10,7 +10,6 @@ public class BezierCurveAdapter : ICurve
     public BezierCurve BezierCurve { get; set; }
     public float StartT { get; set; }
     public float EndT { get; set; }
-    public CurveType CurveType { get; set; }
     public float3 P0 { get; set; }
     public float3 P1 { get; set; }
     public float3 P2 { get; set; }
@@ -21,7 +20,6 @@ public class BezierCurveAdapter : ICurve
         StartT = 0;
         EndT = 1;
         BezierCurve = c;
-        CurveType = CurveType.Beizer;
         P0 = c.P0;
         P1 = c.P1;
         P2 = c.P2;
