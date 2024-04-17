@@ -1,0 +1,20 @@
+.devPanel {
+    width: 170px;
+    background-color: dimgray;
+    font-size: 14px;
+}
+
+.devPanel Foldout {
+    margin: 0;
+}
+
+.devPanel Toggle {
+    height: 20px;
+}
+
+.devPanel #unity-checkmark {
+    height: 13px;
+    width: 13px;
+    margin-right: 5px;
+    margin-bottom: 3px;
+}

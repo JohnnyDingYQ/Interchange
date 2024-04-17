@@ -95,12 +95,8 @@ public class Road
 
     void InitLanes()
     {
-
         Lanes = new();
-
         for (int i = 0; i < LaneCount; i++)
-        {
             Lanes.Add(new(this, i));
-        }
     }
 }
