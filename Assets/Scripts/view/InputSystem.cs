@@ -5,18 +5,17 @@ using UnityEngine.InputSystem;
 
 public class InputSystem : MonoBehaviour
 {
-
+    public static bool MouseInGameWorld { get; set; }
     private GameActions gameActions;
 
     private const int CameraSpeedMultiplier = 25;
     private const float CameraZoomMultiplier = 0.3f;
-    public event Action ShowPaths;
-    public event Action ShowRoadAndLanes;
     public float3 MouseWorldPos { get; set; }
 
     void Awake()
     {
         gameActions = new();
+        MouseInGameWorld = true;
     }
 
     void OnEnable()
@@ -47,11 +46,6 @@ public class InputSystem : MonoBehaviour
         cameraOffset.y *= CameraZoomMultiplier;
         Camera.main.transform.position += CameraSpeedMultiplier * Time.deltaTime * cameraOffset;
 
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-            ShowRoadAndLanes.Invoke();
-        if (Input.GetKeyDown(KeyCode.Keypad2))
-            ShowPaths.Invoke();
-
         float3 mouseWorldPos = new(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {
             z = Camera.main.transform.position.y - 0
@@ -61,7 +55,8 @@ public class InputSystem : MonoBehaviour
 
     void OnBuild(InputAction.CallbackContext context)
     {
-        BuildHandler.HandleBuildCommand(MouseWorldPos);
+        if (MouseInGameWorld)
+            BuildHandler.HandleBuildCommand(MouseWorldPos);
     }
     void OnSetLaneWidthTo1(InputAction.CallbackContext context)
     {

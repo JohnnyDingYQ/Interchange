@@ -42,28 +42,17 @@ public static class Gizmos
         DrawSpline(spline, 0, 1, color, duration);
     }
 
-    public static void DrawRoadsAndLanes(float duration)
+    public static void DrawLanes(float duration)
     {
         foreach (Road road in Game.Roads.Values)
-        {
-            if (road.LaneCount % 2 == 0)
-            {
-                DrawBezierCurve(road.BezierCurve, Color.red, duration);
-            }
-            int laneCount = road.Lanes.Count;
             foreach (Lane lane in road.Lanes)
-            {
-                if ((lane.Order + 1) * 2 - 1 != laneCount)
-                {
-                    DrawSpline(lane.Spline, Color.white, duration);
-                }
-                else
-                {
-                    DrawSpline(lane.Spline, Color.magenta, duration);
-                }
+                DrawSpline(lane.Spline, Color.white, duration);
+    }
 
-            }
-        }
+    public static void DrawRoadCenter(float duration)
+    {
+        foreach (Road road in Game.Roads.Values)
+            DrawBezierCurve(road.BezierCurve, Color.magenta, duration);
     }
 
     public static void DrawVertices(float duration)
@@ -100,13 +89,13 @@ public static class Gizmos
     {
         foreach (Road road in Game.Roads.Values)
         {
-            Color start = new(99.0f/255, 224.0f/255, 103.0f/255, 1);
-            Color mid = new(43.0f/255, 153.0f/255, 47.0f/255, 1);
-            Color end = new(16.0f/255, 99.0f/255, 19.0f/255, 1);
+            Color start = new(99.0f / 255, 224.0f / 255, 103.0f / 255, 1);
+            Color mid = new(43.0f / 255, 153.0f / 255, 47.0f / 255, 1);
+            Color end = new(16.0f / 255, 99.0f / 255, 19.0f / 255, 1);
             DrawListofPoints(road.LeftOutline.Mid, mid, duration);
             DrawListofPoints(road.LeftOutline.Start, start, duration);
             DrawListofPoints(road.LeftOutline.End, end, duration);
-            
+
             DrawListofPoints(road.RightOutline.Mid, mid, duration);
             DrawListofPoints(road.RightOutline.Start, start, duration);
             DrawListofPoints(road.RightOutline.End, end, duration);
@@ -120,6 +109,6 @@ public static class Gizmos
         if (l.Count == 1)
             return;
         for (int i = 1; i < l.Count; i++)
-            Debug.DrawLine(l[i-1], l[i], color, duration);
+            Debug.DrawLine(l[i - 1], l[i], color, duration);
     }
 }

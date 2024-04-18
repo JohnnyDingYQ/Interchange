@@ -3,11 +3,12 @@
     <Style src="project://database/Assets/UI/Base.uss?fileID=7433441132597879392&amp;guid=28de604cf2fee904f96c092088db9480&amp;type=3#Base" />
     <ui:VisualElement style="flex-grow: 1;" class="devPanel">
         <ui:Foldout text="Roads" name="MyFoldout" value="true">
-            <ui:Toggle text="Center" />
-            <ui:Toggle text="Lanes" />
-            <ui:Toggle text="Paths" />
-            <ui:Toggle text="Outline" />
-            <ui:Toggle text="Control Points" />
+            <ui:Toggle text="Center" name="RoadCenter" />
+            <ui:Toggle text="Lanes" name="RoadLanes" />
+            <ui:Toggle text="Paths" name="RoadPaths" />
+            <ui:Toggle text="Outline" name="RoadOutline" />
+            <ui:Toggle text="Control Points" name="RoadPx" />
+            <ui:Toggle text="Vertices" name="RoadVertices" />
         </ui:Foldout>
     </ui:VisualElement>
 </ui:UXML>
