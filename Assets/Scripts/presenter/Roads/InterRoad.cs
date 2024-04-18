@@ -224,34 +224,6 @@ public static class InterRoad
             }
         }
 
-        List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Side side)
-        {
-            List<float3> results = new();
-            Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
-            float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation : -Constants.RoadOutlineSeparation;
-            int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution / 2);
-            for (int i = 0; i <= numPoints; i++)
-            {
-                float t;
-                if (side == Side.Start)
-                    t = (float) i / numPoints * lane.StartVertex.Interpolation;
-                else
-                    t = lane.EndVertex.Interpolation + (float)i / numPoints * (1 - lane.EndVertex.Interpolation);
-                float3 normal = Get2DNormal(lane.Spline, t);
-                results.Add(lane.Spline.EvaluatePosition(t) + normal * normalMultiplier);
-            }
-            return results;
-        }
-
-        float3 Get2DNormal(Spline spline, float t)
-        {
-            float3 forward = spline.EvaluateTangent(t);
-            float3 upVector = spline.EvaluateUpVector(t);
-            float3 normal = Vector3.Cross(forward, upVector).normalized;
-            normal.y = 0;
-            return normal;
-        }
-
         void SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, out List<float3> outlineStart, out List<float3> outlineEnd)
         {
             outlineEnd = new();
@@ -279,5 +251,33 @@ public static class InterRoad
             }
         }
         #endregion
+    }
+
+    static float3 Get2DNormal(Spline spline, float t)
+    {
+        float3 forward = spline.EvaluateTangent(t);
+        float3 upVector = spline.EvaluateUpVector(t);
+        float3 normal = Vector3.Cross(forward, upVector).normalized;
+        normal.y = 0;
+        return normal;
+    }
+
+    public static List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Side side)
+    {
+        List<float3> results = new();
+        Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
+        float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation : -Constants.RoadOutlineSeparation;
+        int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution / 2);
+        for (int i = 0; i <= numPoints; i++)
+        {
+            float t;
+            if (side == Side.Start)
+                t = (float)i / numPoints * lane.StartVertex.Interpolation;
+            else
+                t = lane.EndVertex.Interpolation + (float)i / numPoints * (1 - lane.EndVertex.Interpolation);
+            float3 normal = Get2DNormal(lane.Spline, t);
+            results.Add(lane.Spline.EvaluatePosition(t) + normal * normalMultiplier);
+        }
+        return results;
     }
 }

@@ -200,10 +200,13 @@ public class DivideTest
     public void RoadOutlineDividedProperly()
     {
         Road road = RoadBuilder.Build(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
         Assert.True(subRoads.Left.RoadOutLinePlausible());
         Assert.True(subRoads.Right.RoadOutLinePlausible());
         Assert.True(Utility.AreNumericallyEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
         Assert.True(Utility.AreNumericallyEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
+        Assert.True(Utility.AreNumericallyEqual(subRoads.Right.LeftOutline.End.Last(), road1.LeftOutline.Start.First()));
+        Assert.True(Utility.AreNumericallyEqual(subRoads.Right.RightOutline.End.Last(), road1.RightOutline.Start.First()));
     }
 }

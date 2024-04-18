@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -35,6 +36,8 @@ public static class DivideHandler
         Game.RegisterRoad(RightRoad);
         OperateNodes();
         OperatePaths();
+        OperateOutline();
+
 
         return new SubRoads(LeftRoad, RightRoad);
 
@@ -78,6 +81,24 @@ public static class DivideHandler
                 lanes.Add(laneRight);
             }
             InterRoad.BuildAllPaths(lanes, nodes, Direction.Out);
+        }
+
+        void OperateOutline()
+        {
+            LeftRoad.LeftOutline.Start = road.LeftOutline.Start;
+            LeftRoad.RightOutline.Start = road.RightOutline.Start;
+            RightRoad.LeftOutline.End = road.LeftOutline.End;
+            RightRoad.RightOutline.End = road.RightOutline.End;
+
+            LeftRoad.LeftOutline.Start.Add(LeftRoad.LeftOutline.Mid.First());
+            LeftRoad.RightOutline.Start.Add(LeftRoad.RightOutline.Mid.First());
+            RightRoad.LeftOutline.Start.Insert(0, RightRoad.LeftOutline.Mid.Last());
+            RightRoad.RightOutline.Start.Insert(0, RightRoad.RightOutline.Mid.Last());
+
+            LeftRoad.LeftOutline.End = InterRoad.GetOutLineAtTwoEnds(LeftRoad, Orientation.Left, Side.End);
+            LeftRoad.RightOutline.End = InterRoad.GetOutLineAtTwoEnds(LeftRoad, Orientation.Right, Side.End);
+            RightRoad.LeftOutline.Start = InterRoad.GetOutLineAtTwoEnds(RightRoad, Orientation.Left, Side.Start);
+            RightRoad.RightOutline.Start = InterRoad.GetOutLineAtTwoEnds(RightRoad, Orientation.Right, Side.Start);
         }
     }
 }
