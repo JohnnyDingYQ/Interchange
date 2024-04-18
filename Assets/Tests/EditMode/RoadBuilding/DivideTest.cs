@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -193,5 +194,16 @@ public class DivideTest
         );
         SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
         Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
+    }
+
+    [Test]
+    public void RoadOutlineDividedProperly()
+    {
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 3);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
+        Assert.True(subRoads.Left.RoadOutLinePlausible());
+        Assert.True(subRoads.Right.RoadOutLinePlausible());
+        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
+        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
     }
 }

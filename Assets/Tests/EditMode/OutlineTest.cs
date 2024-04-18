@@ -18,7 +18,7 @@ public class OutlineTest
     {
         RoadBuilder.Build(0, stride, 2 * stride, 1);
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class OutlineTest
     {
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
         RoadBuilder.Build(0, stride, 2 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -34,7 +34,7 @@ public class OutlineTest
     {
         RoadBuilder.Build(0, stride, 2 * stride, 3);
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 3);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class OutlineTest
     {
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 3);
         RoadBuilder.Build(0, stride, 2 * stride, 3);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -51,9 +51,9 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 2);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -62,9 +62,9 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -73,9 +73,9 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset / 2, 3 * stride - offset / 2, 4 * stride - offset / 2, 2);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -84,9 +84,9 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 2);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset / 2, 3 * stride - offset / 2, 4 * stride - offset / 2, 2);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -95,11 +95,11 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -108,11 +108,11 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -121,11 +121,11 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -134,11 +134,11 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
 
     }
 
@@ -148,11 +148,11 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
@@ -161,31 +161,23 @@ public class OutlineTest
         Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.True(AllRoadsOutLinePlausible());
+        Assert.True(AllRoadsOutLineValid());
     }
 
-    bool AllRoadsOutLinePlausible()
+    bool AllRoadsOutLineValid()
     {
         foreach (Road r in Game.Roads.Values)
-            if (!RoadOutLinePlausible(r))
-                return false;
-        return true;
-    }
-    bool RoadOutLinePlausible(Road road)
-    {
-        foreach (RoadOutline outline in new List<RoadOutline>() { road.LeftOutline, road.RightOutline })
         {
-            if (outline.Start.Count != 0)
-                if (!Utility.AreNumericallyEqual(outline.Start.Last(), outline.Mid.First()))
-                    return false;
-            if (outline.End.Count != 0)
-                if (!Utility.AreNumericallyEqual(outline.End.First(), outline.Mid.Last()))
-                    return false;
+            if (!r.RoadOutLinePlausible())
+                return false;
+            if (!r.HasNoneEmptyOutline())
+                return false;
         }
         return true;
     }
+    
 }

@@ -3,8 +3,24 @@ using UnityEngine;
 
 public class Roads : MonoBehaviour
 {
-    [SerializeField] private GameObject roads;
-    // [SerializeField] private RoadGameObject roadPrefab;
+    // [SerializeField] private GameObject roads;
+    [SerializeField] private RoadGameObject roadPrefab;
+    void OnEnable()
+    {
+        Game.InstantiateRoad += InstantiateRoad;
+    }
+
+    void OnDisable()
+    {
+        Game.InstantiateRoad -= InstantiateRoad;
+    }
+
+    void InstantiateRoad(Road road)
+    {
+        RoadGameObject roadGameObject = Instantiate(roadPrefab, transform, true);
+        roadGameObject.name = $"Road-{road.Id}";
+        roadGameObject.Road = road;
+    }
 
     # region legacy code
     // public void InstantiateRoad(Road road)

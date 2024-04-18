@@ -93,6 +93,16 @@ public class Road
         return n;
     }
 
+    public bool HasNoneEmptyOutline()
+    {
+        return LeftOutline.Mid.Count != 0 && RightOutline.Mid.Count != 0;
+    }
+
+    public bool RoadOutLinePlausible()
+    {
+        return HasNoneEmptyOutline() && LeftOutline.IsPlausible() && RightOutline.IsPlausible();
+    }
+
     void InitLanes()
     {
         Lanes = new();
