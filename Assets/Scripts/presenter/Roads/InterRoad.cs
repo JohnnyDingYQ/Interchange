@@ -185,12 +185,12 @@ public static class InterRoad
             if (r.RightOutline.End.Count == 0)
                 r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
-
+        
         #region extracted
         void EvaluateSideOutline(Orientation orientation)
         {
             IEnumerable<Path> edges;
-            List<float3> outline;
+            List<float3> pathOutline;
             Node firstNodeWithInRoad = nodeGroup.FirstWithInRoad();
             Node lastNodeWithInRoad = nodeGroup.LastWithInRoad();
             Road leftmostRoad = firstNodeWithInRoad.GetRoads(Direction.In).First();
@@ -206,11 +206,11 @@ public static class InterRoad
 
             int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
             if (orientation == Orientation.Left)
-                outline = paths.First().GetOutline(numPoints, orientation);
+                pathOutline = paths.First().GetOutline(numPoints, orientation);
             else
-                outline = paths.Last().GetOutline(numPoints, orientation);
+                pathOutline = paths.Last().GetOutline(numPoints, orientation);
 
-            SeparateOutlineWithEndofRoad(outline, out List<float3> outlineStart, out List<float3> outlineEnd);
+            SeparateOutlineWithEndofRoad(pathOutline, out List<float3> outlineStart, out List<float3> outlineEnd);
 
             if (orientation == Orientation.Left)
             {

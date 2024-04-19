@@ -68,7 +68,7 @@ public class OutlineTest
     }
 
     [Test]
-    public void OneTwoThreeLanesRoadInAJunction_OnEnd()
+    public void OneTwoThreeLanesRoadInAtunction_OnEnd()
     {
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
@@ -79,7 +79,7 @@ public class OutlineTest
     }
 
     [Test]
-    public void OneTwoThreeLanesRoadInAJunction_OnStart()
+    public void OneTwoThreeLanesRoadInAtunction_OnStart()
     {
         Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 2);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;

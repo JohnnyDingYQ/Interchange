@@ -1,18 +1,22 @@
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
 public class Roads : MonoBehaviour
 {
-    // [SerializeField] private GameObject roads;
     [SerializeField] private RoadGameObject roadPrefab;
-    void OnEnable()
+    private Dictionary<Road, RoadGameObject> roadMapping;
+    void Start()
     {
         Game.InstantiateRoad += InstantiateRoad;
+        Game.UpdateRoadMesh += UpdateRoadMesh;
+        roadMapping = new();
     }
 
-    void OnDisable()
+    void OnDestroy()
     {
         Game.InstantiateRoad -= InstantiateRoad;
+        Game.UpdateRoadMesh -= UpdateRoadMesh;
     }
 
     void InstantiateRoad(Road road)
@@ -20,35 +24,30 @@ public class Roads : MonoBehaviour
         RoadGameObject roadGameObject = Instantiate(roadPrefab, transform, true);
         roadGameObject.name = $"Road-{road.Id}";
         roadGameObject.Road = road;
+        roadMapping[road] = roadGameObject;
+        UpdateRoadMesh(road);
     }
 
-    # region legacy code
+    void UpdateRoadMesh(Road road)
+    {
+        roadMapping[road].GetComponent<MeshFilter>().mesh = MeshUtil.GetMesh(road);
+    }
+
+    #region legacy code
     // public void InstantiateRoad(Road road)
     // {
-        // return;
-        // RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-        // roadGameObject.name = $"Road-{road.Id}";
-        // road.RoadGameObject = roadGameObject;
+    // return;
+    // RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
+    // roadGameObject.name = $"Road-{road.Id}";
+    // road.RoadGameObject = roadGameObject;
 
-        // Mesh mesh = RoadMesh.CreateMesh(road, road.Lanes.Count);
-        // roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
-        // roadGameObject.OriginalMesh = Instantiate(mesh);
-        // MeshCollider meshCollider = roadGameObject.GetComponent<MeshCollider>();
-        // meshCollider.sharedMesh = mesh;
+    // Mesh mesh = RoadMesh.CreateMesh(road, road.Lanes.Count);
+    // roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
+    // roadGameObject.OriginalMesh = Instantiate(mesh);
+    // MeshCollider meshCollider = roadGameObject.GetComponent<MeshCollider>();
+    // meshCollider.sharedMesh = mesh;
 
-        // roadGameObject.Road = road;
-    // }
-
-    // public void RedrawAllRoads()
-    // {
-    //     while (roads.transform.childCount > 0) {
-    //         DestroyImmediate(roads.transform.GetChild(0).gameObject);
-    //     }
-
-    //     foreach (Road road in Game.Roads.Values)
-    //     {
-    //         InstantiateRoad(road);
-    //     }
+    // roadGameObject.Road = road;
     // }
     #endregion
 }

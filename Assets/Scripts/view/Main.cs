@@ -7,5 +7,4 @@ public class Main : MonoBehaviour
         Application.targetFrameRate = 60;
     }
 
-
 }

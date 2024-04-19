@@ -35,15 +35,10 @@ public class Node : IComparable<Node>
     public float3 GetTangent()
     {
         if (Lanes.Count == 0)
-        {
             throw new InvalidOperationException("Node has no lane... Cannot get tangent");
-        }
-        Lane lane = Lanes.First();
-        if (lane.StartNode == this)
-        {
-            return lane.Spline.EvaluateTangent(0);
-        }
-        return lane.Spline.EvaluateTangent(1);
+        if (GetRoads(Direction.In).Count() != 0)
+            return CurveUtility.EvaluateTangent(GetRoads(Direction.In).First().BezierCurve, 1);
+        return CurveUtility.EvaluateTangent(GetRoads(Direction.Out).First().BezierCurve, 0);
     }
 
     public void AddLane(Lane lane, Direction direction)

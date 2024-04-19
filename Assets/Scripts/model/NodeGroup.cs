@@ -14,7 +14,9 @@ public class NodeGroup : IEnumerable<Node>
     public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }
     private readonly HashSet<Road> outRoads;
     public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
+    public HashSet<Road> Roads { get { return GetRoads(); } }
     public Plane Plane { get; private set; }
+    public float3 Normal { get; private set; }
     public float3 PointOnInside { get; private set; }
 
     public NodeGroup(Node node)
@@ -38,8 +40,16 @@ public class NodeGroup : IEnumerable<Node>
             inRoads.UnionWith(n.GetRoads(Direction.In));
 
         Road randomInRoad = InRoads.First();
+        Normal = math.normalize(randomInRoad.GetNormal(1));
         Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + randomInRoad.GetNormal(1), randomInRoad.EndPos - new float3(0, 1, 0));
         PointOnInside = randomInRoad.PivotPos;
+    }
+
+    public HashSet<Road> GetRoads()
+    {
+        HashSet<Road> h = new(inRoads);
+        h.UnionWith(outRoads);
+        return h;
     }
 
     public Node FirstWithInRoad()

@@ -6,6 +6,7 @@ using QuikGraph;
 public static class Game
 {
     public static event Action<Road> InstantiateRoad;
+    public static event Action<Road> UpdateRoadMesh;
     public static GameState GameState { get; set; }
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
@@ -31,12 +32,12 @@ public static class Game
     {
         GameState = new();
     }
-    
+
     public static void RegisterRoad(Road road)
     {
         road.Id = NextAvailableRoadId++;
         Roads.Add(road.Id, road);
-        // InstantiateRoad.Invoke(road);
+        InstantiateRoad?.Invoke(road);
     }
 
     public static void RegisterNode(Node node)
@@ -61,6 +62,11 @@ public static class Game
             }
         }
         return true;
+    }
+
+    public static void InvokeUpdateRoadMesh(Road road)
+    {
+        UpdateRoadMesh?.Invoke(road);
     }
 
     public static void AddVertex(Vertex vertex)
