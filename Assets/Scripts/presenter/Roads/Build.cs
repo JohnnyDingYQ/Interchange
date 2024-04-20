@@ -83,8 +83,6 @@ public static class BuildHandler
             InterRoad.UpdateOutline(nodeGroup);
             road.LeftOutline.AddStartFixedPoint(road.Lanes.First().StartNode.Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
             road.RightOutline.AddStartFixedPoint(road.Lanes.Last().StartNode.Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
-            DebugExtension.DebugPoint(road.RightOutline.FixedStart, Color.blue, 2, 1000);
-            DebugExtension.DebugPoint(road.RightOutline.Start.First(), Color.blue, 2, 1000);
             foreach (Road r in nodeGroup.GetRoads())
                 Game.InvokeUpdateRoadMesh(r);
         }
@@ -164,18 +162,12 @@ public static class BuildHandler
         Node GetArbitraryRegisteredNode(List<Node> nodes)
         {
             foreach (Node node in nodes)
-            {
                 if (node.IsRegistered())
-                {
                     return node;
-                }
-            }
             return null;
         }
         #endregion
     }
-
-
 
     static void RegisterNodes(Road road)
     {

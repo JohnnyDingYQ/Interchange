@@ -11,6 +11,7 @@ public static class Game
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
+    public static Road SelectedRoad { get; set; }
 
     public static int NextAvailableNodeId
     {
@@ -89,5 +90,12 @@ public static class Game
         if (Graph.ContainsEdge(from, to))
             return true;
         return false;
+    }
+
+    public static void DivideSelectedRoad()
+    {
+        Debug.Log(SelectedRoad);
+        if (SelectedRoad != null)
+            Debug.Log("Divide!");
     }
 }

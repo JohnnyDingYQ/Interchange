@@ -89,6 +89,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DivideRoad"",
+                    ""type"": ""Button"",
+                    ""id"": ""887c1d3b-fdc0-480b-b3c5-4e85fd0cdcd5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -234,6 +243,17 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""LoadGame"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9cf8bcdb-8c9c-4afd-80d2-b9afbb7fafa2"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DivideRoad"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -249,6 +269,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_SetLaneWidthTo3 = m_InGame.FindAction("SetLaneWidthTo3", throwIfNotFound: true);
         m_InGame_SaveGame = m_InGame.FindAction("SaveGame", throwIfNotFound: true);
         m_InGame_LoadGame = m_InGame.FindAction("LoadGame", throwIfNotFound: true);
+        m_InGame_DivideRoad = m_InGame.FindAction("DivideRoad", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -317,6 +338,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_SetLaneWidthTo3;
     private readonly InputAction m_InGame_SaveGame;
     private readonly InputAction m_InGame_LoadGame;
+    private readonly InputAction m_InGame_DivideRoad;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -328,6 +350,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @SetLaneWidthTo3 => m_Wrapper.m_InGame_SetLaneWidthTo3;
         public InputAction @SaveGame => m_Wrapper.m_InGame_SaveGame;
         public InputAction @LoadGame => m_Wrapper.m_InGame_LoadGame;
+        public InputAction @DivideRoad => m_Wrapper.m_InGame_DivideRoad;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -358,6 +381,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @LoadGame.started += instance.OnLoadGame;
             @LoadGame.performed += instance.OnLoadGame;
             @LoadGame.canceled += instance.OnLoadGame;
+            @DivideRoad.started += instance.OnDivideRoad;
+            @DivideRoad.performed += instance.OnDivideRoad;
+            @DivideRoad.canceled += instance.OnDivideRoad;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -383,6 +409,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @LoadGame.started -= instance.OnLoadGame;
             @LoadGame.performed -= instance.OnLoadGame;
             @LoadGame.canceled -= instance.OnLoadGame;
+            @DivideRoad.started -= instance.OnDivideRoad;
+            @DivideRoad.performed -= instance.OnDivideRoad;
+            @DivideRoad.canceled -= instance.OnDivideRoad;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -409,5 +438,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnSetLaneWidthTo3(InputAction.CallbackContext context);
         void OnSaveGame(InputAction.CallbackContext context);
         void OnLoadGame(InputAction.CallbackContext context);
+        void OnDivideRoad(InputAction.CallbackContext context);
     }
 }

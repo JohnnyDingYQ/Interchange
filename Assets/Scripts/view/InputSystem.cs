@@ -26,6 +26,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.SetLaneWidthTo3.performed += OnSetLaneWidthTo3;
         gameActions.InGame.SaveGame.performed += SaveGame;
         gameActions.InGame.LoadGame.performed += LoadGame;
+        gameActions.InGame.DivideRoad.performed += DivideRoad;
         gameActions.InGame.Enable();
     }
 
@@ -37,6 +38,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.SetLaneWidthTo3.performed -= OnSetLaneWidthTo3;
         gameActions.InGame.SaveGame.performed -= SaveGame;
         gameActions.InGame.LoadGame.performed -= LoadGame;
+        gameActions.InGame.DivideRoad.performed -= DivideRoad;
         gameActions.InGame.Disable();
     }
 
@@ -77,5 +79,9 @@ public class InputSystem : MonoBehaviour
     void LoadGame(InputAction.CallbackContext context)
     {
         SaveSystem.LoadGame();
+    }
+    void DivideRoad(InputAction.CallbackContext context)
+    {
+        Game.DivideSelectedRoad();
     }
 }

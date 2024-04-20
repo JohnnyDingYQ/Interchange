@@ -59,27 +59,11 @@ public class RoadOutline
     public bool IsPlausible()
     {
         if (Start.Count != 0)
-        {
             if (!Utility.AreNumericallyEqual(Start.Last(), Mid.First()))
                 return false;
-            if (IsFixedAtStart)
-            {
-                Debug.Log(FixedStart);
-                Debug.Log(Start.First());
-
-            }
-            if (IsFixedAtStart)
-                if (!Utility.AreNumericallyEqual(FixedStart, Start.First(), Constants.LaneWidth))
-                    return false;
-        }
         if (End.Count != 0)
-        {
             if (!Utility.AreNumericallyEqual(End.First(), Mid.Last()))
                 return false;
-            // if (IsFixedAtEnd)
-            //     if (!Utility.AreNumericallyEqual(FixedEnd, End.Last(), Constants.LaneWidth))
-            //         return false;
-        }
         return true;
     }
 }

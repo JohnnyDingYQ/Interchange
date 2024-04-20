@@ -30,7 +30,9 @@ public class Roads : MonoBehaviour
 
     void UpdateRoadMesh(Road road)
     {
-        roadMapping[road].GetComponent<MeshFilter>().mesh = MeshUtil.GetMesh(road);
+        Mesh m = MeshUtil.GetMesh(road);
+        roadMapping[road].GetComponent<MeshFilter>().mesh = m;
+        roadMapping[road].GetComponent<MeshCollider>().sharedMesh = m;
     }
 
     #region legacy code
