@@ -7,12 +7,11 @@ public class RoadGameObject : MonoBehaviour
 
     void OnMouseOver()
     {
-        Debug.Log(Road);
         Game.SelectedRoad = Road;
     }
 
-    // void OnMouseExit()
-    // {
-    //     Game.SelectedRoad = null;
-    // }
+    void OnMouseExit()
+    {
+        Game.SelectedRoad = null;
+    }
 }

@@ -189,7 +189,7 @@ public class DivideTest
         Road road = RoadBuilder.Build(
             0,
             Constants.MinimumLaneLength * new float3(1, 0, 0),
-            2 * Constants.MinimumLaneLength * new float3(0, 0, 1),
+            2 * Constants.MinimumLaneLength * new float3(1, 0, 1),
             3
         );
         SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);

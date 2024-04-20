@@ -103,6 +103,14 @@ public class Road
         return HasNoneEmptyOutline() && LeftOutline.IsPlausible() && RightOutline.IsPlausible();
     }
 
+    public bool HasLaneShorterThanMinimumLaneLength()
+    {
+        foreach (Lane lane in Lanes)
+            if (lane.Length < Constants.MinimumLaneLength)
+                return true;
+        return false;
+    }
+
     void InitLanes()
     {
         Lanes = new();

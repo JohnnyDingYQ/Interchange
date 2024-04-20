@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using QuikGraph;
+using Unity.Mathematics;
 
 public static class Game
 {
     public static event Action<Road> InstantiateRoad;
     public static event Action<Road> UpdateRoadMesh;
+    public static event Action<Road> DestroyRoad;
     public static GameState GameState { get; set; }
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
@@ -62,6 +64,7 @@ public static class Game
                     Nodes.Remove(node.Id);
             }
         }
+        DestroyRoad?.Invoke(road);
         return true;
     }
 
@@ -92,10 +95,9 @@ public static class Game
         return false;
     }
 
-    public static void DivideSelectedRoad()
+    public static void DivideSelectedRoad(float3 mouseWorldPos)
     {
-        Debug.Log(SelectedRoad);
         if (SelectedRoad != null)
-            Debug.Log("Divide!");
+            DivideHandler.HandleDivideCommand(SelectedRoad, mouseWorldPos);
     }
 }

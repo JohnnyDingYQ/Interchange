@@ -82,6 +82,6 @@ public class InputSystem : MonoBehaviour
     }
     void DivideRoad(InputAction.CallbackContext context)
     {
-        Game.DivideSelectedRoad();
+        Game.DivideSelectedRoad(MouseWorldPos);
     }
 }

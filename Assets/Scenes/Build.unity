@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a810ada1cacd7348ad3026e9ab89d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roadPrefab: {fileID: 8105830289191215056, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
+  roadPrefab: {fileID: 6831116549096913646, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
 --- !u!1 &35865359
 GameObject:
   m_ObjectHideFlags: 0

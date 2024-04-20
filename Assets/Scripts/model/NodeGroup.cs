@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 public class NodeGroup : IEnumerable<Node>
 {
     private readonly List<Node> nodes;
-    public ReadOnlyCollection<Node> Nodes { get { return nodes.AsReadOnly(); } }
+    public List<Node> Nodes { get { return new List<Node>(nodes); } }
     public int Count { get { return Nodes.Count; } }
     private readonly HashSet<Road> inRoads;
     public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }

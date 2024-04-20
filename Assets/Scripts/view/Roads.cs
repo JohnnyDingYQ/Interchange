@@ -10,6 +10,7 @@ public class Roads : MonoBehaviour
     {
         Game.InstantiateRoad += InstantiateRoad;
         Game.UpdateRoadMesh += UpdateRoadMesh;
+        Game.DestroyRoad += DestroyRoad;
         roadMapping = new();
     }
 
@@ -17,6 +18,7 @@ public class Roads : MonoBehaviour
     {
         Game.InstantiateRoad -= InstantiateRoad;
         Game.UpdateRoadMesh -= UpdateRoadMesh;
+        Game.DestroyRoad -= DestroyRoad;
     }
 
     void InstantiateRoad(Road road)
@@ -33,6 +35,12 @@ public class Roads : MonoBehaviour
         Mesh m = MeshUtil.GetMesh(road);
         roadMapping[road].GetComponent<MeshFilter>().mesh = m;
         roadMapping[road].GetComponent<MeshCollider>().sharedMesh = m;
+    }
+
+    void DestroyRoad(Road road)
+    {
+        Destroy(roadMapping[road].gameObject);
+        roadMapping.Remove(road);
     }
 
     #region legacy code

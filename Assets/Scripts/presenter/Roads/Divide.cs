@@ -26,31 +26,33 @@ public static class DivideHandler
     {
         if (!Game.Roads.ContainsKey(road.Id))
             return null;
-        Game.RemoveRoad(road);
         int laneCount = road.LaneCount;
         interpolation = CurveUtility.GetDistanceToInterpolation(road.BezierCurve, road.Length * interpolation);
         CurveUtility.Split(road.BezierCurve, interpolation, out BezierCurve left, out BezierCurve right);
-        Road LeftRoad = new(left, laneCount);
-        Game.RegisterRoad(LeftRoad);
-        Road RightRoad = new(right, laneCount);
-        Game.RegisterRoad(RightRoad);
+        Road leftRoad = new(left, laneCount);
+        Road rightRoad = new(right, laneCount);
+        if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
+            return null;
+        Game.RemoveRoad(road);
+        Game.RegisterRoad(leftRoad);
+        Game.RegisterRoad(rightRoad);
+        List<Node> leftNodes = new();
+        for (int i = 0; i < leftRoad.LaneCount; i++)
+            leftNodes.Add(leftRoad.Lanes[i].EndNode);
         OperateNodes();
-        OperatePaths();
-        OperateOutline();
+        BuildHandler.ConnectRoadStartToNodes(leftNodes, rightRoad);
+        Game.InvokeUpdateRoadMesh(leftRoad);
+        Game.InvokeUpdateRoadMesh(rightRoad);
 
-
-        return new SubRoads(LeftRoad, RightRoad);
+        return new SubRoads(leftRoad, rightRoad);
 
         void OperateNodes()
         {
-            for (int i = 0; i < LeftRoad.LaneCount; i++)
+            for (int i = 0; i < leftRoad.LaneCount; i++)
             {
-                Lane laneLeft = LeftRoad.Lanes[i];
-                Lane laneRight = RightRoad.Lanes[i];
+                Lane laneLeft = leftRoad.Lanes[i];
+                Lane laneRight = rightRoad.Lanes[i];
                 Lane lane = road.Lanes[i];
-                laneLeft.EndNode = laneRight.StartNode;
-                laneLeft.EndNode.AddLane(laneLeft, Direction.In);
-                Game.RegisterNode(laneLeft.EndNode);
 
                 laneLeft.StartNode = lane.StartNode;
                 lane.StartNode.AddLane(laneLeft, Direction.Out);
@@ -58,47 +60,10 @@ public static class DivideHandler
                 laneRight.EndNode = lane.EndNode;
                 lane.EndNode.AddLane(laneRight, Direction.In);
 
+                Game.RegisterNode(laneLeft.EndNode);
                 Game.RegisterNode(laneLeft.StartNode);
                 Game.RegisterNode(laneRight.EndNode);
             }
-        }
-
-        void OperatePaths()
-        {
-            List<Node> nodes = new();
-            List<Lane> lanes = new();
-            for (int i = 0; i < LeftRoad.LaneCount; i++)
-            {
-                Lane laneLeft = LeftRoad.Lanes[i];
-                Lane laneRight = RightRoad.Lanes[i];
-                Lane lane = road.Lanes[i];
-                laneLeft.StartVertex = lane.StartVertex;
-                Game.AddVertex(laneLeft.EndVertex);
-                Game.AddVertex(laneRight.StartVertex);
-                laneRight.EndVertex = lane.EndVertex;
-
-                nodes.Add(laneLeft.EndNode);
-                lanes.Add(laneRight);
-            }
-            InterRoad.BuildAllPaths(lanes, nodes, Direction.Out);
-        }
-
-        void OperateOutline()
-        {
-            LeftRoad.LeftOutline.Start = road.LeftOutline.Start;
-            LeftRoad.RightOutline.Start = road.RightOutline.Start;
-            RightRoad.LeftOutline.End = road.LeftOutline.End;
-            RightRoad.RightOutline.End = road.RightOutline.End;
-
-            LeftRoad.LeftOutline.Start.Add(LeftRoad.LeftOutline.Mid.First());
-            LeftRoad.RightOutline.Start.Add(LeftRoad.RightOutline.Mid.First());
-            RightRoad.LeftOutline.Start.Insert(0, RightRoad.LeftOutline.Mid.Last());
-            RightRoad.RightOutline.Start.Insert(0, RightRoad.RightOutline.Mid.Last());
-
-            LeftRoad.LeftOutline.End = InterRoad.GetOutLineAtTwoEnds(LeftRoad, Orientation.Left, Side.End);
-            LeftRoad.RightOutline.End = InterRoad.GetOutLineAtTwoEnds(LeftRoad, Orientation.Right, Side.End);
-            RightRoad.LeftOutline.Start = InterRoad.GetOutLineAtTwoEnds(RightRoad, Orientation.Left, Side.Start);
-            RightRoad.RightOutline.Start = InterRoad.GetOutLineAtTwoEnds(RightRoad, Orientation.Right, Side.Start);
         }
     }
 }
