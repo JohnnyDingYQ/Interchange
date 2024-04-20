@@ -49,7 +49,7 @@ public static class Game
         Nodes[node.Id] = node;
     }
 
-    public static bool RemoveRoad(Road road)
+    public static bool RemoveRoad(Road road, bool retainVertices)
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
@@ -57,6 +57,11 @@ public static class Game
         foreach (Lane lane in road.Lanes)
         {
             Graph.RemoveEdgeIf(e => e.Source == lane.StartVertex && e.Target == lane.EndVertex);
+            if (!retainVertices)
+            {
+                Graph.RemoveVertex(lane.StartVertex);
+                Graph.RemoveVertex(lane.EndVertex);
+            }
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);
@@ -66,6 +71,11 @@ public static class Game
         }
         DestroyRoad?.Invoke(road);
         return true;
+    }
+
+    public static bool RemoveRoad(Road road)
+    {
+        return RemoveRoad(road, false);
     }
 
     public static void InvokeUpdateRoadMesh(Road road)
@@ -99,5 +109,11 @@ public static class Game
     {
         if (SelectedRoad != null)
             DivideHandler.HandleDivideCommand(SelectedRoad, mouseWorldPos);
+    }
+
+    public static void RemoveSelectedRoad()
+    {
+        if (SelectedRoad != null)
+            RemoveRoad(SelectedRoad);
     }
 }

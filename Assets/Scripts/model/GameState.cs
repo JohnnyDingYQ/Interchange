@@ -15,7 +15,7 @@ public class GameState
     {
         Roads = new();
         Nodes = new();
-        Graph = new();
+        Graph = new(false);
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
     }

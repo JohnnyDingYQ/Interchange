@@ -33,16 +33,16 @@ public static class DivideHandler
         Road rightRoad = new(right, laneCount);
         if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
             return null;
-        Game.RemoveRoad(road);
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
         List<Node> leftNodes = new();
         for (int i = 0; i < leftRoad.LaneCount; i++)
             leftNodes.Add(leftRoad.Lanes[i].EndNode);
         OperateNodes();
+        OperateVertices();
+        OperateOutline();
+        Game.RemoveRoad(road, true);
         BuildHandler.ConnectRoadStartToNodes(leftNodes, rightRoad);
-        Game.InvokeUpdateRoadMesh(leftRoad);
-        Game.InvokeUpdateRoadMesh(rightRoad);
 
         return new SubRoads(leftRoad, rightRoad);
 
@@ -61,9 +61,32 @@ public static class DivideHandler
                 lane.EndNode.AddLane(laneRight, Direction.In);
 
                 Game.RegisterNode(laneLeft.EndNode);
-                Game.RegisterNode(laneLeft.StartNode);
-                Game.RegisterNode(laneRight.EndNode);
             }
+        }
+
+        void OperateVertices()
+        {
+            for (int i = 0; i < leftRoad.LaneCount; i++)
+            {
+                Lane laneLeft = leftRoad.Lanes[i];
+                Lane laneRight = rightRoad.Lanes[i];
+                Lane lane = road.Lanes[i];
+                laneLeft.StartVertex = lane.StartVertex;
+                laneRight.EndVertex = lane.EndVertex;
+            }
+        }
+
+        void OperateOutline()
+        {
+            leftRoad.LeftOutline.Start = road.LeftOutline.Start;
+            leftRoad.RightOutline.Start = road.RightOutline.Start;
+            rightRoad.LeftOutline.End = road.LeftOutline.End;
+            rightRoad.RightOutline.End = road.RightOutline.End;
+
+            leftRoad.LeftOutline.Start.Add(leftRoad.LeftOutline.Mid.First());
+            leftRoad.RightOutline.Start.Add(leftRoad.RightOutline.Mid.First());
+            rightRoad.LeftOutline.End.Insert(0, rightRoad.LeftOutline.Mid.Last());
+            rightRoad.RightOutline.End.Insert(0, rightRoad.RightOutline.Mid.Last());
         }
     }
 }

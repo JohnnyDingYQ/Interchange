@@ -172,7 +172,7 @@ public class OutlineTest
     {
         foreach (Road r in Game.Roads.Values)
         {
-            if (!r.RoadOutLinePlausible())
+            if (!r.OutLinePlausible())
                 return false;
             if (!r.HasNoneEmptyOutline())
                 return false;

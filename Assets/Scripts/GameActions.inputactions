@@ -76,6 +76,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RemoveRoad",
+                    "type": "Button",
+                    "id": "80942f95-8132-432e-aa8b-38c487f29c31",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -225,11 +234,22 @@
                 {
                     "name": "",
                     "id": "9cf8bcdb-8c9c-4afd-80d2-b9afbb7fafa2",
-                    "path": "<Mouse>/rightButton",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "DivideRoad",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "89218214-cf9e-49aa-9d99-a9b8961089e6",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RemoveRoad",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

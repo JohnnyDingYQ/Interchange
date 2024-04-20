@@ -76,7 +76,7 @@ public static class BuildHandler
         if (endTarget.SnapNotNull)
             ConnectRoadEndToNodes(endNodes, road);
 
-        RegisterNodes(road);
+        RegisterUnregisteredNodes(road);
         AutoDivideRoad(road);
         return road;
 
@@ -147,8 +147,6 @@ public static class BuildHandler
         InterRoad.UpdateOutline(nodeGroup);
         road.LeftOutline.AddStartFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
         road.RightOutline.AddStartFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
-        // DebugExtension.DebugPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2, Color.blue, 1, 1000);
-        // DebugExtension.DebugPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2, Color.blue, 1, 1000);
         foreach (Road r in nodeGroup.GetRoads())
             Game.InvokeUpdateRoadMesh(r);
     }
@@ -169,7 +167,7 @@ public static class BuildHandler
             Game.InvokeUpdateRoadMesh(r);
     }
 
-    static void RegisterNodes(Road road)
+    static void RegisterUnregisteredNodes(Road road)
     {
         foreach (Lane lane in road.Lanes)
         {
