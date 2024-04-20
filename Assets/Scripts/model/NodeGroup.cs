@@ -40,8 +40,8 @@ public class NodeGroup : IEnumerable<Node>
             inRoads.UnionWith(n.GetRoads(Direction.In));
 
         Road randomInRoad = InRoads.First();
-        Normal = math.normalize(randomInRoad.GetNormal(1));
-        Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + randomInRoad.GetNormal(1), randomInRoad.EndPos - new float3(0, 1, 0));
+        Normal = math.normalize(randomInRoad.Get2DNormal(1));
+        Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + randomInRoad.Get2DNormal(1), randomInRoad.EndPos - new float3(0, 1, 0));
         PointOnInside = randomInRoad.PivotPos;
     }
 

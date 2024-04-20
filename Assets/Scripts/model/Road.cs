@@ -72,13 +72,13 @@ public class Road
 
     public float3 InterpolateLanePos(float t, int lane)
     {
-        float3 normal = GetNormal(t);
+        float3 normal = Get2DNormal(t);
         float3 pos = CurveUtility.EvaluatePosition(BezierCurve, t);
         float3 offset = normal * (Constants.LaneWidth * ((float)LaneCount / 2 - 0.5f) - lane * Constants.LaneWidth);
         return pos + offset;
     }
 
-    public float3 GetNormal(float t)
+    public float3 Get2DNormal(float t)
     {
         float3 tangent = CurveUtility.EvaluateTangent(BezierCurve, t);
         tangent.y = 0;

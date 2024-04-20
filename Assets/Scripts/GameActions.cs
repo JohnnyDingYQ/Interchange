@@ -107,6 +107,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReplaceRoad"",
+                    ""type"": ""Button"",
+                    ""id"": ""bab231d5-6056-49c2-9dd9-de5811a744a2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -274,6 +283,17 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""RemoveRoad"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2d180df2-efd6-4885-bd5b-0c5a125a928b"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReplaceRoad"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -291,6 +311,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_LoadGame = m_InGame.FindAction("LoadGame", throwIfNotFound: true);
         m_InGame_DivideRoad = m_InGame.FindAction("DivideRoad", throwIfNotFound: true);
         m_InGame_RemoveRoad = m_InGame.FindAction("RemoveRoad", throwIfNotFound: true);
+        m_InGame_ReplaceRoad = m_InGame.FindAction("ReplaceRoad", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -361,6 +382,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_LoadGame;
     private readonly InputAction m_InGame_DivideRoad;
     private readonly InputAction m_InGame_RemoveRoad;
+    private readonly InputAction m_InGame_ReplaceRoad;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -374,6 +396,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @LoadGame => m_Wrapper.m_InGame_LoadGame;
         public InputAction @DivideRoad => m_Wrapper.m_InGame_DivideRoad;
         public InputAction @RemoveRoad => m_Wrapper.m_InGame_RemoveRoad;
+        public InputAction @ReplaceRoad => m_Wrapper.m_InGame_ReplaceRoad;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -410,6 +433,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @RemoveRoad.started += instance.OnRemoveRoad;
             @RemoveRoad.performed += instance.OnRemoveRoad;
             @RemoveRoad.canceled += instance.OnRemoveRoad;
+            @ReplaceRoad.started += instance.OnReplaceRoad;
+            @ReplaceRoad.performed += instance.OnReplaceRoad;
+            @ReplaceRoad.canceled += instance.OnReplaceRoad;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -441,6 +467,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @RemoveRoad.started -= instance.OnRemoveRoad;
             @RemoveRoad.performed -= instance.OnRemoveRoad;
             @RemoveRoad.canceled -= instance.OnRemoveRoad;
+            @ReplaceRoad.started -= instance.OnReplaceRoad;
+            @ReplaceRoad.performed -= instance.OnReplaceRoad;
+            @ReplaceRoad.canceled -= instance.OnReplaceRoad;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -469,5 +498,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnLoadGame(InputAction.CallbackContext context);
         void OnDivideRoad(InputAction.CallbackContext context);
         void OnRemoveRoad(InputAction.CallbackContext context);
+        void OnReplaceRoad(InputAction.CallbackContext context);
     }
 }
