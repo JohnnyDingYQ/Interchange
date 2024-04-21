@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -20,5 +21,15 @@ public static class Utility
     public static bool AreNumericallyEqual(float a, float b, float tolerance)
     {
         return Math.Abs(a - b) < tolerance;
+    }
+
+    public static bool AreNumericallyEqual(List<float3> a, List<float3> b)
+    {
+        if (a.Count != b.Count)
+            return false;
+        for (int i = 0; i < a.Count; i++)
+            if (!AreNumericallyEqual(a[i], b[i]))
+                return false;
+        return true;
     }
 }

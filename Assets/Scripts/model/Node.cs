@@ -14,16 +14,23 @@ public class Node : IComparable<Node>
     private readonly HashSet<Lane> lanes;
     [JsonIgnore]
     public ReadOnlySet<Lane> Lanes { get { return lanes.AsReadOnly(); } }
-    public float3 Pos { get; set; }
-    public int Order { get; set; }
-    private readonly Dictionary<Lane, Direction> directions;
+    [JsonProperty]
+    public float3 Pos { get; private set; }
+    [JsonProperty]
+    public int NodeIndex { get; private set; }
+    [JsonProperty]
+    public List<KeyValuePair<Lane, Direction>> SerializedDirections
+    {
+        get { return directions.ToList(); }
+        set { directions = value.ToDictionary(x => x.Key, x => x.Value); }
+    }
+    private Dictionary<Lane, Direction> directions;
 
-    public Node() { }
 
     public Node(float3 pos, int order)
     {
         Pos = pos;
-        Order = order;
+        NodeIndex = order;
         Id = -1;
         lanes = new();
         directions = new();
@@ -91,7 +98,7 @@ public class Node : IComparable<Node>
 
     public int CompareTo(Node other)
     {
-        return Order.CompareTo(other.Order);
+        return NodeIndex.CompareTo(other.NodeIndex);
     }
 
     public bool IsRegistered()

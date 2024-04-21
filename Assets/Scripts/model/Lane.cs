@@ -1,7 +1,6 @@
 using UnityEngine.Splines;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Mathematics;
-
 public class Lane
 {
     public Vertex StartVertex { get; set; }
@@ -14,17 +13,21 @@ public class Lane
     public float3 StartPos { get { return StartNode.Pos; } }
     [JsonIgnore]
     public float3 EndPos { get { return EndNode.Pos; } }
-    public Road Road { get; set; }
-    public int Order { get; set; }
-    public float Length { get; set; }
-    public Path InnerPath { get; set; }
+    [JsonProperty]
+    public Road Road { get; private set; }
+    [JsonProperty]
+    public int LaneIndex { get; private set; }
+    [JsonProperty]
+    public float Length { get; private set; }
+    [JsonProperty]
+    public Path InnerPath { get; private set; }
 
     // Empty constructor for JSON.Net deserialization
     public Lane() { }
 
     public Lane(Road road, int laneIndex)
     {
-        Order = laneIndex;
+        LaneIndex = laneIndex;
         Road = road;
         InitSpline();
         InitNodes();
@@ -34,13 +37,13 @@ public class Lane
 
     public void InitSpline()
     {
-        Spline = GetLaneSpline(Order);
+        Spline = GetLaneSpline(LaneIndex);
     }
 
     void InitNodes()
     {
-        StartNode = new(Spline.EvaluatePosition(0), Order);
-        EndNode = new(Spline.EvaluatePosition(1), Order);
+        StartNode = new(Spline.EvaluatePosition(0), LaneIndex);
+        EndNode = new(Spline.EvaluatePosition(1), LaneIndex);
         StartNode.AddLane(this, Direction.Out);
         EndNode.AddLane(this, Direction.In);
     }
@@ -79,7 +82,7 @@ public class Lane
 
     public override string ToString()
     {
-        return "Lane " + Order + " of Road " + Road.Id;
+        return "Lane " + LaneIndex + " of Road " + Road.Id;
     }
 
 }

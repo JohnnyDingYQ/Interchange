@@ -2,15 +2,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.Plastic.Newtonsoft.Json;
+using System;
 
-public class RoadOutline
+public class RoadOutline : IEquatable<RoadOutline>
 {
+    [JsonProperty]
     public bool IsFixedAtStart { get; private set; }
+    [JsonProperty]
     public bool IsFixedAtEnd { get; private set; }
+    [JsonProperty]
     public float3 FixedStart { get; private set; }
     public List<float3> Start { get; set; }
     public List<float3> Mid { get; set; }
     public List<float3> End { get; set; }
+    [JsonProperty]
     public float3 FixedEnd { get; private set; }
 
     public RoadOutline()
@@ -65,5 +71,16 @@ public class RoadOutline
             if (!Utility.AreNumericallyEqual(End.First(), Mid.Last()))
                 return false;
         return true;
+    }
+
+    public bool Equals(RoadOutline other)
+    {
+        return Utility.AreNumericallyEqual(Start, other.Start)
+        && Utility.AreNumericallyEqual(Mid, other.Mid)
+        && Utility.AreNumericallyEqual(End, other.End)
+        && IsFixedAtStart == other.IsFixedAtStart
+        && IsFixedAtEnd == other.IsFixedAtEnd
+        && Utility.AreNumericallyEqual(FixedStart, other.FixedStart)
+        && Utility.AreNumericallyEqual(FixedEnd, other.FixedEnd);
     }
 }

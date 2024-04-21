@@ -7,12 +7,7 @@ using Unity.Mathematics;
 using UnityEngine;
 public class SaveSystemTest
 {
-    float3 pos1 = new(0, 0, 0);
-    float3 pos2 = new(Constants.MinimumLaneLength, 0, 0);
-    float3 pos3 = new(Constants.MinimumLaneLength * 2, 0, 0);
-    float3 pos4 = new(Constants.MinimumLaneLength * 3, 0, 0);
-    float3 pos5 = new(Constants.MinimumLaneLength * 4, 0, 0);
-    float3 pos6 = new(Constants.MinimumLaneLength * 5, 0, 0);
+    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
 
     [SetUp]
     public void SetUp()
@@ -23,20 +18,20 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleOneLaneRoad()
     {
-        RoadBuilder.Build(pos1, pos2, pos3, 1);
+        RoadBuilder.Build(0, stride, 2 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
         Road road = Game.Roads.Values.First();
-        Assert.AreEqual(pos1, road.StartPos);
-        Assert.AreEqual(pos2, road.PivotPos);
-        Assert.AreEqual(pos3, road.EndPos);
+        Assert.AreEqual(new float3(0), road.StartPos);
+        Assert.AreEqual(stride, road.PivotPos);
+        Assert.AreEqual(2 * stride, road.EndPos);
         Assert.AreEqual(1, road.Lanes.Count);
         Lane lane = road.Lanes.First();
-        Assert.AreEqual(pos1, lane.StartPos);
-        Assert.AreEqual(pos3, lane.EndPos);
+        Assert.AreEqual(new float3(0), lane.StartPos);
+        Assert.AreEqual(2 * stride, lane.EndPos);
         HashSet<Lane> expected = new() { lane };
         Assert.AreEqual(2, Game.Nodes.Count);
         Assert.True(lane.StartNode.Lanes.SetEquals(expected));
@@ -46,20 +41,20 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleThreeLaneRoad()
     {
-        RoadBuilder.Build(pos1, pos2, pos3, 3);
+        RoadBuilder.Build(0, stride, 2 * stride, 3);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
         Road road = Game.Roads.Values.First();
-        Assert.AreEqual(pos1, road.StartPos);
-        Assert.AreEqual(pos2, road.PivotPos);
-        Assert.AreEqual(pos3, road.EndPos);
+        Assert.AreEqual(new float3(0), road.StartPos);
+        Assert.AreEqual(stride, road.PivotPos);
+        Assert.AreEqual(2 * stride, road.EndPos);
         Assert.AreEqual(3, road.Lanes.Count);
         Lane lane = road.Lanes[1];
-        Assert.AreEqual(pos1, lane.StartPos);
-        Assert.AreEqual(pos3, lane.EndPos);
+        Assert.AreEqual(new float3(0), lane.StartPos);
+        Assert.AreEqual(2 * stride, lane.EndPos);
         Assert.AreEqual(6, Game.Nodes.Count);
         Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
         Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
@@ -73,20 +68,20 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoDisconnectedOneLaneRoad()
     {
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.Build(pos4, pos5, pos6, 1);
+        Road road0 = RoadBuilder.Build(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Build(3 * stride, 4 * stride, 5 * stride, 1);
 
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Assert.AreEqual(pos1, road0.StartPos);
-        Assert.AreEqual(pos2, road0.PivotPos);
-        Assert.AreEqual(pos3, road0.EndPos);
-        Assert.AreEqual(pos4, road1.StartPos);
-        Assert.AreEqual(pos5, road1.PivotPos);
-        Assert.AreEqual(pos6, road1.EndPos);
+        Assert.AreEqual(new float3(0), road0.StartPos);
+        Assert.AreEqual(stride, road0.PivotPos);
+        Assert.AreEqual(2 * stride, road0.EndPos);
+        Assert.AreEqual(3 * stride, road1.StartPos);
+        Assert.AreEqual(4 * stride, road1.PivotPos);
+        Assert.AreEqual(5 * stride, road1.EndPos);
         Assert.AreEqual(4, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
@@ -97,20 +92,20 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoConnectedOneLaneRoad()
     {
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.Build(pos3, pos4, pos5, 1);
+        Road road0 = RoadBuilder.Build(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
 
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Assert.AreEqual(pos1, road0.StartPos);
-        Assert.AreEqual(pos2, road0.PivotPos);
-        Assert.AreEqual(pos3, road0.EndPos);
-        Assert.AreEqual(pos3, road1.StartPos);
-        Assert.True(Vector3.Distance(pos4, road1.PivotPos) < 0.01f);
-        Assert.AreEqual(pos5, road1.EndPos);
+        Assert.AreEqual(new float3(0), road0.StartPos);
+        Assert.AreEqual(stride, road0.PivotPos);
+        Assert.AreEqual(2 * stride, road0.EndPos);
+        Assert.AreEqual(2 * stride, road1.StartPos);
+        Assert.True(Vector3.Distance(3 * stride, road1.PivotPos) < 0.01f);
+        Assert.AreEqual(4 * stride, road1.EndPos);
         Assert.AreEqual(3, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
@@ -121,8 +116,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverLanesSplines()
     {
-        RoadBuilder.Build(pos1, pos2, pos3, 1);
-        RoadBuilder.Build(pos3, pos4, pos5, 1);
+        RoadBuilder.Build(0, stride, 2 * stride, 1);
+        RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -139,8 +134,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverPathGraph()
     {
-        RoadBuilder.Build(pos1, pos2, pos3, 1);
-        RoadBuilder.Build(pos3, pos4, pos5, 1);
+        RoadBuilder.Build(0, stride, 2 * stride, 1);
+        RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -151,6 +146,44 @@ public class SaveSystemTest
             Assert.NotNull(path.Curve);
     }
 
+    [Test]
+    public void RecoverNodeLaneDirections()
+    {
+        Road road = RoadBuilder.Build(0, stride, 2 * stride, 1);
+        Lane lane = road.Lanes.First();
+        Assert.AreSame(lane, lane.StartNode.GetLanes(Direction.Out).First());
+        Assert.AreSame(lane, lane.EndNode.GetLanes(Direction.In).First());
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
+        road = Game.Roads.Values.First();
+        lane = road.Lanes.First();
+        Assert.AreSame(lane, lane.StartNode.GetLanes(Direction.Out).First());
+        Assert.AreSame(lane, lane.EndNode.GetLanes(Direction.In).First());
+
+    }
+
+    [Test]
+    public void RecoverRoadOutline()
+    {
+        Road saved1 = RoadBuilder.Build(0, stride, 2 * stride, 1);
+        Road saved2 = RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
+        Road saved3 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 1);
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
+        Road restored1 = Game.Roads[saved1.Id];
+        Road restored2 = Game.Roads[saved2.Id];
+        Road restored3 = Game.Roads[saved3.Id];
+
+        Assert.True(saved1.LeftOutline.Equals(restored1.LeftOutline));
+        Assert.True(saved1.RightOutline.Equals(restored1.RightOutline));
+        Assert.True(saved2.LeftOutline.Equals(restored2.LeftOutline));
+        Assert.True(saved2.RightOutline.Equals(restored2.RightOutline));
+        Assert.True(saved3.LeftOutline.Equals(restored3.LeftOutline));
+        Assert.True(saved3.RightOutline.Equals(restored3.RightOutline));
+
+    }
 
     // TODO: Complete further testing
     // [Test]
@@ -160,11 +193,3 @@ public class SaveSystemTest
     }
 
 }
-
-// public static class MyExtension
-// {
-//     public static void Help(this AdjacencyGraph<Vertex, Path> graph)
-//     {
-
-//     }
-// }

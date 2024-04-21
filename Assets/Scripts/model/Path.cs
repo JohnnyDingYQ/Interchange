@@ -9,15 +9,19 @@ using Unity.Plastic.Newtonsoft.Json.Serialization;
 [JsonObject]
 public class Path : IEdge<Vertex>, IComparable<Path>
 {
-    public ICurve Curve { get; set; }
-    public Vertex Source { get; set; }
-    public Vertex Target { get; set; }
+    [JsonProperty]
+    public ICurve Curve { get; private set; }
+    [JsonProperty]
+    public Vertex Source { get; private set; }
+    [JsonProperty]
+    public Vertex Target { get; private set; }
     /// <summary>
     /// straight path: Span = 0 ||
     /// left turn path: Span = -1 ||
     /// right turn path: Span = 1, 
     /// </summary>
-    public int Span { get; set; }
+    [JsonProperty]
+    public int Span { get; private set; }
 
     public Path() { }
 

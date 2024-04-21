@@ -11,12 +11,15 @@ public class Road
     public int Id { get; set; }
     [JsonIgnore]
     public BezierCurve BezierCurve { get; set; }
-    public List<Lane> Lanes { get; set; }
-    public int LaneCount { get; set; }
+    [JsonProperty]
+    public List<Lane> Lanes { get; private set; }
+    [JsonProperty]
+    public int LaneCount { get; private set; }
     public float3 StartPos { get; set; }
     public float3 PivotPos { get; set; }
     public float3 EndPos { get; set; }
-    public float Length { get; set; }
+    [JsonProperty]
+    public float Length { get; private set; }
     public RoadOutline LeftOutline { get; set; }
     public RoadOutline RightOutline { get; set; }
 

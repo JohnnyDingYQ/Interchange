@@ -6,10 +6,14 @@ using UnityEngine.Splines;
 public class Vertex
 {
     public int Id { get; set; }
-    public float3 Pos { get; set; }
-    public float Interpolation { get; set; }
-    public float3 Tangent { get; set; }
-    public Lane Lane { get; set; }
+    [JsonProperty]
+    public float3 Pos { get; private set; }
+    [JsonProperty]
+    public float Interpolation { get; private set; }
+    [JsonProperty]
+    public float3 Tangent { get; private set; }
+    [JsonProperty]
+    public Lane Lane { get; private set; }
     [JsonIgnore]
     public Road Road { get { return Lane.Road; } }
 

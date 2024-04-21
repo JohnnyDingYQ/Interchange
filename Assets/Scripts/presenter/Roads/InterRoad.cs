@@ -45,7 +45,7 @@ public static class InterRoad
                             }
                         foreach (Lane l1 in nodes.First().GetLanes(InvertDirection(direction)))
                             foreach (Lane l2 in connected.GetLanes(direction))
-                                BuildLanePath(l1, l2, nodes.First().Order - connected.Order);
+                                BuildLanePath(l1, l2, nodes.First().NodeIndex - connected.NodeIndex);
                     }
                     nodes.Reverse();
                 }
@@ -79,11 +79,11 @@ public static class InterRoad
                     if (from.Contains(node))
                         continue;
 
-                    int span = from.First().Order - node.Order;
+                    int span = from.First().NodeIndex - node.NodeIndex;
                     if (span == 1)
                         BuildLanePath(lane, to.First(), direction == Direction.Out ? span : -span);
 
-                    span = from.Last().Order - node.Order;
+                    span = from.Last().NodeIndex - node.NodeIndex;
                     if (span == -1)
                         BuildLanePath(lane, to.Last(), direction == Direction.Out ? span : -span);
                 }

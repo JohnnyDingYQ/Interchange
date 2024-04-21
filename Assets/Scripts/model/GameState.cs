@@ -4,10 +4,12 @@ using Unity.Plastic.Newtonsoft.Json;
 
 public class GameState
 {
-    public SortedDictionary<int, Road> Roads { get; set; }
-    public SortedDictionary<int, Node> Nodes { get; set; }
+    [JsonProperty]
+    public SortedDictionary<int, Road> Roads { get; private set; }
+    [JsonProperty]
+    public SortedDictionary<int, Node> Nodes { get; private set; }
     [JsonIgnore]
-    public AdjacencyGraph<Vertex, Path> Graph { get; set; }
+    public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
     public List<Path> GraphSave { get; set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
