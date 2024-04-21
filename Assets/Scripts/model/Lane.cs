@@ -54,9 +54,6 @@ public class Lane
         EndVertex = new(this, Side.End);
         ICurve curve = new SplineAdapter(Spline, StartVertex.Interpolation, EndVertex.Interpolation, this);
         Path path = new(curve, StartVertex, EndVertex, 0);
-        Game.AddVertex(StartVertex);
-        Game.AddVertex(EndVertex);
-        Game.AddEdge(path);
         InnerPath = path;
     }
 

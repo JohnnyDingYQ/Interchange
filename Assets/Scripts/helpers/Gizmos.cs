@@ -102,6 +102,14 @@ public static class Gizmos
         }
     }
 
+    public static void DrawBeizerSeries(BezierSeries bs, Color color, float duration)
+    {
+        foreach (BezierCurve curve in bs.Curves)
+        {
+            DrawBezierCurve(curve, color, duration);
+        }
+    }
+
     static void DrawListofPoints(List<float3> l, Color color, float duration)
     {
         if (l == null)

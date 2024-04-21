@@ -40,6 +40,12 @@ public static class Game
     {
         road.Id = NextAvailableRoadId++;
         Roads.Add(road.Id, road);
+        foreach (Lane lane in road.Lanes)
+        {
+            AddVertex(lane.StartVertex);
+            AddVertex(lane.EndVertex);
+            AddEdge(lane.InnerPath);
+        }
         InstantiateRoad?.Invoke(road);
     }
 
