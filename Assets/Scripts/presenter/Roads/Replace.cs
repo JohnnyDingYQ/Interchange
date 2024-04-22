@@ -8,8 +8,8 @@ public static class ReplaceHandler
     {
         // float centeroffset = -((float)newLaneCount / 2 - (float)road.LaneCount / 2 + offset) * Constants.LaneWidth / 2;
 
-        BezierSeries bs = new(road.BezierCurve);
-        bs = bs.Offset(Constants.LaneWidth / 2, Orientation.Left);
-        Gizmos.DrawBeizerSeries(bs, Color.blue, 10000);
+        // BezierSeries bs = new(road.BezierCurve);
+        // bs = bs.Offset(Constants.LaneWidth / 2, Orientation.Left);
+        // Gizmos.DrawBeizerSeries(bs, Color.blue, 10000);
     }
 }

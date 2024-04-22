@@ -40,9 +40,10 @@ public class NodeGroup : IEnumerable<Node>
             inRoads.UnionWith(n.GetRoads(Direction.In));
 
         Road randomInRoad = InRoads.First();
-        Normal = math.normalize(randomInRoad.Get2DNormal(1));
-        Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + randomInRoad.Get2DNormal(1), randomInRoad.EndPos - new float3(0, 1, 0));
-        PointOnInside = randomInRoad.PivotPos;
+        BezierSeries bs = randomInRoad.BezierSeries;
+        Normal = math.normalize(bs.Evaluate2DNormalizedNormal(bs.EndLocation));
+        Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + Normal, randomInRoad.EndPos - new float3(0, 1, 0));
+        PointOnInside = bs.EvaluatePosition(bs.EndLocation) - math.normalize(bs.EvaluateTangent(bs.EndLocation));
     }
 
     public HashSet<Road> GetRoads()

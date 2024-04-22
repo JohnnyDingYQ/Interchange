@@ -113,9 +113,8 @@ public static class InterRoad
                 return null;
             float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
-            BezierCurve bezierCurve = new(start.Pos, pos1, pos2, end.Pos);
-            ICurve curve = new BezierCurveAdapter(bezierCurve);
-            Path p = new(curve, start, end, span);
+            BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
+            Path p = new(bs, start, end, span);
             Game.AddEdge(p);
             return p;
         }
@@ -204,11 +203,10 @@ public static class InterRoad
             List<Path> paths = new(edges);
             paths.Sort();
 
-            int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution);
             if (orientation == Orientation.Left)
-                pathOutline = paths.First().GetOutline(numPoints, orientation);
+                pathOutline = paths.First().GetOutline(orientation);
             else
-                pathOutline = paths.Last().GetOutline(numPoints, orientation);
+                pathOutline = paths.Last().GetOutline(orientation);
 
             SeparateOutlineWithEndofRoad(pathOutline, out List<float3> outlineStart, out List<float3> outlineEnd);
 
@@ -253,30 +251,27 @@ public static class InterRoad
         #endregion
     }
 
-    static float3 Get2DNormal(Spline spline, float t)
-    {
-        float3 forward = spline.EvaluateTangent(t);
-        float3 upVector = spline.EvaluateUpVector(t);
-        float3 normal = Vector3.Cross(forward, upVector).normalized;
-        normal.y = 0;
-        return normal;
-    }
-
     public static List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Side side)
     {
         List<float3> results = new();
         Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
         float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation : -Constants.RoadOutlineSeparation;
         int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution / 2);
+        BezierSeries bs = lane.BezierSeries;
+        float interpolationOfLocation;
+        if (side == Side.Start)
+            interpolationOfLocation = bs.LocationToInterpolation(lane.StartVertex.SeriesLocation);
+        else
+            interpolationOfLocation = bs.LocationToInterpolation(lane.EndVertex.SeriesLocation);
         for (int i = 0; i <= numPoints; i++)
         {
             float t;
             if (side == Side.Start)
-                t = (float)i / numPoints * lane.StartVertex.Interpolation;
+                t = (float)i / numPoints * interpolationOfLocation;
             else
-                t = lane.EndVertex.Interpolation + (float)i / numPoints * (1 - lane.EndVertex.Interpolation);
-            float3 normal = Get2DNormal(lane.Spline, t);
-            results.Add(lane.Spline.EvaluatePosition(t) + normal * normalMultiplier);
+                t = interpolationOfLocation + (float)i / numPoints * (1 - interpolationOfLocation);
+            float3 normal = bs.Evaluate2DNormalizedNormal(t);
+            results.Add(bs.EvaluatePosition(t) + normal * normalMultiplier);
         }
         return results;
     }

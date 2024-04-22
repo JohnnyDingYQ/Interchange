@@ -10,7 +10,7 @@ namespace CurveExtensions
         {
             float3 tangent = CurveUtility.EvaluateTangent(curve, t);
             tangent.y = 0;
-            return Vector3.Cross(Vector3.up, tangent).normalized;
+            return Vector3.Cross(tangent, Vector3.up).normalized;
         }
 
         public static float InterpolationOfPoint(this BezierCurve curve, float3 pt)

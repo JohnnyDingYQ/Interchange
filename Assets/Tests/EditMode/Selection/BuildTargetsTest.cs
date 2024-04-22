@@ -103,7 +103,7 @@ public class BuildTargetTest
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.InterpolateLanePos(1.0f, -1), node0.Pos));
+        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
         Assert.True(Utility.AreNumericallyEqual(pos3, node1.Pos));
     }
 
@@ -117,7 +117,7 @@ public class BuildTargetTest
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.InterpolateLanePos(1.0f, 1), node1.Pos));
+        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node1.Pos));
         Assert.True(Utility.AreNumericallyEqual(pos3, node0.Pos));
     }
 
@@ -134,7 +134,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.InterpolateLanePos(1.0f, -1), node0.Pos));
+        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
         Assert.AreSame(lane0.EndNode, node1);
         Assert.AreSame(lane1.EndNode, node2);
     }
@@ -152,7 +152,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.InterpolateLanePos(1.0f, 2), node2.Pos));
+        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 2), node2.Pos));
         Assert.AreEqual(lane0.EndPos, node0.Pos);
         Assert.AreEqual(lane1.EndPos, node1.Pos);
         Assert.AreSame(node0, lane0.EndNode);
@@ -168,9 +168,9 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
         Node node2 = bt.Nodes[2];
 
-        Assert.True(Utility.AreNumericallyEqual(road.InterpolateLanePos(1.0f, -1), node0.Pos));
+        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
         Assert.AreSame(road.Lanes[0].EndNode, node1);
-        Assert.True(Utility.AreNumericallyEqual(road.InterpolateLanePos(1.0f, 1), node2.Pos));
+        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node2.Pos));
     }
 
     [Test]
@@ -184,8 +184,8 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
         Node node2 = bt.Nodes[2];
 
-        Assert.AreEqual(road.InterpolateLanePos(1.0f, -2), node0.Pos);
-        Assert.AreEqual(road.InterpolateLanePos(1.0f, -1), node1.Pos);
+        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, -2), node0.Pos);
+        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, -1), node1.Pos);
         Assert.AreSame(road.Lanes[0].EndNode, node2);
     }
 
@@ -201,8 +201,8 @@ public class BuildTargetTest
         Node node2 = bt.Nodes[2];
 
         Assert.AreSame(road.Lanes[0].EndNode, node0);
-        Assert.AreEqual(road.InterpolateLanePos(1.0f, 1), node1.Pos);
-        Assert.AreEqual(road.InterpolateLanePos(1.0f, 2), node2.Pos);
+        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, 1), node1.Pos);
+        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, 2), node2.Pos);
         
     }
 
@@ -216,8 +216,8 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
         Node node2 = bt.Nodes[2];
 
-        Assert.AreEqual(road.InterpolateLanePos(0.0f, -1), node0.Pos);
+        Assert.AreEqual(road.ExtrapolateNodePos(Side.Start, -1), node0.Pos);
         Assert.AreEqual(road.Lanes[0].StartPos, node1.Pos);
-        Assert.AreEqual(road.InterpolateLanePos(0.0f, 1), node2.Pos);
+        Assert.AreEqual(road.ExtrapolateNodePos(Side.Start, 1), node2.Pos);
     }
 }

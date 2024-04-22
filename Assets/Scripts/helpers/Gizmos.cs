@@ -46,13 +46,13 @@ public static class Gizmos
     {
         foreach (Road road in Game.Roads.Values)
             foreach (Lane lane in road.Lanes)
-                DrawSpline(lane.Spline, Color.white, duration);
+                DrawBeizerSeries(lane.BezierSeries, Color.white, duration);
     }
 
     public static void DrawRoadCenter(float duration)
     {
-        foreach (Road road in Game.Roads.Values)
-            DrawBezierCurve(road.BezierCurve, Color.magenta, duration);
+        // foreach (Road road in Game.Roads.Values)
+        //     DrawBezierCurve(road.BezierCurve, Color.magenta, duration);
     }
 
     public static void DrawVertices(float duration)
@@ -72,7 +72,7 @@ public static class Gizmos
         foreach (Road road in Game.Roads.Values)
         {
             DebugExtension.DebugPoint(road.StartPos, Color.magenta, 1, duration);
-            DebugExtension.DebugPoint(road.PivotPos, Color.magenta, 1, duration);
+            // DebugExtension.DebugPoint(road.PivotPos, Color.magenta, 1, duration);
             DebugExtension.DebugPoint(road.EndPos, Color.magenta, 1, duration);
         }
     }
@@ -81,7 +81,7 @@ public static class Gizmos
     {
         foreach (Path path in Game.Graph.Edges)
         {
-            path.Curve.Draw(duration);
+            DrawBeizerSeries(path.BezierSeries, Color.yellow, duration);
         }
     }
 
@@ -104,13 +104,18 @@ public static class Gizmos
 
     public static void DrawBeizerSeries(BezierSeries bs, Color color, float duration)
     {
-        foreach (BezierCurve curve in bs.Curves)
+        int resolution = 15;
+        float3 prev = bs.EvaluatePosition(0);
+        for (int i = 1; i <= resolution; i++)
         {
-            DrawBezierCurve(curve, color, duration);
+            float3 cur = bs.EvaluatePosition((float) i / resolution);
+            Debug.DrawLine(prev, cur, color, duration);
+            prev = cur;
         }
+
     }
 
-    static void DrawListofPoints(List<float3> l, Color color, float duration)
+    public static void DrawListofPoints(List<float3> l, Color color, float duration)
     {
         if (l == null)
             return;

@@ -33,4 +33,19 @@ public class LaneContractionTest
         Assert.True(lane11.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
         Assert.True(lane12.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
     }
+    // [Test]
+    // public void ThreeLaneToOneLane_Left()
+    // {
+    //     Road road0 = RoadBuilder.Build(pos3, pos4, pos5, 1);
+    //     Road road1 = RoadBuilder.Build(pos1, pos2 , pos3, 3);
+    //     Lane lane00 = road0.Lanes[0];
+    //     Lane lane10 = road1.Lanes[0];
+    //     Lane lane11 = road1.Lanes[1];
+    //     Lane lane12 = road1.Lanes[2];
+    //     Assert.AreSame(lane00.StartNode, lane11.EndNode);
+    //     Assert.AreEqual(7, Nodes.Count);
+    //     Assert.True(lane10.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
+    //     Assert.True(lane11.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
+    //     Assert.True(lane12.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
+    // }
 }

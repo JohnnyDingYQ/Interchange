@@ -83,11 +83,10 @@ public class BuildTargets
         void GetInterpolatedCandidates(Road road, int interpolationReach, Side side)
         {
             floatContainers = new();
-            float t = side == Side.Start ? 1 : 0;
             for (int i = 0; i < interpolationReach; i++)
             {
-                float3 left = road.InterpolateLanePos(t, -(1 + i));
-                float3 right = road.InterpolateLanePos(t, road.LaneCount + i);
+                float3 left = road.ExtrapolateNodePos(side == Side.Start ? Side.End : Side.Start, -(1 + i));
+                float3 right = road.ExtrapolateNodePos(side == Side.Start ? Side.End : Side.Start, road.LaneCount + i);
                 AddNodeIfWithinSnap(new(left, -(1 + i)));
                 AddNodeIfWithinSnap(new(right, road.LaneCount + i));
             }

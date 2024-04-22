@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using QuikGraph;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
@@ -10,7 +9,7 @@ using Unity.Plastic.Newtonsoft.Json.Serialization;
 public class Path : IEdge<Vertex>, IComparable<Path>
 {
     [JsonProperty]
-    public ICurve Curve { get; private set; }
+    public BezierSeries BezierSeries { get; private set; }
     [JsonProperty]
     public Vertex Source { get; private set; }
     [JsonProperty]
@@ -25,38 +24,17 @@ public class Path : IEdge<Vertex>, IComparable<Path>
 
     public Path() { }
 
-    public Path(ICurve curve, Vertex source, Vertex target, int span)
+    public Path(BezierSeries bezierSeries, Vertex source, Vertex target, int span)
     {
-        Curve = curve;
+        BezierSeries = bezierSeries;
         Source = source;
         Target = target;
         Span = span;
     }
-    public float3 EvaluatePosition(float t)
+
+    public List<float3> GetOutline(Orientation orientation)
     {
-        return Curve.EvaluatePosition(t);
-    }
-
-    public float3 Evaluate2DNormal(float t)
-    {
-        return Curve.Evaluate2DNormal(t);
-    }
-
-    public List<float3> GetOutline(int numPoints, Orientation orientation)
-    {
-        List<float3> results = new();
-
-        for (int i = 0; i <= numPoints; i++)
-        {
-            float t = (float)i / numPoints;
-            float3 normal = Evaluate2DNormal(t) * Constants.RoadOutlineSeparation;
-            if (orientation == Orientation.Left)
-                results.Add(EvaluatePosition(t) + normal);
-            else
-                results.Add(EvaluatePosition(t) - normal);
-        }
-        return results;
-
+        return BezierSeries.GetOutline(orientation);
     }
 
     public int CompareTo(Path other)

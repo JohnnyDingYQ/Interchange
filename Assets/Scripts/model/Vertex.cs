@@ -1,6 +1,7 @@
 using System;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 using UnityEngine.Splines;
 
 public class Vertex
@@ -9,7 +10,7 @@ public class Vertex
     [JsonProperty]
     public float3 Pos { get; private set; }
     [JsonProperty]
-    public float Interpolation { get; private set; }
+    public SeriesLocation SeriesLocation { get; private set; }
     [JsonProperty]
     public float3 Tangent { get; private set; }
     [JsonProperty]
@@ -22,13 +23,13 @@ public class Vertex
     public Vertex(Lane lane, Side side)
     {
         Lane = lane;
-        if (lane.Spline == null)
-            throw new InvalidOperationException("Lane spline is null");
+        BezierSeries bs = lane.BezierSeries;
         if (side == Side.Start)
-            Interpolation = Constants.MinimumLaneLength / 2 / lane.Length;
+            SeriesLocation = bs.GetLocationByDistance(Constants.MinimumLaneLength / 2);
         else
-            Interpolation = (lane.Length - Constants.MinimumLaneLength / 2) / lane.Length;
-        Pos = lane.Spline.EvaluatePosition(Interpolation);
-        Tangent = math.normalizesafe(lane.Spline.EvaluateTangent(Interpolation));
+            SeriesLocation = bs.GetLocationByDistance(bs.Length - Constants.MinimumLaneLength / 2);
+            
+        Pos = bs.EvaluatePosition(SeriesLocation);
+        Tangent = math.normalizesafe(bs.EvaluateTangent(SeriesLocation));
     }
 }

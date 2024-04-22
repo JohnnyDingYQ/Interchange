@@ -10,14 +10,15 @@ public class Road
 {
     public int Id { get; set; }
     [JsonIgnore]
-    public BezierCurve BezierCurve { get; set; }
+    public BezierSeries BezierSeries { get; set; }
     [JsonProperty]
     public List<Lane> Lanes { get; private set; }
     [JsonProperty]
     public int LaneCount { get; private set; }
-    public float3 StartPos { get; set; }
-    public float3 PivotPos { get; set; }
-    public float3 EndPos { get; set; }
+    [JsonProperty]
+    public float3 StartPos { get; private set; }
+    [JsonProperty]
+    public float3 EndPos { get; private set; }
     [JsonProperty]
     public float Length { get; private set; }
     public RoadOutline LeftOutline { get; set; }
@@ -28,64 +29,33 @@ public class Road
 
     public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount)
     {
-        StartPos = startPos;
-        PivotPos = pivotPos;
-        EndPos = endPos;
         LaneCount = laneCount;
-        InitCurve();
+        BezierSeries = new(new BezierCurve(startPos, pivotPos, endPos));
+        StartPos = startPos;
+        EndPos = endPos;
 
         InitRoad();
     }
 
-    public Road(BezierCurve curve, int laneCount)
+    public Road(BezierSeries bs, int laneCount)
     {
-        BezierCurve = curve;
-        StartPos = curve.P0;
-        PivotPos = curve.P1;
-        EndPos = curve.P3;
+        BezierSeries = bs;
         LaneCount = laneCount;
+        StartPos = bs.Curves.First().P0;
+        EndPos = bs.Curves.Last().P3;
 
         InitRoad();
     }
 
     private void InitRoad()
     {
-        Length = CurveUtility.CalculateLength(BezierCurve);
+        Length = BezierSeries.Length;
         InitLanes();
         LeftOutline = new();
         RightOutline = new();
-        int numPoints = (int)((Length - Constants.MinimumLaneLength) * Constants.MeshResolution);
 
-        LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(numPoints, Orientation.Left);
-        RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(numPoints, Orientation.Right);
-    }
-
-    public void RestoreFromDeserialization()
-    {
-        InitCurve();
-        foreach (Lane lane in Lanes)
-            lane.InitSpline();
-    }
-
-    public void InitCurve()
-    {
-        BezierCurve = new(StartPos, PivotPos, EndPos);
-    }
-
-
-    public float3 InterpolateLanePos(float t, int lane)
-    {
-        float3 normal = Get2DNormal(t);
-        float3 pos = CurveUtility.EvaluatePosition(BezierCurve, t);
-        float3 offset = normal * (Constants.LaneWidth * ((float)LaneCount / 2 - 0.5f) - lane * Constants.LaneWidth);
-        return pos + offset;
-    }
-
-    public float3 Get2DNormal(float t)
-    {
-        float3 tangent = CurveUtility.EvaluateTangent(BezierCurve, t);
-        tangent.y = 0;
-        return Vector3.Cross(tangent, Vector3.up).normalized;
+        LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(Orientation.Left);
+        RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(Orientation.Right);
     }
 
     public List<Node> GetNodes(Side side)
@@ -112,6 +82,15 @@ public class Road
             if (lane.Length < Constants.MinimumLaneLength)
                 return true;
         return false;
+    }
+
+    public float3 ExtrapolateNodePos(Side side, int laneIndex)
+    {
+        if (side == Side.Start)
+            return BezierSeries.EvaluatePosition(BezierSeries.StartLocation)
+            + ((float)LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth * BezierSeries.Evaluate2DNormalizedNormal(BezierSeries.StartLocation);
+        return BezierSeries.EvaluatePosition(BezierSeries.EndLocation)
+        + ((float)LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth * BezierSeries.Evaluate2DNormalizedNormal(BezierSeries.EndLocation);
     }
 
     void InitLanes()

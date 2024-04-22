@@ -11,24 +11,30 @@ public static class DivideHandler
     {
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
-        return DivideRoad(road, GetInterpolation(road, clickPos));
+        return DivideRoad(road, GetLocation(road, clickPos));
     }
 
-    public static float GetInterpolation(Road road, float3 clickPos)
+    public static SeriesLocation GetLocation(Road road, float3 clickPos)
     {
         clickPos.y = 0;
         Ray ray = new(clickPos, Vector3.up);
-        float distance = CurveUtility.GetNearestPoint(road.BezierCurve, ray, out float3 position, out float interpolation);
-        return interpolation;
+        float distance = road.BezierSeries.GetNearestPoint(ray, out float3 p, out SeriesLocation location);
+        return location;
     }
 
-    public static SubRoads DivideRoad(Road road, float interpolation)
+    public static SubRoads DivideRoad(Road road, float t)
+    {
+        if (!Game.Roads.ContainsKey(road.Id))
+            return null;
+        return DivideRoad(road, road.BezierSeries.InterpolationToLocation(t));
+    }
+
+    public static SubRoads DivideRoad(Road road, SeriesLocation location)
     {
         if (!Game.Roads.ContainsKey(road.Id))
             return null;
         int laneCount = road.LaneCount;
-        interpolation = CurveUtility.GetDistanceToInterpolation(road.BezierCurve, road.Length * interpolation);
-        CurveUtility.Split(road.BezierCurve, interpolation, out BezierCurve left, out BezierCurve right);
+        road.BezierSeries.Split(location, out BezierSeries left, out BezierSeries right);
         Road leftRoad = new(left, laneCount);
         Road rightRoad = new(right, laneCount);
         if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
