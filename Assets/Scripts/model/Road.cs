@@ -9,7 +9,6 @@ using UnityEngine.Splines;
 public class Road
 {
     public int Id { get; set; }
-    [JsonIgnore]
     public BezierSeries BezierSeries { get; set; }
     [JsonProperty]
     public List<Lane> Lanes { get; private set; }

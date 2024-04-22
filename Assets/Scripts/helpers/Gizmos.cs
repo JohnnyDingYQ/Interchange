@@ -51,8 +51,8 @@ public static class Gizmos
 
     public static void DrawRoadCenter(float duration)
     {
-        // foreach (Road road in Game.Roads.Values)
-        //     DrawBezierCurve(road.BezierCurve, Color.magenta, duration);
+        foreach (Road road in Game.Roads.Values)
+            DrawBeizerSeries(road.BezierSeries, Color.magenta, duration);
     }
 
     public static void DrawVertices(float duration)
@@ -72,7 +72,6 @@ public static class Gizmos
         foreach (Road road in Game.Roads.Values)
         {
             DebugExtension.DebugPoint(road.StartPos, Color.magenta, 1, duration);
-            // DebugExtension.DebugPoint(road.PivotPos, Color.magenta, 1, duration);
             DebugExtension.DebugPoint(road.EndPos, Color.magenta, 1, duration);
         }
     }

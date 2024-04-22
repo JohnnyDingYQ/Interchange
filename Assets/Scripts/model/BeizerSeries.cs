@@ -21,11 +21,15 @@ public class BezierSeries
     private float endLocationDistance = 0;
     [JsonProperty]
     public bool IsOffsetted { get; set; }
-    public List<float3[]> SerializeCurves
+    [JsonProperty]
+    private List<List<float3>> serializedCurves;
+
+    [JsonConstructor]
+    public BezierSeries(List<List<float3>> serializedCurves)
     {
-        get { return PrepForSerialization(); }
-        set { SerializeCurves = value; }
+        RestoreFromSerialization(serializedCurves);
     }
+
     public BezierSeries(List<BezierCurve> c, bool offsetted)
     {
         curves = c;
@@ -33,6 +37,7 @@ public class BezierSeries
         EndLocation = new(curves.Count - 1, 1);
         IsOffsetted = offsetted;
         Length = GetLength();
+        PrepForSerialization();
     }
 
     public BezierSeries(BezierCurve c)
@@ -42,6 +47,7 @@ public class BezierSeries
         EndLocation = new(0, 1);
         IsOffsetted = false;
         Length = GetLength();
+        PrepForSerialization();
     }
 
     public void SetStartLocation(SeriesLocation location)
@@ -115,18 +121,17 @@ public class BezierSeries
         }
     }
 
-    public List<float3[]> PrepForSerialization()
+    public void PrepForSerialization()
     {
-        List<float3[]> s = new();
+        serializedCurves = new();
         foreach (BezierCurve curve in curves)
-            s.Add(new float3[] { curve.P0, curve.P1, curve.P2, curve.P3 });
-        return s;
+            serializedCurves.Add(new List<float3>() { curve.P0, curve.P1, curve.P2, curve.P3 });
     }
 
-    public void RestoreFromSerialization()
+    public void RestoreFromSerialization(List<List<float3>> serializeCurves)
     {
         curves = new();
-        foreach (float3[] a in SerializeCurves)
+        foreach (List<float3> a in serializeCurves)
             curves.Add(new(a[0], a[1], a[2], a[3]));
     }
 

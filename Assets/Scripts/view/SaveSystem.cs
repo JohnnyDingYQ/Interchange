@@ -23,6 +23,8 @@ public static class SaveSystem
                 TypeNameHandling = TypeNameHandling.Auto
             });
             Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
+            foreach (Road road in Game.Roads.Values)
+                Game.InvokeInstantiateRoad(road);
         }
         else
         {

@@ -88,6 +88,10 @@ public static class Game
     {
         UpdateRoadMesh?.Invoke(road);
     }
+    public static void InvokeInstantiateRoad(Road road)
+    {
+        InstantiateRoad?.Invoke(road);
+    }
 
     public static void AddVertex(Vertex vertex)
     {
