@@ -4,6 +4,8 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine.Splines;
 using UnityEngine;
+using GraphExtensions;
+using QuikGraph;
 
 
 public static class InterRoad
@@ -17,41 +19,51 @@ public static class InterRoad
         BuildRightLaneChangePath();
         BuildLeftLaneChangePath();
 
-        NodeGroup nodeGroup = new(from.First());
-
         if (BranchExists())
             DeleteAllLaneChangingPaths();
         else
             BuildSidePaths();
 
-        PatchSidePaths();
+        PatchUnconnectedLanes();
 
         #region extracted 
-        void PatchSidePaths()
+        void PatchUnconnectedLanes()
         {
-            List<Node> nodes = new();
-            foreach (Road road in roadsOnOtherside)
-            {
-                nodes = direction == Direction.Out ? road.GetNodes(Side.End) : road.GetNodes(Side.Start);
-                for (int i = 0; i < 2; i++)
-                {
-
-                    if (!nodes.First().HasLanes(direction))
+            NodeGroup nodeGroup = new(from.First());
+            Node firstNodeWithOutRoad = nodeGroup.FirstWithRoad(Direction.Out);
+            Node lastNodeWithOutRoad = nodeGroup.LastWithRoad(Direction.Out);
+            foreach (Road inRoad in nodeGroup.InRoads)
+                foreach (Lane inLane in inRoad.Lanes)
+                    if (Game.Graph.OutDegree(inLane.EndVertex) == 0)
                     {
-                        Node connected = nodes.First();
-                        foreach (Node node in nodes)
-                            if (node.HasLanes(direction))
-                            {
-                                connected = node;
-                                break;
-                            }
-                        foreach (Lane l1 in nodes.First().GetLanes(InvertDirection(direction)))
-                            foreach (Lane l2 in connected.GetLanes(direction))
-                                BuildPathLane2Lane(l1, l2, direction == Direction.Out ? nodes.First().NodeIndex - connected.NodeIndex : -nodes.First().NodeIndex - connected.NodeIndex);
+                        Node n;
+                        int laneNodeIndex = inLane.EndNode.NodeIndex;
+                        if (laneNodeIndex < lastNodeWithOutRoad.NodeIndex && laneNodeIndex > firstNodeWithOutRoad.NodeIndex)
+                            continue;
+                        if (laneNodeIndex < (float)nodeGroup.Count / 2)
+                            n = firstNodeWithOutRoad;
+                        else
+                            n = lastNodeWithOutRoad;
+                        foreach (Lane outLane in n.GetLanes(Direction.Out))
+                            BuildPathLane2Lane(inLane, outLane, n.NodeIndex - inLane.EndNode.NodeIndex);
                     }
-                    nodes.Reverse();
-                }
-            }
+            Node firstNodeWithInRoad = nodeGroup.FirstWithRoad(Direction.In);
+            Node lastNodeWithInRoad = nodeGroup.LastWithRoad(Direction.In);
+            foreach (Road outRoad in nodeGroup.OutRoads)
+                foreach (Lane outLane in outRoad.Lanes)
+                    if (Game.Graph.InDegree(outLane.StartVertex) == 0)
+                    {
+                        Node n;
+                        int laneNodeIndex = outLane.EndNode.NodeIndex;
+                        if (laneNodeIndex < lastNodeWithInRoad.NodeIndex && laneNodeIndex > firstNodeWithInRoad.NodeIndex)
+                            continue;
+                        if (laneNodeIndex < (float)nodeGroup.Count / 2)
+                            n = firstNodeWithInRoad;
+                        else
+                            n = lastNodeWithInRoad;
+                        foreach (Lane inLane in n.GetLanes(Direction.In))
+                            BuildPathLane2Lane(outLane, inLane, n.NodeIndex - outLane.EndNode.NodeIndex);
+                    }
         }
 
         void BuildStraightPath()
@@ -189,8 +201,8 @@ public static class InterRoad
         #region extracted
         void EvaluateSideOutline()
         {
-            Node firstNodeWithInRoad = nodeGroup.FirstWithInRoad();
-            Node lastNodeWithInRoad = nodeGroup.LastWithInRoad();
+            Node firstNodeWithInRoad = nodeGroup.FirstWithRoad(Direction.In);
+            Node lastNodeWithInRoad = nodeGroup.LastWithRoad(Direction.In);
             Road leftmostRoad = firstNodeWithInRoad.GetRoads(Direction.In).First();
             Road rightmostRoad = lastNodeWithInRoad.GetRoads(Direction.In).First();
 

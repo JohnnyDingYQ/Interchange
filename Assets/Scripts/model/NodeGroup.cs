@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.Mathematics;
-using System.Collections.ObjectModel;
 
 public class NodeGroup : IEnumerable<Node>
 {
@@ -53,18 +52,18 @@ public class NodeGroup : IEnumerable<Node>
         return h;
     }
 
-    public Node FirstWithInRoad()
+    public Node FirstWithRoad(Direction direction)
     {
         foreach (Node n in nodes)
-            if (n.GetLanes(Direction.In).Count != 0)
+            if (n.GetLanes(direction).Count != 0)
                 return n;
         return null;
     }
 
-    public Node LastWithInRoad()
+    public Node LastWithRoad(Direction direction)
     {
         for (int i = nodes.Count - 1; i >= 0; i--)
-            if (nodes[i].GetLanes(Direction.In).Count != 0)
+            if (nodes[i].GetLanes(direction).Count != 0)
                 return nodes[i];
         return null;
     }

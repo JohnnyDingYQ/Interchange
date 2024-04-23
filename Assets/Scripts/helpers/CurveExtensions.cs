@@ -4,7 +4,7 @@ using UnityEngine.Splines;
 
 namespace CurveExtensions
 {
-    public static class MyExtensions
+    public static class CurveExtensions
     {
         public static float3 Normalized2DNormal(this BezierCurve curve, float t)
         {
