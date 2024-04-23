@@ -178,4 +178,11 @@ public static class BuildHandler
                 Game.RegisterNode(lane.EndNode);
         }
     }
+
+    public static BuildTargets PollBuildTarget(float3 clickPos)
+    {
+        if (!startAssigned)
+            return new(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
+        return new(clickPos, LaneCount, Side.End, Game.Nodes.Values);
+    }
 }

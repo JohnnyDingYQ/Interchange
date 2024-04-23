@@ -10,7 +10,7 @@ public class InputSystem : MonoBehaviour
 
     private const int CameraSpeedMultiplier = 25;
     private const float CameraZoomMultiplier = 0.3f;
-    public float3 MouseWorldPos { get; set; }
+    public static float3 MouseWorldPos { get; set; }
 
     void Awake()
     {

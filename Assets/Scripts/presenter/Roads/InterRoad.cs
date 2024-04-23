@@ -167,8 +167,7 @@ public static class InterRoad
             r.RightOutline.End.Clear();
         }
 
-        EvaluateSideOutline(Orientation.Left);
-        EvaluateSideOutline(Orientation.Right);
+        EvaluateSideOutline();
 
         foreach (Road r in outRoads)
         {
@@ -184,42 +183,34 @@ public static class InterRoad
             if (r.RightOutline.End.Count == 0)
                 r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
-        
+
         #region extracted
-        void EvaluateSideOutline(Orientation orientation)
+        void EvaluateSideOutline()
         {
-            IEnumerable<Path> edges;
-            List<float3> pathOutline;
             Node firstNodeWithInRoad = nodeGroup.FirstWithInRoad();
             Node lastNodeWithInRoad = nodeGroup.LastWithInRoad();
             Road leftmostRoad = firstNodeWithInRoad.GetRoads(Direction.In).First();
             Road rightmostRoad = lastNodeWithInRoad.GetRoads(Direction.In).First();
 
-            if (orientation == Orientation.Left)
-                Game.Graph.TryGetOutEdges(leftmostRoad.Lanes.First().EndVertex, out edges);
-            else
-                Game.Graph.TryGetOutEdges(rightmostRoad.Lanes.Last().EndVertex, out edges);
+            Game.Graph.TryGetOutEdges(leftmostRoad.Lanes.First().EndVertex, out IEnumerable<Path> leftEdges);
+            Game.Graph.TryGetOutEdges(rightmostRoad.Lanes.Last().EndVertex, out IEnumerable<Path> rightEdges);
 
-            List<Path> paths = new(edges);
-            paths.Sort();
+            List<Path> leftPaths = new(leftEdges);
+            List<Path> rightPaths = new(rightEdges);
+            leftPaths.Sort();
+            rightPaths.Sort();
 
-            if (orientation == Orientation.Left)
-                pathOutline = paths.First().GetOutline(orientation);
-            else
-                pathOutline = paths.Last().GetOutline(orientation);
+            List<float3> leftPathOutline = leftPaths.First().GetOutline(Orientation.Left);
+            List<float3> rightPathOutline = rightPaths.Last().GetOutline(Orientation.Right);
 
-            SeparateOutlineWithEndofRoad(pathOutline, out List<float3> outlineStart, out List<float3> outlineEnd);
+            SeparateOutlineWithEndofRoad(leftPathOutline, out List<float3> leftStart, out List<float3> leftEnd);
+            SeparateOutlineWithEndofRoad(rightPathOutline, out List<float3> rightStart, out List<float3> rightEnd);
+            leftmostRoad.LeftOutline.End = leftEnd;
+            leftPaths.First().Target.Road.LeftOutline.Start = leftStart;
 
-            if (orientation == Orientation.Left)
-            {
-                leftmostRoad.LeftOutline.End = outlineEnd;
-                paths.First().Target.Road.LeftOutline.Start = outlineStart;
-            }
-            else
-            {
-                rightmostRoad.RightOutline.End = outlineEnd;
-                paths.Last().Target.Road.RightOutline.Start = outlineStart;
-            }
+            rightmostRoad.RightOutline.End = rightEnd;
+            rightPaths.Last().Target.Road.RightOutline.Start = rightStart;
+
         }
 
         void SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, out List<float3> outlineStart, out List<float3> outlineEnd)

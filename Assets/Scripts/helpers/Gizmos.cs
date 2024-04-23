@@ -24,24 +24,6 @@ public static class Gizmos
         DrawBezierCurve(curve, 0, 1, color, duration);
     }
 
-    public static void DrawSpline(Spline spline, float startT, float endT, Color color, float duration)
-    {
-        int resolution = 32;
-        float3 pos1;
-        float3 pos2;
-        for (int i = 1; i <= resolution; i++)
-        {
-            pos1 = spline.EvaluatePosition(1 / (float)resolution * (i - 1) * (endT - startT) + startT);
-            pos2 = spline.EvaluatePosition(1 / (float)resolution * i * (endT - startT) + startT);
-            Debug.DrawLine(pos1, pos2, color, duration);
-        }
-    }
-
-    public static void DrawSpline(Spline spline, Color color, float duration)
-    {
-        DrawSpline(spline, 0, 1, color, duration);
-    }
-
     public static void DrawLanes(float duration)
     {
         foreach (Road road in Game.Roads.Values)
