@@ -60,6 +60,8 @@ public static class BuildHandler
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
 
         AlignPivotPos();
+        if (startTarget.SnapNotNull && endTarget.SnapNotNull)
+            RemoveExistingRoad();
 
         Road road = new(startPos, pivotPos, endPos, LaneCount);
         Game.RegisterRoad(road);
@@ -132,6 +134,19 @@ public static class BuildHandler
                     return node;
             return null;
         }
+
+        void RemoveExistingRoad()
+        {
+            HashSet<Road> startRoads = new();
+            HashSet<Road> endRoads = new();
+            foreach (Node node in startTarget.Nodes)
+                startRoads.UnionWith(node.GetRoads(Direction.Out));
+            foreach (Node node in endTarget.Nodes)
+                endRoads.UnionWith(node.GetRoads(Direction.In));
+            startRoads.IntersectWith(endRoads);
+            if (startRoads.Count != 0)
+                Game.RemoveRoad(startRoads.First());
+        }
         #endregion
     }
 
@@ -145,8 +160,16 @@ public static class BuildHandler
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.Out);
         NodeGroup nodeGroup = new(nodes.First());
         InterRoad.UpdateOutline(nodeGroup);
-        road.LeftOutline.AddStartFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
-        road.RightOutline.AddStartFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
+        if (nodeGroup.InRoads.Count == 1)
+        {
+            road.LeftOutline.AddStartFixedPoint(nodeGroup.InRoads.First().LeftOutline.End.Last());
+            road.RightOutline.AddStartFixedPoint(nodeGroup.InRoads.First().RightOutline.End.Last());
+        }
+        else
+        {
+            road.LeftOutline.AddStartFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
+            road.RightOutline.AddStartFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
+        }
         foreach (Road r in nodeGroup.GetRoads())
             Game.InvokeUpdateRoadMesh(r);
     }
@@ -161,8 +184,16 @@ public static class BuildHandler
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.In);
         NodeGroup nodeGroup = new(nodes.First());
         InterRoad.UpdateOutline(nodeGroup);
-        road.LeftOutline.AddEndFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
-        road.RightOutline.AddEndFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
+        if (nodeGroup.OutRoads.Count == 1)
+        {
+            road.LeftOutline.AddEndFixedPoint(nodeGroup.OutRoads.First().LeftOutline.Start.First());
+            road.RightOutline.AddEndFixedPoint(nodeGroup.OutRoads.First().RightOutline.Start.First());
+        }
+        else
+        {
+            road.LeftOutline.AddEndFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
+            road.RightOutline.AddEndFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
+        }
         foreach (Road r in nodeGroup.GetRoads())
             Game.InvokeUpdateRoadMesh(r);
     }

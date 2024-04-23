@@ -126,10 +126,4 @@ public static class Game
         if (SelectedRoad != null)
             RemoveRoad(SelectedRoad);
     }
-
-    public static void ReplaceSelectedRoad()
-    {
-        if (SelectedRoad != null)
-            ReplaceHandler.ReplaceRoad(SelectedRoad, 3, 0);
-    }
 }

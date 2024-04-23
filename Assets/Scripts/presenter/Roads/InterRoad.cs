@@ -45,7 +45,7 @@ public static class InterRoad
                         else
                             n = lastNodeWithOutRoad;
                         foreach (Lane outLane in n.GetLanes(Direction.Out))
-                            BuildPathLane2Lane(inLane, outLane, n.NodeIndex - inLane.EndNode.NodeIndex);
+                            BuildPath(inLane.EndVertex, outLane.StartVertex, n.NodeIndex - laneNodeIndex);
                     }
             Node firstNodeWithInRoad = nodeGroup.FirstWithRoad(Direction.In);
             Node lastNodeWithInRoad = nodeGroup.LastWithRoad(Direction.In);
@@ -54,7 +54,7 @@ public static class InterRoad
                     if (Game.Graph.InDegree(outLane.StartVertex) == 0)
                     {
                         Node n;
-                        int laneNodeIndex = outLane.EndNode.NodeIndex;
+                        int laneNodeIndex = outLane.StartNode.NodeIndex;
                         if (laneNodeIndex < lastNodeWithInRoad.NodeIndex && laneNodeIndex > firstNodeWithInRoad.NodeIndex)
                             continue;
                         if (laneNodeIndex < (float)nodeGroup.Count / 2)
@@ -62,7 +62,7 @@ public static class InterRoad
                         else
                             n = lastNodeWithInRoad;
                         foreach (Lane inLane in n.GetLanes(Direction.In))
-                            BuildPathLane2Lane(outLane, inLane, n.NodeIndex - outLane.EndNode.NodeIndex);
+                            BuildPath(inLane.EndVertex, outLane.StartVertex, -n.NodeIndex + laneNodeIndex);
                     }
         }
 

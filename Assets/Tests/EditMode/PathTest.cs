@@ -231,4 +231,46 @@ public class PathTest
         Assert.True(Game.HasEdge(road1.Lanes[1], road4.Lanes[0]));
         Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[0]));
     }
+
+    [Test]
+    public void Expand3LanesTo2LanesAnd2Lanes_OnEnd()
+    {
+        Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
+        float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
+        Road road2 = RoadBuilder.Build(2 * stride + offset * 2, 3 * stride + offset * 2, 4 * stride + offset * 2, 2);
+
+        Assert.AreEqual(9, Game.Graph.EdgeCount);
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[1], road2.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[2], road2.Lanes[1]));
+
+        Road road3 = RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
+        Assert.AreEqual(11, Game.Graph.EdgeCount);
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[1]));
+    }
+
+    [Test]
+    public void Expand3LanesTo2LanesAnd2Lanes_OnStart()
+    {
+        Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 3);
+        float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
+        Road road2 = RoadBuilder.Build(2 * stride + offset * 2, 3 * stride + offset * 2, 4 * stride + offset * 2, 2);
+
+        Assert.AreEqual(9, Game.Graph.EdgeCount);
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[1], road2.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[2], road2.Lanes[1]));
+
+        Road road3 = RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
+        Assert.AreEqual(11, Game.Graph.EdgeCount);
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[1]));
+    }
 }

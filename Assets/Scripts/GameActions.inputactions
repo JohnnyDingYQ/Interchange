@@ -85,15 +85,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ReplaceRoad",
-                    "type": "Button",
-                    "id": "bab231d5-6056-49c2-9dd9-de5811a744a2",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -259,17 +250,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "RemoveRoad",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2d180df2-efd6-4885-bd5b-0c5a125a928b",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ReplaceRoad",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
