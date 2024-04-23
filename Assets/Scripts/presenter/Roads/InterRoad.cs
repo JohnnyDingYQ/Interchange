@@ -17,6 +17,8 @@ public static class InterRoad
         BuildRightLaneChangePath();
         BuildLeftLaneChangePath();
 
+        NodeGroup nodeGroup = new(from.First());
+
         if (BranchExists())
             DeleteAllLaneChangingPaths();
         else
@@ -45,7 +47,7 @@ public static class InterRoad
                             }
                         foreach (Lane l1 in nodes.First().GetLanes(InvertDirection(direction)))
                             foreach (Lane l2 in connected.GetLanes(direction))
-                                BuildLanePath(l1, l2, nodes.First().NodeIndex - connected.NodeIndex);
+                                BuildPathLane2Lane(l1, l2, direction == Direction.Out ? nodes.First().NodeIndex - connected.NodeIndex : -nodes.First().NodeIndex - connected.NodeIndex);
                     }
                     nodes.Reverse();
                 }
@@ -56,19 +58,19 @@ public static class InterRoad
         {
             for (int i = 0; i < laneCount; i++)
                 foreach (Lane lane in from[i].GetLanes(InvertDirection(direction)))
-                    BuildLanePath(lane, to[i], 0);
+                    BuildPathLane2Lane(lane, to[i], 0);
         }
         void BuildRightLaneChangePath()
         {
             for (int i = 1; i < laneCount; i++)
                 foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(direction)))
-                    BuildLanePath(lane, to[i], direction == Direction.Out ? 1 : -1);
+                    BuildPathLane2Lane(lane, to[i], 1);
         }
         void BuildLeftLaneChangePath()
         {
             for (int i = 0; i < laneCount - 1; i++)
                 foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(direction)))
-                    BuildLanePath(lane, to[i], direction == Direction.Out ? -1 : 1);
+                    BuildPathLane2Lane(lane, to[i], -1);
         }
         void BuildSidePaths()
         {
@@ -81,11 +83,11 @@ public static class InterRoad
 
                     int span = from.First().NodeIndex - node.NodeIndex;
                     if (span == 1)
-                        BuildLanePath(lane, to.First(), direction == Direction.Out ? span : -span);
+                        BuildPathLane2Lane(lane, to.First(), span);
 
                     span = from.Last().NodeIndex - node.NodeIndex;
                     if (span == -1)
-                        BuildLanePath(lane, to.Last(), direction == Direction.Out ? span : -span);
+                        BuildPathLane2Lane(lane, to.Last(), span);
                 }
         }
 
@@ -96,13 +98,13 @@ public static class InterRoad
             return Direction.In;
         }
 
-        Path BuildLanePath(Lane l1, Lane l2, int span)
+        Path BuildPathLane2Lane(Lane l1, Lane l2, int span)
         {
             Path path;
             if (direction == Direction.Out)
                 path = BuildPath(l1.EndVertex, l2.StartVertex, span);
             else
-                path = BuildPath(l2.EndVertex, l1.StartVertex, span);
+                path = BuildPath(l2.EndVertex, l1.StartVertex, -span);
             return path;
         }
 
