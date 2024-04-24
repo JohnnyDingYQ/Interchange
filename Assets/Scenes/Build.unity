@@ -652,6 +652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snapPoint: {fileID: -5880970430599108443, guid: 84563d96b247c4540ab47c3bc5b08ded, type: 3}
+  roadPrefab: {fileID: 6831116549096913646, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
 --- !u!1 &1857876028
 GameObject:
   m_ObjectHideFlags: 0

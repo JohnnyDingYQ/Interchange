@@ -62,7 +62,10 @@ public class InputSystem : MonoBehaviour
     void OnBuild(InputAction.CallbackContext context)
     {
         if (MouseInGameWorld)
+        {
+            BuildAid.RemoveGhostRoad();
             BuildHandler.HandleBuildCommand(MouseWorldPos);
+        }
     }
     void OnSetLaneWidthTo1(InputAction.CallbackContext context)
     {

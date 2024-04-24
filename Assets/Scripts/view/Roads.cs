@@ -5,7 +5,7 @@ using UnityEngine;
 public class Roads : MonoBehaviour
 {
     [SerializeField] private RoadGameObject roadPrefab;
-    private Dictionary<Road, RoadGameObject> roadMapping;
+    private static Dictionary<Road, RoadGameObject> roadMapping;
     void Start()
     {
         Game.InstantiateRoad += InstantiateRoad;
@@ -30,7 +30,7 @@ public class Roads : MonoBehaviour
         UpdateRoadMesh(road);
     }
 
-    void UpdateRoadMesh(Road road)
+    public static void UpdateRoadMesh(Road road)
     {
         Mesh m = MeshUtil.GetMesh(road);
         roadMapping[road].GetComponent<MeshFilter>().mesh = m;
@@ -42,22 +42,4 @@ public class Roads : MonoBehaviour
         Destroy(roadMapping[road].gameObject);
         roadMapping.Remove(road);
     }
-
-    #region legacy code
-    // public void InstantiateRoad(Road road)
-    // {
-    // return;
-    // RoadGameObject roadGameObject = Instantiate(roadPrefab, roads.transform, true);
-    // roadGameObject.name = $"Road-{road.Id}";
-    // road.RoadGameObject = roadGameObject;
-
-    // Mesh mesh = RoadMesh.CreateMesh(road, road.Lanes.Count);
-    // roadGameObject.GetComponent<MeshFilter>().mesh = mesh;
-    // roadGameObject.OriginalMesh = Instantiate(mesh);
-    // MeshCollider meshCollider = roadGameObject.GetComponent<MeshCollider>();
-    // meshCollider.sharedMesh = mesh;
-
-    // roadGameObject.Road = road;
-    // }
-    #endregion
 }

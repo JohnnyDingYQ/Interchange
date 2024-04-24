@@ -4,11 +4,10 @@ using System.Linq;
 using QuikGraph.Predicates;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public static class BuildHandler
 {
-    private static float3 pivotClick;
+    private static float3 pivotPos;
     private static bool startAssigned, pivotAssigned;
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
@@ -19,6 +18,22 @@ public static class BuildHandler
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
+    }
+
+    public static BuildTargets GetStartTarget()
+    {
+        return startTarget;
+    }
+
+    public static bool ShouldShowGhostRoad()
+    {
+        return startAssigned == true && pivotAssigned == true;
+    }
+
+    public static Road BuildGhostRoad(float3 endTargetClickPos)
+    {
+        Road road = BuildRoad(startTarget, pivotPos, new(endTargetClickPos, LaneCount, Side.End, Game.Nodes.Values));
+        return road;
     }
 
     public static void Reset()
@@ -33,35 +48,42 @@ public static class BuildHandler
         if (!startAssigned)
         {
             startAssigned = true;
-            startTarget = new BuildTargets(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
+            startTarget = new(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
             return null;
         }
         else if (!pivotAssigned)
         {
             pivotAssigned = true;
-            pivotClick = clickPos;
+            pivotPos = clickPos;
             return null;
         }
         else
         {
-            endTarget = new BuildTargets(clickPos, LaneCount, Side.End, Game.Nodes.Values);
+            endTarget = new(clickPos, LaneCount, Side.End, Game.Nodes.Values);
+            Road road = BuildRoad(startTarget, pivotPos, endTarget);
             startAssigned = false;
             pivotAssigned = false;
-            return BuildRoad(startTarget, pivotClick, endTarget);
+            startTarget = null;
+            endTarget = null;
+            return road;
         }
 
     }
 
     static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
     {
+        if (startTarget.SnapNotNull && endTarget.SnapNotNull)
+        {
+            if (HasRepeatedTarget())
+                return null;
+            if (startTarget.SnapNotNull && endTarget.SnapNotNull)
+                RemoveExistingRoad();
+        }
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-
         AlignPivotPos();
-        if (startTarget.SnapNotNull && endTarget.SnapNotNull)
-            RemoveExistingRoad();
 
         Road road = new(startPos, pivotPos, endPos, LaneCount);
         Game.RegisterRoad(road);
@@ -146,6 +168,15 @@ public static class BuildHandler
             startRoads.IntersectWith(endRoads);
             if (startRoads.Count != 0)
                 Game.RemoveRoad(startRoads.First());
+        }
+
+        bool HasRepeatedTarget()
+        {
+            HashSet<Node> nodes = new(startTarget.Nodes);
+            nodes.IntersectWith(endTarget.Nodes);
+            if (nodes.Count != 0)
+                return true;
+            return false;
         }
         #endregion
     }

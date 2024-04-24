@@ -175,6 +175,15 @@ public class BasicBuildTest
         Assert.AreEqual(0, Roads.Count);
     }
 
+    [Test]
+    public void RoadCannotSnapBackToItSelf()
+    {
+        RoadBuilder.Build(pos1, pos2, pos3, 3);
+        RoadBuilder.Build(pos3, pos4, pos3, 3);
+
+        Assert.AreEqual(1, Roads.Count);
+    }
+
     #region Helpers
     public void CheckLanesConnection(Road enteringRoad, Road exitingRoad, int laneCount)
     {
