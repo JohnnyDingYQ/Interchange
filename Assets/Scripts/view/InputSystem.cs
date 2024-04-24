@@ -64,20 +64,20 @@ public class InputSystem : MonoBehaviour
         if (MouseInGameWorld)
         {
             BuildAid.RemoveGhostRoad();
-            BuildHandler.HandleBuildCommand(MouseWorldPos);
+            Build.HandleBuildCommand(MouseWorldPos);
         }
     }
     void OnSetLaneWidthTo1(InputAction.CallbackContext context)
     {
-        BuildHandler.LaneCount = 1;
+        Build.LaneCount = 1;
     }
     void OnSetLaneWidthTo2(InputAction.CallbackContext context)
     {
-        BuildHandler.LaneCount = 2;
+        Build.LaneCount = 2;
     }
     void OnSetLaneWidthTo3(InputAction.CallbackContext context)
     {
-        BuildHandler.LaneCount = 3;
+        Build.LaneCount = 3;
     }
     void SaveGame(InputAction.CallbackContext context)
     {

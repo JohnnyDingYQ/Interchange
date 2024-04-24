@@ -1,4 +1,3 @@
-using UnityEngine.Splines;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Mathematics;
 using System.Linq;
@@ -32,7 +31,6 @@ public class Lane
         Road = road;
         InitNodes();
         Length = BezierSeries.Length;
-        InitVertices();
     }
 
     void InitNodes()
@@ -43,7 +41,7 @@ public class Lane
         EndNode.AddLane(this, Direction.In);
     }
 
-    void InitVertices()
+    public void InitVertices()
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);

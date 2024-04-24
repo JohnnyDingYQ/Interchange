@@ -19,7 +19,7 @@ public class BasicBuildTest
     [SetUp]
     public void SetUp()
     {
-        BuildHandler.Reset();
+        Build.Reset();
         Game.WipeState();
         Nodes = Game.Nodes;
         Roads = Game.Roads;
@@ -28,7 +28,7 @@ public class BasicBuildTest
     [Test]
     public void ResetSuccessful()
     {
-        Assert.AreEqual(1, BuildHandler.LaneCount);
+        Assert.AreEqual(1, Build.LaneCount);
     }
 
     [Test]
@@ -100,8 +100,8 @@ public class BasicBuildTest
     {
         float3 exitingRoadStartPos = pos3 + new float3(Constants.BuildSnapTolerance + Constants.LaneWidth + 1, 0, 0);
         Road enteringRoad = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road exitingRoad =  RoadBuilder.Build(exitingRoadStartPos, pos4, pos5, 1);
-        
+        Road exitingRoad = RoadBuilder.Build(exitingRoadStartPos, pos4, pos5, 1);
+
         Assert.AreEqual(1, enteringRoad.Lanes[0].EndNode.Lanes.Count);
         Assert.AreEqual(1, exitingRoad.Lanes[0].StartNode.Lanes.Count);
     }
@@ -182,6 +182,14 @@ public class BasicBuildTest
         RoadBuilder.Build(pos3, pos4, pos3, 3);
 
         Assert.AreEqual(1, Roads.Count);
+    }
+
+    [Test]
+    public void RoadTooBentShoudNotBuild()
+    {
+        RoadBuilder.Build(pos1, pos2, pos1, 3);
+
+        Assert.AreEqual(0, Roads.Count);
     }
 
     #region Helpers

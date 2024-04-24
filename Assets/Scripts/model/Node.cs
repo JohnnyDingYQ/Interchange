@@ -4,7 +4,6 @@ using System.Linq;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Splines;
 
 
 public class Node : IComparable<Node>

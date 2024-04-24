@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuikGraph.Predicates;
 using Unity.Mathematics;
 using UnityEngine;
 
-public static class BuildHandler
+public static class Build
 {
     private static float3 pivotPos;
     private static bool startAssigned, pivotAssigned;
@@ -13,7 +12,7 @@ public static class BuildHandler
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
 
-    static BuildHandler()
+    static Build()
     {
         LaneCount = 1;
         startAssigned = false;
@@ -32,7 +31,8 @@ public static class BuildHandler
 
     public static Road BuildGhostRoad(float3 endTargetClickPos)
     {
-        Road road = BuildRoad(startTarget, pivotPos, new(endTargetClickPos, LaneCount, Side.End, Game.Nodes.Values));
+        BuildTargets tempEnd = new(endTargetClickPos, LaneCount, Side.End, Game.Nodes.Values);
+        Road road = BuildRoad(startTarget, pivotPos, tempEnd, BuildMode.Ghost);
         return road;
     }
 
@@ -60,7 +60,7 @@ public static class BuildHandler
         else
         {
             endTarget = new(clickPos, LaneCount, Side.End, Game.Nodes.Values);
-            Road road = BuildRoad(startTarget, pivotPos, endTarget);
+            Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             startAssigned = false;
             pivotAssigned = false;
             startTarget = null;
@@ -70,7 +70,7 @@ public static class BuildHandler
 
     }
 
-    static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
+    static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
         if (startTarget.SnapNotNull && endTarget.SnapNotNull)
         {
@@ -85,15 +85,18 @@ public static class BuildHandler
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
         AlignPivotPos();
 
+        if (RoadIsTooBent())
+            return null;
+
+
         Road road = new(startPos, pivotPos, endPos, LaneCount);
-        Game.RegisterRoad(road);
 
         if (road.HasLaneShorterThanMinimumLaneLength())
         {
-            Debug.Log("Lane length is less than " + Constants.MinimumLaneLength);
             Game.RemoveRoad(road);
             return null;
         }
+        Game.RegisterRoad(road);
 
         if (startTarget.SnapNotNull)
             ConnectRoadStartToNodes(startNodes, road);
@@ -101,7 +104,8 @@ public static class BuildHandler
             ConnectRoadEndToNodes(endNodes, road);
 
         RegisterUnregisteredNodes(road);
-        AutoDivideRoad(road);
+        if (buildMode == BuildMode.Actual)
+            AutoDivideRoad(road);
         return road;
 
         # region extracted funcitons
@@ -175,6 +179,16 @@ public static class BuildHandler
             HashSet<Node> nodes = new(startTarget.Nodes);
             nodes.IntersectWith(endTarget.Nodes);
             if (nodes.Count != 0)
+                return true;
+            return false;
+        }
+
+        bool RoadIsTooBent()
+        {
+            float3 v1 = pivotPos - startPos;
+            float3 v2 = endPos - pivotPos;
+            float angle = MathF.Abs(MathF.Acos(math.dot(v1, v2) / math.length(v1) / math.length(v2)));
+            if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
                 return true;
             return false;
         }

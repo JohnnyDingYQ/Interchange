@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -50,9 +49,12 @@ public class Road
     {
         Length = BezierSeries.Length;
         InitLanes();
+        if (HasLaneShorterThanMinimumLaneLength())
+            return;
         LeftOutline = new();
         RightOutline = new();
-
+        foreach (Lane l in Lanes)
+            l.InitVertices();
         LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(Orientation.Left);
         RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(Orientation.Right);
     }

@@ -13,7 +13,7 @@ public class BranchingTest
     [SetUp]
     public void SetUp()
     {
-        BuildHandler.Reset();
+        Build.Reset();
         Game.WipeState();
         Roads = Game.Roads;
     }

@@ -34,10 +34,10 @@ public class BuildAid : MonoBehaviour
     void UpdateGhostRoad()
     {
         RemoveGhostRoad();
-        if (BuildHandler.ShouldShowGhostRoad())
+        if (Build.ShouldShowGhostRoad())
         {
             ghostroad.gameObject.SetActive(true);
-            Road road = BuildHandler.BuildGhostRoad(InputSystem.MouseWorldPos);
+            Road road = Build.BuildGhostRoad(InputSystem.MouseWorldPos);
             ghostroad.Road = road;
             if (road != null)
                 Roads.UpdateRoadMesh(road);
@@ -59,7 +59,7 @@ public class BuildAid : MonoBehaviour
         foreach (SnapPoint snapPoint in activeSnapPoints)
             snapPointPool.Release(snapPoint);
         activeSnapPoints.Clear();
-        BuildTargets polled = BuildHandler.PollBuildTarget(InputSystem.MouseWorldPos);
+        BuildTargets polled = Build.PollBuildTarget(InputSystem.MouseWorldPos);
         if (polled.SnapNotNull)
             foreach (Node node in polled.Nodes)
             {
@@ -67,7 +67,7 @@ public class BuildAid : MonoBehaviour
                 snapPoint.transform.position = node.Pos;
                 activeSnapPoints.Add(snapPoint);
             }
-        BuildTargets startTarget = BuildHandler.GetStartTarget();
+        BuildTargets startTarget = Build.GetStartTarget();
         if (startTarget != null && startTarget.SnapNotNull)
             foreach (Node node in startTarget.Nodes)
             {

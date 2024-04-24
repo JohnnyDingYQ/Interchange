@@ -48,7 +48,7 @@ public static class DivideHandler
         OperateVertices();
         OperateOutline();
         Game.RemoveRoad(road, true);
-        BuildHandler.ConnectRoadStartToNodes(leftNodes, rightRoad);
+        Build.ConnectRoadStartToNodes(leftNodes, rightRoad);
 
         return new SubRoads(leftRoad, rightRoad);
 

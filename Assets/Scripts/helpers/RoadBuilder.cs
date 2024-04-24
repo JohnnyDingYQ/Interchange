@@ -5,9 +5,9 @@ public static class RoadBuilder
 {
     public static Road Build(float3 start, float3 pivot, float3 end, int laneCount)
     {
-        BuildHandler.LaneCount = laneCount;
-        BuildHandler.HandleBuildCommand(start);
-        BuildHandler.HandleBuildCommand(pivot);
-        return BuildHandler.HandleBuildCommand(end);
+        global::Build.LaneCount = laneCount;
+        global::Build.HandleBuildCommand(start);
+        global::Build.HandleBuildCommand(pivot);
+        return global::Build.HandleBuildCommand(end);
     }
 }

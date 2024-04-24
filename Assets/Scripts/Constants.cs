@@ -9,4 +9,5 @@ public static class Constants
     public const float LaneSplineResolution = 1f;
     public const float RoadOutlineSeparation = LaneWidth / 2;
     public const float NumericallyEqualMaxTolerance = 0.01f;
+    public const float MaxRoadBendAngle = 130;
 }
