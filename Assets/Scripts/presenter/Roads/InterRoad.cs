@@ -14,6 +14,7 @@ public static class InterRoad
     {
         int laneCount = to.Count;
         ReadOnlySet<Road> roadsOnOtherside = GetRelevantRoads();
+        NodeGroup nodeGroup = new(from.First());
 
         BuildStraightPath();
         BuildRightLaneChangePath();
@@ -24,12 +25,13 @@ public static class InterRoad
         else
             BuildSidePaths();
 
-        PatchUnconnectedLanes();
+        if (nodeGroup.InRoads.Count != 0 && nodeGroup.OutRoads.Count != 0)
+            PatchUnconnectedLanes();
 
         #region extracted 
         void PatchUnconnectedLanes()
         {
-            NodeGroup nodeGroup = new(from.First());
+            
             Node firstNodeWithOutRoad = nodeGroup.FirstWithRoad(Direction.Out);
             Node lastNodeWithOutRoad = nodeGroup.LastWithRoad(Direction.Out);
             foreach (Road inRoad in nodeGroup.InRoads)
@@ -180,8 +182,8 @@ public static class InterRoad
             r.LeftOutline.End.Clear();
             r.RightOutline.End.Clear();
         }
-
-        EvaluateSideOutline();
+        if (inRoads.Count != 0 && outRoads.Count != 0)
+            EvaluateSideOutline();
 
         foreach (Road r in outRoads)
         {

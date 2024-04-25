@@ -192,6 +192,20 @@ public class BasicBuildTest
         Assert.AreEqual(0, Roads.Count);
     }
 
+    [Test]
+    public void TwoRoadWithSameEnd()
+    {
+        RoadBuilder.Build(pos1, pos2, pos3, 3);
+        RoadBuilder.Build(
+            new float3(1, 0, 0) * Constants.MinimumLaneLength,
+            new float3(1, 0, 0.5f) * Constants.MinimumLaneLength,
+            pos3,
+            3
+        );
+
+        Assert.AreEqual(2, Roads.Count);
+    }
+
     #region Helpers
     public void CheckLanesConnection(Road enteringRoad, Road exitingRoad, int laneCount)
     {

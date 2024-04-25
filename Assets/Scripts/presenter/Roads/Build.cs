@@ -31,7 +31,7 @@ public static class Build
 
     public static Road BuildGhostRoad(float3 endTargetClickPos)
     {
-        BuildTargets tempEnd = new(endTargetClickPos, LaneCount, Side.End, Game.Nodes.Values);
+        BuildTargets tempEnd = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
         Road road = BuildRoad(startTarget, pivotPos, tempEnd, BuildMode.Ghost);
         return road;
     }
@@ -48,7 +48,7 @@ public static class Build
         if (!startAssigned)
         {
             startAssigned = true;
-            startTarget = new(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
+            startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             return null;
         }
         else if (!pivotAssigned)
@@ -59,7 +59,7 @@ public static class Build
         }
         else
         {
-            endTarget = new(clickPos, LaneCount, Side.End, Game.Nodes.Values);
+            endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             startAssigned = false;
             pivotAssigned = false;
@@ -72,13 +72,8 @@ public static class Build
 
     static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
-        if (startTarget.SnapNotNull && endTarget.SnapNotNull)
-        {
-            if (HasRepeatedTarget())
-                return null;
-            if (startTarget.SnapNotNull && endTarget.SnapNotNull)
-                RemoveExistingRoad();
-        }
+        if (startTarget.SnapNotNull && endTarget.SnapNotNull && HasRepeatedTarget())
+            return null;
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
@@ -105,7 +100,11 @@ public static class Build
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
+        {
             AutoDivideRoad(road);
+            if (startTarget.SnapNotNull && endTarget.SnapNotNull)
+                RemoveExistingRoad();
+        }
         return road;
 
         # region extracted funcitons
@@ -258,7 +257,7 @@ public static class Build
     public static BuildTargets PollBuildTarget(float3 clickPos)
     {
         if (!startAssigned)
-            return new(clickPos, LaneCount, Side.Start, Game.Nodes.Values);
-        return new(clickPos, LaneCount, Side.End, Game.Nodes.Values);
+            return new(clickPos, LaneCount, Game.Nodes.Values);
+        return new(clickPos, LaneCount, Game.Nodes.Values);
     }
 }

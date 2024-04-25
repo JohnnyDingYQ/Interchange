@@ -81,7 +81,7 @@ public class OutlineTest
     [Test]
     public void OneTwoThreeLanesRoadInAtunction_OnStart()
     {
-        Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 2);
+        Road road1 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());

@@ -10,18 +10,15 @@ public class BuildTargets
     public float3 ClickPos { get; set; }
     public bool SnapNotNull { get; set; }
     public float3 MedianPoint { get; set; }
-    public Side Side { get; set; }
 
     /// <summary>
     /// Determine nodes selected by a buildcommand and its properties
     /// </summary>
     /// <param name="clickPos">The click position</param>
     /// <param name="laneCount">How many lanes the road will have</param>
-    /// <param name="side">Which side of the raod does the clickPos define</param>
     /// <param name="gameNodes">Nodes eligible for consideration</param>
-    public BuildTargets(float3 clickPos, int laneCount, Side side, IEnumerable<Node> gameNodes)
+    public BuildTargets(float3 clickPos, int laneCount, IEnumerable<Node> gameNodes)
     {
-        Side = side;
         Nodes = GetBuildNodes(clickPos, laneCount, gameNodes);
         if (Nodes == null)
         {
@@ -60,8 +57,7 @@ public class BuildTargets
         }
         else if (nodes.Count > 0)
         {
-            Road road = nodes.First().Lanes.First().Road;
-            GetInterpolatedCandidates(road, 2, Side);
+            GetInterpolatedCandidates(2);
             if (floatContainers.Count + nodes.Count < laneCount)
             {
                 return null;
@@ -80,15 +76,16 @@ public class BuildTargets
         }
 
         # region extracted functions
-        void GetInterpolatedCandidates(Road road, int interpolationReach, Side side)
+        void GetInterpolatedCandidates(int interpolationReach)
         {
+            float3 normal = new NodeGroup(nodes.First()).Normal * Constants.LaneWidth;
             floatContainers = new();
-            for (int i = 0; i < interpolationReach; i++)
+            for (int i = 1; i <= interpolationReach; i++)
             {
-                float3 left = road.ExtrapolateNodePos(side == Side.Start ? Side.End : Side.Start, -(1 + i));
-                float3 right = road.ExtrapolateNodePos(side == Side.Start ? Side.End : Side.Start, road.LaneCount + i);
-                AddNodeIfWithinSnap(new(left, -(1 + i)));
-                AddNodeIfWithinSnap(new(right, road.LaneCount + i));
+                float3 left = nodes.First().Pos + i * normal;
+                float3 right = nodes.Last().Pos - i * normal;
+                AddNodeIfWithinSnap(new(left, nodes.First().NodeIndex - i));
+                AddNodeIfWithinSnap(new(right, nodes.Last().NodeIndex + i));
             }
             floatContainers.Sort();
         }
