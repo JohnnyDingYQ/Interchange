@@ -13,7 +13,6 @@ public class RoadsSplineVisualCheck
     public void OneTimeSetUp()
     {
         SceneManager.LoadScene("Build");
-        Build.Reset();
     }
 
     [UnityTest, Order(1)]

@@ -25,10 +25,19 @@ public class ReplaceTest
     }
 
     [Test]
-    public void ShiftingByReplacing()
+    public void ShiftingRightByReplacing()
     {
         Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
         RoadBuilder.Build(road1.Lanes[2].StartPos, stride, road1.Lanes[2].EndPos, 3);
+        Assert.AreEqual(1, Game.Roads.Count);
+        Assert.AreEqual(6, Game.Nodes.Count);
+    }
+
+    [Test]
+    public void ShiftingLeftByReplacing()
+    {
+        Road road1 = RoadBuilder.Build(0, stride, 2 * stride, 3);
+        RoadBuilder.Build(road1.Lanes[0].StartPos, stride, road1.Lanes[0].EndPos, 3);
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(6, Game.Nodes.Count);
     }

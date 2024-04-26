@@ -9,14 +9,14 @@ public class NodeGroup : IEnumerable<Node>
     private readonly List<Node> nodes;
     public List<Node> Nodes { get { return new List<Node>(nodes); } }
     public int Count { get { return Nodes.Count; } }
-    private readonly HashSet<Road> inRoads;
+    private HashSet<Road> inRoads;
     public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }
-    private readonly HashSet<Road> outRoads;
+    private HashSet<Road> outRoads;
     public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
     public HashSet<Road> Roads { get { return GetRoads(); } }
     public Plane Plane { get; private set; }
     public float3 Normal { get; private set; }
-    public float3 PointOnInside { get; private set; }
+    public float3 PointOnInSide { get; private set; }
 
     public NodeGroup(Node node)
     {
@@ -31,12 +31,7 @@ public class NodeGroup : IEnumerable<Node>
         l.Sort();
         nodes = l;
 
-        outRoads = new();
-        inRoads = new();
-        foreach (Node n in nodes)
-            outRoads.UnionWith(n.GetRoads(Direction.Out));
-        foreach (Node n in nodes)
-            inRoads.UnionWith(n.GetRoads(Direction.In));
+        SetInAndOutRoads();
 
         if (inRoads.Count != 0)
         {
@@ -45,18 +40,27 @@ public class NodeGroup : IEnumerable<Node>
             BezierSeries bs = randomInRoad.BezierSeries;
             Normal = math.normalize(bs.Evaluate2DNormalizedNormal(bs.EndLocation));
             Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + Normal, randomInRoad.EndPos - new float3(0, 1, 0));
-            PointOnInside = bs.EvaluatePosition(bs.EndLocation) - math.normalize(bs.EvaluateTangent(bs.EndLocation));
+            PointOnInSide = bs.EvaluatePosition(bs.EndLocation) - math.normalize(bs.EvaluateTangent(bs.EndLocation));
         }
-        else
+        else if (outRoads.Count != 0)
         {
             Road randomOutRoad = OutRoads.First();
             BezierSeries bs = randomOutRoad.BezierSeries;
             Normal = math.normalize(bs.Evaluate2DNormalizedNormal(bs.StartLocation));
             Plane = new(randomOutRoad.StartPos, randomOutRoad.StartPos + Normal, randomOutRoad.EndPos - new float3(0, 1, 0));
-            PointOnInside = bs.EvaluatePosition(bs.StartLocation) - math.normalize(bs.EvaluateTangent(bs.StartLocation));
+            PointOnInSide = bs.EvaluatePosition(bs.StartLocation) - math.normalize(bs.EvaluateTangent(bs.StartLocation));
         }
     }
 
+    void SetInAndOutRoads()
+    {
+        outRoads = new();
+        inRoads = new();
+        foreach (Node n in nodes)
+            outRoads.UnionWith(n.GetRoads(Direction.Out));
+        foreach (Node n in nodes)
+            inRoads.UnionWith(n.GetRoads(Direction.In));
+    }
     public HashSet<Road> GetRoads()
     {
         HashSet<Road> h = new(inRoads);

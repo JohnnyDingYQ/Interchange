@@ -107,6 +107,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AbandonBuild"",
+                    ""type"": ""Button"",
+                    ""id"": ""f313cc28-09f8-48e3-bbd6-feb27caf5592"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -274,6 +283,17 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""RemoveRoad"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cf87bb18-b175-4013-afdc-7869fa33628f"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AbandonBuild"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -291,6 +311,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_LoadGame = m_InGame.FindAction("LoadGame", throwIfNotFound: true);
         m_InGame_DivideRoad = m_InGame.FindAction("DivideRoad", throwIfNotFound: true);
         m_InGame_RemoveRoad = m_InGame.FindAction("RemoveRoad", throwIfNotFound: true);
+        m_InGame_AbandonBuild = m_InGame.FindAction("AbandonBuild", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -361,6 +382,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_LoadGame;
     private readonly InputAction m_InGame_DivideRoad;
     private readonly InputAction m_InGame_RemoveRoad;
+    private readonly InputAction m_InGame_AbandonBuild;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -374,6 +396,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @LoadGame => m_Wrapper.m_InGame_LoadGame;
         public InputAction @DivideRoad => m_Wrapper.m_InGame_DivideRoad;
         public InputAction @RemoveRoad => m_Wrapper.m_InGame_RemoveRoad;
+        public InputAction @AbandonBuild => m_Wrapper.m_InGame_AbandonBuild;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -410,6 +433,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @RemoveRoad.started += instance.OnRemoveRoad;
             @RemoveRoad.performed += instance.OnRemoveRoad;
             @RemoveRoad.canceled += instance.OnRemoveRoad;
+            @AbandonBuild.started += instance.OnAbandonBuild;
+            @AbandonBuild.performed += instance.OnAbandonBuild;
+            @AbandonBuild.canceled += instance.OnAbandonBuild;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -441,6 +467,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @RemoveRoad.started -= instance.OnRemoveRoad;
             @RemoveRoad.performed -= instance.OnRemoveRoad;
             @RemoveRoad.canceled -= instance.OnRemoveRoad;
+            @AbandonBuild.started -= instance.OnAbandonBuild;
+            @AbandonBuild.performed -= instance.OnAbandonBuild;
+            @AbandonBuild.canceled -= instance.OnAbandonBuild;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -469,5 +498,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnLoadGame(InputAction.CallbackContext context);
         void OnDivideRoad(InputAction.CallbackContext context);
         void OnRemoveRoad(InputAction.CallbackContext context);
+        void OnAbandonBuild(InputAction.CallbackContext context);
     }
 }

@@ -19,7 +19,6 @@ public class BasicBuildTest
     [SetUp]
     public void SetUp()
     {
-        Build.Reset();
         Game.WipeState();
         Nodes = Game.Nodes;
         Roads = Game.Roads;

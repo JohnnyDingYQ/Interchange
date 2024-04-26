@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using QuikGraph;
 using Unity.Mathematics;
+using System.Linq;
 
 public static class Game
 {
@@ -55,10 +56,17 @@ public static class Game
         Nodes[node.Id] = node;
     }
 
+    public static bool HasNode(Node node)
+    {
+        return Nodes.Values.Contains(node);
+    }
+
     public static bool RemoveRoad(Road road, bool retainVertices)
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
+        HashSet<Road> connectedInRoads = road.GetConnectedRoads(Side.Start);
+        HashSet<Road> connectedOutRoads = road.GetConnectedRoads(Side.End);
         Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
@@ -76,6 +84,12 @@ public static class Game
             }
         }
         DestroyRoad?.Invoke(road);
+        // if (connectedInRoads.Count != 0)
+        // {
+        //     InterRoad.UpdateOutline(connectedInRoads.First(), Side.End);
+        // }
+        // if (connectedOutRoads.Count != 0)
+        //     InterRoad.UpdateOutline(connectedOutRoads.First(), Side.Start);
         return true;
     }
 

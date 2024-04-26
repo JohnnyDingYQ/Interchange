@@ -169,6 +169,8 @@ public static class InterRoad
 
     public static void UpdateOutline(NodeGroup nodeGroup)
     {
+        if (nodeGroup.Count == 0)
+            return;
         ReadOnlySet<Road> outRoads = nodeGroup.OutRoads;
         ReadOnlySet<Road> inRoads = nodeGroup.InRoads;
 
@@ -199,6 +201,9 @@ public static class InterRoad
             if (r.RightOutline.End.Count == 0)
                 r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
+
+        foreach (Road r in nodeGroup.GetRoads())
+            Game.InvokeUpdateRoadMesh(r);
 
         #region extracted
         void EvaluateSideOutline()
@@ -238,7 +243,7 @@ public static class InterRoad
             foreach (float3 pt in interRoadOutline)
             {
                 if (!crossed)
-                    if (nodeGroup.Plane.SameSide(pt, nodeGroup.PointOnInside))
+                    if (nodeGroup.Plane.SameSide(pt, nodeGroup.PointOnInSide))
                         outlineEnd.Add(pt);
                     else
                     {
@@ -281,5 +286,13 @@ public static class InterRoad
             results.Add(bs.EvaluatePosition(t) + normal * normalMultiplier);
         }
         return results;
+    }
+
+    public static void UpdateOutline(Road road, Side side)
+    {
+        if (side != Side.Start)
+            UpdateOutline(new(road.Lanes[0].EndNode));
+        if (side != Side.End)
+            UpdateOutline(new(road.Lanes[0].StartNode));
     }
 }

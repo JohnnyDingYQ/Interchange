@@ -36,13 +36,6 @@ public static class Build
         return road;
     }
 
-    public static void Reset()
-    {
-        LaneCount = 1;
-        startAssigned = false;
-        pivotAssigned = false;
-    }
-
     public static Road HandleBuildCommand(float3 clickPos)
     {
         if (!startAssigned)
@@ -61,10 +54,7 @@ public static class Build
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
-            startAssigned = false;
-            pivotAssigned = false;
-            startTarget = null;
-            endTarget = null;
+            ResetBuild();
             return road;
         }
 
@@ -95,8 +85,12 @@ public static class Build
 
         if (startTarget.SnapNotNull)
             ConnectRoadStartToNodes(startNodes, road);
+        else
+            InterRoad.UpdateOutline(road, Side.Start);
         if (endTarget.SnapNotNull)
             ConnectRoadEndToNodes(endNodes, road);
+        else
+            InterRoad.UpdateOutline(road, Side.End);
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
@@ -155,7 +149,7 @@ public static class Build
         Node GetArbitraryRegisteredNode(List<Node> nodes)
         {
             foreach (Node node in nodes)
-                if (node.IsRegistered())
+                if (Game.HasNode(node))
                     return node;
             return null;
         }
@@ -169,8 +163,9 @@ public static class Build
             foreach (Node node in endTarget.Nodes)
                 endRoads.UnionWith(node.GetRoads(Direction.In));
             startRoads.IntersectWith(endRoads);
-            if (startRoads.Count != 0)
-                Game.RemoveRoad(startRoads.First());
+            foreach (Road r in startRoads)
+                if (r != road)
+                    Game.RemoveRoad(r);
         }
 
         bool HasRepeatedTarget()
@@ -203,7 +198,8 @@ public static class Build
         }
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.Out);
         NodeGroup nodeGroup = new(nodes.First());
-        InterRoad.UpdateOutline(nodeGroup);
+        InterRoad.UpdateOutline(road, Side.Start);
+
         if (nodeGroup.InRoads.Count == 1)
         {
             road.LeftOutline.AddStartFixedPoint(nodeGroup.InRoads.First().LeftOutline.End.Last());
@@ -214,8 +210,6 @@ public static class Build
             road.LeftOutline.AddStartFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
             road.RightOutline.AddStartFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
         }
-        foreach (Road r in nodeGroup.GetRoads())
-            Game.InvokeUpdateRoadMesh(r);
     }
 
     public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
@@ -227,7 +221,7 @@ public static class Build
         }
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.In);
         NodeGroup nodeGroup = new(nodes.First());
-        InterRoad.UpdateOutline(nodeGroup);
+        InterRoad.UpdateOutline(road, Side.End);
         if (nodeGroup.OutRoads.Count == 1)
         {
             road.LeftOutline.AddEndFixedPoint(nodeGroup.OutRoads.First().LeftOutline.Start.First());
@@ -238,18 +232,16 @@ public static class Build
             road.LeftOutline.AddEndFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
             road.RightOutline.AddEndFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
         }
-        foreach (Road r in nodeGroup.GetRoads())
-            Game.InvokeUpdateRoadMesh(r);
     }
 
     static void RegisterUnregisteredNodes(Road road)
     {
         foreach (Lane lane in road.Lanes)
         {
-            if (!lane.StartNode.IsRegistered())
+            if (!Game.HasNode(lane.StartNode))
                 Game.RegisterNode(lane.StartNode);
 
-            if (!lane.EndNode.IsRegistered())
+            if (!Game.HasNode(lane.EndNode))
                 Game.RegisterNode(lane.EndNode);
         }
     }
@@ -259,5 +251,13 @@ public static class Build
         if (!startAssigned)
             return new(clickPos, LaneCount, Game.Nodes.Values);
         return new(clickPos, LaneCount, Game.Nodes.Values);
+    }
+
+    public static void ResetBuild()
+    {
+        startAssigned = false;
+        pivotAssigned = false;
+        startTarget = null;
+        endTarget = null;
     }
 }

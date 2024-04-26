@@ -104,11 +104,6 @@ public class Node : IComparable<Node>
         return NodeIndex.CompareTo(other.NodeIndex);
     }
 
-    public bool IsRegistered()
-    {
-        return Id != -1;
-    }
-
     public override string ToString()
     {
         return "Node " + Id;

@@ -28,6 +28,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.LoadGame.performed += LoadGame;
         gameActions.InGame.DivideRoad.performed += DivideRoad;
         gameActions.InGame.RemoveRoad.performed += RemoveRoad;
+        gameActions.InGame.AbandonBuild.performed += AbandonBuild;
     
         gameActions.InGame.Enable();
     }
@@ -42,6 +43,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.LoadGame.performed -= LoadGame;
         gameActions.InGame.DivideRoad.performed -= DivideRoad;
         gameActions.InGame.RemoveRoad.performed -= RemoveRoad;
+        gameActions.InGame.AbandonBuild.performed -= AbandonBuild;
 
         gameActions.InGame.Disable();
     }
@@ -94,5 +96,9 @@ public class InputSystem : MonoBehaviour
     void RemoveRoad(InputAction.CallbackContext context)
     {
         Game.RemoveSelectedRoad();
+    }
+    void AbandonBuild(InputAction.CallbackContext context)
+    {
+        Build.ResetBuild();
     }
 }

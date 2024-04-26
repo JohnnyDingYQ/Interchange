@@ -69,7 +69,9 @@ public class Road
 
     public bool HasNoneEmptyOutline()
     {
-        return LeftOutline.Mid.Count != 0 && RightOutline.Mid.Count != 0;
+        return LeftOutline.Mid.Count != 0 && RightOutline.Mid.Count != 0
+            && LeftOutline.Start.Count != 0 && RightOutline.Start.Count != 0
+            && LeftOutline.End.Count != 0 && RightOutline.End.Count != 0;
     }
 
     public bool OutLinePlausible()
@@ -99,5 +101,28 @@ public class Road
         Lanes = new();
         for (int i = 0; i < LaneCount; i++)
             Lanes.Add(new(this, i));
+    }
+
+    public HashSet<Road> GetConnectedRoads(Side side)
+    {
+        HashSet<Road> r = new();
+        foreach (Lane lane in Lanes)
+        {
+            if (side == Side.Both)
+            {
+                r.UnionWith(lane.StartNode.GetRoads(Direction.In));
+                r.UnionWith(lane.EndNode.GetRoads(Direction.Out));
+            }
+            if (side == Side.Start)
+                r.UnionWith(lane.StartNode.GetRoads(Direction.In));
+            if (side == Side.End)
+                r.UnionWith(lane.EndNode.GetRoads(Direction.Out));
+        }
+        return r;
+    }
+
+    public override string ToString()
+    {
+        return " Road " + Id;
     }
 }
