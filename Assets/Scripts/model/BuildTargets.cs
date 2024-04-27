@@ -78,7 +78,7 @@ public class BuildTargets
         # region extracted functions
         void GetInterpolatedCandidates(int interpolationReach)
         {
-            float3 normal = new NodeGroup(nodes.First()).Normal * Constants.LaneWidth;
+            float3 normal = nodes.First().Intersection.Normal * Constants.LaneWidth;
             floatContainers = new();
             for (int i = 1; i <= interpolationReach; i++)
             {

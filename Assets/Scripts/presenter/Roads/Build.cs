@@ -198,19 +198,27 @@ public static class Build
             nodes[i].AddLane(road.Lanes[i], Direction.Out);
             road.Lanes[i].StartNode = nodes[i];
         }
+        Intersection intersection = null;
+        foreach (Node n in nodes)
+            if (n.Intersection != null)
+            {
+                intersection = n.Intersection;
+                break;
+            }
+        road.StartIntersection = intersection;
+        intersection.AddRoad(road, Side.Start);
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.Out);
-        NodeGroup nodeGroup = new(nodes.First());
         InterRoad.UpdateOutline(road, Side.Start);
 
-        if (nodeGroup.InRoads.Count == 1)
+        if (intersection.InRoads.Count == 1)
         {
-            road.LeftOutline.AddStartFixedPoint(nodeGroup.InRoads.First().LeftOutline.End.Last());
-            road.RightOutline.AddStartFixedPoint(nodeGroup.InRoads.First().RightOutline.End.Last());
+            road.LeftOutline.AddStartFixedPoint(intersection.InRoads.First().LeftOutline.End.Last());
+            road.RightOutline.AddStartFixedPoint(intersection.InRoads.First().RightOutline.End.Last());
         }
         else
         {
-            road.LeftOutline.AddStartFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
-            road.RightOutline.AddStartFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
+            road.LeftOutline.AddStartFixedPoint(nodes.First().Pos + intersection.Normal * Constants.LaneWidth / 2);
+            road.RightOutline.AddStartFixedPoint(nodes.Last().Pos - intersection.Normal * Constants.LaneWidth / 2);
         }
     }
 
@@ -221,18 +229,26 @@ public static class Build
             nodes[i].AddLane(road.Lanes[i], Direction.In);
             road.Lanes[i].EndNode = nodes[i];
         }
+        Intersection intersection = null;
+        foreach (Node n in nodes)
+            if (n.Intersection != null)
+            {
+                intersection = n.Intersection;
+                break;
+            }
+        road.EndIntersection = intersection;
+        intersection.AddRoad(road, Side.End);
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.In);
-        NodeGroup nodeGroup = new(nodes.First());
         InterRoad.UpdateOutline(road, Side.End);
-        if (nodeGroup.OutRoads.Count == 1)
+        if (intersection.OutRoads.Count == 1)
         {
-            road.LeftOutline.AddEndFixedPoint(nodeGroup.OutRoads.First().LeftOutline.Start.First());
-            road.RightOutline.AddEndFixedPoint(nodeGroup.OutRoads.First().RightOutline.Start.First());
+            road.LeftOutline.AddEndFixedPoint(intersection.OutRoads.First().LeftOutline.Start.First());
+            road.RightOutline.AddEndFixedPoint(intersection.OutRoads.First().RightOutline.Start.First());
         }
         else
         {
-            road.LeftOutline.AddEndFixedPoint(nodes.First().Pos + nodeGroup.Normal * Constants.LaneWidth / 2);
-            road.RightOutline.AddEndFixedPoint(nodes.Last().Pos - nodeGroup.Normal * Constants.LaneWidth / 2);
+            road.LeftOutline.AddEndFixedPoint(nodes.First().Pos + intersection.Normal * Constants.LaneWidth / 2);
+            road.RightOutline.AddEndFixedPoint(nodes.Last().Pos - intersection.Normal * Constants.LaneWidth / 2);
         }
     }
 

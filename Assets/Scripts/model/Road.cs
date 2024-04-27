@@ -19,12 +19,21 @@ public class Road
     public float3 EndPos { get; private set; }
     [JsonProperty]
     public float Length { get; private set; }
+    public Intersection StartIntersection { get; set; }
+    public Intersection EndIntersection { get; set; }
+    [JsonIgnore]
     public RoadOutline LeftOutline { get; set; }
+    [JsonIgnore]
     public RoadOutline RightOutline { get; set; }
     public bool IsGhost { get; set; }
 
     // Empty constructor for JSON.Net deserialization
-    public Road() { }
+    [JsonConstructor]
+    public Road()
+    {
+        LeftOutline = new();
+        RightOutline = new();
+    }
 
     public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount)
     {
@@ -51,6 +60,10 @@ public class Road
         IsGhost = false;
         Length = BezierSeries.Length;
         InitLanes();
+        StartIntersection = new();
+        StartIntersection.AddRoad(this, Side.Start);
+        EndIntersection = new();
+        EndIntersection.AddRoad(this, Side.End);
         if (HasLaneShorterThanMinimumLaneLength())
             return;
         LeftOutline = new();

@@ -3,39 +3,86 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.Mathematics;
+using Unity.Plastic.Newtonsoft.Json;
+using System;
 
-public class NodeGroup : IEnumerable<Node>
+public class Intersection
 {
+    [JsonProperty]
     private readonly List<Node> nodes;
+    [JsonIgnore]
     public List<Node> Nodes { get { return new List<Node>(nodes); } }
+    [JsonIgnore]
     public int Count { get { return Nodes.Count; } }
-    private HashSet<Road> inRoads;
+    [JsonProperty]
+    private readonly HashSet<Road> inRoads;
+    [JsonIgnore]
     public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }
-    private HashSet<Road> outRoads;
+    [JsonProperty]
+    private readonly HashSet<Road> outRoads;
+    [JsonIgnore]
     public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
+    [JsonIgnore]
     public HashSet<Road> Roads { get { return GetRoads(); } }
+    [JsonIgnore]
     public Plane Plane { get; private set; }
+    [JsonIgnore]
     public float3 Normal { get; private set; }
+    [JsonIgnore]
     public float3 PointOnInSide { get; private set; }
 
-    public NodeGroup(Node node)
+    public Intersection()
     {
-        HashSet<Node> h = new();
-        foreach (Road road in node.GetRoads(Direction.In))
-            foreach (Lane lane in road.Lanes)
-                h.Add(lane.EndNode);
-        foreach (Road road in node.GetRoads(Direction.Out))
-            foreach (Lane lane in road.Lanes)
-                h.Add(lane.StartNode);
-        List<Node> l = new(h);
-        l.Sort();
-        nodes = l;
+        nodes = new();
+        inRoads = new();
+        outRoads = new();
+    }
 
-        SetInAndOutRoads();
+    public void AddRoad(Road road, Side side)
+    {
+        if (side != Side.Start && side != Side.End)
+            throw new InvalidOperationException("Invalid side");
+
+        if (side == Side.Start)
+            outRoads.Add(road);
+        else if (side == Side.End)
+            inRoads.Add(road);
+
+        foreach (Node n in road.GetNodes(side))
+        {
+            n.Intersection = this;
+            if (!nodes.Contains(n))
+                nodes.Add(n);
+        }
+        nodes.Sort();
+        UpdateNormalAndPlane();
+    }
+
+    public void RemoveRoad(Road road, Side side)
+    {
+        if (side != Side.Start && side != Side.End)
+            throw new InvalidOperationException("Invalid side");
+
+        if (side == Side.Start)
+            outRoads.Remove(road);
+        else if (side == Side.End)
+            inRoads.Remove(road);
+    }
+
+    public void RemoveNode(Node node)
+    {
+        nodes.Remove(node);
+    }
+
+    public void UpdateNormalAndPlane()
+    {
+        // if (nodes.Count > 1)
+        // {
+        //     Normal = math.normalize(math.cross(nodes[0].Pos - nodes[1].Pos, new float3(0, 1, 0)));
+        // }
 
         if (inRoads.Count != 0)
         {
-
             Road randomInRoad = InRoads.First();
             BezierSeries bs = randomInRoad.BezierSeries;
             Normal = math.normalize(bs.Evaluate2DNormalizedNormal(bs.EndLocation));
@@ -52,15 +99,6 @@ public class NodeGroup : IEnumerable<Node>
         }
     }
 
-    void SetInAndOutRoads()
-    {
-        outRoads = new();
-        inRoads = new();
-        foreach (Node n in nodes)
-            outRoads.UnionWith(n.GetRoads(Direction.Out));
-        foreach (Node n in nodes)
-            inRoads.UnionWith(n.GetRoads(Direction.In));
-    }
     public HashSet<Road> GetRoads()
     {
         HashSet<Road> h = new(inRoads);
@@ -79,8 +117,11 @@ public class NodeGroup : IEnumerable<Node>
     public Node LastWithRoad(Direction direction)
     {
         for (int i = nodes.Count - 1; i >= 0; i--)
+        {
+            Debug.Log(nodes);
             if (nodes[i].GetLanes(direction).Count != 0)
                 return nodes[i];
+        }
         return null;
     }
 
@@ -91,16 +132,5 @@ public class NodeGroup : IEnumerable<Node>
                 Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
         foreach (Road r in outRoads)
             InterRoad.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
-    }
-
-    public IEnumerator<Node> GetEnumerator()
-    {
-        foreach (Node node in nodes)
-            yield return node;
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
     }
 }

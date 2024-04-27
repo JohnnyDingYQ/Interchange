@@ -14,7 +14,7 @@ public static class InterRoad
     {
         int laneCount = to.Count;
         ReadOnlySet<Road> roadsOnOtherside = GetRelevantRoads();
-        NodeGroup nodeGroup = new(from.First());
+        Intersection nodeGroup = from.First().Intersection;
 
         BuildStraightPath();
         BuildRightLaneChangePath();
@@ -24,7 +24,6 @@ public static class InterRoad
             DeleteAllLaneChangingPaths();
         else
             BuildSidePaths();
-
         if (nodeGroup.InRoads.Count != 0 && nodeGroup.OutRoads.Count != 0)
             PatchUnconnectedLanes();
 
@@ -159,7 +158,7 @@ public static class InterRoad
 
         ReadOnlySet<Road> GetRelevantRoads()
         {
-            NodeGroup nodeGroup = new(from.First());
+            Intersection nodeGroup = from.First().Intersection;
             if (direction == Direction.Out)
                 return nodeGroup.InRoads;
             return nodeGroup.OutRoads;
@@ -167,7 +166,7 @@ public static class InterRoad
         #endregion
     }
 
-    public static void UpdateOutline(NodeGroup nodeGroup)
+    public static void UpdateOutline(Intersection nodeGroup)
     {
         if (nodeGroup.Count == 0)
             return;
@@ -290,9 +289,14 @@ public static class InterRoad
 
     public static void UpdateOutline(Road road, Side side)
     {
-        if (side != Side.Start)
-            UpdateOutline(new(road.Lanes[0].EndNode));
-        if (side != Side.End)
-            UpdateOutline(new(road.Lanes[0].StartNode));
+        if (side == Side.Start)
+            UpdateOutline(road.StartIntersection);
+        if (side == Side.End)
+            UpdateOutline(road.EndIntersection);
+        if (side == Side.Both)
+        {
+            UpdateOutline(road.StartIntersection);
+            UpdateOutline(road.EndIntersection);
+        }
     }
 }

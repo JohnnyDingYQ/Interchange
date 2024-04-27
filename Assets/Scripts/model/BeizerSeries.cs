@@ -15,7 +15,9 @@ public class BezierSeries
     [JsonIgnore]
     public ReadOnlyCollection<BezierCurve> Curves { get { return curves.AsReadOnly(); } }
     public float Length { get; set; }
+    [JsonProperty]
     public SeriesLocation StartLocation { get; private set; }
+    [JsonProperty]
     public SeriesLocation EndLocation { get; private set; }
     private float startLocationDistance = 0;
     private float endLocationDistance = 0;

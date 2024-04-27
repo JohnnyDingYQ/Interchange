@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
-
 public class Node : IComparable<Node>
 {
     public int Id { get; set; }
@@ -24,6 +23,7 @@ public class Node : IComparable<Node>
         set { directions = value.ToDictionary(x => x.Key, x => x.Value); }
     }
     private Dictionary<Lane, Direction> directions;
+    public Intersection Intersection { get; set; }
 
 
     public Node(float3 pos, int order)

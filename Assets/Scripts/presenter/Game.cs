@@ -14,6 +14,7 @@ public static class Game
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
+    public static HashSet<Intersection> Intersections { get { return GameState.Intersections; } }
     public static Road SelectedRoad { get; set; }
 
     public static int NextAvailableNodeId
@@ -51,6 +52,8 @@ public static class Game
             AddEdge(lane.InnerPath);
         }
         InstantiateRoad?.Invoke(road);
+        Intersections.Add(road.StartIntersection);
+        Intersections.Add(road.EndIntersection);
     }
 
     public static void RegisterNode(Node node)
@@ -83,19 +86,25 @@ public static class Game
             {
                 node.RemoveLane(lane);
                 if (node.Lanes.Count == 0)
+                {
                     Nodes.Remove(node.Id);
+                    road.StartIntersection.RemoveNode(node);
+                    road.EndIntersection.RemoveNode(node);
+                }
             }
         }
+        road.StartIntersection.RemoveRoad(road, Side.Start);
+        road.EndIntersection.RemoveRoad(road, Side.End);
         DestroyRoad?.Invoke(road);
         if (connectedInRoads.Count != 0)
         {
-            NodeGroup t = new(connectedInRoads.First().Lanes[0].EndNode);
+            Intersection t = connectedInRoads.First().EndIntersection;
             t.ReevaluatePaths();
             InterRoad.UpdateOutline(connectedInRoads.First(), Side.End);
         }
         if (connectedOutRoads.Count != 0)
         {
-            NodeGroup t = new(connectedOutRoads.First().Lanes[0].StartNode);
+            Intersection t = connectedOutRoads.First().StartIntersection;
             t.ReevaluatePaths();
             InterRoad.UpdateOutline(connectedOutRoads.First(), Side.Start);
         }
