@@ -21,6 +21,7 @@ public class Road
     public float Length { get; private set; }
     public RoadOutline LeftOutline { get; set; }
     public RoadOutline RightOutline { get; set; }
+    public bool IsGhost { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road() { }
@@ -47,6 +48,7 @@ public class Road
 
     private void InitRoad()
     {
+        IsGhost = false;
         Length = BezierSeries.Length;
         InitLanes();
         if (HasLaneShorterThanMinimumLaneLength())

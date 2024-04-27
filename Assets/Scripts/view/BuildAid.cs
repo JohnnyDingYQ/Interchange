@@ -28,7 +28,7 @@ public class BuildAid : MonoBehaviour
     void FixedUpdate()
     {
         UpdateSnapPoints();
-        UpdateGhostRoad();
+        // UpdateGhostRoad();
     }
 
     void UpdateGhostRoad()

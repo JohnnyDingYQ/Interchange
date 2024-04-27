@@ -84,6 +84,15 @@ public class NodeGroup : IEnumerable<Node>
         return null;
     }
 
+    public void ReevaluatePaths()
+    {
+        foreach (Road r in inRoads)
+            foreach (Lane l in r.Lanes)
+                Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
+        foreach (Road r in outRoads)
+            InterRoad.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
+    }
+
     public IEnumerator<Node> GetEnumerator()
     {
         foreach (Node node in nodes)

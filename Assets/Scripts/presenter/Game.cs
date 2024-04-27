@@ -39,7 +39,10 @@ public static class Game
 
     public static void RegisterRoad(Road road)
     {
-        road.Id = NextAvailableRoadId++;
+        if (road.IsGhost)
+            road.Id = -2;
+        else
+            road.Id = NextAvailableRoadId++;
         Roads.Add(road.Id, road);
         foreach (Lane lane in road.Lanes)
         {
@@ -84,12 +87,18 @@ public static class Game
             }
         }
         DestroyRoad?.Invoke(road);
-        // if (connectedInRoads.Count != 0)
-        // {
-        //     InterRoad.UpdateOutline(connectedInRoads.First(), Side.End);
-        // }
-        // if (connectedOutRoads.Count != 0)
-        //     InterRoad.UpdateOutline(connectedOutRoads.First(), Side.Start);
+        if (connectedInRoads.Count != 0)
+        {
+            NodeGroup t = new(connectedInRoads.First().Lanes[0].EndNode);
+            t.ReevaluatePaths();
+            InterRoad.UpdateOutline(connectedInRoads.First(), Side.End);
+        }
+        if (connectedOutRoads.Count != 0)
+        {
+            NodeGroup t = new(connectedOutRoads.First().Lanes[0].StartNode);
+            t.ReevaluatePaths();
+            InterRoad.UpdateOutline(connectedOutRoads.First(), Side.Start);
+        }
         return true;
     }
 

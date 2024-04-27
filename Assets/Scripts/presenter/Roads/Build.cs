@@ -73,8 +73,14 @@ public static class Build
         if (RoadIsTooBent())
             return null;
 
+        if (buildMode == BuildMode.Actual)
+            if (startTarget.SnapNotNull && endTarget.SnapNotNull)
+                RemoveExistingRoad();
 
-        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        Road road = new(startPos, pivotPos, endPos, LaneCount)
+        {
+            IsGhost = buildMode == BuildMode.Ghost
+        };
 
         if (road.HasLaneShorterThanMinimumLaneLength())
         {
@@ -87,6 +93,7 @@ public static class Build
             ConnectRoadStartToNodes(startNodes, road);
         else
             InterRoad.UpdateOutline(road, Side.Start);
+
         if (endTarget.SnapNotNull)
             ConnectRoadEndToNodes(endNodes, road);
         else
@@ -94,11 +101,7 @@ public static class Build
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
-        {
             AutoDivideRoad(road);
-            if (startTarget.SnapNotNull && endTarget.SnapNotNull)
-                RemoveExistingRoad();
-        }
         return road;
 
         # region extracted funcitons
@@ -164,8 +167,7 @@ public static class Build
                 endRoads.UnionWith(node.GetRoads(Direction.In));
             startRoads.IntersectWith(endRoads);
             foreach (Road r in startRoads)
-                if (r != road)
-                    Game.RemoveRoad(r);
+                Game.RemoveRoad(r);
         }
 
         bool HasRepeatedTarget()
