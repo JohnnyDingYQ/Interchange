@@ -83,17 +83,17 @@ public static class Build
 
         if (road.HasLaneShorterThanMinimumLaneLength())
             return null;
-        
+
         if (startTarget.SnapNotNull)
             road.StartIntersection = startNodes.GetIntersection();
         else
             Game.RegisterIntersection(road.StartIntersection);
-            
+
         if (endTarget.SnapNotNull)
             road.EndIntersection = endNodes.GetIntersection();
         else
             Game.RegisterIntersection(road.EndIntersection);
-        
+
         Game.RegisterRoad(road);
 
         if (startTarget.SnapNotNull)
@@ -105,7 +105,6 @@ public static class Build
             ConnectRoadEndToNodes(endNodes, road);
         else
             InterRoad.UpdateOutline(road, Side.End);
-
 
         road.StartIntersection.SetNodeReferece();
         road.EndIntersection.SetNodeReferece();
@@ -209,13 +208,16 @@ public static class Build
 
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
     {
+        Debug.Log(nodes.GetIntersection());
+        Debug.Log(road.StartIntersection);
+        if (nodes.GetIntersection() != road.StartIntersection)
+            throw new InvalidOperationException("Not the same intersection");
         for (int i = 0; i < road.LaneCount; i++)
         {
             nodes[i].AddLane(road.Lanes[i], Direction.Out);
             road.Lanes[i].StartNode = nodes[i];
         }
-        Intersection intersection = nodes.GetIntersection();
-        road.StartIntersection = intersection;
+        Intersection intersection = road.StartIntersection;
         intersection.AddRoad(road, Side.Start);
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.Out);
         InterRoad.UpdateOutline(road, Side.Start);
@@ -234,13 +236,15 @@ public static class Build
 
     public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
     {
+        if (nodes.GetIntersection() != road.EndIntersection)
+            throw new InvalidOperationException("Not the same intersection");
+
         for (int i = 0; i < road.LaneCount; i++)
         {
             nodes[i].AddLane(road.Lanes[i], Direction.In);
             road.Lanes[i].EndNode = nodes[i];
         }
-        Intersection intersection = nodes.GetIntersection();
-        road.EndIntersection = intersection;
+        Intersection intersection = road.EndIntersection;
         intersection.AddRoad(road, Side.End);
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.In);
         InterRoad.UpdateOutline(road, Side.End);

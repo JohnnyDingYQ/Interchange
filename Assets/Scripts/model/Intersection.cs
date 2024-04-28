@@ -133,4 +133,9 @@ public class Intersection
         foreach (Road r in outRoads)
             InterRoad.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
     }
+
+    public override string ToString()
+    {
+        return "Intersection " + Id;
+    }
 }
