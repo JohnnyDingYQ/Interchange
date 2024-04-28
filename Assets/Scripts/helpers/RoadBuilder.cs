@@ -3,11 +3,11 @@ using Unity.Mathematics;
 
 public static class RoadBuilder
 {
-    public static Road Build(float3 start, float3 pivot, float3 end, int laneCount)
+    public static Road B(float3 start, float3 pivot, float3 end, int laneCount)
     {
-        global::Build.LaneCount = laneCount;
-        global::Build.HandleBuildCommand(start);
-        global::Build.HandleBuildCommand(pivot);
-        return global::Build.HandleBuildCommand(end);
+        Build.LaneCount = laneCount;
+        Build.HandleBuildCommand(start);
+        Build.HandleBuildCommand(pivot);
+        return Build.HandleBuildCommand(end);
     }
 }

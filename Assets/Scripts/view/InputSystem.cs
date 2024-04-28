@@ -99,6 +99,6 @@ public class InputSystem : MonoBehaviour
     }
     void AbandonBuild(InputAction.CallbackContext context)
     {
-        Build.ResetBuild();
+        Build.Reset();
     }
 }

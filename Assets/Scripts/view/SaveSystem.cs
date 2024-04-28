@@ -22,7 +22,7 @@ public static class SaveSystem
                 TypeNameHandling = TypeNameHandling.Auto
             });
             Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
-            foreach (Intersection i in Game.Intersections)
+            foreach (Intersection i in Game.Intersections.Values)
             {
                 i.UpdateNormalAndPlane();
                 InterRoad.UpdateOutline(i);

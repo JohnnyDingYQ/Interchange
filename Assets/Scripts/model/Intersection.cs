@@ -8,6 +8,7 @@ using System;
 
 public class Intersection
 {
+    public int Id { get; set; }
     [JsonProperty]
     private readonly List<Node> nodes;
     [JsonIgnore]
@@ -50,7 +51,6 @@ public class Intersection
 
         foreach (Node n in road.GetNodes(side))
         {
-            n.Intersection = this;
             if (!nodes.Contains(n))
                 nodes.Add(n);
         }
@@ -74,13 +74,16 @@ public class Intersection
         nodes.Remove(node);
     }
 
+    public void SetNodeReferece()
+    {
+        if (Id == 0)
+            throw new InvalidOperationException("intersection id is 0");
+        foreach (Node n in nodes)
+            n.Intersection = this;
+    }
+
     public void UpdateNormalAndPlane()
     {
-        // if (nodes.Count > 1)
-        // {
-        //     Normal = math.normalize(math.cross(nodes[0].Pos - nodes[1].Pos, new float3(0, 1, 0)));
-        // }
-
         if (inRoads.Count != 0)
         {
             Road randomInRoad = InRoads.First();
@@ -117,11 +120,8 @@ public class Intersection
     public Node LastWithRoad(Direction direction)
     {
         for (int i = nodes.Count - 1; i >= 0; i--)
-        {
-            Debug.Log(nodes);
             if (nodes[i].GetLanes(direction).Count != 0)
                 return nodes[i];
-        }
         return null;
     }
 

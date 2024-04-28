@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ListExtensions;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -54,7 +55,7 @@ public static class Build
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
-            ResetBuild();
+            Reset();
             return road;
         }
 
@@ -62,20 +63,18 @@ public static class Build
 
     static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
-        if (startTarget.SnapNotNull && endTarget.SnapNotNull && HasRepeatedTarget())
-            return null;
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-        AlignPivotPos();
 
-        if (RoadIsTooBent())
+        // AlignPivotPos();
+
+        if (RoadIsTooBent() || HasRepeatedTarget())
             return null;
 
         if (buildMode == BuildMode.Actual)
-            if (startTarget.SnapNotNull && endTarget.SnapNotNull)
-                RemoveExistingRoad();
+            RemoveExistingRoad();
 
         Road road = new(startPos, pivotPos, endPos, LaneCount)
         {
@@ -83,10 +82,18 @@ public static class Build
         };
 
         if (road.HasLaneShorterThanMinimumLaneLength())
-        {
-            Game.RemoveRoad(road);
             return null;
-        }
+        
+        if (startTarget.SnapNotNull)
+            road.StartIntersection = startNodes.GetIntersection();
+        else
+            Game.RegisterIntersection(road.StartIntersection);
+            
+        if (endTarget.SnapNotNull)
+            road.EndIntersection = endNodes.GetIntersection();
+        else
+            Game.RegisterIntersection(road.EndIntersection);
+        
         Game.RegisterRoad(road);
 
         if (startTarget.SnapNotNull)
@@ -98,6 +105,11 @@ public static class Build
             ConnectRoadEndToNodes(endNodes, road);
         else
             InterRoad.UpdateOutline(road, Side.End);
+
+
+        road.StartIntersection.SetNodeReferece();
+        road.EndIntersection.SetNodeReferece();
+
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
@@ -159,6 +171,8 @@ public static class Build
 
         void RemoveExistingRoad()
         {
+            if (!(startTarget.SnapNotNull && endTarget.SnapNotNull))
+                return;
             HashSet<Road> startRoads = new();
             HashSet<Road> endRoads = new();
             foreach (Node node in startTarget.Nodes)
@@ -172,6 +186,8 @@ public static class Build
 
         bool HasRepeatedTarget()
         {
+            if (!(startTarget.SnapNotNull && endTarget.SnapNotNull))
+                return false;
             HashSet<Node> nodes = new(startTarget.Nodes);
             nodes.IntersectWith(endTarget.Nodes);
             if (nodes.Count != 0)
@@ -198,13 +214,7 @@ public static class Build
             nodes[i].AddLane(road.Lanes[i], Direction.Out);
             road.Lanes[i].StartNode = nodes[i];
         }
-        Intersection intersection = null;
-        foreach (Node n in nodes)
-            if (n.Intersection != null)
-            {
-                intersection = n.Intersection;
-                break;
-            }
+        Intersection intersection = nodes.GetIntersection();
         road.StartIntersection = intersection;
         intersection.AddRoad(road, Side.Start);
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.Out);
@@ -229,13 +239,7 @@ public static class Build
             nodes[i].AddLane(road.Lanes[i], Direction.In);
             road.Lanes[i].EndNode = nodes[i];
         }
-        Intersection intersection = null;
-        foreach (Node n in nodes)
-            if (n.Intersection != null)
-            {
-                intersection = n.Intersection;
-                break;
-            }
+        Intersection intersection = nodes.GetIntersection();
         road.EndIntersection = intersection;
         intersection.AddRoad(road, Side.End);
         InterRoad.BuildAllPaths(road.Lanes, nodes, Direction.In);
@@ -271,7 +275,7 @@ public static class Build
         return new(clickPos, LaneCount, Game.Nodes.Values);
     }
 
-    public static void ResetBuild()
+    public static void Reset()
     {
         startAssigned = false;
         pivotAssigned = false;

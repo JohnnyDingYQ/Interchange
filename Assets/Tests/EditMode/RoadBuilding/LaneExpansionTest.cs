@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class LaneExpansionTest
 {
+    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
     Vector3 pos1 = new(0, 10, 0);
     Vector3 pos2 = new(0, 12, Constants.MinimumLaneLength);
     Vector3 pos3 = new(0, 14, Constants.MinimumLaneLength * 2);
@@ -21,8 +23,8 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToTwoLane_Left()
     {
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.Build(pos3 + 0.9f * Constants.BuildSnapTolerance * Vector3.forward, pos4, pos5, 2);
+        Road road0 = RoadBuilder.B(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.B(pos3 + 0.9f * Constants.BuildSnapTolerance * Vector3.forward, pos4, pos5, 2);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -36,8 +38,8 @@ public class LaneExpansionTest
     [Test]
     public void TwoLaneToThreeLane_Right()
     {   
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 2);
-        Road road1 = RoadBuilder.Build(pos3 + 0.9f * Constants.BuildSnapTolerance * Vector3.right, pos4, pos5, 3);
+        Road road0 = RoadBuilder.B(pos1, pos2, pos3, 2);
+        Road road1 = RoadBuilder.B(pos3 + 0.9f * Constants.BuildSnapTolerance * Vector3.right, pos4, pos5, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane01 = road0.Lanes[1];
         Lane lane10 = road1.Lanes[0];
@@ -55,8 +57,8 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToThreeLane_Mid()
     {
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.Build(pos3, pos4, pos5, 3);
+        Road road0 = RoadBuilder.B(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.B(pos3, pos4, pos5, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -72,8 +74,8 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToThreeLane_Left()
     {
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.Build(pos3 + 1.5f * Constants.BuildSnapTolerance * Vector3.left, pos4, pos5, 3);
+        Road road0 = RoadBuilder.B(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.B(pos3 + 1.5f * Constants.BuildSnapTolerance * Vector3.left, pos4, pos5, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -88,8 +90,8 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToThreeLane_Right()
     {   
-        Road road0 = RoadBuilder.Build(pos1, pos2, pos3, 1);
-        Road road1 = RoadBuilder.Build(pos3 + 1.5f * Constants.BuildSnapTolerance * Vector3.right, pos4, pos5, 3);
+        Road road0 = RoadBuilder.B(pos1, pos2, pos3, 1);
+        Road road1 = RoadBuilder.B(pos3 + 1.5f * Constants.BuildSnapTolerance * Vector3.right, pos4, pos5, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];

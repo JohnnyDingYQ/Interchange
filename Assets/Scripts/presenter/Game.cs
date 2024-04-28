@@ -14,7 +14,7 @@ public static class Game
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
-    public static HashSet<Intersection> Intersections { get { return GameState.Intersections; } }
+    public static SortedDictionary<int, Intersection> Intersections { get { return GameState.Intersections; } }
     public static Road SelectedRoad { get; set; }
 
     public static int NextAvailableNodeId
@@ -27,6 +27,11 @@ public static class Game
         get { return GameState.NextAvailableRoadId; }
         set { GameState.NextAvailableRoadId = value; }
     }
+    public static int NextAvailableIntersectionId
+    {
+        get { return GameState.NextAvailableIntersectionId; }
+        set { GameState.NextAvailableIntersectionId = value; }
+    }
 
     static Game()
     {
@@ -35,11 +40,14 @@ public static class Game
 
     public static void WipeState()
     {
+        Build.Reset();
         GameState = new();
     }
 
     public static void RegisterRoad(Road road)
     {
+        if (Roads.ContainsKey(road.Id))
+            return;
         if (road.IsGhost)
             road.Id = -2;
         else
@@ -52,14 +60,22 @@ public static class Game
             AddEdge(lane.InnerPath);
         }
         InstantiateRoad?.Invoke(road);
-        Intersections.Add(road.StartIntersection);
-        Intersections.Add(road.EndIntersection);
     }
 
     public static void RegisterNode(Node node)
     {
+        if (Nodes.ContainsKey(node.Id))
+            return;
         node.Id = NextAvailableNodeId++;
         Nodes[node.Id] = node;
+    }
+
+    public static void RegisterIntersection(Intersection intersection)
+    {
+        if (Intersections.ContainsKey(intersection.Id))
+            return;
+        intersection.Id = NextAvailableIntersectionId++;
+        Intersections[intersection.Id] = intersection;
     }
 
     public static bool HasNode(Node node)

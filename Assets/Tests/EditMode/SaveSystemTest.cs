@@ -18,7 +18,7 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleOneLaneRoad()
     {
-        RoadBuilder.Build(0, stride, 2 * stride, 1);
+        RoadBuilder.B(0, stride, 2 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -40,7 +40,7 @@ public class SaveSystemTest
     [Test]
     public void RecoverSingleThreeLaneRoad()
     {
-        Road r = RoadBuilder.Build(0, stride, 2 * stride, 3);
+        Road r = RoadBuilder.B(0, stride, 2 * stride, 3);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -66,8 +66,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoDisconnectedOneLaneRoad()
     {
-        Road road0 = RoadBuilder.Build(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.Build(3 * stride, 4 * stride, 5 * stride, 1);
+        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.B(3 * stride, 4 * stride, 5 * stride, 1);
 
         SaveSystem.SaveGame();
         Game.WipeState();
@@ -88,8 +88,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverTwoConnectedOneLaneRoad()
     {
-        Road road0 = RoadBuilder.Build(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
 
         SaveSystem.SaveGame();
         Game.WipeState();
@@ -110,8 +110,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverLanesSplines()
     {
-        RoadBuilder.Build(0, stride, 2 * stride, 1);
-        RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.B(0, stride, 2 * stride, 1);
+        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -128,8 +128,8 @@ public class SaveSystemTest
     [Test]
     public void RecoverPathGraph()
     {
-        RoadBuilder.Build(0, stride, 2 * stride, 1);
-        RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.B(0, stride, 2 * stride, 1);
+        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -143,7 +143,7 @@ public class SaveSystemTest
     [Test]
     public void RecoverNodeLaneDirections()
     {
-        Road road = RoadBuilder.Build(0, stride, 2 * stride, 1);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
         Lane lane = road.Lanes.First();
         Assert.AreSame(lane, lane.StartNode.GetLanes(Direction.Out).First());
         Assert.AreSame(lane, lane.EndNode.GetLanes(Direction.In).First());
@@ -160,9 +160,9 @@ public class SaveSystemTest
     [Test]
     public void RecoverRoadOutline()
     {
-        Road saved1 = RoadBuilder.Build(0, stride, 2 * stride, 1);
-        Road saved2 = RoadBuilder.Build(2 * stride, 3 * stride, 4 * stride, 1);
-        Road saved3 = RoadBuilder.Build(4 * stride, 5 * stride, 6 * stride, 1);
+        Road saved1 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road saved2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        Road saved3 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -181,10 +181,10 @@ public class SaveSystemTest
     [Test]
     public void RecoverConnectedLanes_2to1and1()
     {
-        Road saved1 = RoadBuilder.Build(0, stride, 2 * stride, 2);
+        Road saved1 = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 offset = saved1.Lanes[0].EndPos - saved1.EndPos;
-        Road saved2 = RoadBuilder.Build(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Road saved3 = RoadBuilder.Build(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        Road saved2 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        Road saved3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         SaveSystem.SaveGame();
         Game.WipeState();
         SaveSystem.LoadGame();
@@ -195,7 +195,6 @@ public class SaveSystemTest
         Assert.True(Game.HasEdge(restored1.Lanes[0], restored2.Lanes[0]));
         Assert.True(Game.HasEdge(restored1.Lanes[1], restored3.Lanes[0]));
         Assert.AreEqual(2, restored1.Lanes[0].EndNode.Lanes.Count);
-        Debug.Log(restored1.Lanes[1].EndNode);
         Assert.AreEqual(2, restored1.Lanes[1].EndNode.Lanes.Count);
     }
 

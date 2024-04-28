@@ -23,7 +23,17 @@ public class Node : IComparable<Node>
         set { directions = value.ToDictionary(x => x.Key, x => x.Value); }
     }
     private Dictionary<Lane, Direction> directions;
-    public Intersection Intersection { get; set; }
+    private int intersectionId;
+    public Intersection Intersection
+    {
+        get
+        {   
+            if (Game.Intersections.ContainsKey(intersectionId))
+                return Game.Intersections[intersectionId];
+            return null;
+        }
+        set { intersectionId = value.Id; }
+    }
 
 
     public Node(float3 pos, int order)
