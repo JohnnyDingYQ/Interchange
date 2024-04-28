@@ -106,8 +106,8 @@ public static class Build
         else
             InterRoad.UpdateOutline(road, Side.End);
 
-        road.StartIntersection.SetNodeReferece();
-        road.EndIntersection.SetNodeReferece();
+        road.StartIntersection.SetNodeReferenece();
+        road.EndIntersection.SetNodeReferenece();
 
 
         RegisterUnregisteredNodes(road);
@@ -208,8 +208,6 @@ public static class Build
 
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
     {
-        Debug.Log(nodes.GetIntersection());
-        Debug.Log(road.StartIntersection);
         if (nodes.GetIntersection() != road.StartIntersection)
             throw new InvalidOperationException("Not the same intersection");
         for (int i = 0; i < road.LaneCount; i++)

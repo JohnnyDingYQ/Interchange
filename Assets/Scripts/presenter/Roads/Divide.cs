@@ -39,14 +39,14 @@ public static class DivideHandler
         Road rightRoad = new(right, laneCount);
         if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
             return null;
-        // Debug.Log("Hi");
-        Game.RegisterRoad(leftRoad);
-        Game.RegisterRoad(rightRoad);
+
         OperateNodes();
         OperateIntersections();
         List<Node> leftNodes = new();
         for (int i = 0; i < leftRoad.LaneCount; i++)
             leftNodes.Add(leftRoad.Lanes[i].EndNode);
+        Game.RegisterRoad(leftRoad);
+        Game.RegisterRoad(rightRoad);
         OperateVertices();
         OperateOutline();
         Game.RemoveRoad(road, true);
@@ -57,10 +57,10 @@ public static class DivideHandler
         void OperateIntersections()
         {
             leftRoad.StartIntersection = road.StartIntersection;
-            leftRoad.EndIntersection = rightRoad.StartIntersection;
+            rightRoad.StartIntersection = leftRoad.EndIntersection;
             rightRoad.EndIntersection = road.EndIntersection;
             Game.RegisterIntersection(leftRoad.EndIntersection);
-            leftRoad.EndIntersection.SetNodeReferece();
+            leftRoad.EndIntersection.SetNodeReferenece();
         }
 
         void OperateNodes()

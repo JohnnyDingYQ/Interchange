@@ -38,6 +38,7 @@ public class BasicBuildTest
         Assert.True(Nodes.ContainsKey(lane.EndNode.Id));
         Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
         Assert.True(lane.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
+        Assert.AreEqual(2, Game.Intersections.Count);
     }
 
     [Test]

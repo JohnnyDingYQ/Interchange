@@ -74,7 +74,7 @@ public class Intersection
         nodes.Remove(node);
     }
 
-    public void SetNodeReferece()
+    public void SetNodeReferenece()
     {
         if (Id == 0)
             throw new InvalidOperationException("intersection id is 0");
