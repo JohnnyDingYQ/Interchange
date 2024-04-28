@@ -111,6 +111,10 @@ public static class Game
         }
         road.StartIntersection.RemoveRoad(road, Side.Start);
         road.EndIntersection.RemoveRoad(road, Side.End);
+        if (road.StartIntersection.IsEmpty())
+            Intersections.Remove(road.StartIntersection.Id);
+        if (road.EndIntersection.IsEmpty())
+            Intersections.Remove(road.EndIntersection.Id);
         DestroyRoad?.Invoke(road);
         if (connectedInRoads.Count != 0)
         {

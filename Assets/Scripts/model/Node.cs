@@ -63,6 +63,8 @@ public class Node : IComparable<Node>
 
     public void AddLane(Lane lane, Direction direction)
     {
+        if (lanes.Contains(lane))
+            throw new InvalidOperationException("lane already exists");
         lanes.Add(lane);
         directions[lane] = direction;
     }

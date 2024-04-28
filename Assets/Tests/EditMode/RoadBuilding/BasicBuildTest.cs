@@ -39,6 +39,12 @@ public class BasicBuildTest
         Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
         Assert.True(lane.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
         Assert.AreEqual(2, Game.Intersections.Count);
+        Assert.AreSame(lane.StartNode, road.StartIntersection.Nodes.Single());
+        Assert.AreSame(lane.EndNode, road.EndIntersection.Nodes.Single());
+        Assert.AreSame(road, road.StartIntersection.OutRoads.Single());
+        Assert.AreSame(road, road.EndIntersection.InRoads.Single());
+        Assert.AreSame(road.StartIntersection, lane.StartNode.Intersection);
+        Assert.AreSame(road.EndIntersection, lane.EndNode.Intersection);
     }
 
     [Test]
@@ -60,6 +66,11 @@ public class BasicBuildTest
         Assert.True(lane0.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane0 }));
         Assert.True(lane1.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
         Assert.True(lane1.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
+        Assert.AreEqual(2, Game.Intersections.Count);
+        Assert.True(road.StartIntersection.Nodes.SequenceEqual(road.GetNodes(Side.Start)));
+        Assert.True(road.EndIntersection.Nodes.SequenceEqual(road.GetNodes(Side.End)));
+        Assert.AreSame(road, road.StartIntersection.OutRoads.Single());
+        Assert.AreSame(road, road.EndIntersection.InRoads.Single());
     }
 
     [Test]
@@ -201,18 +212,23 @@ public class BasicBuildTest
     }
 
     #region Helpers
-    public void CheckLanesConnection(Road enteringRoad, Road exitingRoad, int laneCount)
+    public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)
     {
-        Assert.NotNull(enteringRoad);
-        Assert.NotNull(exitingRoad);
+        Assert.NotNull(inRoad);
+        Assert.NotNull(outRoad);
         Assert.AreEqual(laneCount * 3, Nodes.Count);
+        Assert.AreEqual(3, Game.Intersections.Count);
+        Assert.AreSame(inRoad.EndIntersection, outRoad.StartIntersection);
         for (int i = 0; i < laneCount; i++)
         {
-            Lane enteringLane = enteringRoad.Lanes[i];
-            Lane exitingLane = exitingRoad.Lanes[i];
+            Lane enteringLane = inRoad.Lanes[i];
+            Lane exitingLane = outRoad.Lanes[i];
             HashSet<Lane> expectedLanes = new() { enteringLane, exitingLane };
             Assert.True(enteringLane.EndNode.Lanes.SetEquals(expectedLanes));
         }
+        Assert.True(inRoad.EndIntersection.Nodes.SequenceEqual(inRoad.GetNodes(Side.End)));
+        foreach (Node n in inRoad.GetNodes(Side.End))
+            n.Intersection = inRoad.EndIntersection;
     }
     #endregion
 }

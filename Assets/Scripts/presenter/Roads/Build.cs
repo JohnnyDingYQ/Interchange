@@ -73,8 +73,6 @@ public static class Build
         if (RoadIsTooBent() || HasRepeatedTarget())
             return null;
 
-        if (buildMode == BuildMode.Actual)
-            RemoveExistingRoad();
 
         Road road = new(startPos, pivotPos, endPos, LaneCount)
         {
@@ -96,6 +94,7 @@ public static class Build
 
         Game.RegisterRoad(road);
 
+            
         if (startTarget.SnapNotNull)
             ConnectRoadStartToNodes(startNodes, road);
         else
@@ -113,6 +112,8 @@ public static class Build
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
             AutoDivideRoad(road);
+        if (buildMode == BuildMode.Actual)
+            RemoveExistingRoad();
         return road;
 
         # region extracted funcitons
@@ -180,7 +181,8 @@ public static class Build
                 endRoads.UnionWith(node.GetRoads(Direction.In));
             startRoads.IntersectWith(endRoads);
             foreach (Road r in startRoads)
-                Game.RemoveRoad(r);
+                if (r != road)
+                    Game.RemoveRoad(r);
         }
 
         bool HasRepeatedTarget()

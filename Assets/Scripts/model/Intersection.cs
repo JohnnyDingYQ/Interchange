@@ -69,6 +69,11 @@ public class Intersection
             inRoads.Remove(road);
     }
 
+    public bool IsEmpty()
+    {
+        return nodes.Count == 0 && inRoads.Count == 0 && outRoads.Count == 0;
+    }
+
     public void RemoveNode(Node node)
     {
         nodes.Remove(node);

@@ -109,4 +109,13 @@ public class RemoveRoadTest
         Assert.True(Game.RemoveRoad(road2));
         Assert.AreEqual(2, Game.Graph.EdgeCount);
     }
+
+    [Test]
+    public void BasicRemoveIntersection()
+    {
+        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
+        Assert.True(Game.RemoveRoad(road1));
+
+        Assert.AreEqual(0, Game.Intersections.Count);
+    }
 }
