@@ -23,6 +23,7 @@ public class Node : IComparable<Node>
         set { directions = value.ToDictionary(x => x.Key, x => x.Value); }
     }
     private Dictionary<Lane, Direction> directions;
+    [JsonProperty]
     private int intersectionId;
     public Intersection Intersection
     {

@@ -181,15 +181,6 @@ public class BasicBuildTest
     }
 
     [Test]
-    public void RoadCannotSnapBackToItSelf()
-    {
-        RoadBuilder.B(0, stride, 2 * stride, 3);
-        RoadBuilder.B(2 * stride, 3 * stride, 2 * stride, 3);
-
-        Assert.AreEqual(1, Roads.Count);
-    }
-
-    [Test]
     public void RoadTooBentShoudNotBuild()
     {
         RoadBuilder.B(0, stride, 0, 3);

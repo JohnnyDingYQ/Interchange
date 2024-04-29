@@ -87,8 +87,6 @@ public static class Game
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
-        HashSet<Road> connectedInRoads = road.GetConnectedRoads(Side.Start);
-        HashSet<Road> connectedOutRoads = road.GetConnectedRoads(Side.End);
         Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
@@ -113,21 +111,15 @@ public static class Game
         road.EndIntersection.RemoveRoad(road, Side.End);
         if (road.StartIntersection.IsEmpty())
             Intersections.Remove(road.StartIntersection.Id);
+        else
+            road.StartIntersection.ReevaluatePaths();
+
         if (road.EndIntersection.IsEmpty())
             Intersections.Remove(road.EndIntersection.Id);
+        else
+            road.EndIntersection.ReevaluatePaths();
+
         DestroyRoad?.Invoke(road);
-        if (connectedInRoads.Count != 0)
-        {
-            Intersection t = connectedInRoads.First().EndIntersection;
-            t.ReevaluatePaths();
-            InterRoad.UpdateOutline(connectedInRoads.First(), Side.End);
-        }
-        if (connectedOutRoads.Count != 0)
-        {
-            Intersection t = connectedOutRoads.First().StartIntersection;
-            t.ReevaluatePaths();
-            InterRoad.UpdateOutline(connectedOutRoads.First(), Side.Start);
-        }
         return true;
     }
 

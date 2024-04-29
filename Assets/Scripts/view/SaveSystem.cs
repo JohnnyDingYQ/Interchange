@@ -25,7 +25,7 @@ public static class SaveSystem
             foreach (Intersection i in Game.Intersections.Values)
             {
                 i.UpdateNormalAndPlane();
-                InterRoad.UpdateOutline(i);
+                i.UpdateOutline();
             }
             foreach (Road road in Game.Roads.Values)
                 Game.InvokeInstantiateRoad(road);
