@@ -96,11 +96,17 @@ public static class Game
         road.StartIntersection.RemoveRoad(road, Side.Start);
         road.EndIntersection.RemoveRoad(road, Side.End);
         if (!road.StartIntersection.IsEmpty())
-            road.StartIntersection.ReevaluatePaths();
+        {
+            road.StartIntersection.EvaluatePaths();
+            road.StartIntersection.EvaluateOutline();
+        }
 
         if (!road.EndIntersection.IsEmpty())
-            road.EndIntersection.ReevaluatePaths();
-
+        {
+            road.EndIntersection.EvaluatePaths();
+            road.StartIntersection.EvaluateOutline();
+        }
+    
         DestroyRoad?.Invoke(road);
         return true;
     }

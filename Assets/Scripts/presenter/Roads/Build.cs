@@ -187,7 +187,6 @@ public static class Build
             road.Lanes[i].StartNode = nodes[i];
         }
         road.StartIntersection.AddRoad(road, Side.Start);
-        // BuildAllPaths(road.Lanes, nodes, Direction.Out);
         road.StartIntersection.EvaluatePaths();
         road.StartIntersection.EvaluateOutline();
     }
@@ -204,7 +203,6 @@ public static class Build
             road.Lanes[i].EndNode = nodes[i];
         }
         road.EndIntersection.AddRoad(road, Side.End);
-        // BuildAllPaths(road.Lanes, nodes, Direction.In);
         road.EndIntersection.EvaluatePaths();
         road.EndIntersection.EvaluateOutline();
     }
@@ -234,155 +232,5 @@ public static class Build
         pivotAssigned = false;
         startTarget = null;
         endTarget = null;
-    }
-
-    public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction direction)
-    {
-        int laneCount = to.Count;
-        Intersection intersection = from.First().Intersection;
-        ReadOnlySet<Road> roadsOnOtherSide = direction == Direction.Out ? intersection.InRoads : intersection.OutRoads;
-        
-        BuildStraightPath();
-        BuildRightLaneChangePath();
-        BuildLeftLaneChangePath();
-
-        if (BranchExists())
-            DeleteAllLaneChangingPaths();
-        else
-            BuildSidePaths();
-        if (intersection.InRoads.Count != 0 && intersection.OutRoads.Count != 0)
-            PatchUnconnectedLanes();
-        
-        intersection.EvaluateOutline();
-
-        #region extracted 
-        void PatchUnconnectedLanes()
-        {
-            
-            Node firstNodeWithOutRoad = intersection.FirstNodeWithRoad(Direction.Out);
-            Node lastNodeWithOutRoad = intersection.LastNodeWithRoad(Direction.Out);
-            foreach (Road inRoad in intersection.InRoads)
-                foreach (Lane inLane in inRoad.Lanes)
-                    if (Game.Graph.OutDegree(inLane.EndVertex) == 0)
-                    {
-                        Node n;
-                        int laneNodeIndex = inLane.EndNode.NodeIndex;
-                        if (laneNodeIndex < lastNodeWithOutRoad.NodeIndex && laneNodeIndex > firstNodeWithOutRoad.NodeIndex)
-                            continue;
-                        if (laneNodeIndex < (float)intersection.Count / 2)
-                            n = firstNodeWithOutRoad;
-                        else
-                            n = lastNodeWithOutRoad;
-                        foreach (Lane outLane in n.GetLanes(Direction.Out))
-                            BuildPath(inLane.EndVertex, outLane.StartVertex, n.NodeIndex - laneNodeIndex);
-                    }
-            Node firstNodeWithInRoad = intersection.FirstNodeWithRoad(Direction.In);
-            Node lastNodeWithInRoad = intersection.LastNodeWithRoad(Direction.In);
-            foreach (Road outRoad in intersection.OutRoads)
-                foreach (Lane outLane in outRoad.Lanes)
-                    if (Game.Graph.InDegree(outLane.StartVertex) == 0)
-                    {
-                        Node n;
-                        int laneNodeIndex = outLane.StartNode.NodeIndex;
-                        if (laneNodeIndex < lastNodeWithInRoad.NodeIndex && laneNodeIndex > firstNodeWithInRoad.NodeIndex)
-                            continue;
-                        if (laneNodeIndex < (float)intersection.Count / 2)
-                            n = firstNodeWithInRoad;
-                        else
-                            n = lastNodeWithInRoad;
-                        foreach (Lane inLane in n.GetLanes(Direction.In))
-                            BuildPath(inLane.EndVertex, outLane.StartVertex, -n.NodeIndex + laneNodeIndex);
-                    }
-        }
-
-        void BuildStraightPath()
-        {
-            for (int i = 0; i < laneCount; i++)
-                foreach (Lane lane in from[i].GetLanes(InvertDirection(direction)))
-                    BuildPathLane2Lane(lane, to[i], 0);
-        }
-        void BuildRightLaneChangePath()
-        {
-            for (int i = 1; i < laneCount; i++)
-                foreach (Lane lane in from[i - 1].GetLanes(InvertDirection(direction)))
-                    BuildPathLane2Lane(lane, to[i], 1);
-        }
-        void BuildLeftLaneChangePath()
-        {
-            for (int i = 0; i < laneCount - 1; i++)
-                foreach (Lane lane in from[i + 1].GetLanes(InvertDirection(direction)))
-                    BuildPathLane2Lane(lane, to[i], -1);
-        }
-        void BuildSidePaths()
-        {
-            foreach (Road road in roadsOnOtherSide)
-                foreach (Lane lane in road.Lanes)
-                {
-                    Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
-                    if (from.Contains(node))
-                        continue;
-
-                    int span = from.First().NodeIndex - node.NodeIndex;
-                    if (span == 1)
-                        BuildPathLane2Lane(lane, to.First(), span);
-
-                    span = from.Last().NodeIndex - node.NodeIndex;
-                    if (span == -1)
-                        BuildPathLane2Lane(lane, to.Last(), span);
-                }
-        }
-
-        static Direction InvertDirection(Direction direction)
-        {
-            if (direction == Direction.In)
-                return Direction.Out;
-            return Direction.In;
-        }
-
-        Path BuildPathLane2Lane(Lane l1, Lane l2, int span)
-        {
-            Path path;
-            if (direction == Direction.Out)
-                path = BuildPath(l1.EndVertex, l2.StartVertex, span);
-            else
-                path = BuildPath(l2.EndVertex, l1.StartVertex, -span);
-            return path;
-        }
-
-        Path BuildPath(Vertex start, Vertex end, int span)
-        {
-            Game.Graph.TryGetEdge(start, end, out Path edge);
-            if (edge != null)
-                return null;
-            float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
-            float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
-            BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
-            Path p = new(bs, start, end, span);
-            Game.AddEdge(p);
-            return p;
-        }
-
-        void DeleteAllLaneChangingPaths()
-        {
-            foreach (Road road in roadsOnOtherSide)
-                foreach (Lane lane in road.Lanes)
-                    if (direction == Direction.Out)
-                        Game.Graph.RemoveEdgeIf(e => e.Source == lane.EndVertex && Math.Abs(e.Span) > 0);
-                    else
-                        Game.Graph.RemoveEdgeIf(e => e.Target == lane.StartVertex && Math.Abs(e.Span) > 0);
-        }
-
-        bool BranchExists()
-        {
-            HashSet<Road> seenRoads = new();
-            foreach (Road road in roadsOnOtherSide)
-                foreach (Lane lane in road.Lanes)
-                {
-                    Node node = direction == Direction.Out ? lane.EndNode : lane.StartNode;
-                    seenRoads.UnionWith(node.GetRoads(direction));
-                }
-            return seenRoads.Count > 1;
-        }
-        #endregion
     }
 }

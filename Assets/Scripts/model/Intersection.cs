@@ -143,16 +143,6 @@ public class Intersection
         return null;
     }
 
-    public void ReevaluatePaths()
-    {
-        foreach (Road r in inRoads)
-            foreach (Lane l in r.Lanes)
-                Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
-        foreach (Road r in outRoads)
-            Build.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
-        EvaluateOutline();
-    }
-
     public void EvaluateOutline()
     {
         foreach (Road r in outRoads)
@@ -271,10 +261,9 @@ public class Intersection
 
     public void EvaluatePaths()
     {
-        foreach (Road r in inRoads)
-            foreach (Lane l in r.Lanes)
-                Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
-        
+
+        ClearAllPaths();
+
         if (inRoads.Count == 0 || outRoads.Count == 0)
             return;
 
@@ -287,32 +276,14 @@ public class Intersection
             if (i - 1 >= 0)
             {
                 Node other = nodes[i - 1];
-                if (n.GetLanes(Direction.In).Count == 1 && other.GetLanes(Direction.Out).Count == 1
-                    && n.GetLanes(Direction.Out).Count == 1 && other.GetLanes(Direction.In).Count == 1)
-                {
-                    HashSet<Road> ins = n.GetRoads(Direction.In);
-                    ins.UnionWith(other.GetRoads(Direction.In));
-                    HashSet<Road> outs = n.GetRoads(Direction.Out);
-                    outs.UnionWith(other.GetRoads(Direction.Out));
-                    if (ins.Count == 1 && outs.Count == 1)
-                        BuildPathNode2Node(n, other, -1);
-
-                }
+                if (NodesBelongToUniqueRoad(n, other))
+                    BuildPathNode2Node(n, other, -1);
             }
             if (i + 1 < nodes.Count)
             {
                 Node other = nodes[i + 1];
-                if (n.GetLanes(Direction.In).Count == 1 && other.GetLanes(Direction.Out).Count == 1
-                    && n.GetLanes(Direction.Out).Count == 1 && other.GetLanes(Direction.In).Count == 1)
-                {
-                    HashSet<Road> ins = n.GetRoads(Direction.In);
-                    ins.UnionWith(other.GetRoads(Direction.In));
-                    HashSet<Road> outs = n.GetRoads(Direction.Out);
-                    outs.UnionWith(other.GetRoads(Direction.Out));
-                    if (ins.Count == 1 && outs.Count == 1)
-                        BuildPathNode2Node(n, other, 1);
-
-                }
+                if (NodesBelongToUniqueRoad(n, other))
+                    BuildPathNode2Node(n, other, 1);
             }
         }
 
@@ -341,6 +312,29 @@ public class Intersection
                 else
                     BuildPathNode2Node(LastNodeWithRoad(Direction.In), n, indexLast);
             }
+        }
+
+        void ClearAllPaths()
+        {
+            foreach (Road r in inRoads)
+                foreach (Lane l in r.Lanes)
+                    Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
+        }
+
+        bool NodesBelongToUniqueRoad(Node n1, Node n2)
+        {
+            if (n1.GetLanes(Direction.In).Count == 1 && n2.GetLanes(Direction.Out).Count == 1
+                    && n1.GetLanes(Direction.Out).Count == 1 && n2.GetLanes(Direction.In).Count == 1)
+            {
+                HashSet<Road> ins = n1.GetRoads(Direction.In);
+                ins.UnionWith(n2.GetRoads(Direction.In));
+                HashSet<Road> outs = n1.GetRoads(Direction.Out);
+                outs.UnionWith(n2.GetRoads(Direction.Out));
+                if (ins.Count == 1 && outs.Count == 1)
+                    return true;
+
+            }
+            return false;
         }
 
         static void BuildPathNode2Node(Node n1, Node n2, int span)
