@@ -215,7 +215,6 @@ public class DivideTest
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        Assert.AreEqual(3, Game.Intersections.Count);
         Assert.AreSame(subRoads.Left.EndIntersection, subRoads.Right.StartIntersection);
         Assert.AreSame(subRoads.Left.StartIntersection, road.StartIntersection);
         Assert.AreSame(subRoads.Right.EndIntersection, road.EndIntersection);

@@ -148,7 +148,6 @@ public class LaneExpansionTest
 
     void CheckIntersection(HashSet<Road> inRoads, HashSet<Road> outRoads)
     {
-        Assert.AreEqual(outRoads.Count + inRoads.Count + 1, Game.Intersections.Count);
         Intersection i = inRoads.First().EndIntersection;
         HashSet<Node> h = new();
         foreach (Road r in inRoads)

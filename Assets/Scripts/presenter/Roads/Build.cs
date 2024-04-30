@@ -85,13 +85,9 @@ public static class Build
 
         if (startTarget.SnapNotNull)
             road.StartIntersection = startNodes.GetIntersection();
-        else
-            Game.RegisterIntersection(road.StartIntersection);
 
         if (endTarget.SnapNotNull)
             road.EndIntersection = endNodes.GetIntersection();
-        else
-            Game.RegisterIntersection(road.EndIntersection);
 
         Game.RegisterRoad(road);
             
@@ -104,10 +100,6 @@ public static class Build
             ConnectRoadEndToNodes(endNodes, road);
         else
             road.EndIntersection.UpdateOutline();
-
-        road.StartIntersection.SetNodeReferenece();
-        road.EndIntersection.SetNodeReferenece();
-
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)

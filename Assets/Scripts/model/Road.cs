@@ -57,10 +57,10 @@ public class Road
     {
         IsGhost = false;
         Length = BezierSeries.Length;
-        InitLanes();
         StartIntersection = new();
-        StartIntersection.AddRoad(this, Side.Start);
         EndIntersection = new();
+        InitLanes();
+        StartIntersection.AddRoad(this, Side.Start);
         EndIntersection.AddRoad(this, Side.End);
         if (HasLaneShorterThanMinimumLaneLength())
             return;

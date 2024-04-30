@@ -8,7 +8,6 @@ using System;
 
 public class Intersection
 {
-    public int Id { get; set; }
     [JsonProperty]
     private readonly List<Node> nodes;
     [JsonIgnore]
@@ -85,14 +84,6 @@ public class Intersection
         nodes.Remove(node);
     }
 
-    public void SetNodeReferenece()
-    {
-        if (Id == 0)
-            throw new InvalidOperationException("intersection id is 0");
-        foreach (Node n in nodes)
-            n.Intersection = this;
-    }
-
     public void UpdateNormalAndPlane()
     {
         if (inRoads.Count != 0)
@@ -147,12 +138,7 @@ public class Intersection
             Build.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
         UpdateOutline();
     }
-
-    public override string ToString()
-    {
-        return "Intersection " + Id;
-    }
-
+    
     public void UpdateOutline()
     {
         foreach (Road r in outRoads)

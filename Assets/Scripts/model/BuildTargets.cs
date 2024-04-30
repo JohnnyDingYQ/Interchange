@@ -84,8 +84,8 @@ public class BuildTargets
             {
                 float3 left = nodes.First().Pos + i * normal;
                 float3 right = nodes.Last().Pos - i * normal;
-                AddNodeIfWithinSnap(new(left, nodes.First().NodeIndex - i));
-                AddNodeIfWithinSnap(new(right, nodes.Last().NodeIndex + i));
+                AddNodeIfWithinSnap(new(left, nodes.First().NodeIndex - i, nodes.First().Intersection));
+                AddNodeIfWithinSnap(new(right, nodes.Last().NodeIndex + i, nodes.First().Intersection));
             }
             floatContainers.Sort();
         }

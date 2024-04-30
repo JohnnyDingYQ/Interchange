@@ -199,9 +199,17 @@ public class SaveSystemTest
     }
 
     [Test]
-    public void RemoveRoadAfterRecovery()
+    public void RecoverIntersectionNormal()
     {
+        RoadBuilder.B(0, stride, 2 * stride, 2);
+        SaveSystem.SaveGame();
+        Game.WipeState();
+        SaveSystem.LoadGame();
 
+        Intersection i = Game.Roads.Values.First().EndIntersection;
+        Assert.NotNull(i.Normal);
+        Assert.NotNull(i.Tangent);
+        Assert.NotNull(i.PointOnInSide);
     }
 
     // TODO: Complete further testing

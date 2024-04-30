@@ -30,13 +30,14 @@ public class Node : IComparable<Node>
     public Intersection Intersection { get; set; }
 
     public Node() { }
-    public Node(float3 pos, int order)
+    public Node(float3 pos, int order, Intersection i)
     {
         Pos = pos;
         NodeIndex = order;
         Id = -1;
         inLanes = new();
         outLanes = new();
+        Intersection = i;
     }
 
     /// <summary>

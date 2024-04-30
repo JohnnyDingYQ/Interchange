@@ -59,8 +59,6 @@ public static class DivideHandler
             leftRoad.StartIntersection = road.StartIntersection;
             rightRoad.StartIntersection = leftRoad.EndIntersection;
             rightRoad.EndIntersection = road.EndIntersection;
-            Game.RegisterIntersection(leftRoad.EndIntersection);
-            leftRoad.EndIntersection.SetNodeReferenece();
         }
 
         void OperateNodes()

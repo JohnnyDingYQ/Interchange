@@ -38,7 +38,6 @@ public class BasicBuildTest
         Assert.True(Nodes.ContainsKey(lane.EndNode.Id));
         Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
         Assert.True(lane.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
-        Assert.AreEqual(2, Game.Intersections.Count);
         Assert.AreSame(lane.StartNode, road.StartIntersection.Nodes.Single());
         Assert.AreSame(lane.EndNode, road.EndIntersection.Nodes.Single());
         Assert.AreSame(road, road.StartIntersection.OutRoads.Single());
@@ -66,7 +65,6 @@ public class BasicBuildTest
         Assert.True(lane0.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane0 }));
         Assert.True(lane1.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
         Assert.True(lane1.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
-        Assert.AreEqual(2, Game.Intersections.Count);
         Assert.True(road.StartIntersection.Nodes.SequenceEqual(road.GetNodes(Side.Start)));
         Assert.True(road.EndIntersection.Nodes.SequenceEqual(road.GetNodes(Side.End)));
         Assert.AreSame(road, road.StartIntersection.OutRoads.Single());
@@ -208,7 +206,6 @@ public class BasicBuildTest
         Assert.NotNull(inRoad);
         Assert.NotNull(outRoad);
         Assert.AreEqual(laneCount * 3, Nodes.Count);
-        Assert.AreEqual(3, Game.Intersections.Count);
         Assert.AreSame(inRoad.EndIntersection, outRoad.StartIntersection);
         for (int i = 0; i < laneCount; i++)
         {
@@ -219,7 +216,7 @@ public class BasicBuildTest
         }
         Assert.True(inRoad.EndIntersection.Nodes.SequenceEqual(inRoad.GetNodes(Side.End)));
         foreach (Node n in inRoad.GetNodes(Side.End))
-            n.Intersection = inRoad.EndIntersection;
+            Assert.AreSame(n.Intersection, inRoad.EndIntersection);
     }
     #endregion
 }

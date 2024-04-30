@@ -35,8 +35,8 @@ public class Lane
 
     void InitNodes()
     {
-        StartNode = new(BezierSeries.EvaluatePosition(0), LaneIndex);
-        EndNode = new(BezierSeries.EvaluatePosition(1), LaneIndex);
+        StartNode = new(BezierSeries.EvaluatePosition(0), LaneIndex, Road.StartIntersection);
+        EndNode = new(BezierSeries.EvaluatePosition(1), LaneIndex, Road.EndIntersection);
         StartNode.AddLane(this, Direction.Out);
         EndNode.AddLane(this, Direction.In);
     }

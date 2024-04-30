@@ -23,10 +23,6 @@ public static class SaveSystem
                 TypeNameHandling = TypeNameHandling.Auto
             });
             Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
-            foreach (Intersection i in Game.Intersections.Values)
-            {
-                i.UpdateNormalAndPlane();
-            }
             foreach (Road road in Game.Roads.Values)
                 Game.InvokeInstantiateRoad(road);
         }

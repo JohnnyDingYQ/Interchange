@@ -14,7 +14,6 @@ public static class Game
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
-    public static SortedDictionary<int, Intersection> Intersections { get { return GameState.Intersections; } }
     public static Road SelectedRoad { get; set; }
 
     public static int NextAvailableNodeId
@@ -26,11 +25,6 @@ public static class Game
     {
         get { return GameState.NextAvailableRoadId; }
         set { GameState.NextAvailableRoadId = value; }
-    }
-    public static int NextAvailableIntersectionId
-    {
-        get { return GameState.NextAvailableIntersectionId; }
-        set { GameState.NextAvailableIntersectionId = value; }
     }
 
     static Game()
@@ -70,14 +64,6 @@ public static class Game
         Nodes[node.Id] = node;
     }
 
-    public static void RegisterIntersection(Intersection intersection)
-    {
-        if (Intersections.ContainsKey(intersection.Id))
-            return;
-        intersection.Id = NextAvailableIntersectionId++;
-        Intersections[intersection.Id] = intersection;
-    }
-
     public static bool HasNode(Node node)
     {
         return Nodes.Values.Contains(node);
@@ -109,14 +95,10 @@ public static class Game
         }
         road.StartIntersection.RemoveRoad(road, Side.Start);
         road.EndIntersection.RemoveRoad(road, Side.End);
-        if (road.StartIntersection.IsEmpty())
-            Intersections.Remove(road.StartIntersection.Id);
-        else
+        if (!road.StartIntersection.IsEmpty())
             road.StartIntersection.ReevaluatePaths();
 
-        if (road.EndIntersection.IsEmpty())
-            Intersections.Remove(road.EndIntersection.Id);
-        else
+        if (!road.EndIntersection.IsEmpty())
             road.EndIntersection.ReevaluatePaths();
 
         DestroyRoad?.Invoke(road);

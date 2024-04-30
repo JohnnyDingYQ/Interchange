@@ -7,23 +7,18 @@ public class GameState
     [JsonProperty]
     public SortedDictionary<int, Node> Nodes { get; private set; }
     [JsonProperty]
-    public SortedDictionary<int, Intersection> Intersections {get; private set;}
-    [JsonProperty]
     public SortedDictionary<int, Road> Roads { get; private set; }
     [JsonIgnore]
     public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
     public List<Path> GraphSave { get; set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
-    public int NextAvailableIntersectionId { get; set; }
     public GameState()
     {
         Roads = new();
         Nodes = new();
-        Intersections = new();
         Graph = new(false);
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
-        NextAvailableIntersectionId = 1;
     }
 }
