@@ -8,41 +8,33 @@ using System;
 
 public class Intersection
 {
+    public int Id { get; set; }
     [JsonProperty]
-    private readonly List<Node> nodes;
+    private readonly List<Node> nodes = new();
     [JsonIgnore]
     public List<Node> Nodes { get { return new List<Node>(nodes); } }
     [JsonIgnore]
     public int Count { get { return Nodes.Count; } }
     [JsonProperty]
-    private readonly HashSet<Road> inRoads;
+    private readonly HashSet<Road> inRoads = new();
     [JsonIgnore]
     public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }
     [JsonProperty]
-    private readonly HashSet<Road> outRoads;
+    private readonly HashSet<Road> outRoads = new();
     [JsonIgnore]
     public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
     [JsonIgnore]
     public HashSet<Road> Roads { get { return GetRoads(); } }
     [JsonIgnore]
-    public Plane Plane { get; private set; }
+    public Plane Plane { get { return GetPlane(); } }
     [JsonIgnore]
-    public float3 Normal { get; private set; }
+    public float3 Normal { get { return GetAttribute(AttributeTypes.Normal); } }
     [JsonIgnore]
-    public float3 Tangent { get; private set; }
+    public float3 Tangent { get { return GetAttribute(AttributeTypes.Tangent); } }
     [JsonIgnore]
-    public float3 PointOnInSide { get; private set; }
+    public float3 PointOnInSide { get { return GetAttribute(AttributeTypes.PointOnInSide); } }
 
-    [JsonConstructor]
-    public Intersection(int Id)
-    {
-    }
-    public Intersection()
-    {
-        nodes = new();
-        inRoads = new();
-        outRoads = new();
-    }
+    public Intersection() { }
 
     public void AddRoad(Road road, Side side)
     {
@@ -60,7 +52,6 @@ public class Intersection
                 nodes.Add(n);
         }
         nodes.Sort();
-        UpdateNormalAndPlane();
     }
 
     public void RemoveRoad(Road road, Side side)
@@ -84,27 +75,49 @@ public class Intersection
         nodes.Remove(node);
     }
 
-    public void UpdateNormalAndPlane()
+    float3 GetAttribute(AttributeTypes attributeType)
     {
         if (inRoads.Count != 0)
         {
-            Road randomInRoad = InRoads.First();
+            Road randomInRoad = inRoads.First();
             BezierSeries bs = randomInRoad.BezierSeries;
-            Normal = math.normalize(bs.Evaluate2DNormalizedNormal(bs.EndLocation));
-            Tangent = math.normalize(bs.EvaluateTangent(bs.EndLocation));
-            Plane = new(randomInRoad.EndPos, randomInRoad.EndPos + Normal, randomInRoad.EndPos - new float3(0, 1, 0));
-            PointOnInSide = bs.EvaluatePosition(bs.EndLocation) - math.normalize(bs.EvaluateTangent(bs.EndLocation));
+            if (attributeType == AttributeTypes.Normal)
+                return bs.Evaluate2DNormalizedNormal(bs.EndLocation);
+            if (attributeType == AttributeTypes.Tangent)
+                return math.normalize(bs.EvaluateTangent(bs.EndLocation));
+            if (attributeType == AttributeTypes.PointOnInSide)
+                return bs.EvaluatePosition(bs.EndLocation) - math.normalize(bs.EvaluateTangent(bs.EndLocation));
+        }
+        if (outRoads.Count != 0)
+        {
+            Road randomOutRoad = outRoads.First();
+            BezierSeries bs = randomOutRoad.BezierSeries;
+            if (attributeType == AttributeTypes.Normal)
+                return bs.Evaluate2DNormalizedNormal(bs.StartLocation);
+            if (attributeType == AttributeTypes.Tangent)
+                return math.normalize(bs.EvaluateTangent(bs.StartLocation));
+            if (attributeType == AttributeTypes.PointOnInSide)
+                return bs.EvaluatePosition(bs.StartLocation) - math.normalize(bs.EvaluateTangent(bs.StartLocation));
+        }
+        throw new InvalidOperationException("nope");
+    }
+
+    Plane GetPlane()
+    {
+        if (inRoads.Count != 0)
+        {
+            Road randomInRoad = inRoads.First();
+            return new(randomInRoad.EndPos, randomInRoad.EndPos + Normal, randomInRoad.EndPos - new float3(0, 1, 0));
         }
         else if (outRoads.Count != 0)
         {
-            Road randomOutRoad = OutRoads.First();
-            BezierSeries bs = randomOutRoad.BezierSeries;
-            Normal = math.normalize(bs.Evaluate2DNormalizedNormal(bs.StartLocation));
-            Tangent = math.normalize(bs.EvaluateTangent(bs.StartLocation));
-            Plane = new(randomOutRoad.StartPos, randomOutRoad.StartPos + Normal, randomOutRoad.EndPos - new float3(0, 1, 0));
-            PointOnInSide = bs.EvaluatePosition(bs.StartLocation) - math.normalize(bs.EvaluateTangent(bs.StartLocation));
+            Road randomOutRoad = outRoads.First();
+            return new(randomOutRoad.StartPos, randomOutRoad.StartPos + Normal, randomOutRoad.EndPos - new float3(0, 1, 0));
         }
+        throw new InvalidOperationException("nope");
     }
+
+    private enum AttributeTypes { Normal, PointOnInSide, Tangent }
 
     public HashSet<Road> GetRoads()
     {
@@ -138,7 +151,7 @@ public class Intersection
             Build.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
         UpdateOutline();
     }
-    
+
     public void UpdateOutline()
     {
         foreach (Road r in outRoads)

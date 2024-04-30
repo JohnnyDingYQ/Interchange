@@ -20,15 +20,38 @@ public static class SaveSystem
             // There is no server, whatever
             Game.GameState = JsonConvert.DeserializeObject<GameState>(fileContents, new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = TypeNameHandling.Auto,
+                PreserveReferencesHandling = PreserveReferencesHandling.All,
+                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
             });
-            Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
-            foreach (Road road in Game.Roads.Values)
-                Game.InvokeInstantiateRoad(road);
+            RestoreGameState();
         }
         else
         {
             throw new InvalidOperationException("Accessed save file does not exist");
+        }
+
+        static void RestoreGameState()
+        {
+            Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
+            EvaluteIntersections();
+            foreach (Road r in Game.Roads.Values)
+            {
+                r.EvaluateBodyOutline();
+                Game.InvokeInstantiateRoad(r);
+            }
+        }
+
+        static void EvaluteIntersections()
+        {
+            HashSet<Intersection> evaluated = new();
+            foreach (Road r in Game.Roads.Values)
+                foreach (Intersection i in new Intersection[] {r.StartIntersection, r.EndIntersection})
+                    if (!evaluated.Contains(i))
+                    {
+                        evaluated.Add(i);
+                        i.UpdateOutline();
+                    }
         }
     }
 
@@ -38,9 +61,8 @@ public static class SaveSystem
 
         string s = JsonConvert.SerializeObject(Game.GameState, Formatting.None, new JsonSerializerSettings
         {
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
             TypeNameHandling = TypeNameHandling.Auto,
-            ObjectCreationHandling = ObjectCreationHandling.Replace
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
     }

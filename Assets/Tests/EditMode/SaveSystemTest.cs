@@ -47,7 +47,7 @@ public class SaveSystemTest
 
         Assert.AreEqual(1, Game.Roads.Count);
         Road road = Game.Roads.Values.First();
-        Assert.AreEqual(new float3(0), road.StartPos);;
+        Assert.AreEqual(new float3(0), road.StartPos); ;
         Assert.AreEqual(2 * stride, road.EndPos);
         Assert.AreEqual(3, road.Lanes.Count);
         Lane lane = road.Lanes[1];
@@ -108,7 +108,7 @@ public class SaveSystemTest
     }
 
     [Test]
-    public void RecoverLanesSplines()
+    public void RecoverLanesCurves()
     {
         RoadBuilder.B(0, stride, 2 * stride, 1);
         RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
@@ -199,17 +199,24 @@ public class SaveSystemTest
     }
 
     [Test]
-    public void RecoverIntersectionNormal()
+    public void RecoverIntersection()
     {
-        RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road saved = RoadBuilder.B(0, stride, 2 * stride, 2);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
+        Road restored = Game.Roads.Values.First();
+        Assert.NotNull(restored.StartIntersection);
+        Assert.NotNull(restored.EndIntersection);
+        Assert.AreSame(restored.StartIntersection, restored.Lanes[0].StartNode.Intersection);
+        Assert.AreSame(restored.EndIntersection, restored.Lanes[0].EndNode.Intersection);
+        Assert.AreSame(restored.StartIntersection, restored.Lanes[1].StartNode.Intersection);
+        Assert.AreSame(restored.EndIntersection, restored.Lanes[1].EndNode.Intersection);
         Intersection i = Game.Roads.Values.First().EndIntersection;
-        Assert.NotNull(i.Normal);
-        Assert.NotNull(i.Tangent);
-        Assert.NotNull(i.PointOnInSide);
+        Assert.True(Utility.AreNumericallyEqual(saved.EndIntersection.Normal, restored.EndIntersection.Normal));
+        Assert.True(Utility.AreNumericallyEqual(saved.EndIntersection.Tangent, restored.EndIntersection.Tangent));
+        Assert.True(Utility.AreNumericallyEqual(saved.EndIntersection.PointOnInSide, restored.EndIntersection.PointOnInSide));
+        
     }
 
     // TODO: Complete further testing

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphExtensions;
-using ListExtensions;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -84,10 +83,10 @@ public static class Build
             return null;
 
         if (startTarget.SnapNotNull)
-            road.StartIntersection = startNodes.GetIntersection();
+            road.StartIntersection = startTarget.Intersection;
 
         if (endTarget.SnapNotNull)
-            road.EndIntersection = endNodes.GetIntersection();
+            road.EndIntersection = endTarget.Intersection;
 
         Game.RegisterRoad(road);
             
@@ -115,9 +114,9 @@ public static class Build
         {
             float oldY = pivotPos.y;
             if (startTarget.SnapNotNull)
-                pivotPos = (float3)Vector3.Project(pivotPos - startPos, startNodes.GetIntersection().Tangent) + startPos;
+                pivotPos = (float3)Vector3.Project(pivotPos - startPos, startTarget.Intersection.Tangent) + startPos;
             if (endTarget.SnapNotNull)
-                pivotPos = (float3)Vector3.Project(pivotPos - endPos, endNodes.GetIntersection().Tangent) + endPos;
+                pivotPos = (float3)Vector3.Project(pivotPos - endPos, endTarget.Intersection.Tangent) + endPos;
             pivotPos.y = oldY;
         }
 
@@ -178,7 +177,7 @@ public static class Build
 
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
     {
-        if (nodes.GetIntersection() != road.StartIntersection)
+        if (nodes.First().Intersection != road.StartIntersection)
             throw new InvalidOperationException("Not the same intersection");
         if (!Game.Roads.ContainsKey(road.Id))
             throw new InvalidOperationException("Road to connect not registered");
@@ -193,7 +192,7 @@ public static class Build
 
     public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
     {
-        if (nodes.GetIntersection() != road.EndIntersection)
+        if (nodes.First().Intersection != road.EndIntersection)
             throw new InvalidOperationException("Not the same intersection");
         if (!Game.Roads.ContainsKey(road.Id))
             throw new InvalidOperationException("Road to connect not registered");
@@ -236,7 +235,7 @@ public static class Build
     public static void BuildAllPaths(List<Lane> to, List<Node> from, Direction direction)
     {
         int laneCount = to.Count;
-        Intersection intersection = from.GetIntersection();
+        Intersection intersection = from.First().Intersection;
         ReadOnlySet<Road> roadsOnOtherSide = direction == Direction.Out ? intersection.InRoads : intersection.OutRoads;
         
         BuildStraightPath();

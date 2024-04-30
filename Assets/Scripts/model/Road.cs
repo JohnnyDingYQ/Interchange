@@ -19,14 +19,15 @@ public class Road
     public float3 EndPos { get; private set; }
     [JsonProperty]
     public float Length { get; private set; }
-    public Intersection StartIntersection { get; set; }
-    public Intersection EndIntersection { get; set; }
+    [JsonIgnore]
     public RoadOutline LeftOutline { get; set; }
+    [JsonIgnore]
     public RoadOutline RightOutline { get; set; }
     public bool IsGhost { get; set; }
+    public Intersection StartIntersection { get; set; }
+    public Intersection EndIntersection { get; set; }
 
     // Empty constructor for JSON.Net deserialization
-    [JsonConstructor]
     public Road()
     {
         LeftOutline = new();
@@ -60,14 +61,19 @@ public class Road
         StartIntersection = new();
         EndIntersection = new();
         InitLanes();
-        StartIntersection.AddRoad(this, Side.Start);
-        EndIntersection.AddRoad(this, Side.End);
         if (HasLaneShorterThanMinimumLaneLength())
             return;
+        StartIntersection.AddRoad(this, Side.Start);
+        EndIntersection.AddRoad(this, Side.End);
         LeftOutline = new();
         RightOutline = new();
         foreach (Lane l in Lanes)
             l.InitVertices();
+        EvaluateBodyOutline();
+    }
+
+    public void EvaluateBodyOutline()
+    {
         LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(Orientation.Left);
         RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(Orientation.Right);
     }
