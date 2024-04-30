@@ -11,6 +11,7 @@ public static class SaveSystem
 {
     public static void LoadGame()
     {
+        Game.WipeState();
         string saveFile = Application.persistentDataPath + "/save0.json";
 
         if (File.Exists(saveFile))
@@ -25,7 +26,6 @@ public static class SaveSystem
             foreach (Intersection i in Game.Intersections.Values)
             {
                 i.UpdateNormalAndPlane();
-                i.UpdateOutline();
             }
             foreach (Road road in Game.Roads.Values)
                 Game.InvokeInstantiateRoad(road);
@@ -44,7 +44,7 @@ public static class SaveSystem
         {
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             TypeNameHandling = TypeNameHandling.Auto,
-            // ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            ObjectCreationHandling = ObjectCreationHandling.Replace
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
     }

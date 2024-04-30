@@ -27,7 +27,7 @@ public class Lane
     public Lane(Road road, int laneIndex)
     {
         LaneIndex = laneIndex;
-        BezierSeries = road.BezierSeries.Offset(((float) road.LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth);
+        BezierSeries = road.BezierSeries.Offset(((float)road.LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth);
         Road = road;
         InitNodes();
         Length = BezierSeries.Length;

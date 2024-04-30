@@ -9,41 +9,34 @@ public class Node : IComparable<Node>
 {
     public int Id { get; set; }
     [JsonProperty]
-    private readonly HashSet<Lane> lanes;
+    private readonly HashSet<Lane> inLanes;
+    [JsonProperty]
+    private readonly HashSet<Lane> outLanes;
     [JsonIgnore]
-    public ReadOnlySet<Lane> Lanes { get { return lanes.AsReadOnly(); } }
+    public HashSet<Lane> Lanes
+    {
+        get
+        {
+            HashSet<Lane> h = new();
+            h.UnionWith(inLanes);
+            h.UnionWith(outLanes);
+            return h;
+        }
+    }
     [JsonProperty]
     public float3 Pos { get; private set; }
     [JsonProperty]
     public int NodeIndex { get; private set; }
-    [JsonProperty]
-    public List<KeyValuePair<Lane, Direction>> SerializedDirections
-    {
-        get { return directions.ToList(); }
-        set { directions = value.ToDictionary(x => x.Key, x => x.Value); }
-    }
-    private Dictionary<Lane, Direction> directions;
-    [JsonProperty]
-    private int intersectionId;
-    public Intersection Intersection
-    {
-        get
-        {   
-            if (Game.Intersections.ContainsKey(intersectionId))
-                return Game.Intersections[intersectionId];
-            return null;
-        }
-        set { intersectionId = value.Id; }
-    }
+    public Intersection Intersection { get; set; }
 
-
+    public Node() { }
     public Node(float3 pos, int order)
     {
         Pos = pos;
         NodeIndex = order;
         Id = -1;
-        lanes = new();
-        directions = new();
+        inLanes = new();
+        outLanes = new();
     }
 
     /// <summary>
@@ -64,51 +57,48 @@ public class Node : IComparable<Node>
 
     public void AddLane(Lane lane, Direction direction)
     {
-        if (lanes.Contains(lane))
+        if (inLanes.Contains(lane) || outLanes.Contains(lane))
             throw new InvalidOperationException("lane already exists");
-        lanes.Add(lane);
-        directions[lane] = direction;
+        if (direction == Direction.In)
+            inLanes.Add(lane);
+        else if (direction == Direction.Out)
+            outLanes.Add(lane);
+        else
+            throw new ArgumentException("direction");
     }
 
     public bool RemoveLane(Lane lane)
     {
-        if (!lanes.Contains(lane))
-            return false;
-        lanes.Remove(lane);
-        directions.Remove(lane);
-        return true;
-    }
-
-    public Direction GetDirection(Lane lane)
-    {
-        return directions[lane];
+        if (inLanes.Contains(lane))
+        {
+            inLanes.Remove(lane);
+            return true;
+        }
+        else if (outLanes.Contains(lane))
+        {
+            outLanes.Remove(lane);
+            return true;
+        }
+        return false;
     }
 
     // O(n) operation but meh
-    public List<Lane> GetLanes(Direction direction)
+    public ReadOnlySet<Lane> GetLanes(Direction direction)
     {
-        List<Lane> r = new();
-        foreach (Lane lane in directions.Keys)
-        {
-            if (directions[lane] == direction)
-                r.Add(lane);
-        }
-        return r;
-    }
-
-    public bool HasLanes(Direction direction)
-    {
-        return GetLanes(direction).Count != 0;
+        if (direction == Direction.In)
+            return inLanes.AsReadOnly();
+        if (direction == Direction.Out)
+            return outLanes.AsReadOnly();
+        if (direction == Direction.Both)
+            return Lanes.AsReadOnly();
+        throw new ArgumentException("direction");
     }
 
     public IEnumerable<Road> GetRoads(Direction direction)
     {
         HashSet<Road> r = new();
-        foreach (Lane lane in directions.Keys)
-        {
-            if (directions[lane] == direction)
-                r.Add(lane.Road);
-        }
+        foreach (Lane l in GetLanes(direction))
+            r.Add(l.Road);
         return r;
     }
 

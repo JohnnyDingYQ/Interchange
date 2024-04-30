@@ -21,9 +21,7 @@ public class Road
     public float Length { get; private set; }
     public Intersection StartIntersection { get; set; }
     public Intersection EndIntersection { get; set; }
-    [JsonIgnore]
     public RoadOutline LeftOutline { get; set; }
-    [JsonIgnore]
     public RoadOutline RightOutline { get; set; }
     public bool IsGhost { get; set; }
 

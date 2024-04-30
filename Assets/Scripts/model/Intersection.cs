@@ -35,6 +35,9 @@ public class Intersection
     public float3 PointOnInSide { get; private set; }
 
     [JsonConstructor]
+    public Intersection(int Id)
+    {
+    }
     public Intersection()
     {
         nodes = new();
@@ -121,8 +124,6 @@ public class Intersection
 
     public Node FirstWithRoad(Direction direction)
     {
-        foreach (Node n in nodes)
-            Debug.Log(n);
         foreach (Node n in nodes)
             if (n.GetLanes(direction).Count != 0)
                 return n;
@@ -267,16 +268,4 @@ public class Intersection
         }
         #endregion
     }
-
-    // [JsonProperty]
-    // private List<int> SerializedNodes
-    // {
-    //     get
-    //     {
-    //         List<int> s = new();
-    //         foreach (Node n in nodes)
-    //             s.Add(n.Id);
-    //         return s;
-    //     }
-    // }
 }
