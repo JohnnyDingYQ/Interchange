@@ -5,6 +5,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using System;
+using UnityEngine.Splines;
 
 public class Intersection
 {
@@ -126,7 +127,7 @@ public class Intersection
         return h;
     }
 
-    public Node FirstWithRoad(Direction direction)
+    public Node FirstNodeWithRoad(Direction direction)
     {
         foreach (Node n in nodes)
             if (n.GetLanes(direction).Count != 0)
@@ -134,7 +135,7 @@ public class Intersection
         return null;
     }
 
-    public Node LastWithRoad(Direction direction)
+    public Node LastNodeWithRoad(Direction direction)
     {
         for (int i = nodes.Count - 1; i >= 0; i--)
             if (nodes[i].GetLanes(direction).Count != 0)
@@ -149,10 +150,10 @@ public class Intersection
                 Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
         foreach (Road r in outRoads)
             Build.BuildAllPaths(r.Lanes, r.GetNodes(Side.Start), Direction.Out);
-        UpdateOutline();
+        EvaluateOutline();
     }
 
-    public void UpdateOutline()
+    public void EvaluateOutline()
     {
         foreach (Road r in outRoads)
         {
@@ -188,8 +189,8 @@ public class Intersection
         #region extracted
         void EvaluateSideOutline()
         {
-            Node firstNodeWithInRoad = FirstWithRoad(Direction.In);
-            Node lastNodeWithInRoad = LastWithRoad(Direction.In);
+            Node firstNodeWithInRoad = FirstNodeWithRoad(Direction.In);
+            Node lastNodeWithInRoad = LastNodeWithRoad(Direction.In);
             Road leftmostRoad = firstNodeWithInRoad.GetRoads(Direction.In).First();
             Road rightmostRoad = lastNodeWithInRoad.GetRoads(Direction.In).First();
 
@@ -266,5 +267,107 @@ public class Intersection
             return results;
         }
         #endregion
+    }
+
+    public void EvaluatePaths()
+    {
+        foreach (Road r in inRoads)
+            foreach (Lane l in r.Lanes)
+                Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
+        
+        if (inRoads.Count == 0 || outRoads.Count == 0)
+            return;
+
+        foreach (Node n in nodes)
+            BuildPathNode2Node(n, n, 0);
+
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            Node n = nodes[i];
+            if (i - 1 >= 0)
+            {
+                Node other = nodes[i - 1];
+                if (n.GetLanes(Direction.In).Count == 1 && other.GetLanes(Direction.Out).Count == 1
+                    && n.GetLanes(Direction.Out).Count == 1 && other.GetLanes(Direction.In).Count == 1)
+                {
+                    HashSet<Road> ins = n.GetRoads(Direction.In);
+                    ins.UnionWith(other.GetRoads(Direction.In));
+                    HashSet<Road> outs = n.GetRoads(Direction.Out);
+                    outs.UnionWith(other.GetRoads(Direction.Out));
+                    if (ins.Count == 1 && outs.Count == 1)
+                        BuildPathNode2Node(n, other, -1);
+
+                }
+            }
+            if (i + 1 < nodes.Count)
+            {
+                Node other = nodes[i + 1];
+                if (n.GetLanes(Direction.In).Count == 1 && other.GetLanes(Direction.Out).Count == 1
+                    && n.GetLanes(Direction.Out).Count == 1 && other.GetLanes(Direction.In).Count == 1)
+                {
+                    HashSet<Road> ins = n.GetRoads(Direction.In);
+                    ins.UnionWith(other.GetRoads(Direction.In));
+                    HashSet<Road> outs = n.GetRoads(Direction.Out);
+                    outs.UnionWith(other.GetRoads(Direction.Out));
+                    if (ins.Count == 1 && outs.Count == 1)
+                        BuildPathNode2Node(n, other, 1);
+
+                }
+            }
+        }
+
+        foreach (Node n in nodes)
+        {
+            if (n.GetLanes(Direction.Out).Count == 0)
+            {
+                if (n.NodeIndex < LastNodeWithRoad(Direction.Out).NodeIndex && n.NodeIndex > FirstNodeWithRoad(Direction.Out).NodeIndex)
+                    continue;
+                int indexFirst = n.NodeIndex - FirstNodeWithRoad(Direction.Out).NodeIndex;
+                int indexLast = n.NodeIndex - LastNodeWithRoad(Direction.Out).NodeIndex;
+                if (Math.Abs(indexFirst) < Math.Abs(indexLast))
+                    BuildPathNode2Node(n, FirstNodeWithRoad(Direction.Out), indexFirst);
+                else
+                    BuildPathNode2Node(n, LastNodeWithRoad(Direction.Out), indexLast);
+            }
+
+            if (n.GetLanes(Direction.In).Count == 0)
+            {
+                if (n.NodeIndex < LastNodeWithRoad(Direction.In).NodeIndex && n.NodeIndex > FirstNodeWithRoad(Direction.In).NodeIndex)
+                    continue;
+                int indexFirst = n.NodeIndex - FirstNodeWithRoad(Direction.In).NodeIndex;
+                int indexLast = n.NodeIndex - LastNodeWithRoad(Direction.In).NodeIndex;
+                if (Math.Abs(indexFirst) < Math.Abs(indexLast))
+                    BuildPathNode2Node(FirstNodeWithRoad(Direction.In), n, indexFirst);
+                else
+                    BuildPathNode2Node(LastNodeWithRoad(Direction.In), n, indexLast);
+            }
+        }
+
+        static void BuildPathNode2Node(Node n1, Node n2, int span)
+        {
+            foreach (Lane inLane in n1.GetLanes(Direction.In))
+            {
+                foreach (Lane outLane in n2.GetLanes(Direction.Out))
+                    BuildPathLane2Lane(inLane, outLane, span);
+            }
+        }
+
+        static void BuildPathLane2Lane(Lane l1, Lane l2, int span)
+        {
+            BuildPath(l1.EndVertex, l2.StartVertex, span);
+        }
+
+        static void BuildPath(Vertex start, Vertex end, int span)
+        {
+            Game.Graph.TryGetEdge(start, end, out Path edge);
+            if (edge != null)
+                return;
+            float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
+            float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
+            BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
+            Path p = new(bs, start, end, span);
+            Game.AddEdge(p);
+        }
+
     }
 }

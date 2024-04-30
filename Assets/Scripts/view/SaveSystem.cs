@@ -50,7 +50,7 @@ public static class SaveSystem
                     if (!evaluated.Contains(i))
                     {
                         evaluated.Add(i);
-                        i.UpdateOutline();
+                        i.EvaluateOutline();
                     }
         }
     }

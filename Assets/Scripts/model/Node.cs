@@ -95,7 +95,7 @@ public class Node : IComparable<Node>
         throw new ArgumentException("direction");
     }
 
-    public IEnumerable<Road> GetRoads(Direction direction)
+    public HashSet<Road> GetRoads(Direction direction)
     {
         HashSet<Road> r = new();
         foreach (Lane l in GetLanes(direction))

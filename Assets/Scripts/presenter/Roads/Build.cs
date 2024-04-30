@@ -93,12 +93,12 @@ public static class Build
         if (startTarget.SnapNotNull)
             ConnectRoadStartToNodes(startNodes, road);
         else
-            road.StartIntersection.UpdateOutline();
+            road.StartIntersection.EvaluateOutline();
 
         if (endTarget.SnapNotNull)
             ConnectRoadEndToNodes(endNodes, road);
         else
-            road.EndIntersection.UpdateOutline();
+            road.EndIntersection.EvaluateOutline();
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
@@ -187,7 +187,9 @@ public static class Build
             road.Lanes[i].StartNode = nodes[i];
         }
         road.StartIntersection.AddRoad(road, Side.Start);
-        BuildAllPaths(road.Lanes, nodes, Direction.Out);
+        // BuildAllPaths(road.Lanes, nodes, Direction.Out);
+        road.StartIntersection.EvaluatePaths();
+        road.StartIntersection.EvaluateOutline();
     }
 
     public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
@@ -202,7 +204,9 @@ public static class Build
             road.Lanes[i].EndNode = nodes[i];
         }
         road.EndIntersection.AddRoad(road, Side.End);
-        BuildAllPaths(road.Lanes, nodes, Direction.In);
+        // BuildAllPaths(road.Lanes, nodes, Direction.In);
+        road.EndIntersection.EvaluatePaths();
+        road.EndIntersection.EvaluateOutline();
     }
 
     static void RegisterUnregisteredNodes(Road road)
@@ -249,14 +253,14 @@ public static class Build
         if (intersection.InRoads.Count != 0 && intersection.OutRoads.Count != 0)
             PatchUnconnectedLanes();
         
-        intersection.UpdateOutline();
+        intersection.EvaluateOutline();
 
         #region extracted 
         void PatchUnconnectedLanes()
         {
             
-            Node firstNodeWithOutRoad = intersection.FirstWithRoad(Direction.Out);
-            Node lastNodeWithOutRoad = intersection.LastWithRoad(Direction.Out);
+            Node firstNodeWithOutRoad = intersection.FirstNodeWithRoad(Direction.Out);
+            Node lastNodeWithOutRoad = intersection.LastNodeWithRoad(Direction.Out);
             foreach (Road inRoad in intersection.InRoads)
                 foreach (Lane inLane in inRoad.Lanes)
                     if (Game.Graph.OutDegree(inLane.EndVertex) == 0)
@@ -272,8 +276,8 @@ public static class Build
                         foreach (Lane outLane in n.GetLanes(Direction.Out))
                             BuildPath(inLane.EndVertex, outLane.StartVertex, n.NodeIndex - laneNodeIndex);
                     }
-            Node firstNodeWithInRoad = intersection.FirstWithRoad(Direction.In);
-            Node lastNodeWithInRoad = intersection.LastWithRoad(Direction.In);
+            Node firstNodeWithInRoad = intersection.FirstNodeWithRoad(Direction.In);
+            Node lastNodeWithInRoad = intersection.LastNodeWithRoad(Direction.In);
             foreach (Road outRoad in intersection.OutRoads)
                 foreach (Lane outLane in outRoad.Lanes)
                     if (Game.Graph.InDegree(outLane.StartVertex) == 0)

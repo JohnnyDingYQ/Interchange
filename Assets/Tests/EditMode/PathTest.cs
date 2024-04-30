@@ -246,11 +246,13 @@ public class PathTest
         Assert.True(Game.HasEdge(road1.Lanes[2], road2.Lanes[1]));
 
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
-        Assert.AreEqual(11, Game.Graph.EdgeCount);
+        Assert.AreEqual(13, Game.Graph.EdgeCount);
         Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[1]));
         Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[0]));
         Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[0]));
     }
 
     [Test]
@@ -267,10 +269,12 @@ public class PathTest
         Assert.True(Game.HasEdge(road1.Lanes[2], road2.Lanes[1]));
 
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
-        Assert.AreEqual(11, Game.Graph.EdgeCount);
+        Assert.AreEqual(13, Game.Graph.EdgeCount);
         Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[1]));
         Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[0]));
         Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[1]));
+        Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[0]));
     }
 }
