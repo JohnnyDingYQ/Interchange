@@ -163,19 +163,13 @@ public class Intersection
 
             List<float3> outline = GetPath(r, Orientation.Left, Direction.Out)?.GetOutline(Orientation.Left);
             if (outline != null)
-            {
-                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
-                r.LeftOutline.Start = outlineStart;
-            }
+                r.LeftOutline.Start = SeparateOutlineWithEndofRoad(outline, Direction.Out);
             else
                 r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Side.Start);
 
             outline = GetPath(r, Orientation.Right, Direction.Out)?.GetOutline(Orientation.Right);
             if (outline != null)
-            {
-                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
-                r.RightOutline.Start = outlineStart;
-            }
+                r.RightOutline.Start = SeparateOutlineWithEndofRoad(outline, Direction.Out);
             else
                 r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Side.Start);
 
@@ -188,19 +182,13 @@ public class Intersection
 
             List<float3> outline = GetPath(r, Orientation.Left, Direction.In)?.GetOutline(Orientation.Left);
             if (outline != null)
-            {
-                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
-                r.LeftOutline.End = outlineEnd;
-            }
+                r.LeftOutline.End = SeparateOutlineWithEndofRoad(outline, Direction.In);
             else
                 r.LeftOutline.End = GetOutLineAtTwoEnds(r, Orientation.Left, Side.End);
 
             outline = GetPath(r, Orientation.Right, Direction.In)?.GetOutline(Orientation.Right);
             if (outline != null)
-            {
-                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
-                r.RightOutline.End = outlineEnd;
-            }
+                r.RightOutline.End = SeparateOutlineWithEndofRoad(outline, Direction.In);
             else
                 r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
@@ -241,10 +229,12 @@ public class Intersection
             return math.dot(u, v) / math.length(v);
         }
 
-        void SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, out List<float3> outlineEnd, out List<float3> outlineStart)
+        List<float3> SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, Direction direction)
         {
-            outlineEnd = new();
-            outlineStart = new();
+            if (direction != Direction.In && direction != Direction.Out)
+                throw new ArgumentException("direction");
+            List<float3> outlineEnd = new();
+            List<float3> outlineStart = new();
             bool crossed = false;
             float3 prevPt = 0;
             foreach (float3 pt in interRoadOutline)
@@ -266,6 +256,7 @@ public class Intersection
                     outlineStart.Add(pt);
                 prevPt = pt;
             }
+            return direction == Direction.In ? outlineEnd : outlineStart;
         }
 
         static List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Side side)
