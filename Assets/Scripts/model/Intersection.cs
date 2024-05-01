@@ -26,16 +26,25 @@ public class Intersection
     public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
     [JsonIgnore]
     public HashSet<Road> Roads { get { return GetRoads(); } }
-    [JsonIgnore]
-    public Plane Plane { get { return GetPlane(); } }
-    [JsonIgnore]
-    public float3 Normal { get { return GetAttribute(AttributeTypes.Normal); } }
-    [JsonIgnore]
-    public float3 Tangent { get { return GetAttribute(AttributeTypes.Tangent); } }
-    [JsonIgnore]
-    public float3 PointOnInSide { get { return GetAttribute(AttributeTypes.PointOnInSide); } }
+    [JsonProperty]
+    public Plane Plane { get; private set; }
+    [JsonProperty]
+    public float3 Normal { get; private set; }
+    [JsonProperty]
+    public float3 Tangent { get; private set; }
+    [JsonProperty]
+    public float3 PointOnInSide { get; private set; }
 
     public Intersection() { }
+
+    public Intersection(Road road, Side side)
+    {
+        AddRoad(road, side);
+        Normal = GetAttribute(AttributeTypes.Normal);
+        Tangent = GetAttribute(AttributeTypes.Tangent);
+        PointOnInSide = GetAttribute(AttributeTypes.PointOnInSide);
+        Plane = GetPlane();
+    }
 
     public void AddRoad(Road road, Side side)
     {
@@ -49,6 +58,7 @@ public class Intersection
 
         foreach (Node n in road.GetNodes(side))
         {
+            n.Intersection = this;
             if (!nodes.Contains(n))
                 nodes.Add(n);
         }

@@ -19,6 +19,20 @@ public class Float3Converter : JsonConverter<float3>
     }
 }
 
+public class PlaneConverter : JsonConverter<Plane>
+{
+    public override void WriteJson(JsonWriter writer, Plane value, JsonSerializer serializer)
+    {
+        JObject obj = new JObject() { ["n.x"] = value.normal.x, ["n.y"] = value.normal.y, ["n.z"] = value.normal.z, ["d"] = value.distance};
+        obj.WriteTo(writer);
+    }
+    public override Plane ReadJson(JsonReader reader, Type objectType, Plane existingValue, bool hasExistingValue, JsonSerializer serializer)
+    {
+        JObject obj = JObject.Load(reader);
+        return new Plane(new float3((float)obj.GetValue("n.x"), (float)obj.GetValue("n.y"), (float)obj.GetValue("n.z")), (float) obj.GetValue("d"));
+    }
+}
+
 public static class JsonCustomSettings
 {
     public static void ConfigureJsonInternal()
@@ -27,6 +41,7 @@ public static class JsonCustomSettings
         {
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new Float3Converter());
+            settings.Converters.Add(new PlaneConverter());
             return settings;
         };
     }

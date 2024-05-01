@@ -38,7 +38,7 @@ public class BuildTargets
         List<FloatContainer> floatContainers = new();
         foreach (Node node in GameNodes)
             AddNodeIfWithinSnap(node);
-        
+
         if (floatContainers.Count == 0)
             return null;
 
@@ -48,7 +48,7 @@ public class BuildTargets
         List<Node> nodes = FloatContainer.Unwrap<Node>(floatContainers);
         while (nodes.Count > laneCount)
             nodes.Remove(nodes.Last());
-    
+
 
         // this sorts nodes with their order in the road, left to right in the direction of the roads
         nodes.Sort();
@@ -59,7 +59,7 @@ public class BuildTargets
         Intersection = intersection;
         if (nodes.Count == laneCount)
             return nodes;
-        
+
         else
         {
             GetInterpolatedCandidates(2);
@@ -85,8 +85,14 @@ public class BuildTargets
             {
                 float3 left = nodes.First().Pos + i * normal;
                 float3 right = nodes.Last().Pos - i * normal;
-                AddNodeIfWithinSnap(new(left, nodes.First().NodeIndex - i, Intersection));
-                AddNodeIfWithinSnap(new(right, nodes.Last().NodeIndex + i, Intersection));
+                AddNodeIfWithinSnap(new(left, nodes.First().NodeIndex - i)
+                {
+                    Intersection = Intersection
+                });
+                AddNodeIfWithinSnap(new(right, nodes.Last().NodeIndex + i)
+                {
+                    Intersection = Intersection
+                });
             }
             floatContainers.Sort();
         }

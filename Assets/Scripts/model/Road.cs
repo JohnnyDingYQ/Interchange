@@ -58,17 +58,18 @@ public class Road
     {
         IsGhost = false;
         Length = BezierSeries.Length;
-        StartIntersection = new();
-        EndIntersection = new();
         InitLanes();
         if (HasLaneShorterThanMinimumLaneLength())
             return;
-        StartIntersection.AddRoad(this, Side.Start);
-        EndIntersection.AddRoad(this, Side.End);
+        foreach (Lane l in Lanes)
+        {
+            l.InitNodes();
+            l.InitVertices();
+        }
+        StartIntersection = new(this, Side.Start);
+        EndIntersection = new(this, Side.End);
         LeftOutline = new();
         RightOutline = new();
-        foreach (Lane l in Lanes)
-            l.InitVertices();
         EvaluateBodyOutline();
     }
 

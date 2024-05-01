@@ -29,14 +29,13 @@ public class Lane
         LaneIndex = laneIndex;
         BezierSeries = road.BezierSeries.Offset(((float)road.LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth);
         Road = road;
-        InitNodes();
         Length = BezierSeries.Length;
     }
 
-    void InitNodes()
+    public void InitNodes()
     {
-        StartNode = new(BezierSeries.EvaluatePosition(0), LaneIndex, Road.StartIntersection);
-        EndNode = new(BezierSeries.EvaluatePosition(1), LaneIndex, Road.EndIntersection);
+        StartNode = new(BezierSeries.EvaluatePosition(0), LaneIndex);
+        EndNode = new(BezierSeries.EvaluatePosition(1), LaneIndex);
         StartNode.AddLane(this, Direction.Out);
         EndNode.AddLane(this, Direction.In);
     }
