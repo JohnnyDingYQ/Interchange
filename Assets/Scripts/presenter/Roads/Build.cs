@@ -89,16 +89,16 @@ public static class Build
             road.EndIntersection = endTarget.Intersection;
 
         Game.RegisterRoad(road);
-            
+
         if (startTarget.SnapNotNull)
             ConnectRoadStartToNodes(startNodes, road);
         else
-            road.StartIntersection.EvaluateOutline();
+            IntersectionUtil.EvaluateOutline(road.StartIntersection);
 
         if (endTarget.SnapNotNull)
             ConnectRoadEndToNodes(endNodes, road);
         else
-            road.EndIntersection.EvaluateOutline();
+            IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
@@ -187,8 +187,8 @@ public static class Build
             road.Lanes[i].StartNode = nodes[i];
         }
         road.StartIntersection.AddRoad(road, Side.Start);
-        road.StartIntersection.EvaluatePaths();
-        road.StartIntersection.EvaluateOutline();
+        IntersectionUtil.EvaluatePaths(road.StartIntersection);
+        IntersectionUtil.EvaluateOutline(road.StartIntersection);
     }
 
     public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
@@ -203,8 +203,8 @@ public static class Build
             road.Lanes[i].EndNode = nodes[i];
         }
         road.EndIntersection.AddRoad(road, Side.End);
-        road.EndIntersection.EvaluatePaths();
-        road.EndIntersection.EvaluateOutline();
+        IntersectionUtil.EvaluatePaths(road.EndIntersection);
+        IntersectionUtil.EvaluateOutline(road.EndIntersection);
     }
 
     static void RegisterUnregisteredNodes(Road road)
