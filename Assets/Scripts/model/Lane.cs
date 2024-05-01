@@ -49,7 +49,7 @@ public class Lane
         BezierSeries bs = new(BezierSeries.Curves.ToList(), BezierSeries.IsOffsetted);
         bs.SetStartLocation(l);
         bs.SetEndLocation(r);
-        Path path = new(bs, StartVertex, EndVertex, 0);
+        Path path = new(bs, StartVertex, EndVertex);
         InnerPath = path;
     }
 

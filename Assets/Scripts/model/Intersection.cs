@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using System;
 using UnityEngine.Splines;
+using GraphExtensions;
 
 public class Intersection
 {
@@ -159,27 +160,48 @@ public class Intersection
         {
             r.LeftOutline.Start.Clear();
             r.RightOutline.Start.Clear();
+
+            List<float3> outline = GetPath(r, Orientation.Left, Direction.Out)?.GetOutline(Orientation.Left);
+            if (outline != null)
+            {
+                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
+                r.LeftOutline.Start = outlineStart;
+            }
+            else
+                r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Side.Start);
+
+            outline = GetPath(r, Orientation.Right, Direction.Out)?.GetOutline(Orientation.Right);
+            if (outline != null)
+            {
+                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
+                r.RightOutline.Start = outlineStart;
+            }
+            else
+                r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Side.Start);
+
+
         }
         foreach (Road r in inRoads)
         {
             r.LeftOutline.End.Clear();
             r.RightOutline.End.Clear();
-        }
-        if (inRoads.Count != 0 && outRoads.Count != 0)
-            EvaluateSideOutline();
 
-        foreach (Road r in outRoads)
-        {
-            if (r.LeftOutline.Start.Count == 0)
-                r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Side.Start);
-            if (r.RightOutline.Start.Count == 0)
-                r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Side.Start);
-        }
-        foreach (Road r in inRoads)
-        {
-            if (r.LeftOutline.End.Count == 0)
+            List<float3> outline = GetPath(r, Orientation.Left, Direction.In)?.GetOutline(Orientation.Left);
+            if (outline != null)
+            {
+                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
+                r.LeftOutline.End = outlineEnd;
+            }
+            else
                 r.LeftOutline.End = GetOutLineAtTwoEnds(r, Orientation.Left, Side.End);
-            if (r.RightOutline.End.Count == 0)
+
+            outline = GetPath(r, Orientation.Right, Direction.In)?.GetOutline(Orientation.Right);
+            if (outline != null)
+            {
+                SeparateOutlineWithEndofRoad(outline, out List<float3> outlineEnd, out List<float3> outlineStart);
+                r.RightOutline.End = outlineEnd;
+            }
+            else
                 r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
 
@@ -187,35 +209,39 @@ public class Intersection
             Game.InvokeUpdateRoadMesh(r);
 
         #region extracted
-        void EvaluateSideOutline()
+
+        Path GetPath(Road road, Orientation orientation, Direction direction)
         {
-            Node firstNodeWithInRoad = FirstNodeWithRoad(Direction.In);
-            Node lastNodeWithInRoad = LastNodeWithRoad(Direction.In);
-            Road leftmostRoad = firstNodeWithInRoad.GetRoads(Direction.In).First();
-            Road rightmostRoad = lastNodeWithInRoad.GetRoads(Direction.In).First();
+            IEnumerable<Path> edges = null;
+            if (direction == Direction.In)
+                Game.Graph.TryGetOutEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex, out edges);
+            else if (direction == Direction.Out)
+                edges = Game.Graph.GetInEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
+            else
+                throw new ArgumentException("direction");
 
-            Game.Graph.TryGetOutEdges(leftmostRoad.Lanes.First().EndVertex, out IEnumerable<Path> leftEdges);
-            Game.Graph.TryGetOutEdges(rightmostRoad.Lanes.Last().EndVertex, out IEnumerable<Path> rightEdges);
-
-            List<Path> leftPaths = new(leftEdges);
-            List<Path> rightPaths = new(rightEdges);
-            leftPaths.Sort();
-            rightPaths.Sort();
-
-            List<float3> leftPathOutline = leftPaths.First().GetOutline(Orientation.Left);
-            List<float3> rightPathOutline = rightPaths.Last().GetOutline(Orientation.Right);
-
-            SeparateOutlineWithEndofRoad(leftPathOutline, out List<float3> leftStart, out List<float3> leftEnd);
-            SeparateOutlineWithEndofRoad(rightPathOutline, out List<float3> rightStart, out List<float3> rightEnd);
-            leftmostRoad.LeftOutline.End = leftEnd;
-            leftPaths.First().Target.Road.LeftOutline.Start = leftStart;
-
-            rightmostRoad.RightOutline.End = rightEnd;
-            rightPaths.Last().Target.Road.RightOutline.Start = rightStart;
-
+            if (edges != null && edges.Count() != 0)
+            {
+                if (direction == Direction.In)
+                    if (orientation == Orientation.Left)
+                        return edges.OrderBy(e => Component(-Normal, e.Target.Pos)).First();
+                    else
+                        return edges.OrderBy(e => Component(-Normal, e.Target.Pos)).Last();
+                if (direction == Direction.Out)
+                    if (orientation == Orientation.Left)
+                        return edges.OrderBy(e => Component(-Normal, e.Source.Pos)).First();
+                    else
+                        return edges.OrderBy(e => Component(-Normal, e.Source.Pos)).Last();
+            }
+            return null;
         }
 
-        void SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, out List<float3> outlineStart, out List<float3> outlineEnd)
+        static float Component(float3 u, float3 v)
+        {
+            return math.dot(u, v) / math.length(v);
+        }
+
+        void SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, out List<float3> outlineEnd, out List<float3> outlineStart)
         {
             outlineEnd = new();
             outlineStart = new();
@@ -278,7 +304,7 @@ public class Intersection
             return;
 
         foreach (Node n in nodes)
-            BuildPathNode2Node(n, n, 0);
+            BuildPathNode2Node(n, n);
 
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -287,13 +313,13 @@ public class Intersection
             {
                 Node other = nodes[i - 1];
                 if (NodesBelongToUniqueRoad(n, other))
-                    BuildPathNode2Node(n, other, -1);
+                    BuildPathNode2Node(n, other);
             }
             if (i + 1 < nodes.Count)
             {
                 Node other = nodes[i + 1];
                 if (NodesBelongToUniqueRoad(n, other))
-                    BuildPathNode2Node(n, other, 1);
+                    BuildPathNode2Node(n, other);
             }
         }
 
@@ -306,9 +332,9 @@ public class Intersection
                 int indexFirst = n.NodeIndex - FirstNodeWithRoad(Direction.Out).NodeIndex;
                 int indexLast = n.NodeIndex - LastNodeWithRoad(Direction.Out).NodeIndex;
                 if (Math.Abs(indexFirst) < Math.Abs(indexLast))
-                    BuildPathNode2Node(n, FirstNodeWithRoad(Direction.Out), indexFirst);
+                    BuildPathNode2Node(n, FirstNodeWithRoad(Direction.Out));
                 else
-                    BuildPathNode2Node(n, LastNodeWithRoad(Direction.Out), indexLast);
+                    BuildPathNode2Node(n, LastNodeWithRoad(Direction.Out));
             }
 
             if (n.GetLanes(Direction.In).Count == 0)
@@ -318,9 +344,9 @@ public class Intersection
                 int indexFirst = n.NodeIndex - FirstNodeWithRoad(Direction.In).NodeIndex;
                 int indexLast = n.NodeIndex - LastNodeWithRoad(Direction.In).NodeIndex;
                 if (Math.Abs(indexFirst) < Math.Abs(indexLast))
-                    BuildPathNode2Node(FirstNodeWithRoad(Direction.In), n, indexFirst);
+                    BuildPathNode2Node(FirstNodeWithRoad(Direction.In), n);
                 else
-                    BuildPathNode2Node(LastNodeWithRoad(Direction.In), n, indexLast);
+                    BuildPathNode2Node(LastNodeWithRoad(Direction.In), n);
             }
         }
 
@@ -347,21 +373,21 @@ public class Intersection
             return false;
         }
 
-        static void BuildPathNode2Node(Node n1, Node n2, int span)
+        static void BuildPathNode2Node(Node n1, Node n2)
         {
             foreach (Lane inLane in n1.GetLanes(Direction.In))
             {
                 foreach (Lane outLane in n2.GetLanes(Direction.Out))
-                    BuildPathLane2Lane(inLane, outLane, span);
+                    BuildPathLane2Lane(inLane, outLane);
             }
         }
 
-        static void BuildPathLane2Lane(Lane l1, Lane l2, int span)
+        static void BuildPathLane2Lane(Lane l1, Lane l2)
         {
-            BuildPath(l1.EndVertex, l2.StartVertex, span);
+            BuildPath(l1.EndVertex, l2.StartVertex);
         }
 
-        static void BuildPath(Vertex start, Vertex end, int span)
+        static void BuildPath(Vertex start, Vertex end)
         {
             Game.Graph.TryGetEdge(start, end, out Path edge);
             if (edge != null)
@@ -369,7 +395,7 @@ public class Intersection
             float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
             BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
-            Path p = new(bs, start, end, span);
+            Path p = new(bs, start, end);
             Game.AddEdge(p);
         }
 

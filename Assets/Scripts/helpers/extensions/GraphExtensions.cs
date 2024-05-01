@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using QuikGraph;
 
 namespace GraphExtensions
@@ -16,6 +17,20 @@ namespace GraphExtensions
                 }
             }
             return inDegree;
+        }
+
+        public static IEnumerable<Path> GetInEdges(this AdjacencyGraph<Vertex, Path> graph, Vertex vertex)
+        {
+            HashSet<Path> p = new();
+            foreach (Vertex v in graph.Vertices)
+            {
+                foreach (Path e in graph.OutEdges(v))
+                {
+                    if (e.Target.GetHashCode() == vertex.GetHashCode())
+                        p.Add(e);
+                }
+            }
+            return p;
         }
     }
 }
