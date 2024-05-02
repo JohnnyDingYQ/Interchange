@@ -130,7 +130,8 @@ public static class Game
 
     public static void AddVertex(Vertex vertex)
     {
-        Graph.AddVertex(vertex);
+        if (!Graph.Vertices.Contains(vertex))
+            Graph.AddVertex(vertex);
     }
 
     public static void AddEdge(Path path)

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphExtensions;
+using QuikGraph;
+using QuikGraph.Algorithms;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -103,8 +105,8 @@ public static class Build
         RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
         {
+            ReplaceExistingRoad();
             AutoDivideRoad(road);
-            RemoveExistingRoad();
         }
         return road;
 
@@ -147,18 +149,32 @@ public static class Build
             RecursiveRoadDivision(subRoads.Right, divisions - 1);
         }
 
-        void RemoveExistingRoad()
+        void ReplaceExistingRoad()
         {
             if (!(startTarget.SnapNotNull && endTarget.SnapNotNull))
                 return;
-            HashSet<Road> startRoads = new();
-            HashSet<Road> endRoads = new();
-            foreach (Node node in startTarget.Nodes)
-                startRoads.UnionWith(node.GetRoads(Direction.Out));
-            foreach (Node node in endTarget.Nodes)
-                endRoads.UnionWith(node.GetRoads(Direction.In));
-            startRoads.IntersectWith(endRoads);
-            foreach (Road r in startRoads)
+            List<Vertex> startV = new();
+            foreach (Node n in startNodes)
+                foreach (Lane l in n.GetLanes(Direction.Out))
+                    startV.Add(l.StartVertex);
+            List<Vertex> endV = new();
+            foreach (Node n in endNodes)
+                foreach (Lane l in n.GetLanes(Direction.In))
+                    endV.Add(l.EndVertex);
+
+            HashSet<Road> roads = new();
+            foreach (Vertex start in startV)
+                foreach (Vertex end in endV)
+                {
+                    List<Path> paths = Game.Graph.GetPathsFromAtoB(start, end)?.ToList();
+                    if (paths != null)
+                        foreach (Path p in paths)
+                        {
+                            roads.Add(p.Source.Road);
+                            roads.Add(p.Target.Road);
+                        }
+                }
+            foreach (Road r in roads)
                 if (r != road)
                     Game.RemoveRoad(r);
         }

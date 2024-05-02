@@ -45,9 +45,9 @@ public static class DivideHandler
         List<Node> leftNodes = new();
         for (int i = 0; i < leftRoad.LaneCount; i++)
             leftNodes.Add(leftRoad.Lanes[i].EndNode);
+        OperateVertices();
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
-        OperateVertices();
         OperateOutline();
         Game.RemoveRoad(road, true);
         Build.ConnectRoadStartToNodes(leftNodes, rightRoad);
@@ -88,6 +88,8 @@ public static class DivideHandler
                 Lane lane = road.Lanes[i];
                 laneLeft.StartVertex = lane.StartVertex;
                 laneRight.EndVertex = lane.EndVertex;
+                laneLeft.InnerPath = new(laneLeft.InnerPath.BezierSeries, laneLeft.StartVertex, laneLeft.EndVertex);
+                laneRight.InnerPath = new(laneRight.InnerPath.BezierSeries, laneRight.StartVertex, laneRight.EndVertex);
             }
         }
 

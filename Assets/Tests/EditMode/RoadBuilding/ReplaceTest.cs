@@ -41,4 +41,23 @@ public class ReplaceTest
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(6, Game.Nodes.Count);
     }
+
+    [Test]
+    public void ReplaceTwoRoadsAtOnce()
+    {
+        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        RoadBuilder.B(road1.Lanes[0].StartPos, 2 * stride, road2.Lanes[0].EndPos, 2);
+        Assert.AreEqual(1, Game.Roads.Count);
+    }
+
+    [Test]
+    public void ReplaceThreeRoadsAtOnce()
+    {
+        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        Road road3 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
+        RoadBuilder.B(road1.Lanes[0].StartPos, 2 * stride, road3.Lanes[0].EndPos, 2);
+        Assert.AreEqual(1, Game.Roads.Count);
+    }
 }

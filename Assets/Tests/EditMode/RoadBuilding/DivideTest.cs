@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphExtensions;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -156,7 +157,7 @@ public class DivideTest
         Road roadRight = DivideHandler.DivideRoad(road, 0.5f).Right;
         for (int i = 0; i < 3; i++)
         {
-            Assert.True(roadRight.Lanes[i].EndNode.Lanes.SetEquals(new HashSet<Lane>() {roadRight.Lanes[i], connectedRoads[i].Lanes[0]}));
+            Assert.True(roadRight.Lanes[i].EndNode.Lanes.SetEquals(new HashSet<Lane>() { roadRight.Lanes[i], connectedRoads[i].Lanes[0] }));
         }
     }
 
@@ -166,21 +167,6 @@ public class DivideTest
         Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
         Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
-    }
-
-    [Test]
-    public void SubRoadsPathConnected()
-    {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
-        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        for (int i = 0; i < 3; i++)
-        {
-            if (i - 1 >= 0)
-                Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i - 1]));
-            Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i]));
-            if (i + 1 < 3)
-                Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[i + 1]));
-        }
     }
 
     [Test]
@@ -218,5 +204,21 @@ public class DivideTest
         Assert.AreSame(subRoads.Left.EndIntersection, subRoads.Right.StartIntersection);
         Assert.AreSame(subRoads.Left.StartIntersection, road.StartIntersection);
         Assert.AreSame(subRoads.Right.EndIntersection, road.EndIntersection);
+    }
+
+    [Test]
+    public void PathsAreValid()
+    {
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (Math.Abs(i - j) < 2)
+                {
+                    Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
+                    Assert.NotNull(Game.Graph.GetPathsFromAtoB(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
+                }
+
     }
 }

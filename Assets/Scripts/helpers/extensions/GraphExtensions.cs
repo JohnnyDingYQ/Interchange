@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using QuikGraph;
+using QuikGraph.Algorithms;
 
 namespace GraphExtensions
 {
@@ -13,7 +14,7 @@ namespace GraphExtensions
                 foreach (IEdge<Vertex> e in graph.OutEdges(v))
                 {
                     if (e.Target.GetHashCode() == vertex.GetHashCode())
-                    inDegree ++;
+                        inDegree++;
                 }
             }
             return inDegree;
@@ -32,5 +33,22 @@ namespace GraphExtensions
             }
             return p;
         }
+
+        /// <summary>
+        /// Can be costly to invoke!
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public static IEnumerable<Path> GetPathsFromAtoB(this AdjacencyGraph<Vertex, Path> graph, Vertex start, Vertex end)
+        {
+            static double edgeCost(Path path) => 1;
+            TryFunc<Vertex, IEnumerable<Path>> tryGetPaths = graph.ShortestPathsDijkstra(edgeCost, start);
+
+            tryGetPaths(end, out IEnumerable<Path> paths);
+            return paths;
+        }
+
     }
 }

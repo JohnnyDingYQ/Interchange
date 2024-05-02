@@ -1,6 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
+using GraphExtensions;
 
 public class PathTest
 {

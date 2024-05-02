@@ -18,8 +18,7 @@ public class Lane
     public int LaneIndex { get; private set; }
     [JsonProperty]
     public float Length { get; private set; }
-    [JsonProperty]
-    public Path InnerPath { get; private set; }
+    public Path InnerPath { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Lane() { }
