@@ -48,7 +48,7 @@ public static class IntersectionUtil
         }
 
         foreach (Road r in i.GetRoads())
-            Game.InvokeUpdateRoadMesh(r);
+            Game.InvokeRoadUpdated(r);
 
         #region extracted
 

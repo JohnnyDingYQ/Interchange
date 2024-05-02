@@ -7,9 +7,9 @@ using System.Linq;
 
 public static class Game
 {
-    public static event Action<Road> InstantiateRoad;
-    public static event Action<Road> UpdateRoadMesh;
-    public static event Action<Road> DestroyRoad;
+    public static event Action<Road> RoadAdded;
+    public static event Action<Road> RoadUpdated;
+    public static event Action<Road> RoadRemoved;
     public static GameState GameState { get; set; }
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
@@ -53,7 +53,7 @@ public static class Game
             AddVertex(lane.EndVertex);
             AddEdge(lane.InnerPath);
         }
-        InstantiateRoad?.Invoke(road);
+        RoadAdded?.Invoke(road);
     }
 
     public static void RegisterNode(Node node)
@@ -107,7 +107,7 @@ public static class Game
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
         }
 
-        DestroyRoad?.Invoke(road);
+        RoadRemoved?.Invoke(road);
         return true;
     }
 
@@ -116,13 +116,13 @@ public static class Game
         return RemoveRoad(road, false);
     }
 
-    public static void InvokeUpdateRoadMesh(Road road)
+    public static void InvokeRoadUpdated(Road road)
     {
-        UpdateRoadMesh?.Invoke(road);
+        RoadUpdated?.Invoke(road);
     }
-    public static void InvokeInstantiateRoad(Road road)
+    public static void InvokeRoadAdded(Road road)
     {
-        InstantiateRoad?.Invoke(road);
+        RoadAdded?.Invoke(road);
     }
 
     public static void AddVertex(Vertex vertex)

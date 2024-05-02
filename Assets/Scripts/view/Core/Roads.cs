@@ -8,17 +8,17 @@ public class Roads : MonoBehaviour
     private static Dictionary<Road, RoadGameObject> roadMapping;
     void Start()
     {
-        Game.InstantiateRoad += InstantiateRoad;
-        Game.UpdateRoadMesh += UpdateRoadMesh;
-        Game.DestroyRoad += DestroyRoad;
+        Game.RoadAdded += InstantiateRoad;
+        Game.RoadUpdated += UpdateRoadMesh;
+        Game.RoadRemoved += DestroyRoad;
         roadMapping = new();
     }
 
     void OnDestroy()
     {
-        Game.InstantiateRoad -= InstantiateRoad;
-        Game.UpdateRoadMesh -= UpdateRoadMesh;
-        Game.DestroyRoad -= DestroyRoad;
+        Game.RoadAdded -= InstantiateRoad;
+        Game.RoadUpdated -= UpdateRoadMesh;
+        Game.RoadRemoved -= DestroyRoad;
     }
 
     void InstantiateRoad(Road road)

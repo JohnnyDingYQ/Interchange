@@ -38,7 +38,7 @@ public static class SaveSystem
             foreach (Road r in Game.Roads.Values)
             {
                 r.EvaluateBodyOutline();
-                Game.InvokeInstantiateRoad(r);
+                Game.InvokeRoadAdded(r);
             }
         }
 

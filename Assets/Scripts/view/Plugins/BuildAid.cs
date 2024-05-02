@@ -14,7 +14,7 @@ public class BuildAid : MonoBehaviour
     void Awake()
     {
         snapPointPool = new(
-            () => Instantiate(snapPoint),
+            () => Instantiate(snapPoint, gameObject.transform),
             (o) => o.gameObject.SetActive(true),
             (o) => o.gameObject.SetActive(false),
             (o) => Destroy(o.gameObject),
@@ -28,7 +28,7 @@ public class BuildAid : MonoBehaviour
     void FixedUpdate()
     {
         UpdateSnapPoints();
-        // UpdateGhostRoad();
+        UpdateGhostRoad();
     }
 
     void UpdateGhostRoad()
