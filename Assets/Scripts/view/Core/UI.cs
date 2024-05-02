@@ -10,6 +10,8 @@ public class UI : MonoBehaviour
     private Toggle drawOutline;
     private Toggle drawPx;
     private Toggle drawVertices;
+    private Toggle ghostRoad;
+    public static TextElement Elevation { get; private set; }
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
@@ -22,7 +24,9 @@ public class UI : MonoBehaviour
         drawOutline = root.Q<Toggle>("RoadOutline");
         drawPx = root.Q<Toggle>("RoadPx");
         drawVertices = root.Q<Toggle>("RoadVertices");
-        
+        ghostRoad = root.Q<Toggle>("Ghost");
+        Elevation = root.Q<TextElement>("Elevation");
+
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
         drawPaths.RegisterCallback<ChangeEvent<bool>>(TogglePath);
@@ -35,6 +39,8 @@ public class UI : MonoBehaviour
         drawOutline.value = true;
         drawVertices.RegisterCallback<ChangeEvent<bool>>(ToggleVertices);
         drawVertices.value = false;
+        ghostRoad.RegisterCallback<ChangeEvent<bool>>(ToggleGhost);
+        ghostRoad.value = true;
     }
 
     void OnDisable()
@@ -53,39 +59,36 @@ public class UI : MonoBehaviour
     {
         InputSystem.MouseInGameWorld = false;
     }
-
     void EnableGameWorldClick(MouseLeaveEvent e)
     {
         InputSystem.MouseInGameWorld = true;
     }
-    
     void TogglecCenter(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawCenter = e.newValue;
     }
-
     void TogglePath(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawPaths = e.newValue;
     }
-
     void ToggleLanes(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawLanes = e.newValue;
     }
-
     void TogglePx(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawPx = e.newValue;
     }
-
     void ToggleOutline(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawOutline = e.newValue;
     }
-
     void ToggleVertices(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawVertices = e.newValue;
+    }
+    void ToggleGhost(ChangeEvent<bool> e)
+    {
+        BuildAid.GhostIsOn = e.newValue;
     }
 }

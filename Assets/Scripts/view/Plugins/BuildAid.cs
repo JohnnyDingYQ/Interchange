@@ -11,6 +11,7 @@ public class BuildAid : MonoBehaviour
     [SerializeField]
     RoadGameObject roadPrefab;
     static RoadGameObject ghostroad;
+    public static bool GhostIsOn { get; set; }
     void Awake()
     {
         snapPointPool = new(
@@ -28,7 +29,8 @@ public class BuildAid : MonoBehaviour
     void FixedUpdate()
     {
         UpdateSnapPoints();
-        UpdateGhostRoad();
+        if (GhostIsOn)
+            UpdateGhostRoad();
     }
 
     void UpdateGhostRoad()
@@ -39,13 +41,9 @@ public class BuildAid : MonoBehaviour
             ghostroad.gameObject.SetActive(true);
             Road road = Build.BuildGhostRoad(InputSystem.MouseWorldPos);
             ghostroad.Road = road;
-            if (road != null)
-                Roads.UpdateRoadMesh(road);
         }
         else
-        {
             ghostroad.gameObject.SetActive(false);
-        }
     }
 
     public static void RemoveGhostRoad()

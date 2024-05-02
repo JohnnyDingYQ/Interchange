@@ -116,6 +116,24 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Elevate"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d5ae660-34f7-4554-8f69-a764e81bdf22"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Lower"",
+                    ""type"": ""Button"",
+                    ""id"": ""676f582d-b29b-4a4a-8d86-c26f57cdb8e5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -294,6 +312,28 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""AbandonBuild"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""69fcf976-c80a-4ba3-a234-88990b533433"",
+                    ""path"": ""<Mouse>/forwardButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Elevate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e8929b3b-afa8-4bbd-8afc-bf97bc86de06"",
+                    ""path"": ""<Mouse>/backButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Lower"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -312,6 +352,8 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_DivideRoad = m_InGame.FindAction("DivideRoad", throwIfNotFound: true);
         m_InGame_RemoveRoad = m_InGame.FindAction("RemoveRoad", throwIfNotFound: true);
         m_InGame_AbandonBuild = m_InGame.FindAction("AbandonBuild", throwIfNotFound: true);
+        m_InGame_Elevate = m_InGame.FindAction("Elevate", throwIfNotFound: true);
+        m_InGame_Lower = m_InGame.FindAction("Lower", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -383,6 +425,8 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_DivideRoad;
     private readonly InputAction m_InGame_RemoveRoad;
     private readonly InputAction m_InGame_AbandonBuild;
+    private readonly InputAction m_InGame_Elevate;
+    private readonly InputAction m_InGame_Lower;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -397,6 +441,8 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @DivideRoad => m_Wrapper.m_InGame_DivideRoad;
         public InputAction @RemoveRoad => m_Wrapper.m_InGame_RemoveRoad;
         public InputAction @AbandonBuild => m_Wrapper.m_InGame_AbandonBuild;
+        public InputAction @Elevate => m_Wrapper.m_InGame_Elevate;
+        public InputAction @Lower => m_Wrapper.m_InGame_Lower;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -436,6 +482,12 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @AbandonBuild.started += instance.OnAbandonBuild;
             @AbandonBuild.performed += instance.OnAbandonBuild;
             @AbandonBuild.canceled += instance.OnAbandonBuild;
+            @Elevate.started += instance.OnElevate;
+            @Elevate.performed += instance.OnElevate;
+            @Elevate.canceled += instance.OnElevate;
+            @Lower.started += instance.OnLower;
+            @Lower.performed += instance.OnLower;
+            @Lower.canceled += instance.OnLower;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -470,6 +522,12 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @AbandonBuild.started -= instance.OnAbandonBuild;
             @AbandonBuild.performed -= instance.OnAbandonBuild;
             @AbandonBuild.canceled -= instance.OnAbandonBuild;
+            @Elevate.started -= instance.OnElevate;
+            @Elevate.performed -= instance.OnElevate;
+            @Elevate.canceled -= instance.OnElevate;
+            @Lower.started -= instance.OnLower;
+            @Lower.performed -= instance.OnLower;
+            @Lower.canceled -= instance.OnLower;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -499,5 +557,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnDivideRoad(InputAction.CallbackContext context);
         void OnRemoveRoad(InputAction.CallbackContext context);
         void OnAbandonBuild(InputAction.CallbackContext context);
+        void OnElevate(InputAction.CallbackContext context);
+        void OnLower(InputAction.CallbackContext context);
     }
 }

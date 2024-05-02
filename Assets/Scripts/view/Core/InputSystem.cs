@@ -7,7 +7,16 @@ public class InputSystem : MonoBehaviour
 {
     public static bool MouseInGameWorld { get; set; }
     private GameActions gameActions;
-
+    private static float elevation;
+    public static float Elevation
+    {
+        get { return elevation; }
+        set
+        {
+            elevation = value;
+            ReflectElevationChange();
+        }
+    }
     private const int CameraSpeedMultiplier = 25;
     private const float CameraZoomMultiplier = 0.3f;
     public static float3 MouseWorldPos { get; set; }
@@ -15,7 +24,11 @@ public class InputSystem : MonoBehaviour
     void Awake()
     {
         gameActions = new();
+    }
+    void Start()
+    {
         MouseInGameWorld = true;
+        Elevation = 0;
     }
 
     void OnEnable()
@@ -29,7 +42,9 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DivideRoad.performed += DivideRoad;
         gameActions.InGame.RemoveRoad.performed += RemoveRoad;
         gameActions.InGame.AbandonBuild.performed += AbandonBuild;
-    
+        gameActions.InGame.Elevate.performed += Elevate;
+        gameActions.InGame.Lower.performed += Lower;
+
         gameActions.InGame.Enable();
     }
 
@@ -44,6 +59,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DivideRoad.performed -= DivideRoad;
         gameActions.InGame.RemoveRoad.performed -= RemoveRoad;
         gameActions.InGame.AbandonBuild.performed -= AbandonBuild;
+        gameActions.InGame.Elevate.performed -= Elevate;
+        gameActions.InGame.Lower.performed -= Lower;
 
         gameActions.InGame.Disable();
     }
@@ -56,9 +73,14 @@ public class InputSystem : MonoBehaviour
 
         float3 mouseWorldPos = new(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {
-            z = Camera.main.transform.position.y - 0
+            z = Camera.main.transform.position.y - Elevation
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
+    }
+
+    static void ReflectElevationChange()
+    {
+        UI.Elevation.text = "Elevation: " + Elevation;
     }
 
     void OnBuild(InputAction.CallbackContext context)
@@ -100,5 +122,19 @@ public class InputSystem : MonoBehaviour
     void AbandonBuild(InputAction.CallbackContext context)
     {
         Build.Reset();
+    }
+    void Elevate(InputAction.CallbackContext context)
+    {
+        if (Elevation + 2 < 30)
+            Elevation += 2;
+        else
+            Elevation = 30;
+    }
+    void Lower(InputAction.CallbackContext context)
+    {
+        if (Elevation - 2 > 0)
+            Elevation -= 2;
+        else
+            Elevation = 0;
     }
 }

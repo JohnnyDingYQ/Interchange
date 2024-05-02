@@ -94,6 +94,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Elevate",
+                    "type": "Button",
+                    "id": "6d5ae660-34f7-4554-8f69-a764e81bdf22",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Lower",
+                    "type": "Button",
+                    "id": "676f582d-b29b-4a4a-8d86-c26f57cdb8e5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -270,6 +288,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "AbandonBuild",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "69fcf976-c80a-4ba3-a234-88990b533433",
+                    "path": "<Mouse>/forwardButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Elevate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e8929b3b-afa8-4bbd-8afc-bf97bc86de06",
+                    "path": "<Mouse>/backButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Lower",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
