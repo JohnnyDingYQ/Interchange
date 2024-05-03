@@ -15,12 +15,14 @@ public static class Build
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
+    public static bool AutoDivideOn { get; set; }
 
     static Build()
     {
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
+        AutoDivideOn = true;
     }
 
     public static BuildTargets GetStartTarget()
@@ -106,7 +108,8 @@ public static class Build
         if (buildMode == BuildMode.Actual)
         {
             ReplaceExistingRoad();
-            AutoDivideRoad(road);
+            if (AutoDivideOn)
+                AutoDivideRoad(road);
         }
         return road;
 
@@ -248,5 +251,6 @@ public static class Build
         pivotAssigned = false;
         startTarget = null;
         endTarget = null;
+        AutoDivideOn = true;
     }
 }

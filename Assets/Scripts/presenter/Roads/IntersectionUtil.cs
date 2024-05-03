@@ -118,7 +118,7 @@ public static class IntersectionUtil
             List<float3> results = new();
             Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
             float normalMultiplier = orientation == Orientation.Left ? Constants.RoadOutlineSeparation : -Constants.RoadOutlineSeparation;
-            int numPoints = (int)(Constants.MinimumLaneLength * Constants.MeshResolution / 2);
+            int numPoints = (int)(Constants.VertexDistanceFromRoadEnds * Constants.MeshResolution / 2);
             BezierSeries bs = lane.BezierSeries;
             float interpolationOfLocation;
             if (side == Side.Start)

@@ -57,7 +57,22 @@ public class ReplaceTest
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
         Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
         Road road3 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
-        RoadBuilder.B(road1.Lanes[0].StartPos, 2 * stride, road3.Lanes[0].EndPos, 2);
+        Build.AutoDivideOn = false;
+        RoadBuilder.B(road1.Lanes[0].StartPos, 2 * stride, road3.Lanes[0].EndPos, 1);
+
+        // Path edge = null;
+        // Game.Graph.TryGetEdge(road1.Lanes[1].StartVertex, road1.Lanes[1].EndVertex, out edge);
+        // Assert.NotNull(edge);
+        // Game.Graph.TryGetEdge(road1.Lanes[1].EndVertex, road2.Lanes[1].StartVertex, out edge);
+        // Assert.NotNull(edge);
+        // Game.Graph.TryGetEdge(road2.Lanes[1].StartVertex, road2.Lanes[1].EndVertex, out edge);
+        // Assert.NotNull(edge);
+        // Game.Graph.TryGetEdge(road2.Lanes[1].EndVertex, road3.Lanes[1].StartVertex, out edge);
+        // Assert.NotNull(edge);
+        // Game.Graph.TryGetEdge(road3.Lanes[1].StartVertex, road3.Lanes[1].EndVertex, out edge);
+        // Assert.NotNull(edge);
+
+
         Assert.AreEqual(1, Game.Roads.Count);
     }
 }

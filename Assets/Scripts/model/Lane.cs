@@ -43,8 +43,8 @@ public class Lane
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
-        SeriesLocation l = BezierSeries.GetLocationByDistance(Constants.MinimumLaneLength / 2);
-        SeriesLocation r = BezierSeries.GetLocationByDistance(BezierSeries.Length - Constants.MinimumLaneLength / 2);
+        SeriesLocation l = BezierSeries.GetLocationByDistance(Constants.VertexDistanceFromRoadEnds);
+        SeriesLocation r = BezierSeries.GetLocationByDistance(BezierSeries.Length - Constants.VertexDistanceFromRoadEnds);
         BezierSeries bs = new(BezierSeries.Curves.ToList(), BezierSeries.IsOffsetted);
         bs.SetStartLocation(l);
         bs.SetEndLocation(r);

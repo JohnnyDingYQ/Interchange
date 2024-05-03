@@ -42,14 +42,14 @@ public static class DivideHandler
 
         OperateNodes();
         OperateIntersections();
-        List<Node> leftNodes = new();
-        for (int i = 0; i < leftRoad.LaneCount; i++)
-            leftNodes.Add(leftRoad.Lanes[i].EndNode);
         OperateVertices();
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
         OperateOutline();
         Game.RemoveRoad(road, true);
+        List<Node> leftNodes = new();
+        for (int i = 0; i < leftRoad.LaneCount; i++)
+            leftNodes.Add(leftRoad.Lanes[i].EndNode);
         Build.ConnectRoadStartToNodes(leftNodes, rightRoad);
 
         return new SubRoads(leftRoad, rightRoad);
@@ -59,6 +59,9 @@ public static class DivideHandler
             leftRoad.StartIntersection = road.StartIntersection;
             rightRoad.StartIntersection = leftRoad.EndIntersection;
             rightRoad.EndIntersection = road.EndIntersection;
+
+            leftRoad.StartIntersection.AddRoad(leftRoad, Side.Start);
+            rightRoad.EndIntersection.AddRoad(rightRoad, Side.End);
         }
 
         void OperateNodes()
@@ -88,6 +91,8 @@ public static class DivideHandler
                 Lane lane = road.Lanes[i];
                 laneLeft.StartVertex = lane.StartVertex;
                 laneRight.EndVertex = lane.EndVertex;
+                laneLeft.StartVertex.ChangeOwnerLane(laneLeft, Side.Start);
+                laneRight.EndVertex.ChangeOwnerLane(laneRight, Side.End);
                 laneLeft.InnerPath = new(laneLeft.InnerPath.BezierSeries, laneLeft.StartVertex, laneLeft.EndVertex);
                 laneRight.InnerPath = new(laneRight.InnerPath.BezierSeries, laneRight.StartVertex, laneRight.EndVertex);
             }

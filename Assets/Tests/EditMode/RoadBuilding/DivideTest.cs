@@ -204,6 +204,8 @@ public class DivideTest
         Assert.AreSame(subRoads.Left.EndIntersection, subRoads.Right.StartIntersection);
         Assert.AreSame(subRoads.Left.StartIntersection, road.StartIntersection);
         Assert.AreSame(subRoads.Right.EndIntersection, road.EndIntersection);
+        Assert.True(subRoads.Left.StartIntersection.OutRoads.Contains(subRoads.Left));
+        Assert.True(subRoads.Right.EndIntersection.InRoads.Contains(subRoads.Right));
     }
 
     [Test]
@@ -219,6 +221,29 @@ public class DivideTest
                     Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
                     Assert.NotNull(Game.Graph.GetPathsFromAtoB(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
                 }
+    }
 
+    [Test]
+    public void DividingRoadPreservesIntersectionPaths()
+    {
+        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road2, 3 * stride);
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (Math.Abs(i - j) < 2)
+                    Assert.True(Game.HasEdge(road1.Lanes[i], subRoads.Left.Lanes[j]));
+    }
+
+    [Test]
+    public void LaneOfVertexUpdatedCorrectly()
+    {
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
+
+        foreach (Lane l in subRoads.Left.Lanes)
+            foreach (Vertex v in new Vertex[] { l.StartVertex, l.EndVertex })
+                Assert.AreSame(l, v.Lane);
     }
 }
