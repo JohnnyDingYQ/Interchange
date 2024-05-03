@@ -30,6 +30,16 @@ public static class Build
         return startTarget;
     }
 
+    public static List<Tuple<float3, float3>> GetSupportLines()
+    {
+        List<Tuple<float3, float3>> t = new();
+        if (startAssigned && pivotAssigned)
+            t.Add(new (startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos, pivotPos));
+        if (pivotAssigned && endTarget != null)
+            t.Add(new (pivotPos, endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos ));
+        return t;
+    }
+
     public static bool ShouldShowGhostRoad()
     {
         return startAssigned == true && pivotAssigned == true;
@@ -37,8 +47,8 @@ public static class Build
 
     public static Road BuildGhostRoad(float3 endTargetClickPos)
     {
-        BuildTargets tempEnd = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
-        Road road = BuildRoad(startTarget, pivotPos, tempEnd, BuildMode.Ghost);
+        endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
+        Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
         return road;
     }
 

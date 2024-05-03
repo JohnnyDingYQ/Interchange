@@ -10,6 +10,7 @@
             <ui:Toggle text="Outline" name="RoadOutline" />
             <ui:Toggle text="Control Points" name="RoadPx" />
             <ui:Toggle text="Vertices" name="RoadVertices" />
+            <ui:Toggle text="Support Lines" name="SupportLines" />
             <ui:Toggle text="Build Ghost" name="Ghost" />
         </ui:Foldout>
     </ui:VisualElement>

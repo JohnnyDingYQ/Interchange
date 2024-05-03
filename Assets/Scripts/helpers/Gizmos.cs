@@ -105,4 +105,10 @@ public static class Gizmos
         for (int i = 1; i < l.Count; i++)
             Debug.DrawLine(l[i - 1], l[i], color, duration);
     }
+
+    public static void DrawSupportLine(float duration)
+    {
+        foreach (Tuple<float3, float3> t in Build.GetSupportLines())
+            Debug.DrawLine(t.Item1, t.Item2, Color.blue, duration);
+    }
 }

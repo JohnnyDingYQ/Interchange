@@ -8,6 +8,7 @@ public class DrawGizmos : MonoBehaviour
     public static bool DrawOutline { get; set; }
     public static bool DrawPx { get; set; }
     public static bool DrawVertices { get; set; }
+    public static bool DrawSupportLines { get; set; }
 
     private const float DrawDuration = 0.2f;
 
@@ -30,6 +31,8 @@ public class DrawGizmos : MonoBehaviour
             Gizmos.DrawVertices(DrawDuration);
         if (DrawOutline)
             Gizmos.DrawOutline(DrawDuration);
+        if (DrawSupportLines)
+            Gizmos.DrawSupportLine(DrawDuration);
         
     }
 }

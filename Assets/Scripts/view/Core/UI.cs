@@ -11,6 +11,7 @@ public class UI : MonoBehaviour
     private Toggle drawPx;
     private Toggle drawVertices;
     private Toggle ghostRoad;
+    private Toggle supportLines;
     public static TextElement Elevation { get; private set; }
     void OnEnable()
     {
@@ -26,6 +27,7 @@ public class UI : MonoBehaviour
         drawVertices = root.Q<Toggle>("RoadVertices");
         ghostRoad = root.Q<Toggle>("Ghost");
         Elevation = root.Q<TextElement>("Elevation");
+        supportLines = root.Q<Toggle>("SupportLines");
 
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
@@ -39,6 +41,8 @@ public class UI : MonoBehaviour
         drawOutline.value = true;
         drawVertices.RegisterCallback<ChangeEvent<bool>>(ToggleVertices);
         drawVertices.value = false;
+        supportLines.RegisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
+        supportLines.value = true;
         ghostRoad.RegisterCallback<ChangeEvent<bool>>(ToggleGhost);
         ghostRoad.value = true;
     }
@@ -53,6 +57,8 @@ public class UI : MonoBehaviour
         drawPx.UnregisterCallback<ChangeEvent<bool>>(TogglePx);
         drawOutline.UnregisterCallback<ChangeEvent<bool>>(ToggleOutline);
         drawVertices.UnregisterCallback<ChangeEvent<bool>>(ToggleVertices);
+        supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
+        ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
     }
 
     void DisableGameWorldClick(MouseEnterEvent e)
@@ -90,5 +96,9 @@ public class UI : MonoBehaviour
     void ToggleGhost(ChangeEvent<bool> e)
     {
         BuildAid.GhostIsOn = e.newValue;
+    }
+    void ToggleSupportLines(ChangeEvent<bool> e)
+    {
+        DrawGizmos.DrawSupportLines = e.newValue;
     }
 }

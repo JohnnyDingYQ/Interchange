@@ -117,7 +117,8 @@ public class InputSystem : MonoBehaviour
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {
-        Game.RemoveSelectedRoad();
+        if (!Build.ShouldShowGhostRoad())
+            Game.RemoveSelectedRoad();
     }
     void AbandonBuild(InputAction.CallbackContext context)
     {
