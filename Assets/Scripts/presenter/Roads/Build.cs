@@ -16,6 +16,7 @@ public static class Build
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
     public static bool AutoDivideOn { get; set; }
+    private static readonly List<Tuple<float3, float3>> supportLines = new();
 
     static Build()
     {
@@ -32,12 +33,12 @@ public static class Build
 
     public static List<Tuple<float3, float3>> GetSupportLines()
     {
-        List<Tuple<float3, float3>> t = new();
+        supportLines.Clear();
         if (startAssigned && pivotAssigned)
-            t.Add(new (startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos, pivotPos));
+            supportLines.Add(new (startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos, pivotPos));
         if (pivotAssigned && endTarget != null)
-            t.Add(new (pivotPos, endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos ));
-        return t;
+            supportLines.Add(new (pivotPos, endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos ));
+        return supportLines;
     }
 
     public static bool ShouldShowGhostRoad()

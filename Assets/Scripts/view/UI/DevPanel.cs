@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class UI : MonoBehaviour
+public class DevPanel : MonoBehaviour
 {
     private VisualElement root;
     private Toggle drawCenter;
@@ -95,7 +95,7 @@ public class UI : MonoBehaviour
     }
     void ToggleGhost(ChangeEvent<bool> e)
     {
-        BuildAid.GhostIsOn = e.newValue;
+        GhostRoad.GhostIsOn = e.newValue;
     }
     void ToggleSupportLines(ChangeEvent<bool> e)
     {

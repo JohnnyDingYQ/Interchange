@@ -2,16 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class BuildAid : MonoBehaviour
+public class SnapPoints : MonoBehaviour
 {
     [SerializeField]
     SnapPoint snapPoint;
     ObjectPool<SnapPoint> snapPointPool;
     List<SnapPoint> activeSnapPoints;
-    [SerializeField]
-    RoadGameObject roadPrefab;
-    static RoadGameObject ghostroad;
-    public static bool GhostIsOn { get; set; }
     void Awake()
     {
         snapPointPool = new(
@@ -23,33 +19,11 @@ public class BuildAid : MonoBehaviour
             6,
             10
         );
-        ghostroad = Instantiate(roadPrefab);
         activeSnapPoints = new();
     }
     void FixedUpdate()
     {
         UpdateSnapPoints();
-        if (GhostIsOn)
-            UpdateGhostRoad();
-    }
-
-    void UpdateGhostRoad()
-    {
-        RemoveGhostRoad();
-        if (Build.ShouldShowGhostRoad())
-        {
-            ghostroad.gameObject.SetActive(true);
-            Road road = Build.BuildGhostRoad(InputSystem.MouseWorldPos);
-            ghostroad.Road = road;
-        }
-        else
-            ghostroad.gameObject.SetActive(false);
-    }
-
-    public static void RemoveGhostRoad()
-    {
-        if (ghostroad.Road != null)
-            Game.RemoveRoad(ghostroad.Road);
     }
 
     void UpdateSnapPoints()

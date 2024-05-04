@@ -80,14 +80,14 @@ public class InputSystem : MonoBehaviour
 
     static void ReflectElevationChange()
     {
-        UI.Elevation.text = "Elevation: " + Elevation;
+        DevPanel.Elevation.text = "Elevation: " + Elevation;
     }
 
     void OnBuild(InputAction.CallbackContext context)
     {
         if (MouseInGameWorld)
         {
-            BuildAid.RemoveGhostRoad();
+            GhostRoad.RemoveGhostRoad();
             Build.HandleBuildCommand(MouseWorldPos);
         }
     }
