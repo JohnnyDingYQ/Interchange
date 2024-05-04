@@ -11,4 +11,5 @@ public static class Constants
     public const float VertexDistanceFromRoadEnds = MinimumLaneLength / 2;
     public const float NumericallyEqualMaxTolerance = 0.01f;
     public const float MaxRoadBendAngle = 130;
+    public const int GhostRoadId = -1;
 }

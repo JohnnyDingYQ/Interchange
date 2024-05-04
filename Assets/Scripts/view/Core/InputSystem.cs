@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class InputSystem : MonoBehaviour
 {
-    public static bool MouseInGameWorld { get; set; }
+    public static bool MouseIsInGameWorld { get; set; }
     private GameActions gameActions;
     private static float elevation;
     public static float Elevation
@@ -27,7 +27,7 @@ public class InputSystem : MonoBehaviour
     }
     void Start()
     {
-        MouseInGameWorld = true;
+        MouseIsInGameWorld = true;
         Elevation = 0;
     }
 
@@ -85,9 +85,8 @@ public class InputSystem : MonoBehaviour
 
     void OnBuild(InputAction.CallbackContext context)
     {
-        if (MouseInGameWorld)
+        if (MouseIsInGameWorld)
         {
-            GhostRoad.RemoveGhostRoad();
             Build.HandleBuildCommand(MouseWorldPos);
         }
     }
@@ -117,8 +116,7 @@ public class InputSystem : MonoBehaviour
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {
-        if (!Build.ShouldShowGhostRoad())
-            Game.RemoveSelectedRoad();
+        Game.RemoveSelectedRoad();
     }
     void AbandonBuild(InputAction.CallbackContext context)
     {

@@ -15,7 +15,6 @@ public static class Game
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
     public static Road SelectedRoad { get; set; }
-    private static int GhostId = -1;
 
     public static int NextAvailableNodeId
     {
@@ -41,11 +40,10 @@ public static class Game
 
     public static void RegisterRoad(Road road)
     {
-        if (road.IsGhost)
+        if (road.Id == Constants.GhostRoadId)
         {
-            if (Roads.ContainsKey(GhostId))
-                RemoveRoad(Roads[GhostId]);
-            road.Id = GhostId;
+            if (Roads.ContainsKey(road.Id))
+                RemoveRoad(Roads[road.Id]);
         }
         else
             road.Id = NextAvailableRoadId++;

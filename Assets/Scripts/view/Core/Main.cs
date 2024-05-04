@@ -8,4 +8,9 @@ public class Main : MonoBehaviour
         Physics.queriesHitTriggers = false;
     }
 
+    void FixedUpdate()
+    {
+        Build.HandleHover(InputSystem.MouseWorldPos);
+    }
+
 }

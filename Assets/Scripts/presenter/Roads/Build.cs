@@ -16,7 +16,8 @@ public static class Build
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
     public static bool AutoDivideOn { get; set; }
-    private static readonly List<Tuple<float3, float3>> supportLines = new();
+    public static List<Tuple<float3, float3, float>> SupportLines {get;}
+    public static bool ShouldBuildGhostRoad {get; set;}
 
     static Build()
     {
@@ -24,6 +25,7 @@ public static class Build
         startAssigned = false;
         pivotAssigned = false;
         AutoDivideOn = true;
+        SupportLines = new();
     }
 
     public static BuildTargets GetStartTarget()
@@ -31,19 +33,20 @@ public static class Build
         return startTarget;
     }
 
-    public static List<Tuple<float3, float3>> GetSupportLines()
+    public static List<Tuple<float3, float3, float>> SetSupportLines()
     {
-        supportLines.Clear();
-        if (startAssigned && pivotAssigned)
-            supportLines.Add(new (startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos, pivotPos));
+        SupportLines.Clear();
+        if (startAssigned)
+        {
+            float3 startPoint = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
+            SupportLines.Add(new(startPoint, pivotPos, math.length(startPoint - pivotPos)));
+        }
         if (pivotAssigned && endTarget != null)
-            supportLines.Add(new (pivotPos, endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos ));
-        return supportLines;
-    }
-
-    public static bool ShouldShowGhostRoad()
-    {
-        return startAssigned == true && pivotAssigned == true;
+        {
+            float3 endPoint = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
+            SupportLines.Add(new(pivotPos, endPoint, math.length(endPoint - pivotPos)));
+        }
+        return SupportLines;
     }
 
     public static Road BuildGhostRoad(float3 endTargetClickPos)
@@ -51,6 +54,15 @@ public static class Build
         endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
         Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
         return road;
+    }
+
+    public static void HandleHover(float3 hoverPos)
+    {
+        if (startAssigned && !pivotAssigned)
+            pivotPos = hoverPos;
+        if (startAssigned && pivotAssigned && ShouldBuildGhostRoad)
+            BuildGhostRoad(hoverPos);
+        SetSupportLines();
     }
 
     public static Road HandleBuildCommand(float3 clickPos)
@@ -72,6 +84,8 @@ public static class Build
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             Reset();
+            if (Game.Roads.ContainsKey(Constants.GhostRoadId))
+                Game.RemoveRoad(Game.Roads[Constants.GhostRoadId]);
             return road;
         }
 
@@ -91,9 +105,8 @@ public static class Build
 
         Road road = new(startPos, pivotPos, endPos, LaneCount)
         {
-            IsGhost = buildMode == BuildMode.Ghost
+            Id = buildMode == BuildMode.Ghost ? Constants.GhostRoadId : 0
         };
-
         if (road.HasLaneShorterThanMinimumLaneLength())
             return null;
 
@@ -115,9 +128,9 @@ public static class Build
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
-        RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
         {
+            RegisterUnregisteredNodes(road);
             ReplaceExistingRoad();
             if (AutoDivideOn)
                 AutoDivideRoad(road);
@@ -263,5 +276,6 @@ public static class Build
         startTarget = null;
         endTarget = null;
         AutoDivideOn = true;
+        pivotPos = 0;
     }
 }

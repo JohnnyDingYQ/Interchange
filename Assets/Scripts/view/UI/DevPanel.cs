@@ -63,11 +63,11 @@ public class DevPanel : MonoBehaviour
 
     void DisableGameWorldClick(MouseEnterEvent e)
     {
-        InputSystem.MouseInGameWorld = false;
+        InputSystem.MouseIsInGameWorld = false;
     }
     void EnableGameWorldClick(MouseLeaveEvent e)
     {
-        InputSystem.MouseInGameWorld = true;
+        InputSystem.MouseIsInGameWorld = true;
     }
     void TogglecCenter(ChangeEvent<bool> e)
     {
@@ -95,7 +95,7 @@ public class DevPanel : MonoBehaviour
     }
     void ToggleGhost(ChangeEvent<bool> e)
     {
-        GhostRoad.GhostIsOn = e.newValue;
+        Build.ShouldBuildGhostRoad = e.newValue;
     }
     void ToggleSupportLines(ChangeEvent<bool> e)
     {
