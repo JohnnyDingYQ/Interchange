@@ -29,6 +29,10 @@
 # Visual Studio cache directory
 .vs/
 
+# Raw image files
+*.raw
+*.raw.meta
+
 # Gradle cache directory
 .gradle/
 

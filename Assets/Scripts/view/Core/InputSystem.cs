@@ -17,8 +17,7 @@ public class InputSystem : MonoBehaviour
             ReflectElevationChange();
         }
     }
-    private const int CameraSpeedMultiplier = 25;
-    private const float CameraZoomMultiplier = 0.3f;
+    private const int CameraSpeedMultiplier = 10;
     public static float3 MouseWorldPos { get; set; }
 
     void Awake()
@@ -67,15 +66,22 @@ public class InputSystem : MonoBehaviour
 
     void Update()
     {
-        Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
-        cameraOffset.y *= CameraZoomMultiplier;
-        Camera.main.transform.position += CameraSpeedMultiplier * Time.deltaTime * cameraOffset;
+        UpdateCameraPos();
 
         float3 mouseWorldPos = new(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {
-            z = Camera.main.transform.position.y - Elevation
+            z = Camera.main.transform.position.y - (Elevation + Constants.ElevationOffset)
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
+    }
+
+    void UpdateCameraPos()
+    {
+        Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
+        cameraOffset.x *= 1 + MathF.Pow(Camera.main.transform.position.y, 0.7f);
+        cameraOffset.z *= 1 + MathF.Pow(Camera.main.transform.position.y, 0.7f);
+        cameraOffset.y *= MathF.Pow(Camera.main.transform.position.y, 0.05f);
+        Camera.main.transform.position += CameraSpeedMultiplier * Time.deltaTime * cameraOffset;
     }
 
     static void ReflectElevationChange()
