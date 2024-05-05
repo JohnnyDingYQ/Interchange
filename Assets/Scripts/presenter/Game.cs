@@ -70,6 +70,13 @@ public static class Game
         return Nodes.Values.Contains(node);
     }
 
+    public static bool RemoveRoad(int id)
+    {
+        if (!Roads.ContainsKey(id))
+            return false;
+        return RemoveRoad(Roads[id], false);
+    }
+
     public static bool RemoveRoad(Road road, bool retainVertices)
     {
         if (!Roads.ContainsKey(road.Id))

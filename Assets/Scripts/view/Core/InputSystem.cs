@@ -126,7 +126,7 @@ public class InputSystem : MonoBehaviour
     }
     void AbandonBuild(InputAction.CallbackContext context)
     {
-        Build.Reset();
+        Build.ResetSelection();
     }
     void Elevate(InputAction.CallbackContext context)
     {

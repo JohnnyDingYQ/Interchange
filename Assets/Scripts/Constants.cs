@@ -1,12 +1,12 @@
 public static class Constants
 {
     public const float LaneWidth = 5f;
-    public const float BuildSnapTolerance = LaneWidth / 5;
-    public const float MinimumLaneLength = LaneWidth * 2;
+    public const float BuildSnapTolerance = LaneWidth / 2.5f;
+    public const float MinimumLaneLength = LaneWidth * 3;
     public const float MaximumLaneLength = LaneWidth * 20;
     public const float RoadDivisionLengthTestTolerance = 5f;
     public const float MeshResolution = LaneWidth / 8;
-    public const float LaneSplineResolution = LaneWidth / 5;
+    public const float LaneSplineResolution = LaneWidth / 6.25f;
     public const float RoadOutlineSeparation = LaneWidth / 2;
     public const float VertexDistanceFromRoadEnds = MinimumLaneLength / 2;
     public const float NumericallyEqualMaxTolerance = 0.01f;

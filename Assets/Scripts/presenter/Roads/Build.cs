@@ -16,8 +16,9 @@ public static class Build
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
     public static bool AutoDivideOn { get; set; }
-    public static List<Tuple<float3, float3, float>> SupportLines {get;}
-    public static bool ShouldBuildGhostRoad {get; set;}
+    public static List<Tuple<float3, float3, float>> SupportLines { get; }
+    public static bool BuildsGhostRoad { get; set; }
+    public static bool EnforcesTangent { get; set; }
 
     static Build()
     {
@@ -26,6 +27,8 @@ public static class Build
         pivotAssigned = false;
         AutoDivideOn = true;
         SupportLines = new();
+        BuildsGhostRoad = true;
+        EnforcesTangent = true;
     }
 
     public static BuildTargets GetStartTarget()
@@ -53,6 +56,8 @@ public static class Build
     {
         endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
         Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
+        if (road == null)
+            Game.RemoveRoad(Constants.GhostRoadId);
         return road;
     }
 
@@ -60,7 +65,9 @@ public static class Build
     {
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
-        if (startAssigned && pivotAssigned && ShouldBuildGhostRoad)
+        if (EnforcesTangent)
+            pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
+        if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
         SetSupportLines();
     }
@@ -77,15 +84,15 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
+            if (EnforcesTangent)
+                pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
             return null;
         }
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
-            Reset();
-            if (Game.Roads.ContainsKey(Constants.GhostRoadId))
-                Game.RemoveRoad(Game.Roads[Constants.GhostRoadId]);
+            ResetSelection();
             return road;
         }
 
@@ -97,8 +104,6 @@ public static class Build
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-
-        AlignPivotPos();
 
         if (RoadIsTooBent())
             return null;
@@ -138,17 +143,6 @@ public static class Build
         return road;
 
         # region extracted funcitons
-
-        void AlignPivotPos()
-        {
-            float oldY = pivotPos.y;
-            if (startTarget.SnapNotNull)
-                pivotPos = (float3)Vector3.Project(pivotPos - startPos, startTarget.Intersection.Tangent) + startPos;
-            if (endTarget.SnapNotNull)
-                pivotPos = (float3)Vector3.Project(pivotPos - endPos, endTarget.Intersection.Tangent) + endPos;
-            pivotPos.y = oldY;
-        }
-
         static float GetLongestLaneLength(Road road)
         {
             float length = 0;
@@ -218,6 +212,17 @@ public static class Build
         #endregion
     }
 
+    static float3 AlignPivotPos(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
+    {
+        float oldY = pivotPos.y;
+        if (startTarget != null && startTarget.SnapNotNull)
+            pivotPos = math.project(pivotPos - startTarget.MedianPoint, startTarget.Intersection.Tangent) + startTarget.MedianPoint;
+        if (endTarget != null && endTarget.SnapNotNull)
+            pivotPos = math.project(pivotPos - endTarget.MedianPoint, endTarget.Intersection.Tangent) + endTarget.MedianPoint;
+        pivotPos.y = oldY;
+        return pivotPos;
+    }
+
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
     {
         if (nodes.First().Intersection != road.StartIntersection)
@@ -271,11 +276,19 @@ public static class Build
 
     public static void Reset()
     {
+        ResetSelection();
+        AutoDivideOn = true;
+        EnforcesTangent = true;
+        BuildsGhostRoad = true;
+    }
+
+    public static void ResetSelection()
+    {
         startAssigned = false;
         pivotAssigned = false;
         startTarget = null;
         endTarget = null;
-        AutoDivideOn = true;
         pivotPos = 0;
+        Game.RemoveRoad(Constants.GhostRoadId);
     }
 }

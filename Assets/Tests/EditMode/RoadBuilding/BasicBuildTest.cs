@@ -192,7 +192,7 @@ public class BasicBuildTest
         RoadBuilder.B(0, stride, 2 * stride, 3);
         RoadBuilder.B(
             new float3(1, 0, 0) * Constants.MinimumLaneLength,
-            new float3(1, 0, 0.5f) * Constants.MinimumLaneLength,
+            new float3(1.3f, 0, 0.75f) * Constants.MinimumLaneLength,
             2 * stride,
             3
         );

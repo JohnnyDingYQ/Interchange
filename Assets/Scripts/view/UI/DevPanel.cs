@@ -12,6 +12,7 @@ public class DevPanel : MonoBehaviour
     private Toggle drawVertices;
     private Toggle ghostRoad;
     private Toggle supportLines;
+    private Toggle enforceTangent;
     public static TextElement Elevation { get; private set; }
     void OnEnable()
     {
@@ -28,6 +29,7 @@ public class DevPanel : MonoBehaviour
         ghostRoad = root.Q<Toggle>("Ghost");
         Elevation = root.Q<TextElement>("Elevation");
         supportLines = root.Q<Toggle>("SupportLines");
+        enforceTangent = root.Q<Toggle>("EnforceTangent");
 
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
@@ -45,6 +47,8 @@ public class DevPanel : MonoBehaviour
         supportLines.value = true;
         ghostRoad.RegisterCallback<ChangeEvent<bool>>(ToggleGhost);
         ghostRoad.value = true;
+        enforceTangent.RegisterCallback<ChangeEvent<bool>>(EnforceTangent);
+        enforceTangent.value = true;
     }
 
     void OnDisable()
@@ -59,6 +63,7 @@ public class DevPanel : MonoBehaviour
         drawVertices.UnregisterCallback<ChangeEvent<bool>>(ToggleVertices);
         supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
         ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
+        enforceTangent.UnregisterCallback<ChangeEvent<bool>>(EnforceTangent);
     }
 
     void DisableGameWorldClick(MouseEnterEvent e)
@@ -95,10 +100,14 @@ public class DevPanel : MonoBehaviour
     }
     void ToggleGhost(ChangeEvent<bool> e)
     {
-        Build.ShouldBuildGhostRoad = e.newValue;
+        Build.BuildsGhostRoad = e.newValue;
     }
     void ToggleSupportLines(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawSupportLines = e.newValue;
+    }
+    void EnforceTangent(ChangeEvent<bool> e)
+    {
+        Build.EnforcesTangent = e.newValue;
     }
 }
