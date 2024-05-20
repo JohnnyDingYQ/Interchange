@@ -91,8 +91,8 @@ public static class DivideHandler
                 Lane lane = road.Lanes[i];
                 laneLeft.StartVertex = lane.StartVertex;
                 laneRight.EndVertex = lane.EndVertex;
-                laneLeft.StartVertex.ChangeOwnerLane(laneLeft, Side.Start);
-                laneRight.EndVertex.ChangeOwnerLane(laneRight, Side.End);
+                laneLeft.StartVertex.SetOwnerLane(laneLeft, Side.Start);
+                laneRight.EndVertex.SetOwnerLane(laneRight, Side.End);
                 laneLeft.InnerPath = new(laneLeft.InnerPath.BezierSeries, laneLeft.StartVertex, laneLeft.EndVertex);
                 laneRight.InnerPath = new(laneRight.InnerPath.BezierSeries, laneRight.StartVertex, laneRight.EndVertex);
             }

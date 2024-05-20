@@ -22,14 +22,14 @@ public class Vertex
 
     public Vertex(Lane lane, Side side)
     {
-        ChangeOwnerLane(lane, side);
+        SetOwnerLane(lane, side);
         
         BezierSeries bs = lane.BezierSeries;
         Pos = bs.EvaluatePosition(SeriesLocation);
         Tangent = math.normalizesafe(bs.EvaluateTangent(SeriesLocation));
     }
 
-    public void ChangeOwnerLane(Lane l, Side side)
+    public void SetOwnerLane(Lane l, Side side)
     {
         Lane = l;
         BezierSeries bs = l.BezierSeries;

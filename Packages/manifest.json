@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "com.ishape.geometry": "https://github.com/iShapeUnity/Geometry.git",
+    "com.ishape.triangulation": "https://github.com/iShapeUnity/Triangulation.git",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.feature.development": "1.0.1",
     "com.unity.inputsystem": "1.7.0",

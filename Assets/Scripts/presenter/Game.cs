@@ -13,8 +13,10 @@ public static class Game
     public static GameState GameState { get; set; }
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
+    public static SortedDictionary<int, IZone> Zones { get { return GameState.Zones; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
-    public static Road SelectedRoad { get; set; }
+    public static Road HoveredRoad { get; set; }
+    public static IZone HoveredZone { get; set; }
 
     public static int NextAvailableNodeId
     {
@@ -158,13 +160,13 @@ public static class Game
 
     public static void DivideSelectedRoad(float3 mouseWorldPos)
     {
-        if (SelectedRoad != null)
-            DivideHandler.HandleDivideCommand(SelectedRoad, mouseWorldPos);
+        if (HoveredRoad != null)
+            DivideHandler.HandleDivideCommand(HoveredRoad, mouseWorldPos);
     }
 
     public static void RemoveSelectedRoad()
     {
-        if (SelectedRoad != null)
-            RemoveRoad(SelectedRoad);
+        if (HoveredRoad != null)
+            RemoveRoad(HoveredRoad);
     }
 }

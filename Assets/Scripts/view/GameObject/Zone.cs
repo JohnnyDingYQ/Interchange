@@ -3,54 +3,70 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
+using iShape.Geometry;
+using iShape.Triangulation.Shape.Delaunay;
+using iShape.Geometry.Container;
+using Unity.Collections;
+using UnityEngine.Assertions;
 
-public class Zone : MonoBehaviour
+public class Zone : MonoBehaviour, IZone
 {
-    readonly SplineContainer splineContainer;
-    List<Mesh> convexMeshes;
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public SortedDictionary<int, int> Demands { get; set; }
+    public HashSet<Road> InRoads { get; set; }
+    public HashSet<Road> OutRoads { get; set; }
 
-    public void Init(SplineContainer splineContainer)
+    // readonly SplineContainer splineContainer;
+    // List<Mesh> convexMeshes;
+
+    public void Init(SplineContainer splineContainer, int id)
     {
-        convexMeshes = new();
-        foreach (Spline spline in splineContainer.Splines)
+        Assert.AreEqual(1, splineContainer.Splines.Count());
+
+        Id = id;
+        InRoads = new();
+        OutRoads = new();
+        Demands = new();
+        Game.Zones[id] = this;
+        SetupMeshCollider();
+
+        void SetupMeshCollider()
         {
+            Spline spline = splineContainer.Splines.First();
             Mesh mesh = new();
-            float3 midpoint = new(0);
-            foreach (BezierKnot knot in spline.Knots)
-                midpoint += knot.Position;
-            midpoint /= spline.Knots.Count();
-            List<Vector3> verts = new();
-            List<int> tris = new();
-            verts.Add(new Vector3(midpoint.x, midpoint.y, midpoint.z));
+            List<IntVector> verts2D = new();
+            List<Vector3> verts3D = new();
             float length = spline.GetLength();
             int numPoints = (int)(length * Constants.ZoneResolution - 1);
             for (int i = 0; i <= numPoints; i++)
             {
                 float3 pos = spline.EvaluatePosition((float)i / numPoints);
-                verts.Add(new Vector3(pos.x, pos.y, pos.z));
+                verts2D.Add(new((long)pos.x, (long)pos.z));
+                verts3D.Add(new Vector3(pos.x, 32, pos.z)); // MAGIC NUMBER HERE
             }
-            for (int i = 1; i < verts.Count - 1; i++)
-                tris.AddRange(new int[] { 0, i + 1, i });
-            mesh.SetVertices(verts);
+            PlainShape poly = new(new NativeArray<IntVector>(verts2D.ToArray(), Allocator.Temp), true, Allocator.Temp);
+            int[] tris = Triangulation.DelaunayTriangulate(poly, Allocator.Temp).ToArray();
+            mesh.SetVertices(verts3D);
             mesh.SetTriangles(tris, 0);
-            Debug.Log(tris.Count);
-            convexMeshes.Add(mesh);
+            Debug.Log(tris.Count());
             MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
-            // meshCollider.convex = true;
-            // MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            // meshFilter.mesh = mesh;
-            // MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
+
+            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+            meshFilter.mesh = mesh;
+            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
         }
     }
 
-    void OnMouseEnter()
+    void OnMouseOver()
     {
-        Debug.Log("Hi");
+        Game.HoveredZone = this;
+        Debug.Log(OutRoads.Count);
     }
 
     void OnMouseExit()
     {
-        Debug.Log("Exit");
+        Game.HoveredZone = null;
     }
 }

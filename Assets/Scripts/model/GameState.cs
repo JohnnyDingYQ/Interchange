@@ -11,6 +11,8 @@ public class GameState
     [JsonIgnore]
     public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
     public List<Path> GraphSave { get; set; }
+    [JsonIgnore]
+    public SortedDictionary<int, IZone> Zones { get; private set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
     public GameState()
@@ -18,6 +20,7 @@ public class GameState
         Roads = new();
         Nodes = new();
         Graph = new(false);
+        Zones = new();
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
     }

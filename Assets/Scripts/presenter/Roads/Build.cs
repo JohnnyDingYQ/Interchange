@@ -15,6 +15,8 @@ public static class Build
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
+    private static IZone startZone;
+    private static IZone endZone;
     public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3, float>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
@@ -78,6 +80,7 @@ public static class Build
         {
             startAssigned = true;
             startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
+            startZone = Game.HoveredZone;
             return null;
         }
         else if (!pivotAssigned)
@@ -91,6 +94,7 @@ public static class Build
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
+            endZone = Game.HoveredZone;
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return road;
@@ -138,7 +142,15 @@ public static class Build
             RegisterUnregisteredNodes(road);
             ReplaceExistingRoad();
             if (AutoDivideOn)
-                AutoDivideRoad(road);
+            {
+                Road last = AutoDivideRoad(road);
+                endZone?.InRoads.Add(last);
+                // last.EndZone = endZone;
+            }
+            else
+                endZone?.InRoads.Add(road);
+                
+            startZone?.OutRoads.Add(road);
         }
         return road;
 
@@ -151,23 +163,24 @@ public static class Build
             return length;
         }
 
-        static void AutoDivideRoad(Road road)
+        /// Returns last road
+        static Road AutoDivideRoad(Road road)
         {
             float longestLength = GetLongestLaneLength(road);
             if (longestLength <= Constants.MaximumLaneLength)
-                return;
+                return road;
             int divisions = 2;
             while (longestLength / divisions > Constants.MaximumLaneLength)
                 divisions++;
-            RecursiveRoadDivision(road, divisions);
+            return RecursiveRoadDivision(road, divisions);
         }
 
-        static void RecursiveRoadDivision(Road road, int divisions)
+        static Road RecursiveRoadDivision(Road road, int divisions)
         {
             if (divisions == 1)
-                return;
+                return road;
             SubRoads subRoads = DivideHandler.DivideRoad(road, 1 / (float)divisions);
-            RecursiveRoadDivision(subRoads.Right, divisions - 1);
+            return RecursiveRoadDivision(subRoads.Right, divisions - 1);
         }
 
         void ReplaceExistingRoad()
