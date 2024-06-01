@@ -22,9 +22,6 @@ public class Zones : MonoBehaviour
 
     void Start()
     {
-        foreach (IZone zone in Game.Zones.Values)
-            foreach (IZone other in Game.Zones.Values)
-                if (zone != other)
-                    zone.Demands[other.Id] = 1;
+        DemandsGenerator.GenerateDemands();
     }
 }

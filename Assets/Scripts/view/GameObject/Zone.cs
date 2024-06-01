@@ -59,10 +59,11 @@ public class Zone : MonoBehaviour, IZone
         }
     }
 
+    
     void OnMouseOver()
     {
         Game.HoveredZone = this;
-        Debug.Log(OutRoads.Count);
+        // Debug.Log(OutRoads.Count);
     }
 
     void OnMouseExit()

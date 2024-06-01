@@ -17,6 +17,7 @@ public static class Game
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
     public static Road HoveredRoad { get; set; }
     public static IZone HoveredZone { get; set; }
+    public static int Elevation { get { return GameState.Elevation; } }
 
     public static int NextAvailableNodeId
     {
@@ -168,5 +169,16 @@ public static class Game
     {
         if (HoveredRoad != null)
             RemoveRoad(HoveredRoad);
+    }
+
+    public static void SetElevation(int elevation)
+    {
+        if (elevation < 0)
+            GameState.Elevation = 0;
+        else if (elevation > Constants.MaxElevation)
+            GameState.Elevation = Constants.MaxElevation;
+        else
+            GameState.Elevation = elevation;
+        DevPanel.Elevation.text = "Elevation: " + Elevation;
     }
 }

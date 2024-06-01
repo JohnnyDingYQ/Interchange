@@ -80,7 +80,7 @@ public static class Build
         {
             startAssigned = true;
             startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            startZone = Game.HoveredZone;
+            startZone = Game.Elevation == 0 ? Game.HoveredZone : null;
             return null;
         }
         else if (!pivotAssigned)
@@ -94,7 +94,7 @@ public static class Build
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            endZone = Game.HoveredZone;
+            endZone = Game.Elevation == 0 ? Game.HoveredZone : null;
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return road;
@@ -145,7 +145,6 @@ public static class Build
             {
                 Road last = AutoDivideRoad(road);
                 endZone?.InRoads.Add(last);
-                // last.EndZone = endZone;
             }
             else
                 endZone?.InRoads.Add(road);

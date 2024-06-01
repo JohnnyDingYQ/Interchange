@@ -7,16 +7,6 @@ public class InputSystem : MonoBehaviour
 {
     public static bool MouseIsInGameWorld { get; set; }
     private GameActions gameActions;
-    private static float elevation;
-    public static float Elevation
-    {
-        get { return elevation; }
-        set
-        {
-            elevation = value;
-            ReflectElevationChange();
-        }
-    }
     private const int CameraSpeedMultiplier = 10;
     public static float3 MouseWorldPos { get; set; }
 
@@ -27,7 +17,6 @@ public class InputSystem : MonoBehaviour
     void Start()
     {
         MouseIsInGameWorld = true;
-        Elevation = 0;
     }
 
     void OnEnable()
@@ -70,7 +59,7 @@ public class InputSystem : MonoBehaviour
 
         float3 mouseWorldPos = new(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
         {
-            z = Camera.main.transform.position.y - (Elevation + Constants.ElevationOffset)
+            z = Camera.main.transform.position.y - (Game.Elevation + Constants.ElevationOffset)
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
     }
@@ -82,11 +71,6 @@ public class InputSystem : MonoBehaviour
         cameraOffset.z *= 1 + MathF.Pow(Camera.main.transform.position.y, 0.7f);
         cameraOffset.y *= MathF.Pow(Camera.main.transform.position.y, 0.05f);
         Camera.main.transform.position += CameraSpeedMultiplier * Time.deltaTime * cameraOffset;
-    }
-
-    static void ReflectElevationChange()
-    {
-        DevPanel.Elevation.text = "Elevation: " + Elevation;
     }
 
     void OnBuild(InputAction.CallbackContext context)
@@ -130,16 +114,10 @@ public class InputSystem : MonoBehaviour
     }
     void Elevate(InputAction.CallbackContext context)
     {
-        if (Elevation + 2 < 30)
-            Elevation += 2;
-        else
-            Elevation = 30;
+        Game.SetElevation(Game.Elevation + 2);
     }
     void Lower(InputAction.CallbackContext context)
     {
-        if (Elevation - 2 > 0)
-            Elevation -= 2;
-        else
-            Elevation = 0;
+        Game.SetElevation(Game.Elevation - 2);
     }
 }

@@ -15,6 +15,7 @@ public class GameState
     public SortedDictionary<int, IZone> Zones { get; private set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
+    public int Elevation { get; set; }
     public GameState()
     {
         Roads = new();

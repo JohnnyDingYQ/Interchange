@@ -14,4 +14,5 @@ public static class Constants
     public const int GhostRoadId = -1;
     public const float ElevationOffset = 32;
     public const float ZoneResolution = 0.17f;
+    public const int MaxElevation = 30;
 }
