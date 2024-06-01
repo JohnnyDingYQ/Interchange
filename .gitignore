@@ -31,7 +31,6 @@
 
 # Image files
 *.raw
-*.png
 *.raw.meta
 
 # Gradle cache directory
