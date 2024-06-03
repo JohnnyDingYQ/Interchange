@@ -4,9 +4,6 @@ using System.Linq;
 using QuikGraph;
 using QuikGraph.Algorithms;
 using Unity.Mathematics;
-using UnityEngine.Assertions;
-using UnityEngine;
-using Codice.CM.Common.Serialization;
 
 public static class DemandsSatisfer
 {
@@ -19,7 +16,7 @@ public static class DemandsSatisfer
             foreach (int zoneID in zone.Demands.Keys)
             {
                 int demand = zone.Demands[zoneID];
-                if (demand == 1 && zone.OutRoads.Count != 0 && Game.Zones[zoneID].InRoads.Count != 0)
+                if (demand == 1 && zone.OutVerticesCount != 0 && Game.Zones[zoneID].InVerticesCount != 0)
                 {
                     SendCar(zone, Game.Zones[zoneID]);
                     shouldZero.Add(zoneID);
@@ -34,8 +31,8 @@ public static class DemandsSatisfer
 
     public static void SendCar(IZone origin, IZone destination)
     {
-        Vertex startV = origin.OutRoads.First().Lanes.First().StartVertex;
-        Vertex endV = destination.InRoads.First().Lanes.First().EndVertex;
+        Vertex startV = origin.GetRandomOutVertex();
+        Vertex endV = destination.GetRandomInVertex();
         TryFunc<Vertex, IEnumerable<Path>> tryFunc = Game.Graph.ShortestPathsAStar(
             (Path p) => p.Length,
             (Vertex to) => math.distance(startV.Pos, to.Pos),

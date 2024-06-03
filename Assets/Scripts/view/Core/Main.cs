@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Main : MonoBehaviour
@@ -6,6 +7,7 @@ public class Main : MonoBehaviour
     {
         Application.targetFrameRate = 60;
         Physics.queriesHitTriggers = false;
+        UnityEngine.Random.InitState((int)DateTime.Now.Ticks); // different seed for each game session
     }
 
     void FixedUpdate()

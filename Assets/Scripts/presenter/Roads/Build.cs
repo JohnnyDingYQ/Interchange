@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphExtensions;
-using QuikGraph;
-using QuikGraph.Algorithms;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public static class Build
 {
@@ -144,12 +141,12 @@ public static class Build
             if (AutoDivideOn)
             {
                 Road last = AutoDivideRoad(road);
-                endZone?.InRoads.Add(last);
+                endZone?.AddInRoad(last);
             }
             else
-                endZone?.InRoads.Add(road);
+                endZone?.AddInRoad(road);
                 
-            startZone?.OutRoads.Add(road);
+            startZone?.AddOutRoad(road);
         }
         return road;
 

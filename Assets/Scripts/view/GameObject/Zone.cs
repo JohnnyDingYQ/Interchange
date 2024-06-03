@@ -8,25 +8,57 @@ using iShape.Triangulation.Shape.Delaunay;
 using iShape.Geometry.Container;
 using Unity.Collections;
 using UnityEngine.Assertions;
+using QuikGraph.Collections;
+using System;
 
 public class Zone : MonoBehaviour, IZone
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public SortedDictionary<int, int> Demands { get; set; }
-    public HashSet<Road> InRoads { get; set; }
-    public HashSet<Road> OutRoads { get; set; }
+    // public HashSet<Road> InRoads { get; set; }
+    // public HashSet<Road> OutRoads { get; set; }
+    private List<Vertex> InVertices { get; set; }
+    private List<Vertex> OutVertices { get; set; }
+    public int InVerticesCount { get { return InVertices.Count; } }
+    public int OutVerticesCount { get { return OutVertices.Count; } }
+    public void AddInRoad(Road road)
+    {
+        foreach (Lane lane in road.Lanes)
+            InVertices.Add(lane.EndVertex);
+    }
 
-    // readonly SplineContainer splineContainer;
-    // List<Mesh> convexMeshes;
+    public void AddOutRoad(Road road)
+    {
+        foreach (Lane lane in road.Lanes)
+            OutVertices.Add(lane.StartVertex);
+    }
+
+    public Vertex GetRandomInVertex()
+    {
+        int randomIndex = (int) (UnityEngine.Random.value * InVertices.Count());
+        if (randomIndex == InVertices.Count) // technically possible
+            return GetRandomInVertex();
+        return InVertices[randomIndex];
+    }
+
+    public Vertex GetRandomOutVertex()
+    {
+        int randomIndex = (int) (UnityEngine.Random.value * OutVertices.Count());
+        if (randomIndex == OutVertices.Count)
+            return GetRandomOutVertex();
+        return OutVertices[randomIndex];
+    }
 
     public void Init(SplineContainer splineContainer, int id)
     {
         Assert.AreEqual(1, splineContainer.Splines.Count());
 
         Id = id;
-        InRoads = new();
-        OutRoads = new();
+        // InRoads = new();
+        // OutRoads = new();
+        InVertices = new();
+        OutVertices = new();
         Demands = new();
         Game.Zones[id] = this;
         SetupMeshCollider();
@@ -60,12 +92,8 @@ public class Zone : MonoBehaviour, IZone
         }
     }
 
-    
-    void OnMouseOver()
+    public void RemoveRoad(Road road)
     {
-        // Game.HoveredZone = this;
-        // Debug.Log(OutRoads.Count);
-        // Debug.Log(InRoads.Count);
-        // Debug.Log(Demands.Count);
+        throw new System.NotImplementedException();
     }
 }
