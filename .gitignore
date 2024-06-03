@@ -81,4 +81,7 @@ crashlytics-build.properties
 # Code Coverage
 /CodeCoverage
 
-# End of https://www.toptal.com/developers/gitignore/api/unity
+# OSX
+.DS_Store
+
+# End of https://www.toptal.com/developers/gitignore/api/unity modified by Johnny Ding
