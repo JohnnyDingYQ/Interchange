@@ -12,8 +12,8 @@ public static class Build
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
-    private static IZone startZone;
-    private static IZone endZone;
+    private static Zone startZone;
+    private static Zone endZone;
     public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3, float>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }

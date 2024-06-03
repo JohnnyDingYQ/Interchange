@@ -10,16 +10,16 @@ using UnityEngine.Splines;
 public class Zoning : MonoBehaviour
 {
     [SerializeField] GameObject zoneSplines;
-    [SerializeField] Zone zonePrefab;
+    [SerializeField] ZoneHumbleObject zonePrefab;
     void Awake()
     {
         Assert.AreEqual(0, zoneSplines.transform.position.x);
         Assert.AreEqual(0, zoneSplines.transform.position.y);
         foreach (Transform child in zoneSplines.transform)
         {
-            Zone zone = Instantiate(zonePrefab, transform);
+            ZoneHumbleObject zone = Instantiate(zonePrefab, transform);
             zone.name = child.gameObject.name;
-            zone.Init(child.gameObject.GetComponent<SplineContainer>(), int.Parse(zone.name));
+            zone.Init(int.Parse(zone.name), child.gameObject.GetComponent<SplineContainer>());
         }
         Game.UpdateHoveredZone += UpdateHoveredZone;
     }
@@ -47,8 +47,8 @@ public class Zoning : MonoBehaviour
         hits = Physics.RaycastAll(mousePos, new float3(0, -1, 0), 100);
         foreach (RaycastHit hit in hits)
         {
-            if (hit.collider.gameObject.GetComponent<Zone>() != null)
-                Game.HoveredZone = hit.collider.gameObject.GetComponent<Zone>();
+            if (hit.collider.gameObject.GetComponent<ZoneHumbleObject>() != null)
+                Game.HoveredZone = hit.collider.gameObject.GetComponent<ZoneHumbleObject>().zone;
         }
     }
 }

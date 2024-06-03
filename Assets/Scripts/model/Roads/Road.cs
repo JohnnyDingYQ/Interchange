@@ -27,8 +27,8 @@ public class Road
     public Intersection StartIntersection { get; set; }
     public Intersection EndIntersection { get; set; }
     [JsonIgnore]
-    public IZone StartZone { get; set; }
-    public IZone EndZone { get; set; }
+    public Zone StartZone { get; set; }
+    public Zone EndZone { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()

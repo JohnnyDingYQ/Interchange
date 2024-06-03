@@ -14,11 +14,11 @@ public static class Game
     public static GameState GameState { get; set; }
     public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
     public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
-    public static SortedDictionary<int, IZone> Zones { get { return GameState.Zones; } }
+    public static SortedDictionary<int, Zone> Zones { get { return GameState.Zones; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
     public static Road HoveredRoad { get; set; }
-    private static IZone hoveredZone;
-    public static IZone HoveredZone
+    private static Zone hoveredZone;
+    public static Zone HoveredZone
     {
         get
         {

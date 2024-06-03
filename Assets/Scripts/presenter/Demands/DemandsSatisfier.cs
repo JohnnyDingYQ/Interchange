@@ -10,7 +10,7 @@ public static class DemandsSatisfer
     public static event Action<IEnumerable<Path>> Drive;
     public static void SatisfyDemands()
     {
-        foreach (IZone zone in Game.Zones.Values)
+        foreach (Zone zone in Game.Zones.Values)
         {
             List<int> shouldZero = new();
             foreach (int zoneID in zone.Demands.Keys)
@@ -29,7 +29,7 @@ public static class DemandsSatisfer
         }
     }
 
-    public static void SendCar(IZone origin, IZone destination)
+    public static void SendCar(Zone origin, Zone destination)
     {
         Vertex startV = origin.GetRandomOutVertex();
         Vertex endV = destination.GetRandomInVertex();

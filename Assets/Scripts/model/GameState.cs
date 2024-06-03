@@ -12,7 +12,7 @@ public class GameState
     public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
     public List<Path> GraphSave { get; set; }
     [JsonIgnore]
-    public SortedDictionary<int, IZone> Zones { get; private set; }
+    public SortedDictionary<int, Zone> Zones { get; private set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
     public int Elevation { get; set; }
