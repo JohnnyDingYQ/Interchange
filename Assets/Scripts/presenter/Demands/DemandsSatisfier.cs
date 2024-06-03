@@ -6,6 +6,7 @@ using QuikGraph.Algorithms;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 using UnityEngine;
+using Codice.CM.Common.Serialization;
 
 public static class DemandsSatisfer
 {
@@ -13,12 +14,22 @@ public static class DemandsSatisfer
     public static void SatisfyDemands()
     {
         foreach (IZone zone in Game.Zones.Values)
+        {
+            List<int> shouldZero = new();
             foreach (int zoneID in zone.Demands.Keys)
             {
                 int demand = zone.Demands[zoneID];
                 if (demand == 1 && zone.OutRoads.Count != 0 && Game.Zones[zoneID].InRoads.Count != 0)
+                {
                     SendCar(zone, Game.Zones[zoneID]);
+                    shouldZero.Add(zoneID);
+                }
             }
+            foreach (int i in shouldZero)
+            {
+                zone.Demands[i] = 0;
+            }
+        }
     }
 
     public static void SendCar(IZone origin, IZone destination)
