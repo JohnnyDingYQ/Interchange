@@ -55,6 +55,11 @@ public class Zone
 
     public void RemoveRoad(Road road)
     {
-        throw new System.NotImplementedException();
+        foreach (Lane lane in road.Lanes)
+            foreach (Vertex v in new Vertex[] {lane.StartVertex, lane.EndVertex})
+            {
+                InVertices.Remove(v);
+                OutVertices.Remove(v);
+            }
     }
 }

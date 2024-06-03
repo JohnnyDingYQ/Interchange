@@ -39,6 +39,6 @@ public static class DemandsSatisfer
             startV
         );
         tryFunc(endV, out IEnumerable<Path> paths);
-        Drive.Invoke(paths);
+        Drive?.Invoke(paths);
     }
 }

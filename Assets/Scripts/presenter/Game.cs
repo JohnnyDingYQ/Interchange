@@ -22,7 +22,7 @@ public static class Game
     {
         get
         {
-            UpdateHoveredZone.Invoke();
+            UpdateHoveredZone?.Invoke();
             return hoveredZone;
         }
         set
