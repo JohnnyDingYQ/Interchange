@@ -14,6 +14,8 @@ public class Path : IEdge<Vertex>
     public Vertex Source { get; private set; }
     [JsonProperty]
     public Vertex Target { get; private set; }
+    [JsonIgnore]
+    public float Length { get { return BezierSeries.Length; } }
 
     public Path() { }
 

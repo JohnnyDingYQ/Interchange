@@ -95,6 +95,7 @@ public static class Build
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             endZone = Game.Elevation == 0 ? Game.HoveredZone : null;
+            Debug.Log(Game.HoveredZone);
             Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return road;

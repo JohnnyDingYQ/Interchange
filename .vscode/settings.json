@@ -52,5 +52,6 @@
         "Temp/": true
     },
     "dotnet.defaultSolution": "Interchange.sln",
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "dotnet.preferCSharpExtension": true
 }

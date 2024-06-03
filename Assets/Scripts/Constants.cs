@@ -12,7 +12,7 @@ public static class Constants
     public const float NumericallyEqualMaxTolerance = 0.01f;
     public const float MaxRoadBendAngle = 130;
     public const int GhostRoadId = -1;
-    public const float ElevationOffset = 32;
+    public const float ElevationOffset = 33;
     public const float ZoneResolution = 0.17f;
     public const int MaxElevation = 30;
 }

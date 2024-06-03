@@ -45,11 +45,12 @@ public class Zone : MonoBehaviour, IZone
                 verts2D.Add(new((long)pos.x, (long)pos.z));
                 verts3D.Add(new Vector3(pos.x, 32, pos.z)); // MAGIC NUMBER HERE
             }
-            PlainShape poly = new(new NativeArray<IntVector>(verts2D.ToArray(), Allocator.Temp), true, Allocator.Temp);
+            NativeArray<IntVector> nativeArray = new(verts2D.ToArray(), Allocator.Temp);
+            PlainShape poly = new(nativeArray, true, Allocator.Temp);
             int[] tris = Triangulation.DelaunayTriangulate(poly, Allocator.Temp).ToArray();
             mesh.SetVertices(verts3D);
             mesh.SetTriangles(tris, 0);
-            Debug.Log(tris.Count());
+            nativeArray.Dispose();
             MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
 
@@ -62,12 +63,9 @@ public class Zone : MonoBehaviour, IZone
     
     void OnMouseOver()
     {
-        Game.HoveredZone = this;
+        // Game.HoveredZone = this;
         // Debug.Log(OutRoads.Count);
-    }
-
-    void OnMouseExit()
-    {
-        Game.HoveredZone = null;
+        // Debug.Log(InRoads.Count);
+        // Debug.Log(Demands.Count);
     }
 }
