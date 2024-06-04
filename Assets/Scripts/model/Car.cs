@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using QuikGraph;
-using QuikGraph.Algorithms;
-using Unity.Mathematics;
+using UnityEngine.Assertions;
 
 public class Car
 {
@@ -12,35 +9,24 @@ public class Car
     public Zone Origin { get; private set; }
     public Zone Destination { get; private set; }
     public IEnumerable<Path> paths;
-    public Car(Zone origin, Zone destination)
+    public int CurrentPathIndex { get; set; }
+    public bool Blocked { get; set; }
+    public Car(Zone origin, Zone destination, IEnumerable<Path> paths)
     {
+        Assert.IsNotNull(paths);
         DestinationUnreachable = false;
         Origin = origin;
         Destination = destination;
-    }
-
-    public bool CanFindPath()
-    {
-        Vertex startV = Origin.GetRandomOutVertex();
-        Vertex endV = Destination.GetRandomInVertex();
-        if (startV == null || endV == null)
-            return false;
-        TryFunc<Vertex, IEnumerable<Path>> tryFunc = Game.Graph.ShortestPathsAStar(
-            (Path p) => p.Length,
-            (Vertex to) => math.distance(startV.Pos, to.Pos),
-            startV
-        );
-        tryFunc(endV, out paths);
-        return paths == null ? false : true;
+        Blocked = false;
+        this.paths = paths;
     }
 
     public void Travel()
     {
-        if (CanFindPath())
-        {
-            TravelCoroutine?.Invoke(this);
-            if (DestinationUnreachable)
-                Origin.Demands[Destination.Id] += 1;
-        }
+
+        TravelCoroutine?.Invoke(this);
+        if (DestinationUnreachable)
+            Origin.Demands[Destination.Id] += 1;
+
     }
 }

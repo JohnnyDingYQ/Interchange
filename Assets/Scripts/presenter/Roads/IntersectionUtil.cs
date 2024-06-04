@@ -158,13 +158,12 @@ public static class IntersectionUtil
             {
                 Node other = i.Nodes[j - 1];
                 if (NodesBelongToUniqueRoad(n, other))
-                    BuildPathNode2Node(n, other);
-            }
-            if (j + 1 < i.Nodes.Count)
-            {
-                Node other = i.Nodes[j + 1];
-                if (NodesBelongToUniqueRoad(n, other))
-                    BuildPathNode2Node(n, other);
+                {
+                    Path l = BuildPathLane2Lane(n.GetLanes(Direction.In).Single(), other.GetLanes(Direction.Out).Single());
+                    Path r = BuildPathLane2Lane(other.GetLanes(Direction.In).Single(), n.GetLanes(Direction.Out).Single());
+                    l.InterweavingPath = r;
+                    r.InterweavingPath = l;
+                }
             }
         }
 
@@ -202,6 +201,7 @@ public static class IntersectionUtil
                     Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
         }
 
+        // i.e. nodes are internal to a a road
         bool NodesBelongToUniqueRoad(Node n1, Node n2)
         {
             if (n1.GetLanes(Direction.In).Count == 1 && n2.GetLanes(Direction.Out).Count == 1
@@ -225,21 +225,22 @@ public static class IntersectionUtil
 
         }
 
-        static void BuildPathLane2Lane(Lane l1, Lane l2)
+        static Path BuildPathLane2Lane(Lane l1, Lane l2)
         {
-            BuildPath(l1.EndVertex, l2.StartVertex);
+            return BuildPath(l1.EndVertex, l2.StartVertex);
         }
 
-        static void BuildPath(Vertex start, Vertex end)
+        static Path BuildPath(Vertex start, Vertex end)
         {
             Game.Graph.TryGetEdge(start, end, out Path edge);
             if (edge != null)
-                return;
+                return null;
             float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
             BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
             Path p = new(bs, start, end);
             Game.AddEdge(p);
+            return p;
         }
     }
 }

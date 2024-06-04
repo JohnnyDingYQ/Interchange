@@ -20,6 +20,8 @@ public class Path : IEdge<Vertex>
     public float BlockCounter { get; set; }
     [JsonIgnore]
     public bool IsBlocked { get { return BlockCounter > 0; } }
+    public Path InterweavingPath { get; set; }
+    public int NumCars { get; set; }
 
     public Path() { }
 
@@ -29,6 +31,7 @@ public class Path : IEdge<Vertex>
         Source = source;
         Target = target;
         BlockCounter = 0;
+        NumCars = 0;
     }
 
     public List<float3> GetOutline(Orientation orientation)

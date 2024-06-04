@@ -1,12 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using System;
-using UnityEngine.Splines;
-using GraphExtensions;
 
 public class Intersection
 {
