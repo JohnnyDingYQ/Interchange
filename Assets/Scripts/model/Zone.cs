@@ -5,8 +5,6 @@ public class Zone
     public int Id { get; set; }
     public string Name { get; set; }
     public SortedDictionary<int, int> Demands { get; set; }
-    // public HashSet<Road> InRoads { get; set; }
-    // public HashSet<Road> OutRoads { get; set; }
     private List<Vertex> InVertices { get; set; }
     private List<Vertex> OutVertices { get; set; }
     public int InVerticesCount { get { return InVertices.Count; } }
@@ -15,8 +13,6 @@ public class Zone
     public Zone(int id)
     {
         Id = id;
-        // InRoads = new();
-        // OutRoads = new();
         InVertices = new();
         OutVertices = new();
         Demands = new();

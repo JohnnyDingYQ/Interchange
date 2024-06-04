@@ -6,7 +6,7 @@ public static class DemandsGenerator
         {
             foreach (Zone other in Game.Zones.Values)
                 if (zone != other)
-                    zone.Demands[other.Id] = 1;
+                    zone.Demands[other.Id] = 4;
         }
     }
 }

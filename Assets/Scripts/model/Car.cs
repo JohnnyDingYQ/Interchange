@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using QuikGraph;
 using QuikGraph.Algorithms;
 using Unity.Mathematics;
@@ -7,27 +8,39 @@ using Unity.Mathematics;
 public class Car
 {
     public static event Action<Car> TravelCoroutine;
-    public bool IsAtDestination { get; set; }
+    public bool DestinationUnreachable { get; set; }
     public Zone Origin { get; private set; }
     public Zone Destination { get; private set; }
     public IEnumerable<Path> paths;
     public Car(Zone origin, Zone destination)
     {
-        IsAtDestination = false;
+        DestinationUnreachable = false;
         Origin = origin;
         Destination = destination;
     }
-    public void Travel()
+
+    public bool CanFindPath()
     {
         Vertex startV = Origin.GetRandomOutVertex();
         Vertex endV = Destination.GetRandomInVertex();
+        if (startV == null || endV == null)
+            return false;
         TryFunc<Vertex, IEnumerable<Path>> tryFunc = Game.Graph.ShortestPathsAStar(
             (Path p) => p.Length,
             (Vertex to) => math.distance(startV.Pos, to.Pos),
             startV
         );
         tryFunc(endV, out paths);
-        if (paths != null)
+        return paths == null ? false : true;
+    }
+
+    public void Travel()
+    {
+        if (CanFindPath())
+        {
             TravelCoroutine?.Invoke(this);
+            if (DestinationUnreachable)
+                Origin.Demands[Destination.Id] += 1;
+        }
     }
 }
