@@ -1,44 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuikGraph;
-using QuikGraph.Algorithms;
-using Unity.Mathematics;
 
 public static class DemandsSatisfer
 {
-    public static event Action<IEnumerable<Path>> Drive;
     public static void SatisfyDemands()
     {
         foreach (Zone zone in Game.Zones.Values)
         {
-            List<int> shouldZero = new();
+            List<int> shouldDecrement = new(); // avoids concurrent modification of dict
             foreach (int zoneID in zone.Demands.Keys)
             {
                 int demand = zone.Demands[zoneID];
                 if (demand == 1 && zone.OutVerticesCount != 0 && Game.Zones[zoneID].InVerticesCount != 0)
                 {
-                    SendCar(zone, Game.Zones[zoneID]);
-                    shouldZero.Add(zoneID);
+                    Car car = new(zone, Game.Zones[zoneID]);
+                    car.Travel();
+                    shouldDecrement.Add(zoneID);
                 }
             }
-            foreach (int i in shouldZero)
+            foreach (int i in shouldDecrement)
             {
                 zone.Demands[i] = 0;
             }
         }
-    }
-
-    public static void SendCar(Zone origin, Zone destination)
-    {
-        Vertex startV = origin.GetRandomOutVertex();
-        Vertex endV = destination.GetRandomInVertex();
-        TryFunc<Vertex, IEnumerable<Path>> tryFunc = Game.Graph.ShortestPathsAStar(
-            (Path p) => p.Length,
-            (Vertex to) => math.distance(startV.Pos, to.Pos),
-            startV
-        );
-        tryFunc(endV, out IEnumerable<Path> paths);
-        Drive?.Invoke(paths);
     }
 }
