@@ -4,6 +4,7 @@ using UnityEngine;
 using QuikGraph;
 using Unity.Mathematics;
 using System.Linq;
+using UnityEngine.Assertions;
 
 public static class Game
 {
@@ -11,11 +12,13 @@ public static class Game
     public static event Action<Road> RoadUpdated;
     public static event Action<Road> RoadRemoved;
     public static event Action UpdateHoveredZone;
-    public static GameState GameState { get; set; }
-    public static SortedDictionary<int, Road> Roads { get { return GameState.Roads; } }
-    public static SortedDictionary<int, Node> Nodes { get { return GameState.Nodes; } }
-    public static SortedDictionary<int, Zone> Zones { get { return GameState.Zones; } }
-    public static AdjacencyGraph<Vertex, Path> Graph { get { return GameState.Graph; } }
+    public static GameSave GameSave { get; set; }
+    public static SortedDictionary<int, Road> Roads { get { return GameSave.Roads; } }
+    public static SortedDictionary<int, Node> Nodes { get { return GameSave.Nodes; } }
+    public static SortedDictionary<int, Zone> Zones { get { return GameSave.Zones; } }
+    public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
+    public static int Elevation { get { return GameSave.Elevation; } }
+    private static HashSet<Path> blockedPaths;
     public static Road HoveredRoad { get; set; }
     private static Zone hoveredZone;
     public static Zone HoveredZone
@@ -31,28 +34,31 @@ public static class Game
         }
     }
     public static float3 MouseWorldPos { get { return InputSystem.MouseWorldPos; } }
-    public static int Elevation { get { return GameState.Elevation; } }
 
     public static int NextAvailableNodeId
     {
-        get { return GameState.NextAvailableNodeId; }
-        set { GameState.NextAvailableNodeId = value; }
+        get { return GameSave.NextAvailableNodeId; }
+        set { GameSave.NextAvailableNodeId = value; }
     }
     public static int NextAvailableRoadId
     {
-        get { return GameState.NextAvailableRoadId; }
-        set { GameState.NextAvailableRoadId = value; }
+        get { return GameSave.NextAvailableRoadId; }
+        set { GameSave.NextAvailableRoadId = value; }
     }
 
     static Game()
     {
-        GameState = new();
+        GameSave = new();
+        blockedPaths = new();
     }
 
     public static void WipeState()
     {
         Build.Reset();
-        GameState = new();
+        GameSave = new();
+        blockedPaths = new();
+        hoveredZone = null;
+        HoveredRoad = null;
     }
 
     public static void RegisterRoad(Road road)
@@ -188,11 +194,24 @@ public static class Game
     public static void SetElevation(int elevation)
     {
         if (elevation < 0)
-            GameState.Elevation = 0;
+            GameSave.Elevation = 0;
         else if (elevation > Constants.MaxElevation)
-            GameState.Elevation = Constants.MaxElevation;
+            GameSave.Elevation = Constants.MaxElevation;
         else
-            GameState.Elevation = elevation;
+            GameSave.Elevation = elevation;
         DevPanel.Elevation.text = "Elevation: " + Elevation;
+    }
+
+    public static void BlockPath(Path path)
+    {
+        path.BlockCounter = Constants.PathBlockDuration;
+        blockedPaths.Add(path);
+    }
+
+    public static void PassTime(float seconds)
+    {
+        blockedPaths.RemoveWhere(p => p.BlockCounter <= 0);
+        foreach (Path p in blockedPaths)
+            p.BlockCounter -= seconds;
     }
 }

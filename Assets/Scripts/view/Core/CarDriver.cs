@@ -26,6 +26,10 @@ public class CarDriver : MonoBehaviour
         // carObject.Car = car;
         foreach (Path path in car.paths)
         {
+            while (path.IsBlocked)
+                yield return null;
+            
+            Game.BlockPath(path);
             carObject.transform.position = path.BezierSeries.EvaluatePosition(0);
             float totalLength = path.BezierSeries.Length;
             float traveledLength = 0;

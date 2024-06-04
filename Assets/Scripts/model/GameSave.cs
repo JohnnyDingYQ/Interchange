@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using QuikGraph;
 using Unity.Plastic.Newtonsoft.Json;
 
-public class GameState
+public class GameSave
 {
     [JsonProperty]
     public SortedDictionary<int, Node> Nodes { get; private set; }
@@ -16,7 +16,7 @@ public class GameState
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
     public int Elevation { get; set; }
-    public GameState()
+    public GameSave()
     {
         Roads = new();
         Nodes = new();

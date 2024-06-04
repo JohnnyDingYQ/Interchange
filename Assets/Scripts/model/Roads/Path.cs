@@ -16,6 +16,10 @@ public class Path : IEdge<Vertex>
     public Vertex Target { get; private set; }
     [JsonIgnore]
     public float Length { get { return BezierSeries.Length; } }
+    [JsonIgnore]
+    public float BlockCounter { get; set; }
+    [JsonIgnore]
+    public bool IsBlocked { get { return BlockCounter > 0; } }
 
     public Path() { }
 
@@ -24,6 +28,7 @@ public class Path : IEdge<Vertex>
         BezierSeries = bezierSeries;
         Source = source;
         Target = target;
+        BlockCounter = 0;
     }
 
     public List<float3> GetOutline(Orientation orientation)

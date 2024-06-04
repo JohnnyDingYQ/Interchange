@@ -18,7 +18,7 @@ public static class SaveSystem
         {
             string fileContents = File.ReadAllText(saveFile);
             // There is no server, whatever
-            Game.GameState = JsonConvert.DeserializeObject<GameState>(fileContents, new JsonSerializerSettings
+            Game.GameSave = JsonConvert.DeserializeObject<GameSave>(fileContents, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
@@ -33,7 +33,7 @@ public static class SaveSystem
 
         static void RestoreGameState()
         {
-            Game.Graph.AddVerticesAndEdgeRange(Game.GameState.GraphSave);
+            Game.Graph.AddVerticesAndEdgeRange(Game.GameSave.GraphSave);
             EvaluteIntersections();
             foreach (Road r in Game.Roads.Values)
             {
@@ -57,9 +57,9 @@ public static class SaveSystem
 
     public static void SaveGame()
     {
-        Game.GameState.GraphSave = Game.Graph.Edges.ToList();
+        Game.GameSave.GraphSave = Game.Graph.Edges.ToList();
 
-        string s = JsonConvert.SerializeObject(Game.GameState, Formatting.None, new JsonSerializerSettings
+        string s = JsonConvert.SerializeObject(Game.GameSave, Formatting.None, new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.All,
             TypeNameHandling = TypeNameHandling.Auto,
