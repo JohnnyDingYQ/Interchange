@@ -18,7 +18,6 @@ public static class Game
     public static SortedDictionary<int, Zone> Zones { get { return GameSave.Zones; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
     public static int Elevation { get { return GameSave.Elevation; } }
-    private static HashSet<Path> blockedPaths;
     public static Road HoveredRoad { get; set; }
     private static Zone hoveredZone;
     public static Zone HoveredZone
@@ -49,14 +48,12 @@ public static class Game
     static Game()
     {
         GameSave = new();
-        blockedPaths = new();
     }
 
     public static void WipeState()
     {
         Build.Reset();
         GameSave = new();
-        blockedPaths = new();
         hoveredZone = null;
         HoveredRoad = null;
     }
@@ -200,18 +197,5 @@ public static class Game
         else
             GameSave.Elevation = elevation;
         DevPanel.Elevation.text = "Elevation: " + Elevation;
-    }
-
-    public static void BlockPath(Path path)
-    {
-        path.BlockCounter = Constants.PathBlockDuration;
-        blockedPaths.Add(path);
-    }
-
-    public static void PassTime(float seconds)
-    {
-        blockedPaths.RemoveWhere(p => p.BlockCounter <= 0);
-        foreach (Path p in blockedPaths)
-            p.BlockCounter -= seconds;
     }
 }

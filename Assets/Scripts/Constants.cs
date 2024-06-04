@@ -17,4 +17,5 @@ public static class Constants
     public const int MaxElevation = 30;
     public const float CarSpeed = 15f;
     public const float PathBlockDuration = 0.5f;
+    public const float CarMinimumSeparation = 10f;
 }

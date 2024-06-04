@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class CarDriver : MonoBehaviour
 {
@@ -23,29 +25,29 @@ public class CarDriver : MonoBehaviour
     IEnumerator DriveStepper(Car car)
     {
         CarHumbleObject carObject = Instantiate(carGameObject, transform);
-        // carObject.Car = car;
-        int index = 0;
-        foreach (Path path in car.paths)
+        Path[] arrayPaths = car.paths.ToArray();
+        for (int i = 0; i < arrayPaths.Count(); i++)
         {
-            car.CurrentPathIndex = index++;
-            while (path.IsBlocked)
-                yield return null;
-            if (path.InterweavingPath != null)
-                while (path.InterweavingPath.NumCars != 0)
-                    yield return null;
-            path.NumCars++;
-            car.Blocked = false;
-            Game.BlockPath(path);
-            carObject.transform.position = path.BezierSeries.EvaluatePosition(0);
-            float totalLength = path.BezierSeries.Length;
+            Path path = arrayPaths[i];
+            Path nextPath = i + 1 < arrayPaths.Count() ? arrayPaths[i + 1] : null;
+            // carObject.transform.position = path.BezierSeries.EvaluatePosition(0);
+            path.AddCar(car);
+            float totalLength = path.Length;
             float traveledLength = 0;
             while (traveledLength <= totalLength)
             {
                 carObject.transform.position = path.BezierSeries.EvaluatePosition(traveledLength / totalLength);
-                traveledLength += Constants.CarSpeed * Time.deltaTime;
+                traveledLength = path.MoveCar(car, Time.deltaTime, nextPath);
                 yield return null;
             }
-            path.NumCars--;
+            if (nextPath != null)
+            {
+                while (nextPath.IsBlocked)
+                    yield return null;
+                Assert.IsTrue(nextPath.IncomingCar == car);
+                nextPath.IncomingCar = null;
+            }
+            path.RemoveCar(car);
         }
         Destroy(carObject.gameObject);
     }

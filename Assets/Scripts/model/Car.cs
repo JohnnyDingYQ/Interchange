@@ -9,15 +9,17 @@ public class Car
     public Zone Origin { get; private set; }
     public Zone Destination { get; private set; }
     public IEnumerable<Path> paths;
-    public int CurrentPathIndex { get; set; }
-    public bool Blocked { get; set; }
+    // public bool Blocked { get; set; }
+    public int PathIndex { get; set; }
+    public float DistanceOnPath { get; set; }
+
     public Car(Zone origin, Zone destination, IEnumerable<Path> paths)
     {
         Assert.IsNotNull(paths);
         DestinationUnreachable = false;
         Origin = origin;
         Destination = destination;
-        Blocked = false;
+        // Blocked = false;
         this.paths = paths;
     }
 

@@ -1,7 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
-using GraphExtensions;
 
 public class PathTest
 {
@@ -277,5 +276,43 @@ public class PathTest
         Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[1]));
         Assert.True(Game.HasEdge(road1.Lanes[1], road3.Lanes[1]));
         Assert.True(Game.HasEdge(road1.Lanes[2], road3.Lanes[0]));
+    }
+
+    [Test]
+    public void BasicInterweavingPath_2Lanes()
+    {
+        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
+        Game.Graph.TryGetEdge(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex, out Path rightEdge);
+        Game.Graph.TryGetEdge(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex, out Path leftEdge);
+        Assert.AreSame(leftEdge, rightEdge.InterweavingPath);
+        Assert.AreSame(rightEdge, leftEdge.InterweavingPath);
+    }
+
+    [Test]
+    public void BasicInterweavingPath_3Lanes()
+    {
+        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        Game.Graph.TryGetEdge(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex, out Path rightEdge);
+        Game.Graph.TryGetEdge(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex, out Path leftEdge);
+        Assert.AreSame(leftEdge, rightEdge.InterweavingPath);
+        Assert.AreSame(rightEdge, leftEdge.InterweavingPath);
+        Game.Graph.TryGetEdge(road1.Lanes[1].EndVertex, road2.Lanes[2].StartVertex, out rightEdge);
+        Game.Graph.TryGetEdge(road1.Lanes[2].EndVertex, road2.Lanes[1].StartVertex, out leftEdge);
+        Assert.AreSame(leftEdge, rightEdge.InterweavingPath);
+        Assert.AreSame(rightEdge, leftEdge.InterweavingPath);
+    }
+
+    [Test]
+    public void BasicInterweavingPath_2to3Lanes()
+    {
+        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
+        float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
+        Road road2 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
+        Game.Graph.TryGetEdge(road1.Lanes[0].EndVertex, road2.Lanes[2].StartVertex, out Path rightEdge);
+        Game.Graph.TryGetEdge(road1.Lanes[1].EndVertex, road2.Lanes[1].StartVertex, out Path leftEdge);
+        Assert.AreSame(leftEdge, rightEdge.InterweavingPath);
+        Assert.AreSame(rightEdge, leftEdge.InterweavingPath);
     }
 }

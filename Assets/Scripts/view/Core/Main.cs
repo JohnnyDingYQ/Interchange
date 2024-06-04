@@ -15,9 +15,4 @@ public class Main : MonoBehaviour
         Build.HandleHover(InputSystem.MouseWorldPos);
     }
 
-    void Update()
-    {
-        Game.PassTime(Time.deltaTime);
-    }
-
 }
