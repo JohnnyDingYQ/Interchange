@@ -50,7 +50,7 @@ public class Path : IEdge<Vertex>
 
     public bool IsBlockedFor(Car car)
     {
-        if (IncomingCar != car)
+        if (IncomingCar != null && IncomingCar != car)
             return true;
         if (InterweavingPath != null)
         {

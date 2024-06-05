@@ -15,7 +15,10 @@ public static class Constants
     public const float ElevationOffset = 33;
     public const float ZoneResolution = 0.17f;
     public const int MaxElevation = 30;
-    public const float CarSpeed = 15f;
+    public const float CarAcceleration = 15;
+    public const float CarDeceleration = 40f;
+    public const float CarMaxSpeed = 20f;
+    public const float CarMinSpeed = 0f;
     public const float PathBlockDuration = 0.5f;
     public const float CarMinimumSeparation = 6f;
 }

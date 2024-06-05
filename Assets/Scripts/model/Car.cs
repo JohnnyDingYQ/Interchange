@@ -16,6 +16,7 @@ public class Car
     public float DistanceOnPath { get; set; }
     private int pathIndex;
     private float speed;
+    private bool isBraking;
 
     public Car(Zone origin, Zone destination, Path[] paths)
     {
@@ -33,7 +34,7 @@ public class Car
     {
         if (ReachedDestination)
             return 0;
-        float newDistance = DistanceOnPath + deltaTime * Constants.CarSpeed;
+        isBraking = false;
         Path path = paths[pathIndex];
         Path nextPath = pathIndex + 1 < paths.Count() ? paths[pathIndex + 1] : null;
         int carIndex = path.Cars.IndexOf(this);
@@ -44,18 +45,32 @@ public class Car
         }
         if (carIndex != 0)
         {
-            if (newDistance + Constants.CarMinimumSeparation > path.Cars[carIndex - 1].DistanceOnPath)
-                newDistance = MathF.Max(path.Cars[carIndex - 1].DistanceOnPath - Constants.CarMinimumSeparation, 0);
+            float distToNextCar = path.Cars[carIndex - 1].DistanceOnPath - DistanceOnPath;
+            if (distToNextCar < Constants.CarMinimumSeparation)
+            {
+                isBraking = true;
+                speed = distToNextCar / Constants.CarMinimumSeparation * path.Cars[carIndex - 1].speed;
+            }
         }
         else if (carIndex == 0 && nextPath != null)
         {
-            if (path.Length - newDistance < Constants.CarMinimumSeparation && nextPath.IncomingCar == null)
+            if (path.Length - DistanceOnPath < Constants.CarMinimumSeparation && nextPath.IncomingCar == null)
                 nextPath.IncomingCar = this;
             if (nextPath.IsBlockedFor(this))
-                newDistance = MathF.Min(newDistance, path.Length - Constants.CarMinimumSeparation);
+            {
+                isBraking = true;
+                float distFromEnd = path.Length - DistanceOnPath;
+                speed = MathF.Max(Constants.CarMinSpeed, speed - deltaTime * Constants.CarDeceleration / distFromEnd);
+            }
         }
 
-        if (newDistance > path.Length)
+        if (!isBraking)
+            speed = MathF.Min(speed + deltaTime * Constants.CarAcceleration, Constants.CarMaxSpeed);
+
+        DistanceOnPath += deltaTime * speed;
+        Assert.IsTrue(DistanceOnPath >= 0);
+        
+        if (DistanceOnPath > path.Length)
         {
             path.Cars.RemoveAt(0);
             pathIndex++;
@@ -71,8 +86,6 @@ public class Car
             }
             return nextPath.BezierSeries.EvaluatePosition(0);
         }
-        Assert.IsTrue(newDistance >= 0);
-        DistanceOnPath = newDistance;
         return path.BezierSeries.EvaluatePosition(DistanceOnPath / path.Length);
     }
 
