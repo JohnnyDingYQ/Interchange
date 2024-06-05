@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -25,29 +26,14 @@ public class CarDriver : MonoBehaviour
     IEnumerator DriveStepper(Car car)
     {
         CarHumbleObject carObject = Instantiate(carGameObject, transform);
-        Path[] arrayPaths = car.paths.ToArray();
-        while (arrayPaths.First().EntranceOccupied())
+        float3 pos = 0;
+        while (car.SpawnBlocked())
             yield return null;
-        for (int i = 0; i < arrayPaths.Count(); i++)
+        while (!pos.Equals(new(-1, -1, -1)))
         {
-            Path path = arrayPaths[i];
-            Path nextPath = i + 1 < arrayPaths.Count() ? arrayPaths[i + 1] : null;
-            path.AddCar(car);
-            float totalLength = path.Length;
-            float traveledLength = 0;
-            while (traveledLength <= totalLength && traveledLength >= 0)
-            {
-                carObject.transform.position = path.BezierSeries.EvaluatePosition(traveledLength / totalLength);
-                traveledLength = path.MoveCar(car, Time.deltaTime, nextPath);
-                yield return null;
-            }
-            // if (nextPath != null)
-            // {
-            //     if (nextPath.IncomingCar != car)
-            //         Debug.Log(nextPath.IncomingCar);
-            //     nextPath.IncomingCar = null;
-            // }
-            // path.PopCar();
+            pos = car.Move(Time.deltaTime);
+            carObject.transform.position = pos;
+            yield return null;
         }
         Destroy(carObject.gameObject);
     }

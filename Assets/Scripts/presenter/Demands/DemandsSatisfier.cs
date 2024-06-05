@@ -21,7 +21,7 @@ public static class DemandsSatisfer
                     IEnumerable<Path> paths = FindPath(zone, Game.Zones[zoneID]);
                     if (paths != null)
                     {
-                        Car car = new(zone, Game.Zones[zoneID], paths);
+                        Car car = new(zone, Game.Zones[zoneID], paths.ToArray());
                         car.Travel();
                         shouldDecrement.Add(zoneID);
                     }

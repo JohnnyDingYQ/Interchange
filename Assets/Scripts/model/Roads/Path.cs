@@ -46,58 +46,14 @@ public class Path : IEdge<Vertex>
         Cars.Add(car);
     }
 
-    public float MoveCar(Car car, float deltaTime, Path nextPath)
-    {
-        float newDistance = car.DistanceOnPath + deltaTime * Constants.CarSpeed;
-        int carIndex = Cars.IndexOf(car);
-        // Debug.Log(carIndex);
-        if (carIndex != 0)
-        {
-            if (newDistance + Constants.CarMinimumSeparation > Cars[carIndex - 1].DistanceOnPath)
-                newDistance = Cars[carIndex - 1].DistanceOnPath - Constants.CarMinimumSeparation;
-        }
-        else if (nextPath != null)
-        {
-            if (Length - newDistance < Constants.CarMinimumSeparation && nextPath.IncomingCar == null)
-                nextPath.IncomingCar = car;
-            if (nextPath.IsBlockedFor(car))
-                newDistance = MathF.Min(newDistance, Length - Constants.CarMinimumSeparation);
-        }
-        
-        if (newDistance > Length)
-        {
-            Cars.RemoveAt(0);
-            if (nextPath != null)
-            {
-                nextPath.IncomingCar = null;
-                Debug.Log("Removed");
-            }
-        }
-
-        car.DistanceOnPath = newDistance;
-        return newDistance;
-    }
-
-    public void PopCar()
-    {
-        Cars.RemoveAt(0);
-    }
-
     public bool IsBlockedFor(Car car)
     {
         if (IncomingCar != car)
             return true;
         if (InterweavingPath != null)
-            if (InterweavingPath.Cars.Count != 0 || InterweavingPath.IncomingCar != null)
+            if (InterweavingPath.Cars.Count != 0)
                 return true;
-        return false;
-    }
 
-    public bool EntranceOccupied()
-    {
-        if (Cars.Count > 0)
-            if (Cars.Last().DistanceOnPath < Constants.CarMinimumSeparation)
-                return true;
         return false;
     }
 }
