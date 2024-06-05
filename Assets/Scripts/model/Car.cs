@@ -8,26 +8,31 @@ using UnityEngine;
 public class Car
 {
     public static event Action<Car> TravelCoroutine;
-    public bool DestinationUnreachable { get; set; }
-    public Zone Origin { get; private set; }
-    public Zone Destination { get; private set; }
+    public bool DestinationUnreachable { get; private set; }
+    public bool ReachedDestination { get; private set; }
+    private readonly Zone origin;
+    private readonly Zone destination;
     private readonly Path[] paths;
     public float DistanceOnPath { get; set; }
     private int pathIndex;
+    private float speed;
 
     public Car(Zone origin, Zone destination, Path[] paths)
     {
         Assert.IsNotNull(paths);
         DestinationUnreachable = false;
-        Origin = origin;
-        Destination = destination;
+        this.origin = origin;
+        this.destination = destination;
         this.paths = paths;
         DistanceOnPath = 0;
         pathIndex = 0;
+        speed = 0;
     }
 
     public float3 Move(float deltaTime)
     {
+        if (ReachedDestination)
+            return 0;
         float newDistance = DistanceOnPath + deltaTime * Constants.CarSpeed;
         Path path = paths[pathIndex];
         Path nextPath = pathIndex + 1 < paths.Count() ? paths[pathIndex + 1] : null;
@@ -55,7 +60,10 @@ public class Car
             path.Cars.RemoveAt(0);
             pathIndex++;
             if (pathIndex >= paths.Count())
-                return new(-1, -1, -1);
+            {
+                ReachedDestination = true;
+                return 0;
+            }
             if (nextPath != null)
             {
                 nextPath.IncomingCar = null;
@@ -81,6 +89,6 @@ public class Car
     {
         TravelCoroutine?.Invoke(this);
         if (DestinationUnreachable)
-            Origin.Demands[Destination.Id] += 1;
+            origin.Demands[destination.Id] += 1;
     }
 }

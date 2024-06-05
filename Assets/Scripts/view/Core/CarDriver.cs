@@ -26,10 +26,10 @@ public class CarDriver : MonoBehaviour
     IEnumerator DriveStepper(Car car)
     {
         CarHumbleObject carObject = Instantiate(carGameObject, transform);
-        float3 pos = 0;
+        float3 pos;
         while (car.SpawnBlocked())
             yield return null;
-        while (!pos.Equals(new(-1, -1, -1)))
+        while (!car.ReachedDestination)
         {
             pos = car.Move(Time.deltaTime);
             carObject.transform.position = pos;

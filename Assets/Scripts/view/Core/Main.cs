@@ -7,9 +7,10 @@ public class Main : MonoBehaviour
     {
         Application.targetFrameRate = 60;
         Physics.queriesHitTriggers = false;
-        // UnityEngine.Random.InitState((int)DateTime.Now.Ticks); // different seed for each game session
-        // Debug.Log((int)DateTime.Now.Ticks);
-        UnityEngine.Random.InitState(1631369204);
+        int now = (int)DateTime.Now.Ticks;
+        // UnityEngine.Random.InitState((now); // different seed for each game session
+        // Debug.Log("Seed: " + (now);
+        UnityEngine.Random.InitState(1439289702);
     }
 
     void FixedUpdate()
