@@ -22,15 +22,12 @@ public class Path : IEdge<Vertex>
     [JsonIgnore]
     public bool IsBlocked { get { return IsBlockedCheck(); } }
     public Path InterweavingPath { get; set; }
-    /// <summary>
-    /// Smaller index means closer to path end, value is distance traveled
-    /// </summary>
     [JsonIgnore]
     public List<Car> Cars { get; set; }
     [JsonIgnore]
     public Car IncomingCar { get; set; }
-    [JsonIgnore]
-    public float IncomingDistance { get; set; }
+    // [JsonIgnore]
+    // public float IncomingDistance { get; set; }
 
     public Path() { Cars = new(); }
 
@@ -69,10 +66,10 @@ public class Path : IEdge<Vertex>
             if (nextPath.IncomingCar == null || nextPath.IncomingCar == car)
             {
                 nextPath.IncomingCar = car;
-                nextPath.IncomingDistance = Constants.CarMinimumSeparation - (Length - newDistance);
+                // nextPath.IncomingDistance = Length - newDistance;
             }
             else
-                newDistance = MathF.Min(newDistance, Length - (Constants.CarMinimumSeparation - nextPath.IncomingDistance));
+                newDistance = MathF.Min(newDistance, Length - Constants.CarMinimumSeparation);
         }
 
         car.DistanceOnPath = newDistance;
