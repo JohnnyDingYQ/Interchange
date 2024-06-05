@@ -44,6 +44,11 @@ public static class Game
         get { return GameSave.NextAvailableRoadId; }
         set { GameSave.NextAvailableRoadId = value; }
     }
+    public static int NextAvailablePathId
+    {
+        get { return GameSave.NextAvailablePathId; }
+        set { GameSave.NextAvailablePathId = value; }
+    }
 
     static Game()
     {
@@ -162,6 +167,7 @@ public static class Game
 
     public static void AddEdge(Path path)
     {
+        path.Id = NextAvailablePathId++;
         Graph.AddEdge(path);
     }
 

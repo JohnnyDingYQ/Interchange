@@ -15,6 +15,7 @@ public class GameSave
     public SortedDictionary<int, Zone> Zones { get; private set; }
     public int NextAvailableRoadId { get; set; }
     public int NextAvailableNodeId { get; set; }
+    public int NextAvailablePathId { get; set; }
     public int Elevation { get; set; }
     public GameSave()
     {
@@ -24,5 +25,6 @@ public class GameSave
         Zones = new();
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
+        NextAvailablePathId = 1;
     }
 }

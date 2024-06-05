@@ -12,6 +12,8 @@ using UnityEngine;
 public class Path : IEdge<Vertex>
 {
     [JsonProperty]
+    public int Id { get; set; }
+    [JsonProperty]
     public BezierSeries BezierSeries { get; private set; }
     [JsonProperty]
     public Vertex Source { get; private set; }
@@ -51,8 +53,12 @@ public class Path : IEdge<Vertex>
         if (IncomingCar != car)
             return true;
         if (InterweavingPath != null)
+        {
             if (InterweavingPath.Cars.Count != 0)
                 return true;
+            if (InterweavingPath.IncomingCar != null && Id > InterweavingPath.Id) // deadlock prevention
+            return true;
+        }
 
         return false;
     }

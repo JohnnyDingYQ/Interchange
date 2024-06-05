@@ -11,8 +11,7 @@ public class Car
     public bool DestinationUnreachable { get; set; }
     public Zone Origin { get; private set; }
     public Zone Destination { get; private set; }
-    private Path[] paths;
-    // public bool Blocked { get; set; }
+    private readonly Path[] paths;
     public float DistanceOnPath { get; set; }
     private int pathIndex;
 
