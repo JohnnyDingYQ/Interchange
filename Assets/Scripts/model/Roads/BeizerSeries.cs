@@ -7,6 +7,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using System.Linq;
 using System;
 using System.Collections.ObjectModel;
+using UnityEngine.Assertions;
 
 public class BezierSeries
 {
@@ -143,6 +144,8 @@ public class BezierSeries
     }
     public float3 EvaluatePosition(float t)
     {
+        Assert.IsTrue(t <= 1);
+        Assert.IsTrue(t >= 0);
         SeriesLocation location = InterpolationToLocation(t);
         return CurveUtility.EvaluatePosition(curves[location.Index], location.Interpolation);
     }
@@ -152,6 +155,8 @@ public class BezierSeries
     }
     public float3 EvaluateTangent(float t)
     {
+        Assert.IsTrue(t <= 1);
+        Assert.IsTrue(t >= 0);
         SeriesLocation location = InterpolationToLocation(t);
         return CurveUtility.EvaluateTangent(curves[location.Index], location.Interpolation);
     }
@@ -162,12 +167,16 @@ public class BezierSeries
     }
     public float3 Evaluate2DNormalizedNormal(float t)
     {
+        Assert.IsTrue(t <= 1);
+        Assert.IsTrue(t >= 0);
         SeriesLocation location = InterpolationToLocation(t);
         return curves[location.Index].Normalized2DNormal(location.Interpolation);
     }
 
     public SeriesLocation InterpolationToLocation(float t)
     {
+        Assert.IsTrue(t <= 1);
+        Assert.IsTrue(t >= 0);
         float distanceOnCurve = t * (Length - startLocationDistance - endLocationDistance) + startLocationDistance;
         return GetLocationByDistance(distanceOnCurve);
     }

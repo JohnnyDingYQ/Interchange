@@ -48,6 +48,7 @@ public static class Game
     static Game()
     {
         GameSave = new();
+        Assert.IsTrue(Constants.CarMinimumSeparation < Constants.MinimumLaneLength);
     }
 
     public static void WipeState()

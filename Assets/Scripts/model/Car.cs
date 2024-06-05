@@ -10,7 +10,6 @@ public class Car
     public Zone Destination { get; private set; }
     public IEnumerable<Path> paths;
     // public bool Blocked { get; set; }
-    public int PathIndex { get; set; }
     public float DistanceOnPath { get; set; }
 
     public Car(Zone origin, Zone destination, IEnumerable<Path> paths)
@@ -19,7 +18,6 @@ public class Car
         DestinationUnreachable = false;
         Origin = origin;
         Destination = destination;
-        // Blocked = false;
         this.paths = paths;
     }
 
