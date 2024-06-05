@@ -7,7 +7,8 @@ using UnityEngine;
 
 public class Car
 {
-    public static event Action<Car> TravelCoroutine;
+    public static event Action<Car> Drive;
+    public bool IsTraveling { get; set; }
     public bool DestinationUnreachable { get; private set; }
     public bool ReachedDestination { get; private set; }
     private readonly Zone origin;
@@ -25,9 +26,11 @@ public class Car
         this.origin = origin;
         this.destination = destination;
         this.paths = paths;
+        IsTraveling = false;
         DistanceOnPath = 0;
         pathIndex = 0;
         speed = 0;
+        Drive.Invoke(this);
     }
 
     public float3 Move(float deltaTime)
@@ -98,10 +101,8 @@ public class Car
         return false;
     }
 
-    public void Travel()
+    public void ReturnDemand()
     {
-        TravelCoroutine?.Invoke(this);
-        if (DestinationUnreachable)
-            origin.Demands[destination.Id] += 1;
+        origin.Demands[destination.Id] += 1;
     }
 }

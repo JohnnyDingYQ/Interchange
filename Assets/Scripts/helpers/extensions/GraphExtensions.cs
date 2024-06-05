@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using QuikGraph;
 using QuikGraph.Algorithms;
+using Unity.Mathematics;
 
 namespace GraphExtensions
 {
@@ -43,10 +44,12 @@ namespace GraphExtensions
         /// <returns></returns>
         public static IEnumerable<Path> GetPathsFromAtoB(this AdjacencyGraph<Vertex, Path> graph, Vertex start, Vertex end)
         {
-            static double edgeCost(Path path) => 1;
-            TryFunc<Vertex, IEnumerable<Path>> tryGetPaths = graph.ShortestPathsDijkstra(edgeCost, start);
-
-            tryGetPaths(end, out IEnumerable<Path> paths);
+            TryFunc<Vertex, IEnumerable<Path>> tryFunc = graph.ShortestPathsAStar(
+            (Path p) => p.Length,
+            (Vertex to) => math.distance(start.Pos, to.Pos),
+            start
+        );
+            tryFunc(end, out IEnumerable<Path> paths);
             return paths;
         }
 

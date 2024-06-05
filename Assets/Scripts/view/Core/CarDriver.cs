@@ -7,34 +7,43 @@ using UnityEngine.Assertions;
 
 public class CarDriver : MonoBehaviour
 {
-    [SerializeField] CarHumbleObject carGameObject;
-    public void Awake()
+    [SerializeField] CarHumbleObject carPrefab;
+    private HashSet<CarHumbleObject> cars;
+    void Awake()
     {
-        Car.TravelCoroutine += Drive;
+        Car.Drive += Drive;
+        cars = new();
     }
 
-    public void OnDestroy()
+    void Update()
     {
-        Car.TravelCoroutine -= Drive;
-    }
-
-    public void Drive(Car car)
-    {
-        StartCoroutine(DriveStepper(car));
-    }
-
-    IEnumerator DriveStepper(Car car)
-    {
-        CarHumbleObject carObject = Instantiate(carGameObject, transform);
-        float3 pos;
-        while (car.SpawnBlocked())
-            yield return null;
-        while (!car.ReachedDestination)
+        foreach (CarHumbleObject carObject in cars)
         {
-            pos = car.Move(Time.deltaTime);
-            carObject.transform.position = pos;
-            yield return null;
+            Car car = carObject.Car;
+            if (!car.IsTraveling && !car.SpawnBlocked())
+                car.IsTraveling = true;
+            if (!car.IsTraveling)
+                continue;
+            carObject.transform.position = car.Move(Time.deltaTime);
+            if (car.ReachedDestination || car.DestinationUnreachable)
+            {
+                if (car.DestinationUnreachable)
+                    car.ReturnDemand();
+                Destroy(carObject.gameObject);
+            }
         }
-        Destroy(carObject.gameObject);
+        cars.RemoveWhere((c) => c.Car.DestinationUnreachable || c.Car.ReachedDestination);
+    }
+
+    void OnDestroy()
+    {
+        Car.Drive -= Drive;
+    }
+
+    void Drive(Car car)
+    { 
+        CarHumbleObject carObject = Instantiate(carPrefab, transform);
+        carObject.Car = car;
+        cars.Add(carObject);
     }
 }
