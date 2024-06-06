@@ -2,7 +2,8 @@
     xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Base.uss?fileID=7433441132597879392&amp;guid=28de604cf2fee904f96c092088db9480&amp;type=3#Base" />
     <ui:VisualElement style="flex-grow: 1;" class="devPanel">
-        <ui:TextElement text="Elevation" name="Elevation"/>
+        <ui:TextElement text="Elevation:" name="Elevation"/>
+        <ui:TextElement text="Serviced:" name="CarServiced"/>
         <ui:Foldout text="Roads" name="MyFoldout" value="true">
             <ui:Toggle text="Center" name="RoadCenter" />
             <ui:Toggle text="Lanes" name="RoadLanes" />

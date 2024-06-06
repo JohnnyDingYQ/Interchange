@@ -12,11 +12,6 @@ public class TextLabel : MonoBehaviour
         label = root.Q<Label>();
     }
 
-    void LateUpdate()
-    {
-        
-    }
-
     public void ApplyWorldPos(float3 worldPos)
     {
         float2 v = RuntimePanelUtils.CameraTransformWorldToPanel(root.panel, worldPos, Camera.main);

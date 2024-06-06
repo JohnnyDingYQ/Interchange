@@ -75,7 +75,7 @@ public class InputSystem : MonoBehaviour
         Clamp();
         Camera.main.orthographicSize = cameraHeight * 0.8f;
 
-        void Clamp()
+        static void Clamp()
         {
             Vector3 pos = Camera.main.transform.position;
             pos.y = MathF.Max(32, pos.y);

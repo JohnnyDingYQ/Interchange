@@ -29,6 +29,8 @@ public class CarDriver : MonoBehaviour
             {
                 if (car.DestinationUnreachable)
                     car.ReturnDemand();
+                if (car.ReachedDestination)
+                    DevPanel.CarServiced.text = "Serviced: " + Game.CarServiced++;
                 Destroy(carObject.gameObject);
             }
         }

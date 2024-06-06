@@ -14,11 +14,15 @@ public class DevPanel : MonoBehaviour
     private Toggle supportLines;
     private Toggle enforceTangent;
     public static TextElement Elevation { get; private set; }
+    public static TextElement CarServiced { get; private set; }
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
-        root.RegisterCallback<MouseEnterEvent>(DisableGameWorldClick);
-        root.RegisterCallback<MouseLeaveEvent>(EnableGameWorldClick);
+        root.RegisterCallback<MouseEnterEvent>(MouseReturnGameWorld);
+        root.RegisterCallback<MouseLeaveEvent>(MouseLeaveGameWorld);
+
+        Elevation = root.Q<TextElement>("Elevation");
+        CarServiced = root.Q<TextElement>("CarServiced");
 
         drawCenter = root.Q<Toggle>("RoadCenter");
         drawLanes = root.Q<Toggle>("RoadLanes");
@@ -27,7 +31,6 @@ public class DevPanel : MonoBehaviour
         drawPx = root.Q<Toggle>("RoadPx");
         drawVertices = root.Q<Toggle>("RoadVertices");
         ghostRoad = root.Q<Toggle>("Ghost");
-        Elevation = root.Q<TextElement>("Elevation");
         supportLines = root.Q<Toggle>("SupportLines");
         enforceTangent = root.Q<Toggle>("EnforceTangent");
 
@@ -53,8 +56,8 @@ public class DevPanel : MonoBehaviour
 
     void OnDisable()
     {
-        root.UnregisterCallback<MouseEnterEvent>(DisableGameWorldClick);
-        root.UnregisterCallback<MouseLeaveEvent>(EnableGameWorldClick);
+        root.UnregisterCallback<MouseEnterEvent>(MouseReturnGameWorld);
+        root.UnregisterCallback<MouseLeaveEvent>(MouseLeaveGameWorld);
         drawCenter.UnregisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawPaths.UnregisterCallback<ChangeEvent<bool>>(TogglePath);
         drawLanes.UnregisterCallback<ChangeEvent<bool>>(ToggleLanes);
@@ -66,11 +69,11 @@ public class DevPanel : MonoBehaviour
         enforceTangent.UnregisterCallback<ChangeEvent<bool>>(EnforceTangent);
     }
 
-    void DisableGameWorldClick(MouseEnterEvent e)
+    void MouseReturnGameWorld(MouseEnterEvent e)
     {
         InputSystem.MouseIsInGameWorld = false;
     }
-    void EnableGameWorldClick(MouseLeaveEvent e)
+    void MouseLeaveGameWorld(MouseLeaveEvent e)
     {
         InputSystem.MouseIsInGameWorld = true;
     }

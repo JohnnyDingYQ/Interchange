@@ -17,6 +17,7 @@ public class GameSave
     public int NextAvailableNodeId { get; set; }
     public int NextAvailablePathId { get; set; }
     public int Elevation { get; set; }
+    public ulong CarServiced { get; set; }
     public GameSave()
     {
         Roads = new();
@@ -26,5 +27,6 @@ public class GameSave
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
         NextAvailablePathId = 1;
+        CarServiced = 0;
     }
 }

@@ -18,6 +18,7 @@ public static class Game
     public static SortedDictionary<int, Zone> Zones { get { return GameSave.Zones; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
     public static int Elevation { get { return GameSave.Elevation; } }
+    public static ulong CarServiced { get { return GameSave.CarServiced; } set { GameSave.CarServiced = value; } }
     public static Road HoveredRoad { get; set; }
     private static Zone hoveredZone;
     public static Zone HoveredZone
