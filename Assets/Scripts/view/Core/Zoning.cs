@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -24,14 +21,11 @@ public class Zoning : MonoBehaviour
         Game.UpdateHoveredZone += UpdateHoveredZone;
     }
 
-    void Start()
+    void Update()
     {
-        DemandsGenerator.GenerateDemands();
-    }
+        DemandsGenerator.GenerateDemands(Time.deltaTime);
+        DemandsSatisfer.SatisfyDemands(Time.deltaTime);
 
-    void FixedUpdate()
-    {
-        DemandsSatisfer.SatisfyDemands();
     }
 
     void OnDestroy()

@@ -67,10 +67,20 @@ public class InputSystem : MonoBehaviour
     void UpdateCameraPos()
     {
         Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
-        cameraOffset.x *= 1 + MathF.Pow(Camera.main.transform.position.y, 0.7f);
-        cameraOffset.z *= 1 + MathF.Pow(Camera.main.transform.position.y, 0.7f);
-        cameraOffset.y *= MathF.Pow(Camera.main.transform.position.y, 0.05f);
+        float cameraHeight = Camera.main.transform.position.y;
+        cameraOffset.x *= 1 + MathF.Pow(cameraHeight, 0.7f);
+        cameraOffset.z *= 1 + MathF.Pow(cameraHeight, 0.7f);
+        cameraOffset.y *= MathF.Pow(cameraHeight, 0.05f);
         Camera.main.transform.position += CameraSpeedMultiplier * Time.deltaTime * cameraOffset;
+        Clamp();
+        Camera.main.orthographicSize = cameraHeight * 0.8f;
+
+        void Clamp()
+        {
+            Vector3 pos = Camera.main.transform.position;
+            pos.y = MathF.Max(32, pos.y);
+            Camera.main.transform.position = pos;
+        }
     }
 
     void OnBuild(InputAction.CallbackContext context)

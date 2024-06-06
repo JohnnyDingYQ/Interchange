@@ -9,6 +9,7 @@ public class Zone
     private List<Vertex> OutVertices { get; set; }
     public int InVerticesCount { get { return InVertices.Count; } }
     public int OutVerticesCount { get { return OutVertices.Count; } }
+    public float CarSpawnInterval { get; set; }
 
     public Zone(int id)
     {
@@ -16,6 +17,7 @@ public class Zone
         InVertices = new();
         OutVertices = new();
         Demands = new();
+        CarSpawnInterval = 0;
     }
     public void AddInRoad(Road road)
     {

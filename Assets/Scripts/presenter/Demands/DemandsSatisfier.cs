@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphExtensions;
 
-using UnityEngine;
-
 public static class DemandsSatisfer
 {
-    public static void SatisfyDemands()
+    public static void SatisfyDemands(float deltaTime)
     {
         foreach (Zone zone in Game.Zones.Values)
         {
-            List<int> shouldDecrement = new(); // avoids concurrent modification of dict
+            if (zone.CarSpawnInterval > 0)
+            {
+                zone.CarSpawnInterval -= deltaTime;
+                continue;
+            }
+            int toDecrement = -1;
             foreach (int zoneID in zone.Demands.Keys)
             {
                 int demand = zone.Demands[zoneID];
@@ -21,12 +24,14 @@ public static class DemandsSatisfer
                     if (paths != null)
                     {
                         Car car = new(zone, Game.Zones[zoneID], paths.ToArray());
-                        shouldDecrement.Add(zoneID);
+                        toDecrement = zoneID;
+                        zone.CarSpawnInterval = (float)10 / demand;
+                        break;
                     }
                 }
             }
-            foreach (int i in shouldDecrement)
-                zone.Demands[i] -= 1;
+            if (toDecrement != -1)
+                zone.Demands[toDecrement] -= 1;
         }
     }
 

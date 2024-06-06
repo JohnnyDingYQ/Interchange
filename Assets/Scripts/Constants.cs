@@ -21,4 +21,5 @@ public static class Constants
     public const float CarMinSpeed = 0f;
     public const float PathBlockDuration = 0.5f;
     public const float CarMinimumSeparation = 6f;
+    public const int ZoneDemandCap = 20;
 }
