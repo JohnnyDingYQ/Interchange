@@ -35,26 +35,20 @@ public class Zone
     {
         if (InVertices.Count == 0)
             return null;
-        int randomIndex = (int) (UnityEngine.Random.value * InVertices.Count);
-        if (randomIndex == InVertices.Count) // technically possible
-            return GetRandomInVertex();
-        return InVertices[randomIndex];
+        return InVertices[MyNumerics.GetRandomIndex(InVertices.Count)];
     }
 
     public Vertex GetRandomOutVertex()
     {
         if (OutVertices.Count == 0)
             return null;
-        int randomIndex = (int) (UnityEngine.Random.value * OutVertices.Count);
-        if (randomIndex == OutVertices.Count)
-            return GetRandomOutVertex();
-        return OutVertices[randomIndex];
+        return OutVertices[MyNumerics.GetRandomIndex(OutVertices.Count)];
     }
 
     public void RemoveRoad(Road road)
     {
         foreach (Lane lane in road.Lanes)
-            foreach (Vertex v in new Vertex[] {lane.StartVertex, lane.EndVertex})
+            foreach (Vertex v in new Vertex[] { lane.StartVertex, lane.EndVertex })
             {
                 InVertices.Remove(v);
                 OutVertices.Remove(v);

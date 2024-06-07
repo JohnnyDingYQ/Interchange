@@ -32,8 +32,8 @@ public class BasicBuildTest
 
         Assert.AreEqual(1, Roads.Count);
         Assert.AreEqual(1, road.Lanes.Count);
-        Assert.True(Utility.AreNumericallyEqual(0, lane.StartNode.Pos));
-        Assert.True(Utility.AreNumericallyEqual(2 * stride, lane.EndNode.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(0, lane.StartNode.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndNode.Pos));
         Assert.True(Nodes.ContainsKey(lane.StartNode.Id));
         Assert.True(Nodes.ContainsKey(lane.EndNode.Id));
         Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));

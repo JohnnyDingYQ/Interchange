@@ -196,7 +196,7 @@ public static class Build
             foreach (Vertex start in startV)
                 foreach (Vertex end in endV)
                 {
-                    List<Path> paths = Game.Graph.GetPathsFromAtoB(start, end)?.ToList();
+                    List<Path> paths = Game.Graph.ShortestPathAStar(start, end)?.ToList();
                     if (paths != null)
                         foreach (Path p in paths)
                         {

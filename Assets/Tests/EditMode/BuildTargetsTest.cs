@@ -38,7 +38,7 @@ public class BuildTargetTest
         Lane lane = road.Lanes[0];
 
         Assert.True(bt.SnapNotNull);
-        Assert.True(Utility.AreNumericallyEqual(pos3, bt.MedianPoint));
+        Assert.True(MyNumerics.AreNumericallyEqual(pos3, bt.MedianPoint));
         Assert.AreSame(lane.EndNode, node);
     }
 
@@ -70,7 +70,7 @@ public class BuildTargetTest
 
 
         Assert.True(bt.SnapNotNull);
-        Assert.True(Utility.AreNumericallyEqual(lane.EndPos, bt.MedianPoint));
+        Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.MedianPoint));
         Assert.AreSame(lane.EndNode, node);
     }
 
@@ -102,8 +102,8 @@ public class BuildTargetTest
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
-        Assert.True(Utility.AreNumericallyEqual(pos3, node1.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(pos3, node1.Pos));
     }
 
     [Test]
@@ -116,8 +116,8 @@ public class BuildTargetTest
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node1.Pos));
-        Assert.True(Utility.AreNumericallyEqual(pos3, node0.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node1.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(pos3, node0.Pos));
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
         Assert.AreSame(lane0.EndNode, node1);
         Assert.AreSame(lane1.EndNode, node2);
     }
@@ -151,7 +151,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 2), node2.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 2), node2.Pos));
         Assert.AreEqual(lane0.EndPos, node0.Pos);
         Assert.AreEqual(lane1.EndPos, node1.Pos);
         Assert.AreSame(node0, lane0.EndNode);
@@ -167,9 +167,9 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
         Node node2 = bt.Nodes[2];
 
-        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
         Assert.AreSame(road.Lanes[0].EndNode, node1);
-        Assert.True(Utility.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node2.Pos));
+        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node2.Pos));
     }
 
     [Test]

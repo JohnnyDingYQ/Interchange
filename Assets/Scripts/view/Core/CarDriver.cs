@@ -1,18 +1,28 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Mathematics;
+using UnityEngine.Pool;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public class CarDriver : MonoBehaviour
 {
     [SerializeField] CarHumbleObject carPrefab;
-    private HashSet<CarHumbleObject> cars;
+    HashSet<CarHumbleObject> cars;
+    ObjectPool<CarHumbleObject> carPool;
+    HashSet<CarHumbleObject> toRemove;
     void Awake()
     {
         Car.Drive += Drive;
         cars = new();
+        toRemove = new();
+        carPool = new(
+            () => Instantiate(carPrefab, transform),
+            (o) => o.gameObject.SetActive(true),
+            (o) => o.gameObject.SetActive(false),
+            (o) => Destroy(o.gameObject),
+            false,
+            200,
+            1000
+        );
     }
 
     void Update()
@@ -21,20 +31,23 @@ public class CarDriver : MonoBehaviour
         {
             Car car = carObject.Car;
             if (!car.IsTraveling && !car.SpawnBlocked())
-                car.IsTraveling = true;
+                car.Start();
             if (!car.IsTraveling)
                 continue;
             carObject.transform.position = car.Move(Time.deltaTime);
             if (car.ReachedDestination || car.DestinationUnreachable)
             {
                 if (car.DestinationUnreachable)
-                    car.ReturnDemand();
+                    car.Stop();
                 if (car.ReachedDestination)
                     DevPanel.CarServiced.text = "Serviced: " + Game.CarServiced++;
-                Destroy(carObject.gameObject);
+                carPool.Release(carObject);
+                toRemove.Add(carObject);
             }
         }
-        cars.RemoveWhere((c) => c.Car.DestinationUnreachable || c.Car.ReachedDestination);
+        cars.ExceptWith(toRemove);
+        toRemove.Clear();
+
     }
 
     void OnDestroy()
@@ -43,8 +56,8 @@ public class CarDriver : MonoBehaviour
     }
 
     void Drive(Car car)
-    { 
-        CarHumbleObject carObject = Instantiate(carPrefab, transform);
+    {
+        CarHumbleObject carObject = carPool.Get();
         carObject.Car = car;
         cars.Add(carObject);
     }

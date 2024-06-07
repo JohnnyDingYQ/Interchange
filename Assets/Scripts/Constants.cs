@@ -22,4 +22,6 @@ public static class Constants
     public const float PathBlockDuration = 0.5f;
     public const float CarMinimumSeparation = 6f;
     public const int ZoneDemandCap = 20;
+    public const int MaxVertexWaitingCar = 5;
+    public const float ZoneDemandSatisfyCooldown = 10;
 }

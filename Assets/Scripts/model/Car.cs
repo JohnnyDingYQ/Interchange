@@ -22,6 +22,7 @@ public class Car
     public Car(Zone origin, Zone destination, Path[] paths)
     {
         Assert.IsNotNull(paths);
+        Assert.IsFalse(origin == null ^ destination == null);
         DestinationUnreachable = false;
         this.origin = origin;
         this.destination = destination;
@@ -30,9 +31,13 @@ public class Car
         DistanceOnPath = 0;
         pathIndex = 0;
         speed = 0;
-        Drive.Invoke(this);
+        Drive?.Invoke(this);
     }
-
+    public void Start()
+    {
+        IsTraveling = true;
+        paths.First().Source.ScheduledCars--;
+    }
     public float3 Move(float deltaTime)
     {
         if (ReachedDestination)
@@ -101,8 +106,9 @@ public class Car
         return false;
     }
 
-    public void ReturnDemand()
+    public void Stop()
     {
-        origin.Demands[destination.Id] += 1;
+        if (origin != null)
+            origin.Demands[destination.Id] += 1;
     }
 }

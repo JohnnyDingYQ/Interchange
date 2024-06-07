@@ -34,15 +34,7 @@ namespace GraphExtensions
             }
             return p;
         }
-
-        /// <summary>
-        /// Can be costly to invoke!
-        /// </summary>
-        /// <param name="graph"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <returns></returns>
-        public static IEnumerable<Path> GetPathsFromAtoB(this AdjacencyGraph<Vertex, Path> graph, Vertex start, Vertex end)
+        public static IEnumerable<Path> ShortestPathAStar(this AdjacencyGraph<Vertex, Path> graph, Vertex start, Vertex end)
         {
             TryFunc<Vertex, IEnumerable<Path>> tryFunc = graph.ShortestPathsAStar(
             (Path p) => p.Length,

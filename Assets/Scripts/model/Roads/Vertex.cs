@@ -17,6 +17,8 @@ public class Vertex
     public Lane Lane { get; private set; }
     [JsonIgnore]
     public Road Road { get { return Lane.Road; } }
+    [JsonIgnore]
+    public int ScheduledCars { get; set; }
 
     public Vertex() { }
 

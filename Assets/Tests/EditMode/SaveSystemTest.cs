@@ -213,9 +213,9 @@ public class SaveSystemTest
         Assert.AreSame(restored.StartIntersection, restored.Lanes[1].StartNode.Intersection);
         Assert.AreSame(restored.EndIntersection, restored.Lanes[1].EndNode.Intersection);
         Intersection i = Game.Roads.Values.First().EndIntersection;
-        Assert.True(Utility.AreNumericallyEqual(saved.EndIntersection.Normal, restored.EndIntersection.Normal));
-        Assert.True(Utility.AreNumericallyEqual(saved.EndIntersection.Tangent, restored.EndIntersection.Tangent));
-        Assert.True(Utility.AreNumericallyEqual(saved.EndIntersection.PointOnInSide, restored.EndIntersection.PointOnInSide));
+        Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.Normal, restored.EndIntersection.Normal));
+        Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.Tangent, restored.EndIntersection.Tangent));
+        Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.PointOnInSide, restored.EndIntersection.PointOnInSide));
         
     }
 

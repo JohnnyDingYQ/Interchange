@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
-public static class Utility
+public static class MyNumerics
 {
     public static bool AreNumericallyEqual(float3 a, float3 b)
     {
@@ -31,5 +31,11 @@ public static class Utility
             if (!AreNumericallyEqual(a[i], b[i]))
                 return false;
         return true;
+    }
+
+    public static int GetRandomIndex(int length)
+    {
+        int index =  (int) (UnityEngine.Random.value * length);
+        return index != length ? index : GetRandomIndex(length);
     }
 }

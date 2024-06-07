@@ -65,22 +65,22 @@ public class RoadOutline : IEquatable<RoadOutline>
     public bool IsPlausible()
     {
         if (Start.Count != 0)
-            if (!Utility.AreNumericallyEqual(Start.Last(), Mid.First()))
+            if (!MyNumerics.AreNumericallyEqual(Start.Last(), Mid.First()))
                 return false;
         if (End.Count != 0)
-            if (!Utility.AreNumericallyEqual(End.First(), Mid.Last()))
+            if (!MyNumerics.AreNumericallyEqual(End.First(), Mid.Last()))
                 return false;
         return true;
     }
 
     public bool Equals(RoadOutline other)
     {
-        return Utility.AreNumericallyEqual(Start, other.Start)
-        && Utility.AreNumericallyEqual(Mid, other.Mid)
-        && Utility.AreNumericallyEqual(End, other.End)
+        return MyNumerics.AreNumericallyEqual(Start, other.Start)
+        && MyNumerics.AreNumericallyEqual(Mid, other.Mid)
+        && MyNumerics.AreNumericallyEqual(End, other.End)
         && IsFixedAtStart == other.IsFixedAtStart
         && IsFixedAtEnd == other.IsFixedAtEnd
-        && Utility.AreNumericallyEqual(FixedStart, other.FixedStart)
-        && Utility.AreNumericallyEqual(FixedEnd, other.FixedEnd);
+        && MyNumerics.AreNumericallyEqual(FixedStart, other.FixedStart)
+        && MyNumerics.AreNumericallyEqual(FixedEnd, other.FixedEnd);
     }
 }

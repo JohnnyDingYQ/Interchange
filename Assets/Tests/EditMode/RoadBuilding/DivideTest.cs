@@ -166,7 +166,7 @@ public class DivideTest
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class DivideTest
             3
         );
         SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
-        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
     }
 
     [Test]
@@ -190,10 +190,10 @@ public class DivideTest
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
         Assert.True(subRoads.Left.OutLinePlausible());
         Assert.True(subRoads.Right.OutLinePlausible());
-        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
-        Assert.True(Utility.AreNumericallyEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
-        Assert.True(Utility.AreNumericallyEqual(subRoads.Right.LeftOutline.End.Last(), road1.LeftOutline.Start.First()));
-        Assert.True(Utility.AreNumericallyEqual(subRoads.Right.RightOutline.End.Last(), road1.RightOutline.Start.First()));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Right.LeftOutline.End.Last(), road1.LeftOutline.Start.First()));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Right.RightOutline.End.Last(), road1.RightOutline.Start.First()));
     }
 
     [Test]
@@ -219,7 +219,7 @@ public class DivideTest
                 if (Math.Abs(i - j) < 2)
                 {
                     Assert.True(Game.HasEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
-                    Assert.NotNull(Game.Graph.GetPathsFromAtoB(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
+                    Assert.NotNull(Game.Graph.ShortestPathAStar(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
                 }
     }
 
