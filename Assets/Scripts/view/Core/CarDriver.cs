@@ -34,6 +34,7 @@ public class CarDriver : MonoBehaviour
                 car.Start();
             if (!car.IsTraveling)
                 continue;
+            CarControl.CheckPathValid(car);
             carObject.transform.position = car.Move(Time.deltaTime);
             if (car.ReachedDestination || car.DestinationUnreachable)
             {

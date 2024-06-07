@@ -105,4 +105,18 @@ public class CarTest
             cars.Add(car);
         }
     }
+
+    [Test]
+    public void PathRemoved()
+    {
+        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road2 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
+        Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
+        for (float i = 0; i < 0.3f; i += deltaTime)
+            car.Move(deltaTime);
+        Assert.True(Game.RemoveRoad(road0));
+        CarControl.CheckPathValid(car);
+        Assert.True(car.DestinationUnreachable);
+    }
 }

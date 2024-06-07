@@ -246,4 +246,25 @@ public class DivideTest
             foreach (Vertex v in new Vertex[] { l.StartVertex, l.EndVertex })
                 Assert.AreSame(l, v.Lane);
     }
+
+    [Test]
+    public void SubRoadsInheritZones()
+    {
+        Zone zone0 = new(0);
+        Zone zone1 = new(1);
+        Game.Zones[0] = zone0;
+        Game.Zones[1] = zone1;
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        zone0.AddOutRoad(road);
+        zone1.AddInRoad(road);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
+        Assert.AreEqual(0, subRoads.Left.StartZoneId);
+        Assert.AreEqual(1, subRoads.Right.EndZoneId);
+        Assert.True(zone0.OutRoads.Contains(subRoads.Left));
+        Assert.True(zone1.InRoads.Contains(subRoads.Right));
+        Assert.False(zone0.OutRoads.Contains(road));
+        Assert.False(zone1.InRoads.Contains(road));
+        Assert.True(zone0.IsConsistent());
+        Assert.True(zone1.IsConsistent());
+    }
 }

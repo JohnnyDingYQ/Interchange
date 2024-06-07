@@ -9,13 +9,14 @@ public class Car
 {
     public static event Action<Car> Drive;
     public bool IsTraveling { get; set; }
-    public bool DestinationUnreachable { get; private set; }
+    public bool DestinationUnreachable { get; set; }
     public bool ReachedDestination { get; private set; }
     private readonly Zone origin;
     private readonly Zone destination;
     private readonly Path[] paths;
     public float DistanceOnPath { get; set; }
     private int pathIndex;
+    public Path CurrentPath {get {return paths[pathIndex]; }}
     private float speed;
     private bool isBraking;
 

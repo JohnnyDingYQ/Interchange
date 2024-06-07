@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
 public static class DivideHandler
@@ -39,10 +40,10 @@ public static class DivideHandler
         Road rightRoad = new(right, laneCount);
         if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
             return null;
-
         OperateNodes();
         OperateIntersections();
         OperateVertices();
+        OperateZones();
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
         OperateOutline();
@@ -109,6 +110,23 @@ public static class DivideHandler
             leftRoad.RightOutline.Start.Add(leftRoad.RightOutline.Mid.First());
             rightRoad.LeftOutline.End.Insert(0, rightRoad.LeftOutline.Mid.Last());
             rightRoad.RightOutline.End.Insert(0, rightRoad.RightOutline.Mid.Last());
+        }
+        void OperateZones()
+        {
+            leftRoad.StartZoneId = road.StartZoneId;
+            rightRoad.EndZoneId = road.EndZoneId;
+            
+            if (Game.Zones.ContainsKey(leftRoad.StartZoneId))
+            {
+                Game.Zones[leftRoad.StartZoneId].RemoveRoad(road);
+                Game.Zones[leftRoad.StartZoneId].AddOutRoad(leftRoad);
+                Assert.IsTrue(Game.Zones[leftRoad.StartZoneId].IsConsistent());
+            }
+            if (Game.Zones.ContainsKey(rightRoad.EndZoneId))
+            {
+                Game.Zones[rightRoad.EndZoneId].RemoveRoad(road);
+                Game.Zones[rightRoad.EndZoneId].AddInRoad(rightRoad);
+            }
         }
     }
 }

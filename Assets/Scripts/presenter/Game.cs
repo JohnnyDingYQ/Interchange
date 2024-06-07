@@ -142,6 +142,12 @@ public static class Game
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
         }
 
+        if (Zones.ContainsKey(road.StartZoneId))
+            Zones[road.StartZoneId].RemoveRoad(road);
+        
+        if (Zones.ContainsKey(road.EndZoneId))
+            Zones[road.EndZoneId].RemoveRoad(road);
+
         RoadRemoved?.Invoke(road);
         return true;
     }

@@ -41,12 +41,18 @@ public static class Build
         if (startAssigned)
         {
             float3 startPoint = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
-            SupportLines.Add(new(startPoint, pivotPos, math.length(startPoint - pivotPos)));
+            float3 pivotPoint = pivotPos;
+            startPoint.y = 0;
+            pivotPoint.y = 0;
+            SupportLines.Add(new(startPoint, pivotPoint, math.length(startPoint - pivotPoint)));
         }
         if (pivotAssigned && endTarget != null)
         {
             float3 endPoint = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-            SupportLines.Add(new(pivotPos, endPoint, math.length(endPoint - pivotPos)));
+            float3 pivotPoint = pivotPos;
+            endPoint.y = 0;
+            pivotPoint.y = 0;
+            SupportLines.Add(new(pivotPoint, endPoint, math.length(endPoint - pivotPoint)));
         }
         return SupportLines;
     }
@@ -139,15 +145,10 @@ public static class Build
         {
             RegisterUnregisteredNodes(road);
             ReplaceExistingRoad();
-            if (AutoDivideOn)
-            {
-                Road last = AutoDivideRoad(road);
-                endZone?.AddInRoad(last);
-            }
-            else
-                endZone?.AddInRoad(road);
-                
+            endZone?.AddInRoad(road);
             startZone?.AddOutRoad(road);
+            if (AutoDivideOn)
+                AutoDivideRoad(road);
         }
         return road;
 

@@ -62,9 +62,11 @@ public class InputSystem : MonoBehaviour
         {
             x = Input.mousePosition.x,
             y = Input.mousePosition.y,
-            z = Camera.main.transform.position.y - (Game.Elevation + Constants.HeightOffset)
+            z = Camera.main.transform.position.y
         };
-        MouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
+        mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
+        mouseWorldPos.y = Game.Elevation + Constants.HeightOffset;
+        MouseWorldPos = mouseWorldPos;
     }
 
     void UpdateCameraPos()

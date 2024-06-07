@@ -23,12 +23,10 @@ public class Road
     public RoadOutline LeftOutline { get; set; }
     [JsonIgnore]
     public RoadOutline RightOutline { get; set; }
-    public bool IsGhost { get; set; }
     public Intersection StartIntersection { get; set; }
     public Intersection EndIntersection { get; set; }
-    [JsonIgnore]
-    public Zone StartZone { get; set; }
-    public Zone EndZone { get; set; }
+    public int StartZoneId { get; set; }
+    public int EndZoneId { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()
@@ -59,7 +57,6 @@ public class Road
 
     private void InitRoad()
     {
-        IsGhost = false;
         Length = BezierSeries.Length;
         InitLanes();
         if (HasLaneShorterThanMinimumLaneLength())
@@ -74,6 +71,8 @@ public class Road
         LeftOutline = new();
         RightOutline = new();
         EvaluateBodyOutline();
+        StartZoneId = -1;
+        EndZoneId = -1;
     }
 
     public void EvaluateBodyOutline()

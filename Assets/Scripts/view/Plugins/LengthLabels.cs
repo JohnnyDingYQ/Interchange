@@ -20,7 +20,6 @@ public class LengthLabels : MonoBehaviour
 
     void FixedUpdate()
     {
-        List<Tuple<float3, float3, float>> t = Build.SupportLines;
         for (int i = 0; i < Build.SupportLines.Count; i++)
         {
             TextLabel l = labels[i];
