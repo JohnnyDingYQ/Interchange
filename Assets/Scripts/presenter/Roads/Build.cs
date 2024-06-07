@@ -64,7 +64,7 @@ public static class Build
     {
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
-        if (EnforcesTangent)
+        if (EnforcesTangent && !pivotAssigned)
             pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
         if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
@@ -84,8 +84,6 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
-            if (EnforcesTangent)
-                pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
             return null;
         }
         else
@@ -105,6 +103,9 @@ public static class Build
         List<Node> endNodes = endTarget.Nodes;
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
+
+        if (EnforcesTangent)
+            pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
 
         if (RoadIsTooBent())
             return null;

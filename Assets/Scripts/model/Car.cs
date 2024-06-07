@@ -45,13 +45,49 @@ public class Car
         isBraking = false;
         Path path = paths[pathIndex];
         Path nextPath = pathIndex + 1 < paths.Count() ? paths[pathIndex + 1] : null;
-        int carIndex = path.Cars.IndexOf(this);
-        if (carIndex == -1)
+        int carIndex = GetCarIndex();
+
+        if (!IsLeadingCarOnPath())
+            LookForCarAhead();
+        else if (nextPath != null)
+            LookForPathAhead();
+        
+        if (!isBraking)
+            speed = MathF.Min(speed + deltaTime * Constants.CarAcceleration, Constants.CarMaxSpeed);
+
+        DistanceOnPath += deltaTime * speed;
+        
+        if (DistanceOnPath > path.Length)
         {
-            carIndex = path.Cars.Count();
-            path.Cars.Add(this);
+            path.Cars.RemoveAt(0);
+            pathIndex++;
+            if (nextPath != null)
+            {
+                nextPath.IncomingCar = null;
+                nextPath.AddCar(this);
+                return nextPath.BezierSeries.EvaluatePosition(0);
+            }
+            else
+            {
+                ReachedDestination = true;
+                return 0;
+            }
         }
-        if (carIndex != 0)
+        return path.BezierSeries.EvaluatePosition(DistanceOnPath / path.Length);
+
+        # region EXTRACTED FUNCTIONS
+        int GetCarIndex()
+        {
+            int carIndex = path.Cars.IndexOf(this);
+            if (carIndex == -1)
+            {
+                carIndex = path.Cars.Count();
+                path.Cars.Add(this);
+            }
+            return carIndex;
+        }
+
+        void LookForCarAhead()
         {
             float distToNextCar = path.Cars[carIndex - 1].DistanceOnPath - DistanceOnPath;
             if (distToNextCar < Constants.CarMinimumSeparation)
@@ -60,7 +96,8 @@ public class Car
                 speed = distToNextCar / Constants.CarMinimumSeparation * path.Cars[carIndex - 1].speed;
             }
         }
-        else if (carIndex == 0 && nextPath != null)
+
+        void LookForPathAhead()
         {
             if (path.Length - DistanceOnPath < Constants.CarMinimumSeparation && nextPath.IncomingCar == null)
                 nextPath.IncomingCar = this;
@@ -72,29 +109,11 @@ public class Car
             }
         }
 
-        if (!isBraking)
-            speed = MathF.Min(speed + deltaTime * Constants.CarAcceleration, Constants.CarMaxSpeed);
-
-        DistanceOnPath += deltaTime * speed;
-        Assert.IsTrue(DistanceOnPath >= 0);
-        
-        if (DistanceOnPath > path.Length)
+        bool IsLeadingCarOnPath()
         {
-            path.Cars.RemoveAt(0);
-            pathIndex++;
-            if (pathIndex >= paths.Count())
-            {
-                ReachedDestination = true;
-                return 0;
-            }
-            if (nextPath != null)
-            {
-                nextPath.IncomingCar = null;
-                nextPath.AddCar(this);
-            }
-            return nextPath.BezierSeries.EvaluatePosition(0);
+            return carIndex == 0;
         }
-        return path.BezierSeries.EvaluatePosition(DistanceOnPath / path.Length);
+        # endregion
     }
 
     public bool SpawnBlocked()

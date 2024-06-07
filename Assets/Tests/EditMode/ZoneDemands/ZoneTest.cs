@@ -75,4 +75,21 @@ public class ZoneTest
         zone0.RemoveRoad(road0);
         Assert.NotNull(zone0.GetRandomInVertex());
     }
+
+    [Test]
+    public void SimpleDemandSatisfied()
+    {
+        zone0.Demands[1] = 1;
+        zone1.Demands[0] = 1;
+        DemandsSatisfer.SatisfyDemands(0);
+        Assert.AreEqual(1, zone0.Demands[1]);
+        Assert.AreEqual(1, zone1.Demands[0]);
+
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
+        zone0.AddOutRoad(road);
+        zone1.AddInRoad(road);
+        DemandsSatisfer.SatisfyDemands(0);
+        Assert.AreEqual(0, zone0.Demands[1]);
+        Assert.AreEqual(1, zone1.Demands[0]);
+    }
 }

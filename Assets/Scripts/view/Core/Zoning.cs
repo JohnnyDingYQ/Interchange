@@ -36,7 +36,7 @@ public class Zoning : MonoBehaviour
     public void UpdateHoveredZone()
     {
         float3 mousePos = Game.MouseWorldPos;
-        mousePos.y = Constants.ElevationOffset + 5;
+        mousePos.y = Constants.HeightOffset + 5;
         RaycastHit[] hits;
         hits = Physics.RaycastAll(mousePos, new float3(0, -1, 0), 100);
         foreach (RaycastHit hit in hits)

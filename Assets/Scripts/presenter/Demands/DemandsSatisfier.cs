@@ -18,7 +18,7 @@ public static class DemandsSatisfer
             foreach (int zoneID in zone.Demands.Keys)
             {
                 int demand = zone.Demands[zoneID];
-                if (demand > 0 && zone.OutVerticesCount != 0 && Game.Zones[zoneID].InVerticesCount != 0)
+                if (demand > 0)
                     if (AttemptSchedule(zone, Game.Zones[zoneID]) != null)
                     {
                         toDecrement.Add(zoneID);

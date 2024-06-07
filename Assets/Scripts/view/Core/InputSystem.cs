@@ -17,6 +17,7 @@ public class InputSystem : MonoBehaviour
     void Start()
     {
         MouseIsInGameWorld = true;
+        MouseWorldPos = new(0, Constants.HeightOffset, 0);
     }
 
     void OnEnable()
@@ -57,9 +58,11 @@ public class InputSystem : MonoBehaviour
     {
         UpdateCameraPos();
 
-        float3 mouseWorldPos = new(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z)
+        float3 mouseWorldPos = new(0)
         {
-            z = Camera.main.transform.position.y - (Game.Elevation + Constants.ElevationOffset)
+            x = Input.mousePosition.x,
+            y = Input.mousePosition.y,
+            z = Camera.main.transform.position.y - (Game.Elevation + Constants.HeightOffset)
         };
         MouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
     }
