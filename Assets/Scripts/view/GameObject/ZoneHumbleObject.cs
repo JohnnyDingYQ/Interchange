@@ -13,10 +13,11 @@ using System;
 
 public class ZoneHumbleObject : MonoBehaviour
 {
-    private const float TerrainHeight = 32;
+    private const float TerrainHeight = 35;
     private const int DecimalAccuracy = 10;
     private const float AngleThreshold = 4f;
-    private const float ZoneResolution = 0.25f;
+    private const float ZoneResolution = 0.17f;
+    private const float TangnetApproximation = 0.001f;
     public Zone Zone { get; private set; }
 
     public void Init(int id, SplineContainer splineContainer)
@@ -35,11 +36,27 @@ public class ZoneHumbleObject : MonoBehaviour
             List<Vector3> verts3D = new();
             float length = spline.GetLength();
             int numPoints = (int)(length * ZoneResolution - 1);
+            List<float> knotInterpolations = new();
+            for (int i = 0; i < spline.Knots.Count(); i++)
+                knotInterpolations.Add(SplineUtility.GetNormalizedInterpolation(spline, i, PathIndexUnit.Knot));
+            int knotIndex = 0;
             float3 prevTangent = 0;
             for (int i = 0; i <= numPoints; i++)
             {
-                float3 tangent = spline.EvaluateTangent((float)i / numPoints);
-                float3 pos = spline.EvaluatePosition((float)i / numPoints);
+                float interpolation = (float)i / numPoints;
+                if (knotIndex < spline.Knots.Count() && interpolation > knotInterpolations[knotIndex])
+                {
+                    if (GetAngle(prevTangent, spline.EvaluateTangent(interpolation - TangnetApproximation)) > AngleThreshold)
+                    {
+                        BezierKnot knot = spline.Knots.ElementAt(knotIndex);
+                        AddPoint(knot.Position);
+                        prevTangent = spline.EvaluateTangent(interpolation + TangnetApproximation);
+                    }
+                    knotIndex++;
+                }
+
+                float3 tangent = spline.EvaluateTangent(interpolation);
+                float3 pos = spline.EvaluatePosition(interpolation);
                 float angleFromPrev = GetAngle(prevTangent, tangent);
                 if (prevTangent.Equals(0) || angleFromPrev > AngleThreshold)
                 {
@@ -65,6 +82,7 @@ public class ZoneHumbleObject : MonoBehaviour
 
             void AddPoint(float3 pos)
             {
+                DebugExtension.DebugPoint(pos, Color.cyan, 5, 10000);
                 verts2D.Add(new((long)(pos.x * DecimalAccuracy), (long)(pos.z * DecimalAccuracy)));
                 verts3D.Add(new Vector3(pos.x, TerrainHeight, pos.z));
             }
