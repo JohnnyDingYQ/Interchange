@@ -1,5 +1,5 @@
 img = imread("in.png", "png");
-threshold = 2000;
+threshold = 2500;
 clamp_high = 2000;
 clamp_low = 0;
 img = imresize(img, 4, "bicubic");
@@ -12,5 +12,5 @@ for i = 1:numel(img)
     end
 end
 % img = imbilatfilt(img);
-imshow(img);
+% imshow(img);
 imwrite(img, "out.png", "png");
