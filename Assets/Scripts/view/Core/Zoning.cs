@@ -42,7 +42,7 @@ public class Zoning : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             if (hit.collider.gameObject.GetComponent<ZoneHumbleObject>() != null)
-                Game.HoveredZone = hit.collider.gameObject.GetComponent<ZoneHumbleObject>().zone;
+                Game.HoveredZone = hit.collider.gameObject.GetComponent<ZoneHumbleObject>().Zone;
         }
     }
 }
