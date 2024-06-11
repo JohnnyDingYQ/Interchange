@@ -7,8 +7,8 @@ using UnityEngine;
 public class RemoveRoadTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
-    SortedDictionary<int, Road> Roads;
-    SortedDictionary<int, Node> Nodes;
+    SortedDictionary<ulong, Road> Roads;
+    SortedDictionary<ulong, Node> Nodes;
     [SetUp]
     public void SetUp()
     {

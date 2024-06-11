@@ -20,7 +20,7 @@ public class ZoneHumbleObject : MonoBehaviour
     private const float TangnetApproximation = 0.001f;
     public Zone Zone { get; private set; }
 
-    public void Init(int id, SplineContainer splineContainer)
+    public void Init(ulong id, SplineContainer splineContainer)
     {
         Assert.AreEqual(1, splineContainer.Splines.Count());
 

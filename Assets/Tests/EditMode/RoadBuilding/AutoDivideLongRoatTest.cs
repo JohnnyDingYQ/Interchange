@@ -7,7 +7,7 @@ public class AutoDivideLongRoadTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
     float3 direction = new(1, 0, 0);
-    SortedDictionary<int, Road> Roads;
+    SortedDictionary<ulong, Road> Roads;
 
 
     [SetUp]

@@ -80,7 +80,7 @@ public class Car
         int GetCarIndex()
         {
             int carIndex = path.Cars.IndexOf(this);
-            if (carIndex == 0)
+            if (carIndex == -1)
             {
                 carIndex = path.Cars.Count();
                 path.Cars.Add(this);

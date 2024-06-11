@@ -9,8 +9,8 @@ using UnityEngine;
 public class DivideTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
-    SortedDictionary<int, Road> Roads;
-    SortedDictionary<int, Node> Nodes;
+    SortedDictionary<ulong, Road> Roads;
+    SortedDictionary<ulong, Node> Nodes;
 
     public void ResetGame()
     {
@@ -104,7 +104,7 @@ public class DivideTest
             Assert.AreEqual(3 * i, Nodes.Count);
             foreach (Node node in Nodes.Values)
             {
-                Assert.True(node.Id != -1);
+                Assert.True(node.Id != 0);
             }
 
             ResetGame();
@@ -250,21 +250,21 @@ public class DivideTest
     [Test]
     public void SubRoadsInheritZones()
     {
-        Zone zone0 = new(0);
         Zone zone1 = new(1);
-        Game.Zones[0] = zone0;
+        Zone zone2 = new(2);
         Game.Zones[1] = zone1;
+        Game.Zones[2] = zone2;
         Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
-        zone0.AddOutRoad(road);
-        zone1.AddInRoad(road);
+        zone1.AddOutRoad(road);
+        zone2.AddInRoad(road);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        Assert.AreEqual(0, subRoads.Left.StartZoneId);
-        Assert.AreEqual(1, subRoads.Right.EndZoneId);
-        Assert.True(zone0.OutRoads.Contains(subRoads.Left));
-        Assert.True(zone1.InRoads.Contains(subRoads.Right));
-        Assert.False(zone0.OutRoads.Contains(road));
-        Assert.False(zone1.InRoads.Contains(road));
-        Assert.True(zone0.IsConsistent());
+        Assert.AreEqual(1, subRoads.Left.StartZoneId);
+        Assert.AreEqual(2, subRoads.Right.EndZoneId);
+        Assert.True(zone1.OutRoads.Contains(subRoads.Left));
+        Assert.True(zone2.InRoads.Contains(subRoads.Right));
+        Assert.False(zone1.OutRoads.Contains(road));
+        Assert.False(zone2.InRoads.Contains(road));
         Assert.True(zone1.IsConsistent());
+        Assert.True(zone2.IsConsistent());
     }
 }

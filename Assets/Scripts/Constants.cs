@@ -11,7 +11,7 @@ public static class Constants
     public const float VertexDistanceFromRoadEnds = MinimumLaneLength / 2;
     public const float NumericallyEqualMaxTolerance = 0.01f;
     public const float MaxRoadBendAngle = 130;
-    public const ulong GhostRoadId = 0;
+    public const ulong GhostRoadId = ulong.MaxValue;
     public const float HeightOffset = 33;
     public const int MaxElevation = 30;
     public const float CarAcceleration = 15;

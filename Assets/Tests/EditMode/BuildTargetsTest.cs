@@ -9,7 +9,7 @@ public class BuildTargetTest
     float3 pos1 = new(0, 0, 0);
     float3 pos2 = new(Constants.MinimumLaneLength, 0, 0);
     float3 pos3 = new(Constants.MinimumLaneLength * 2, 0, 0);
-    SortedDictionary<int, Road> Roads;
+    SortedDictionary<ulong, Road> Roads;
 
     [SetUp]
     public void SetUp()

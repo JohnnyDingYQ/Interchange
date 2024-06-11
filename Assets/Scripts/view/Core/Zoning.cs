@@ -16,7 +16,7 @@ public class Zoning : MonoBehaviour
         {
             ZoneHumbleObject zone = Instantiate(zonePrefab, transform);
             zone.name = child.gameObject.name;
-            zone.Init(int.Parse(zone.name), child.gameObject.GetComponent<SplineContainer>());
+            zone.Init(ulong.Parse(zone.name), child.gameObject.GetComponent<SplineContainer>());
         }
         Game.UpdateHoveredZone += UpdateHoveredZone;
     }

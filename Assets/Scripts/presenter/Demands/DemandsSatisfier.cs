@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class DemandsSatisfer
 {
-    static readonly HashSet<int> toDecrement = new();
+    static readonly HashSet<ulong> toDecrement = new();
     public static void SatisfyDemands(float deltaTime)
     {
         foreach (Zone zone in Game.Zones.Values)
@@ -16,7 +16,7 @@ public static class DemandsSatisfer
                 zone.CarSpawnInterval -= deltaTime;
                 continue;
             }
-            foreach (int zoneID in zone.Demands.Keys)
+            foreach (ulong zoneID in zone.Demands.Keys)
             {
                 int demand = zone.Demands[zoneID];
                 if (demand > 0)
@@ -26,7 +26,7 @@ public static class DemandsSatisfer
                         zone.CarSpawnInterval = Constants.ZoneDemandSatisfyCooldown / demand;
                     }
             }
-            foreach (int i in toDecrement)
+            foreach (ulong i in toDecrement)
                 zone.Demands[i] -= 1;
             toDecrement.Clear();
         }

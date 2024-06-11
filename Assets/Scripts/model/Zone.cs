@@ -20,6 +20,7 @@ public class Zone
 
     public Zone(ulong id)
     {
+        Assert.AreNotEqual(0, id);
         Id = id;
         inVertices = new();
         inRoads = new();
