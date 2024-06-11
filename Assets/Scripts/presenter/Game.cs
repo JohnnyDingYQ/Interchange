@@ -13,9 +13,9 @@ public static class Game
     public static event Action<Road> RoadRemoved;
     public static event Action UpdateHoveredZone;
     public static GameSave GameSave { get; set; }
-    public static SortedDictionary<int, Road> Roads { get { return GameSave.Roads; } }
-    public static SortedDictionary<int, Node> Nodes { get { return GameSave.Nodes; } }
-    public static SortedDictionary<int, Zone> Zones { get { return GameSave.Zones; } }
+    public static SortedDictionary<ulong, Road> Roads { get { return GameSave.Roads; } }
+    public static SortedDictionary<ulong, Node> Nodes { get { return GameSave.Nodes; } }
+    public static SortedDictionary<ulong, Zone> Zones { get { return GameSave.Zones; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
     public static int Elevation { get { return GameSave.Elevation; } }
     public static ulong CarServiced { get { return GameSave.CarServiced; } set { GameSave.CarServiced = value; } }
@@ -35,17 +35,17 @@ public static class Game
     }
     public static float3 MouseWorldPos { get { return InputSystem.MouseWorldPos; } }
 
-    public static int NextAvailableNodeId
+    public static ulong NextAvailableNodeId
     {
         get { return GameSave.NextAvailableNodeId; }
         set { GameSave.NextAvailableNodeId = value; }
     }
-    public static int NextAvailableRoadId
+    public static ulong NextAvailableRoadId
     {
         get { return GameSave.NextAvailableRoadId; }
         set { GameSave.NextAvailableRoadId = value; }
     }
-    public static int NextAvailablePathId
+    public static ulong NextAvailablePathId
     {
         get { return GameSave.NextAvailablePathId; }
         set { GameSave.NextAvailablePathId = value; }
@@ -97,7 +97,7 @@ public static class Game
         return Nodes.Values.Contains(node);
     }
 
-    public static bool RemoveRoad(int id)
+    public static bool RemoveRoad(ulong id)
     {
         if (!Roads.ContainsKey(id))
             return false;

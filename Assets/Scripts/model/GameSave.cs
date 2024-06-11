@@ -5,17 +5,19 @@ using Unity.Plastic.Newtonsoft.Json;
 public class GameSave
 {
     [JsonProperty]
-    public SortedDictionary<int, Node> Nodes { get; private set; }
+    public SortedDictionary<ulong, Node> Nodes { get; private set; }
     [JsonProperty]
-    public SortedDictionary<int, Road> Roads { get; private set; }
+    public SortedDictionary<ulong, Road> Roads { get; private set; }
     [JsonIgnore]
     public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
     public List<Path> GraphSave { get; set; }
     [JsonIgnore]
-    public SortedDictionary<int, Zone> Zones { get; private set; }
-    public int NextAvailableRoadId { get; set; }
-    public int NextAvailableNodeId { get; set; }
-    public int NextAvailablePathId { get; set; }
+    public SortedDictionary<ulong, Zone> Zones { get; private set; }
+    [JsonIgnore]
+    public SortedDictionary<ulong, Car> Cars { get; private set; }
+    public ulong NextAvailableRoadId { get; set; }
+    public ulong NextAvailableNodeId { get; set; }
+    public ulong NextAvailablePathId { get; set; }
     public int Elevation { get; set; }
     public ulong CarServiced { get; set; }
     public GameSave()
@@ -24,6 +26,7 @@ public class GameSave
         Nodes = new();
         Graph = new(false);
         Zones = new();
+        Cars = new();
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
         NextAvailablePathId = 1;

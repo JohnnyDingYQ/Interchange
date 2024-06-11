@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Node : IComparable<Node>
 {
-    public int Id { get; set; }
+    public ulong Id { get; set; }
     [JsonProperty]
     private readonly HashSet<Lane> inLanes;
     [JsonProperty]
@@ -34,7 +34,7 @@ public class Node : IComparable<Node>
     {
         Pos = pos;
         NodeIndex = order;
-        Id = -1;
+        Id = 0;
         inLanes = new();
         outLanes = new();
     }

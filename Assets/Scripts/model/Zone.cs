@@ -6,9 +6,9 @@ using UnityEngine.Assertions;
 
 public class Zone
 {
-    public int Id { get; set; }
+    public ulong Id { get; set; }
     public string Name { get; set; }
-    public SortedDictionary<int, int> Demands { get; set; }
+    public SortedDictionary<ulong, int> Demands { get; set; }
     private readonly List<Vertex> inVertices;
     private readonly List<Road> inRoads;
     private readonly List<Vertex> outVertices;
@@ -18,7 +18,7 @@ public class Zone
     public ReadOnlyCollection<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
     public float CarSpawnInterval { get; set; }
 
-    public Zone(int id)
+    public Zone(ulong id)
     {
         Id = id;
         inVertices = new();
@@ -69,9 +69,9 @@ public class Zone
         inRoads.Remove(road);
         outRoads.Remove(road);
         if (road.StartZoneId == Id)
-            road.StartZoneId = -1;
+            road.StartZoneId = 0;
         if (road.EndZoneId == Id)
-            road.EndZoneId = -1;
+            road.EndZoneId = 0;
     }
 
     public bool IsConsistent()
