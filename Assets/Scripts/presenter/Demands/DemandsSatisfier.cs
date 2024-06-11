@@ -20,11 +20,15 @@ public static class DemandsSatisfer
             {
                 int demand = zone.Demands[zoneID];
                 if (demand > 0)
-                    if (AttemptSchedule(zone, Game.Zones[zoneID]) != null)
+                {
+                    Car car = AttemptSchedule(zone, Game.Zones[zoneID]);
+                    if (car != null)
                     {
+                        Game.RegisterCar(car);
                         toDecrement.Add(zoneID);
                         zone.CarSpawnInterval = Constants.ZoneDemandSatisfyCooldown / demand;
                     }
+                }
             }
             foreach (ulong i in toDecrement)
                 zone.Demands[i] -= 1;

@@ -6,14 +6,13 @@ using UnityEngine.Assertions;
 public class CarDriver : MonoBehaviour
 {
     [SerializeField] CarHumbleObject carPrefab;
-    HashSet<CarHumbleObject> cars;
+    static Dictionary<ulong, CarHumbleObject> carMapping;
     ObjectPool<CarHumbleObject> carPool;
-    HashSet<CarHumbleObject> toRemove;
     void Awake()
     {
-        Car.Drive += Drive;
-        cars = new();
-        toRemove = new();
+        Game.CarAdded += Drive;
+        Game.CarRemoved += RemoveCar;
+        carMapping = new();
         carPool = new(
             () => Instantiate(carPrefab, transform),
             (o) => o.gameObject.SetActive(true),
@@ -27,39 +26,29 @@ public class CarDriver : MonoBehaviour
 
     void Update()
     {
-        foreach (CarHumbleObject carObject in cars)
+        CarControl.PassTime(Time.deltaTime);
+        foreach (Car car in Game.Cars.Values)
         {
-            Car car = carObject.Car;
-            if (!car.IsTraveling && !car.SpawnBlocked())
-                car.Start();
-            if (!car.IsTraveling)
-                continue;
-            CarControl.CheckPathValid(car);
-            carObject.transform.position = car.Move(Time.deltaTime);
-            if (car.ReachedDestination || car.DestinationUnreachable)
-            {
-                if (car.DestinationUnreachable)
-                    car.Stop();
-                if (car.ReachedDestination)
-                    DevPanel.CarServiced.text = "Serviced: " + Game.CarServiced++;
-                carPool.Release(carObject);
-                toRemove.Add(carObject);
-            }
+            CarHumbleObject carObject = carMapping[car.Id];
+            carObject.transform.position = car.Pos;
         }
-        cars.ExceptWith(toRemove);
-        toRemove.Clear();
-
     }
 
     void OnDestroy()
     {
-        Car.Drive -= Drive;
+        Game.CarAdded -= Drive;
+        Game.CarRemoved -= RemoveCar;
     }
 
     void Drive(Car car)
     {
         CarHumbleObject carObject = carPool.Get();
         carObject.Car = car;
-        cars.Add(carObject);
+        carMapping[car.Id] = carObject;
+    }
+
+    void RemoveCar(Car car)
+    {
+        carPool.Release(carMapping[car.Id]);
     }
 }

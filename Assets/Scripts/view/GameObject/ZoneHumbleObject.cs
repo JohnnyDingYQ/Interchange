@@ -13,7 +13,6 @@ using System;
 
 public class ZoneHumbleObject : MonoBehaviour
 {
-    private const float TerrainHeight = 35;
     private const int DecimalAccuracy = 10;
     private const float AngleThreshold = 4f;
     private const float ZoneResolution = 0.17f;
@@ -84,7 +83,7 @@ public class ZoneHumbleObject : MonoBehaviour
             {
                 DebugExtension.DebugPoint(pos, Color.cyan, 5, 10000);
                 verts2D.Add(new((long)(pos.x * DecimalAccuracy), (long)(pos.z * DecimalAccuracy)));
-                verts3D.Add(new Vector3(pos.x, TerrainHeight, pos.z));
+                verts3D.Add(new Vector3(pos.x, Constants.ZoneHeight, pos.z));
             }
         }
     }

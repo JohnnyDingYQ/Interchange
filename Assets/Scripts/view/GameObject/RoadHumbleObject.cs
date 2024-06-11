@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class RoadGameObject : MonoBehaviour
+public class RoadHumbleObject : MonoBehaviour
 {
     public Road Road { get; set; }
 

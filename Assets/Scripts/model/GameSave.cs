@@ -18,7 +18,9 @@ public class GameSave
     public ulong NextAvailableRoadId { get; set; }
     public ulong NextAvailableNodeId { get; set; }
     public ulong NextAvailablePathId { get; set; }
-    public int Elevation { get; set; }
+    [JsonIgnore]
+    public ulong NextAvailableCarId { get; set; }
+    public float Elevation { get; set; }
     public ulong CarServiced { get; set; }
     public GameSave()
     {
@@ -30,6 +32,7 @@ public class GameSave
         NextAvailableNodeId = 1;
         NextAvailableRoadId = 1;
         NextAvailablePathId = 1;
+        NextAvailableCarId = 1;
         CarServiced = 0;
     }
 }

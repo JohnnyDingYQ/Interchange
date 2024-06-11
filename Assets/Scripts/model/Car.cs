@@ -7,10 +7,10 @@ using UnityEngine;
 
 public class Car
 {
-    public static event Action<Car> Drive;
+    public ulong Id { get; set; }
     public bool IsTraveling { get; set; }
-    public bool DestinationUnreachable { get; set; }
-    public bool ReachedDestination { get; private set; }
+    public bool IsDone { get; private set; }
+    public float3 Pos { get; private set; }
     private readonly Zone origin;
     private readonly Zone destination;
     private readonly Path[] paths;
@@ -24,7 +24,6 @@ public class Car
     {
         Assert.IsNotNull(paths);
         Assert.IsFalse(origin == null ^ destination == null);
-        DestinationUnreachable = false;
         this.origin = origin;
         this.destination = destination;
         this.paths = paths;
@@ -32,17 +31,16 @@ public class Car
         DistanceOnPath = 0;
         pathIndex = 0;
         speed = 0;
-        Drive?.Invoke(this);
     }
     public void Start()
     {
         IsTraveling = true;
         paths.First().Source.ScheduledCars--;
     }
-    public float3 Move(float deltaTime)
+    public void Move(float deltaTime)
     {
-        if (ReachedDestination)
-            return 0;
+        if (IsDone)
+            return;
         isBraking = false;
         Path path = paths[pathIndex];
         Path nextPath = pathIndex + 1 < paths.Count() ? paths[pathIndex + 1] : null;
@@ -66,15 +64,15 @@ public class Car
             {
                 nextPath.IncomingCar = null;
                 nextPath.AddCar(this);
-                return nextPath.BezierSeries.EvaluatePosition(0);
+                Pos = nextPath.BezierSeries.EvaluatePosition(0);
             }
             else
             {
-                ReachedDestination = true;
-                return 0;
+                IsDone = true;
             }
+            return;
         }
-        return path.BezierSeries.EvaluatePosition(DistanceOnPath / path.Length);
+        Pos = path.BezierSeries.EvaluatePosition(DistanceOnPath / path.Length);
 
         # region EXTRACTED FUNCTIONS
         int GetCarIndex()
@@ -126,9 +124,10 @@ public class Car
         return false;
     }
 
-    public void Stop()
+    public void Cancel()
     {
         if (origin != null)
             origin.Demands[destination.Id] += 1;
+        IsDone = true;
     }
 }

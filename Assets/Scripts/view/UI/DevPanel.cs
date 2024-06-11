@@ -52,6 +52,9 @@ public class DevPanel : MonoBehaviour
         ghostRoad.value = true;
         enforceTangent.RegisterCallback<ChangeEvent<bool>>(EnforceTangent);
         enforceTangent.value = true;
+
+        Game.ElevationUpdated += UpdateElevation;
+        Game.CarServicedUpdated += UpdateCarServiced;
     }
 
     void OnDisable()
@@ -67,6 +70,9 @@ public class DevPanel : MonoBehaviour
         supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
         ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
         enforceTangent.UnregisterCallback<ChangeEvent<bool>>(EnforceTangent);
+
+        Game.ElevationUpdated -= UpdateElevation;
+        Game.CarServicedUpdated -= UpdateCarServiced;
     }
 
     void MouseReturnGameWorld(MouseEnterEvent e)
@@ -112,5 +118,15 @@ public class DevPanel : MonoBehaviour
     void EnforceTangent(ChangeEvent<bool> e)
     {
         Build.EnforcesTangent = e.newValue;
+    }
+
+    void UpdateElevation(float newElevation)
+    {
+        Elevation.text = "Elevation: " + newElevation;
+    }
+
+    void UpdateCarServiced(ulong newCarServiced)
+    {
+        CarServiced.text = "Elevation: " + newCarServiced;
     }
 }

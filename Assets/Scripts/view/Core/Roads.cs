@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Roads : MonoBehaviour
 {
-    [SerializeField] private RoadGameObject roadPrefab;
-    private static Dictionary<ulong, RoadGameObject> roadMapping;
+    [SerializeField] private RoadHumbleObject roadPrefab;
+    private static Dictionary<ulong, RoadHumbleObject> roadMapping;
     void Start()
     {
         Game.RoadAdded += InstantiateRoad;
@@ -26,7 +26,7 @@ public class Roads : MonoBehaviour
         if (roadMapping.ContainsKey(road.Id))
             DestroyRoad(roadMapping[road.Id].Road);
         
-        RoadGameObject roadGameObject = Instantiate(roadPrefab, transform, true);
+        RoadHumbleObject roadGameObject = Instantiate(roadPrefab, transform, true);
         roadGameObject.name = $"Road-{road.Id}";
         roadGameObject.Road = road;
         roadMapping[road.Id] = roadGameObject;

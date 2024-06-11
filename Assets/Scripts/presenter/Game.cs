@@ -11,14 +11,22 @@ public static class Game
     public static event Action<Road> RoadAdded;
     public static event Action<Road> RoadUpdated;
     public static event Action<Road> RoadRemoved;
+    public static event Action<Car> CarAdded;
+    public static event Action<Car> CarRemoved;
     public static event Action UpdateHoveredZone;
+    public static event Action<float> ElevationUpdated;
+    public static event Action<ulong> CarServicedUpdated;
     public static GameSave GameSave { get; set; }
     public static SortedDictionary<ulong, Road> Roads { get { return GameSave.Roads; } }
     public static SortedDictionary<ulong, Node> Nodes { get { return GameSave.Nodes; } }
     public static SortedDictionary<ulong, Zone> Zones { get { return GameSave.Zones; } }
+    public static SortedDictionary<ulong, Car> Cars { get { return GameSave.Cars; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
-    public static int Elevation { get { return GameSave.Elevation; } }
-    public static ulong CarServiced { get { return GameSave.CarServiced; } set { GameSave.CarServiced = value; } }
+    public static float Elevation { get { return GameSave.Elevation; } }
+    public static ulong CarServiced {
+        get { return GameSave.CarServiced; }
+        set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); } 
+    }
     public static Road HoveredRoad { get; set; }
     private static Zone hoveredZone;
     public static Zone HoveredZone
@@ -49,6 +57,11 @@ public static class Game
     {
         get { return GameSave.NextAvailablePathId; }
         set { GameSave.NextAvailablePathId = value; }
+    }
+    public static ulong NextAvailableCarId
+    {
+        get { return GameSave.NextAvailableCarId; }
+        set { GameSave.NextAvailableCarId = value; }
     }
 
     static Game()
@@ -152,6 +165,21 @@ public static class Game
         return true;
     }
 
+    public static void RegisterCar(Car car)
+    {
+        Assert.IsFalse(Cars.ContainsValue(car));
+        car.Id = NextAvailableCarId++;
+        Cars[car.Id] = car;
+        CarAdded?.Invoke(car);
+    }
+
+    public static void RemoveCar(Car car)
+    {
+        Assert.IsTrue(Cars.ContainsValue(car));
+        Cars.Remove(car.Id);
+        CarRemoved?.Invoke(car);
+    }
+
     public static bool RemoveRoad(Road road)
     {
         return RemoveRoad(road, false);
@@ -202,7 +230,7 @@ public static class Game
             RemoveRoad(HoveredRoad);
     }
 
-    public static void SetElevation(int elevation)
+    public static void SetElevation(float elevation)
     {
         if (elevation < 0)
             GameSave.Elevation = 0;
@@ -210,6 +238,6 @@ public static class Game
             GameSave.Elevation = Constants.MaxElevation;
         else
             GameSave.Elevation = elevation;
-        DevPanel.Elevation.text = "Elevation: " + Elevation;
+        ElevationUpdated?.Invoke(elevation);
     }
 }

@@ -23,9 +23,10 @@ public class CarTest
         Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
         Car car = DemandsSatisfer.AttemptSchedule(road, road);
         Assert.NotNull(car);
+        Game.RegisterCar(car);
         for (float i = 0; i < maxGivenTime; i += deltaTime)
-            car.Move(deltaTime);
-        Assert.True(car.ReachedDestination);
+            CarControl.PassTime(deltaTime);
+        Assert.True(car.IsDone);
     }
 
     [Test]
@@ -36,9 +37,10 @@ public class CarTest
         Road road2 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
         Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
         Assert.NotNull(car);
+        Game.RegisterCar(car);
         for (float i = 0; i < maxGivenTime; i += deltaTime)
-            car.Move(deltaTime);
-        Assert.True(car.ReachedDestination);
+            CarControl.PassTime(deltaTime);
+        Assert.True(car.IsDone);
     }
 
     [Test]
@@ -47,18 +49,16 @@ public class CarTest
         Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
         RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
-        List<Car> cars = new();
         for (int i = 0; i < Constants.MaxVertexWaitingCar; i++)
         {
             Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
             Assert.NotNull(car);
-            cars.Add(car);
+            Game.RegisterCar(car);
         }
         for (float i = 0; i < maxGivenTime; i += deltaTime)
-            foreach (Car car in cars)
-                car.Move(deltaTime);
-        foreach (Car car in cars)
-            Assert.True(car.ReachedDestination);
+            CarControl.PassTime(deltaTime);
+        foreach (Car car in Game.Cars.Values)
+            Assert.True(car.IsDone);
     }
 
     [Test]
@@ -70,21 +70,19 @@ public class CarTest
         Road road0 = RoadBuilder.B(0, stride, 2 * stride, 3);
         RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
         Road road2 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
-        List<Car> cars = new();
         for (int i = 0; i < Constants.MaxVertexWaitingCar; i++)
         {
             Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
             Assert.NotNull(car);
-            cars.Add(car);
+            Game.RegisterCar(car);
         }
         for (float i = 0; i < maxGivenTime; i += deltaTime)
-            foreach (Car car in cars)
-                car.Move(deltaTime);
-        foreach (Car car in cars)
+            CarControl.PassTime(deltaTime);
+        foreach (Car car in Game.Cars.Values)
         {
-            if (!car.ReachedDestination)
+            if (!car.IsDone)
                 Debug.Log("Seed: " + now);
-            Assert.True(car.ReachedDestination);
+            Assert.True(car.IsDone);
         }
     }
 
@@ -94,7 +92,6 @@ public class CarTest
         Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
         RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
-        List<Car> cars = new();
         for (int i = 0; i <= Constants.MaxVertexWaitingCar; i++)
         {
             Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
@@ -102,7 +99,6 @@ public class CarTest
                 Assert.NotNull(car);
             else
                 Assert.Null(car);
-            cars.Add(car);
         }
     }
 
@@ -113,10 +109,11 @@ public class CarTest
         RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
         Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
+        Game.RegisterCar(car);
         for (float i = 0; i < 0.3f; i += deltaTime)
-            car.Move(deltaTime);
+            CarControl.PassTime(deltaTime);
         Assert.True(Game.RemoveRoad(road0));
-        CarControl.CheckPathValid(car);
-        Assert.True(car.DestinationUnreachable);
+        CarControl.PassTime(deltaTime);
+        Assert.True(car.IsDone);
     }
 }
