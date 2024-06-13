@@ -81,7 +81,7 @@ public class ZoneHumbleObject : MonoBehaviour
 
             void AddPoint(float3 pos)
             {
-                DebugExtension.DebugPoint(pos, Color.cyan, 5, 10000);
+                // DebugExtension.DebugPoint(pos, Color.cyan, 5, 10000);
                 verts2D.Add(new((long)(pos.x * DecimalAccuracy), (long)(pos.z * DecimalAccuracy)));
                 verts3D.Add(new Vector3(pos.x, Constants.ZoneHeight, pos.z));
             }

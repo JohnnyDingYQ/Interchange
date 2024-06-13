@@ -127,6 +127,6 @@ public class DevPanel : MonoBehaviour
 
     void UpdateCarServiced(ulong newCarServiced)
     {
-        CarServiced.text = "Elevation: " + newCarServiced;
+        CarServiced.text = "Car Serviced: " + newCarServiced;
     }
 }

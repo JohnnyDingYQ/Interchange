@@ -17,7 +17,7 @@ public class InputSystem : MonoBehaviour
     void Start()
     {
         MouseIsInGameWorld = true;
-        MouseWorldPos = new(0, Constants.RoadBaseHeight, 0);
+        MouseWorldPos = new(0, 0, 0);
     }
 
     void OnEnable()
@@ -65,7 +65,7 @@ public class InputSystem : MonoBehaviour
             z = Camera.main.transform.position.y
         };
         mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
-        mouseWorldPos.y = Game.Elevation + Constants.RoadBaseHeight;
+        mouseWorldPos.y = Game.Elevation;
         MouseWorldPos = mouseWorldPos;
     }
 
