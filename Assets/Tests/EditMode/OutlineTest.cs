@@ -15,6 +15,15 @@ public class OutlineTest
     }
 
     [Test]
+    public void SingleOneLaneRoad()
+    {
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
+        foreach (float3 pt in road.LeftOutline.Mid)
+            Debug.Log(pt);
+        Assert.True(AllRoadsOutLineValid());
+    }
+
+    [Test]
     public void OneLaneRepeated_OnEnd()
     {
         RoadBuilder.B(0, stride, 2 * stride, 1);
@@ -176,9 +185,15 @@ public class OutlineTest
             r.LeftOutline.IsPlausible();
             // Debug.Log(r.HasNoneEmptyOutline());
             if (!r.OutLinePlausible())
+            {
+                Debug.Log("Road " + r.Id + ": Outline not plausible");   
                 return false;
+            }
             if (!r.HasNoneEmptyOutline())
+            {
+                Debug.Log(r.Id);   
                 return false;
+            }
         }
         return true;
     }

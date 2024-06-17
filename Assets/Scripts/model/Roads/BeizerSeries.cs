@@ -17,8 +17,6 @@ public class BezierSeries
     public ReadOnlyCollection<BezierCurve> Curves { get { return curves.AsReadOnly(); } }
     public float Length { get; set; }
     [JsonProperty]
-    public bool IsOffsetted { get; set; }
-    [JsonProperty]
     private List<List<float3>> serializedCurves;
 
     [JsonConstructor]
@@ -27,10 +25,9 @@ public class BezierSeries
         RestoreFromSerialization(serializedCurves);
     }
 
-    public BezierSeries(List<BezierCurve> c, bool offsetted)
+    public BezierSeries(List<BezierCurve> c)
     {
         curves = c;
-        IsOffsetted = offsetted;
         Length = GetLength();
         PrepForSerialization();
     }
@@ -38,7 +35,6 @@ public class BezierSeries
     public BezierSeries(BezierCurve c)
     {
         curves = new() { c };
-        IsOffsetted = false;
         Length = GetLength();
         PrepForSerialization();
     }
@@ -47,10 +43,9 @@ public class BezierSeries
     {
         float startDistance = startInterpolation * bs.Length;
         bs.Split(endInterpolation, out BezierSeries left, out _);
-        left.Split(startDistance / bs.Length, out _, out BezierSeries right);
-        curves = left.curves;
-        IsOffsetted = left.IsOffsetted;
-        Length = left.Length;
+        left.Split(startDistance / left.Length, out _, out BezierSeries right);
+        curves = right.curves;
+        Length = right.Length;
         PrepForSerialization();
     }
 
@@ -79,7 +74,7 @@ public class BezierSeries
         {
             foreach (BezierCurve c in curves)
                 offset.Add(NaiveOffsetByNormal(c));
-            return new(offset, true);
+            return new(offset);
         }
 
         List<BezierCurve> divided = DivideCurves(curves);
@@ -87,7 +82,7 @@ public class BezierSeries
         foreach (BezierCurve c in divided)
             offset.Add(NaiveOffsetByNormal(c));
 
-        return new(offset, true);
+        return new(offset);
 
         BezierCurve NaiveOffsetByNormal(BezierCurve curve)
         {
@@ -104,8 +99,7 @@ public class BezierSeries
             List<BezierCurve> result = new();
             foreach (BezierCurve curve in curves)
             {
-                float t = CurveUtility.GetDistanceToInterpolation(curve, 0.5f * CurveUtility.CalculateLength(curve));
-                CurveUtility.Split(curve, t, out BezierCurve left, out BezierCurve right);
+                CurveUtility.Split(curve, 0.5f, out BezierCurve left, out BezierCurve right);
                 result.Add(left);
                 result.Add(right);
             }
@@ -162,7 +156,7 @@ public class BezierSeries
     private float LocationToInterpolation(SeriesLocation location)
     {
         float distance = GetDistanceByLocation(location);
-        return distance/ Length;
+        return distance / Length;
     }
 
     public List<float3> GetOutline(Orientation orientation)
@@ -170,7 +164,9 @@ public class BezierSeries
         List<float3> results = new();
         foreach (BezierCurve curve in curves)
         {
-            int numPoints = (int)(CurveUtility.ApproximateLength(curve) * Constants.MeshResolution);
+            int numPoints = (int)(CurveUtility.CalculateLength(curve) * Constants.MeshResolution);
+            if (numPoints == 0) // curve is too short
+                continue;
             for (int j = 0; j <= numPoints; j++)
             {
                 float t = (float)j / numPoints;
@@ -230,8 +226,8 @@ public class BezierSeries
         rightSeries.Add(r);
         while (count < curves.Count)
             rightSeries.Add(curves[count++]);
-        left = new(leftSeries, IsOffsetted);
-        right = new(rightSeries, IsOffsetted);
+        left = new(leftSeries);
+        right = new(rightSeries);
     }
 
     private struct SeriesLocation

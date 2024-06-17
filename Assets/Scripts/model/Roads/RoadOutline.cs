@@ -7,69 +7,48 @@ using System;
 
 public class RoadOutline : IEquatable<RoadOutline>
 {
-    [JsonProperty]
-    public bool IsFixedAtStart { get; private set; }
-    [JsonProperty]
-    public bool IsFixedAtEnd { get; private set; }
-    [JsonProperty]
-    public float3 FixedStart { get; private set; }
     public List<float3> Start { get; set; }
     public List<float3> Mid { get; set; }
     public List<float3> End { get; set; }
-    [JsonProperty]
-    public float3 FixedEnd { get; private set; }
 
     public RoadOutline()
     {
         Start = new();
         End = new();
         Mid = new();
-        IsFixedAtEnd = false;
-        IsFixedAtEnd = false;
     }
 
     public int GetSize()
     {
         int size = Start.Count + End.Count + Mid.Count;
-        if (IsFixedAtEnd)
-            size++;
-        if (IsFixedAtStart)
-            size++;
         return size;
     }
 
     public List<float3> GetConcatenated()
     {
         List<float3> l = new();
-        if (IsFixedAtStart)
-            l.Add(FixedStart);
         l.AddRange(Start);
         l.AddRange(Mid);
         l.AddRange(End);
-        if (IsFixedAtEnd)
-            l.Add(FixedEnd);
         return l;
-    }
-
-    public void AddStartFixedPoint(float3 pt)
-    {
-        FixedStart = pt;
-        IsFixedAtStart = true;
-    }
-    public void AddEndFixedPoint(float3 pt)
-    {
-        FixedEnd = pt;
-        IsFixedAtEnd = true;
     }
 
     public bool IsPlausible()
     {
         if (Start.Count != 0)
             if (!MyNumerics.AreNumericallyEqual(Start.Last(), Mid.First()))
+            {
+                Debug.Log("start misaligns with mid");
+                Debug.Log("start end: " + Start.Last());
+                Debug.Log("mid start: " + Mid.First());
                 return false;
+            }
         if (End.Count != 0)
             if (!MyNumerics.AreNumericallyEqual(End.First(), Mid.Last()))
+            {
+                Debug.Log("mid misaligns with end");
                 return false;
+            }
         return true;
     }
 
@@ -77,10 +56,6 @@ public class RoadOutline : IEquatable<RoadOutline>
     {
         return MyNumerics.AreNumericallyEqual(Start, other.Start)
         && MyNumerics.AreNumericallyEqual(Mid, other.Mid)
-        && MyNumerics.AreNumericallyEqual(End, other.End)
-        && IsFixedAtStart == other.IsFixedAtStart
-        && IsFixedAtEnd == other.IsFixedAtEnd
-        && MyNumerics.AreNumericallyEqual(FixedStart, other.FixedStart)
-        && MyNumerics.AreNumericallyEqual(FixedEnd, other.FixedEnd);
+        && MyNumerics.AreNumericallyEqual(End, other.End);
     }
 }
