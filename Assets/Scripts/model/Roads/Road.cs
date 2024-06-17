@@ -112,10 +112,10 @@ public class Road
     public float3 ExtrapolateNodePos(Side side, int laneIndex)
     {
         if (side == Side.Start)
-            return BezierSeries.EvaluatePosition(BezierSeries.StartLocation)
-            + ((float)LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth * BezierSeries.Evaluate2DNormalizedNormal(BezierSeries.StartLocation);
-        return BezierSeries.EvaluatePosition(BezierSeries.EndLocation)
-        + ((float)LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth * BezierSeries.Evaluate2DNormalizedNormal(BezierSeries.EndLocation);
+            return BezierSeries.EvaluatePosition(0)
+            + ((float)LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth * BezierSeries.Evaluate2DNormalizedNormal(0);
+        return BezierSeries.EvaluatePosition(1)
+        + ((float)LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth * BezierSeries.Evaluate2DNormalizedNormal(1);
     }
 
     void InitLanes()

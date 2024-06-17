@@ -17,12 +17,6 @@ public class BezierSeries
     public ReadOnlyCollection<BezierCurve> Curves { get { return curves.AsReadOnly(); } }
     public float Length { get; set; }
     [JsonProperty]
-    public SeriesLocation StartLocation { get; private set; }
-    [JsonProperty]
-    public SeriesLocation EndLocation { get; private set; }
-    private float startLocationDistance = 0;
-    private float endLocationDistance = 0;
-    [JsonProperty]
     public bool IsOffsetted { get; set; }
     [JsonProperty]
     private List<List<float3>> serializedCurves;
@@ -36,8 +30,6 @@ public class BezierSeries
     public BezierSeries(List<BezierCurve> c, bool offsetted)
     {
         curves = c;
-        StartLocation = new(0, 0);
-        EndLocation = new(curves.Count - 1, 1);
         IsOffsetted = offsetted;
         Length = GetLength();
         PrepForSerialization();
@@ -46,23 +38,20 @@ public class BezierSeries
     public BezierSeries(BezierCurve c)
     {
         curves = new() { c };
-        StartLocation = new(0, 0);
-        EndLocation = new(0, 1);
         IsOffsetted = false;
         Length = GetLength();
         PrepForSerialization();
     }
 
-    public void SetStartLocation(SeriesLocation location)
+    public BezierSeries(BezierSeries bs, float startInterpolation, float endInterpolation)
     {
-        StartLocation = location;
-        startLocationDistance = GetDistanceByLocation(location);
-    }
-
-    public void SetEndLocation(SeriesLocation location)
-    {
-        EndLocation = location;
-        endLocationDistance = Length - GetDistanceByLocation(location);
+        float startDistance = startInterpolation * bs.Length;
+        bs.Split(endInterpolation, out BezierSeries left, out _);
+        left.Split(startDistance / bs.Length, out _, out BezierSeries right);
+        curves = left.curves;
+        IsOffsetted = left.IsOffsetted;
+        Length = left.Length;
+        PrepForSerialization();
     }
 
     float GetDistanceByLocation(SeriesLocation location)
@@ -138,10 +127,6 @@ public class BezierSeries
             curves.Add(new(a[0], a[1], a[2], a[3]));
     }
 
-    public float3 EvaluatePosition(SeriesLocation location)
-    {
-        return CurveUtility.EvaluatePosition(curves[location.Index], location.Interpolation);
-    }
     public float3 EvaluatePosition(float t)
     {
         Assert.IsTrue(t <= 1);
@@ -149,10 +134,7 @@ public class BezierSeries
         SeriesLocation location = InterpolationToLocation(t);
         return CurveUtility.EvaluatePosition(curves[location.Index], location.Interpolation);
     }
-    public float3 EvaluateTangent(SeriesLocation location)
-    {
-        return CurveUtility.EvaluateTangent(curves[location.Index], location.Interpolation);
-    }
+
     public float3 EvaluateTangent(float t)
     {
         Assert.IsTrue(t <= 1);
@@ -161,10 +143,6 @@ public class BezierSeries
         return CurveUtility.EvaluateTangent(curves[location.Index], location.Interpolation);
     }
 
-    public float3 Evaluate2DNormalizedNormal(SeriesLocation location)
-    {
-        return curves[location.Index].Normalized2DNormal(location.Interpolation);
-    }
     public float3 Evaluate2DNormalizedNormal(float t)
     {
         Assert.IsTrue(t <= 1);
@@ -173,37 +151,29 @@ public class BezierSeries
         return curves[location.Index].Normalized2DNormal(location.Interpolation);
     }
 
-    public SeriesLocation InterpolationToLocation(float t)
+    private SeriesLocation InterpolationToLocation(float t)
     {
         Assert.IsTrue(t <= 1);
         Assert.IsTrue(t >= 0);
-        float distanceOnCurve = t * (Length - startLocationDistance - endLocationDistance) + startLocationDistance;
+        float distanceOnCurve = t * Length;
         return GetLocationByDistance(distanceOnCurve);
     }
 
-    public float LocationToInterpolation(SeriesLocation location)
+    private float LocationToInterpolation(SeriesLocation location)
     {
         float distance = GetDistanceByLocation(location);
-        return (distance - startLocationDistance) / (Length - startLocationDistance - endLocationDistance);
+        return distance/ Length;
     }
 
     public List<float3> GetOutline(Orientation orientation)
     {
         List<float3> results = new();
-        for (int i = StartLocation.Index; i <= EndLocation.Index; i++)
+        foreach (BezierCurve curve in curves)
         {
-            BezierCurve curve = curves[i];
             int numPoints = (int)(CurveUtility.ApproximateLength(curve) * Constants.MeshResolution);
             for (int j = 0; j <= numPoints; j++)
             {
                 float t = (float)j / numPoints;
-                float lower = 0;
-                float upper = 1;
-                if (i == StartLocation.Index)
-                    lower = StartLocation.Interpolation;
-                if (i == EndLocation.Index)
-                    upper = EndLocation.Interpolation;
-                t = lower + t * (upper - lower);
                 float3 normal = curve.Normalized2DNormal(t) * Constants.RoadOutlineSeparation;
                 if (orientation == Orientation.Right)
                     normal *= -1;
@@ -213,7 +183,7 @@ public class BezierSeries
         return results;
     }
 
-    public SeriesLocation GetLocationByDistance(float distanceFromStart)
+    private SeriesLocation GetLocationByDistance(float distanceFromStart)
     {
         float distance = CurveUtility.CalculateLength(curves.First(), 10);
         int startIndex = 0;
@@ -227,7 +197,7 @@ public class BezierSeries
         return new(startIndex, startInterpolation);
     }
 
-    public float GetNearestPoint(Ray ray, out float3 position, out SeriesLocation location)
+    public float GetNearestPoint(Ray ray, out float3 position, out float interpolation)
     {
         float minDistance = float.MaxValue;
         int minIndex = 0;
@@ -242,12 +212,13 @@ public class BezierSeries
         }
         float _d = CurveUtility.GetNearestPoint(curves[minIndex], ray, out float3 _p, out float _t);
         position = _p;
-        location = new(minIndex, _t);
+        interpolation = LocationToInterpolation(new(minIndex, _t));
         return _d;
     }
 
-    public void Split(SeriesLocation location, out BezierSeries left, out BezierSeries right)
+    public void Split(float interpolation, out BezierSeries left, out BezierSeries right)
     {
+        SeriesLocation location = InterpolationToLocation(interpolation);
         CurveUtility.Split(curves[location.Index], location.Interpolation, out BezierCurve l, out BezierCurve r);
         List<BezierCurve> leftSeries = new();
         List<BezierCurve> rightSeries = new();
@@ -262,16 +233,16 @@ public class BezierSeries
         left = new(leftSeries, IsOffsetted);
         right = new(rightSeries, IsOffsetted);
     }
-}
 
-public class SeriesLocation
-{
-    public int Index { get; set; }
-    public float Interpolation { get; set; }
-
-    public SeriesLocation(int index, float interpolation)
+    private struct SeriesLocation
     {
-        Index = index;
-        Interpolation = interpolation;
+        public int Index { get; set; }
+        public float Interpolation { get; set; }
+
+        public SeriesLocation(int index, float interpolation)
+        {
+            Index = index;
+            Interpolation = interpolation;
+        }
     }
 }

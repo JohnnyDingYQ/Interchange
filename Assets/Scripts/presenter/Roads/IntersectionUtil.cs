@@ -122,9 +122,9 @@ public static class IntersectionUtil
             BezierSeries bs = lane.BezierSeries;
             float interpolationOfLocation;
             if (side == Side.Start)
-                interpolationOfLocation = bs.LocationToInterpolation(lane.StartVertex.SeriesLocation);
+                interpolationOfLocation = lane.StartVertex.SeriesInterpolation;
             else
-                interpolationOfLocation = bs.LocationToInterpolation(lane.EndVertex.SeriesLocation);
+                interpolationOfLocation = lane.EndVertex.SeriesInterpolation;
             for (int i = 0; i <= numPoints; i++)
             {
                 float t;

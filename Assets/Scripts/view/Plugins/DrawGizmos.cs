@@ -10,7 +10,7 @@ public class DrawGizmos : MonoBehaviour
     public static bool DrawVertices { get; set; }
     public static bool DrawSupportLines { get; set; }
 
-    private const float DrawDuration = 0.05f;
+    private const float DrawDuration = 0.2f;
 
     void Start()
     {
@@ -19,7 +19,6 @@ public class DrawGizmos : MonoBehaviour
 
     void Draw()
     {
-        return;
         if (DrawCenter)
             Gizmos.DrawRoadCenter(DrawDuration);
         if (DrawPaths)

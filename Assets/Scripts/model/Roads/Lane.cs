@@ -43,11 +43,9 @@ public class Lane
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
-        SeriesLocation l = BezierSeries.GetLocationByDistance(Constants.VertexDistanceFromRoadEnds);
-        SeriesLocation r = BezierSeries.GetLocationByDistance(BezierSeries.Length - Constants.VertexDistanceFromRoadEnds);
-        BezierSeries bs = new(BezierSeries.Curves.ToList(), BezierSeries.IsOffsetted);
-        bs.SetStartLocation(l);
-        bs.SetEndLocation(r);
+        float startInterpolation = Constants.VertexDistanceFromRoadEnds / BezierSeries.Length;
+        float endInterpolation = (BezierSeries.Length - Constants.VertexDistanceFromRoadEnds) / BezierSeries.Length;
+        BezierSeries bs = new(BezierSeries, startInterpolation, endInterpolation);
         Path path = new(bs, StartVertex, EndVertex);
         InnerPath = path;
     }

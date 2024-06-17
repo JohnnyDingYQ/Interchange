@@ -10,7 +10,7 @@ public class Vertex
     [JsonProperty]
     public float3 Pos { get; private set; }
     [JsonProperty]
-    public SeriesLocation SeriesLocation { get; private set; }
+    public float SeriesInterpolation { get; private set; }
     [JsonProperty]
     public float3 Tangent { get; private set; }
     [JsonProperty]
@@ -27,8 +27,8 @@ public class Vertex
         SetOwnerLane(lane, side);
         
         BezierSeries bs = lane.BezierSeries;
-        Pos = bs.EvaluatePosition(SeriesLocation);
-        Tangent = math.normalizesafe(bs.EvaluateTangent(SeriesLocation));
+        Pos = bs.EvaluatePosition(SeriesInterpolation);
+        Tangent = math.normalizesafe(bs.EvaluateTangent(SeriesInterpolation));
     }
 
     public void SetOwnerLane(Lane l, Side side)
@@ -36,8 +36,8 @@ public class Vertex
         Lane = l;
         BezierSeries bs = l.BezierSeries;
         if (side == Side.Start)
-            SeriesLocation = bs.GetLocationByDistance(Constants.MinimumLaneLength / 2);
+            SeriesInterpolation = Constants.MinimumLaneLength / 2 / bs.Length;
         else
-            SeriesLocation = bs.GetLocationByDistance(bs.Length - Constants.MinimumLaneLength / 2);
+            SeriesInterpolation = (bs.Length - Constants.MinimumLaneLength / 2) / bs.Length;
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
+using UnityEngine;
 
 public class OutlineTest
 {
@@ -172,6 +173,8 @@ public class OutlineTest
     {
         foreach (Road r in Game.Roads.Values)
         {
+            r.LeftOutline.IsPlausible();
+            // Debug.Log(r.HasNoneEmptyOutline());
             if (!r.OutLinePlausible())
                 return false;
             if (!r.HasNoneEmptyOutline())

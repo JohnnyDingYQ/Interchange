@@ -26,13 +26,6 @@ public class DivideTest
     }
 
     [Test]
-    public void RoadToDivideInvalid()
-    {
-        Road road = new();
-        Assert.IsNull(DivideHandler.DivideRoad(road, 0.5f));
-    }
-
-    [Test]
     public void DividingCreatesTwoRoads()
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 1);

@@ -149,6 +149,8 @@ public static class Build
             startZone?.AddOutRoad(road);
             if (AutoDivideOn)
                 AutoDivideRoad(road);
+            foreach (float3 pt in road.LeftOutline.GetConcatenated())
+                DebugExtension.DebugPoint(pt, Color.cyan, 2, 10000);
         }
         return road;
 

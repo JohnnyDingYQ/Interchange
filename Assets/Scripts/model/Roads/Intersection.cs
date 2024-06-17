@@ -91,22 +91,22 @@ public class Intersection
             Road randomInRoad = inRoads.First();
             BezierSeries bs = randomInRoad.BezierSeries;
             if (attributeType == AttributeTypes.Normal)
-                return bs.Evaluate2DNormalizedNormal(bs.EndLocation);
+                return bs.Evaluate2DNormalizedNormal(1);
             if (attributeType == AttributeTypes.Tangent)
-                return math.normalize(bs.EvaluateTangent(bs.EndLocation));
+                return math.normalize(bs.EvaluateTangent(1));
             if (attributeType == AttributeTypes.PointOnInSide)
-                return bs.EvaluatePosition(bs.EndLocation) - math.normalize(bs.EvaluateTangent(bs.EndLocation));
+                return bs.EvaluatePosition(1) - math.normalize(bs.EvaluateTangent(1));
         }
         if (outRoads.Count != 0)
         {
             Road randomOutRoad = outRoads.First();
             BezierSeries bs = randomOutRoad.BezierSeries;
             if (attributeType == AttributeTypes.Normal)
-                return bs.Evaluate2DNormalizedNormal(bs.StartLocation);
+                return bs.Evaluate2DNormalizedNormal(0);
             if (attributeType == AttributeTypes.Tangent)
-                return math.normalize(bs.EvaluateTangent(bs.StartLocation));
+                return math.normalize(bs.EvaluateTangent(0));
             if (attributeType == AttributeTypes.PointOnInSide)
-                return bs.EvaluatePosition(bs.StartLocation) - math.normalize(bs.EvaluateTangent(bs.StartLocation));
+                return bs.EvaluatePosition(0) - math.normalize(bs.EvaluateTangent(0));
         }
         throw new InvalidOperationException("intersection is empty");
     }
