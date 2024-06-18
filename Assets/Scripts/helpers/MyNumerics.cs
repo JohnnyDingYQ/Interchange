@@ -5,9 +5,11 @@ using UnityEngine;
 
 public static class MyNumerics
 {
+    const float DefaultTolerance = 0.01f;
+
     public static bool AreNumericallyEqual(float3 a, float3 b)
     {
-        return Vector3.Distance(a, b) < Constants.NumericallyEqualMaxTolerance;
+        return Vector3.Distance(a, b) < DefaultTolerance;
     }
     public static bool AreNumericallyEqual(float3 a, float3 b, float tolerance)
     {
@@ -15,7 +17,7 @@ public static class MyNumerics
     }
     public static bool AreNumericallyEqual(float a, float b)
     {
-        return Math.Abs(a - b) < Constants.NumericallyEqualMaxTolerance;
+        return Math.Abs(a - b) < DefaultTolerance;
     }
 
     public static bool AreNumericallyEqual(float a, float b, float tolerance)

@@ -77,7 +77,7 @@ public class ZoneHumbleObject : MonoBehaviour
 
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
-            gameObject.AddComponent<MeshRenderer>();
+            // gameObject.AddComponent<MeshRenderer>();
 
             void AddPoint(float3 pos)
             {

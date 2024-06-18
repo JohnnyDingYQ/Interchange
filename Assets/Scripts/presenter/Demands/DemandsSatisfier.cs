@@ -26,7 +26,7 @@ public static class DemandsSatisfer
                     {
                         Game.RegisterCar(car);
                         toDecrement.Add(zoneID);
-                        zone.CarSpawnInterval = Constants.ZoneDemandSatisfyCooldown / demand;
+                        zone.CarSpawnInterval = Constants.ZoneDemandSatisfyCooldownSpeed / demand;
                     }
                 }
             }

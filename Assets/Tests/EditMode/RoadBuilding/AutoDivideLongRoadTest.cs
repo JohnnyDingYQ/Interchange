@@ -5,8 +5,8 @@ using Unity.Mathematics;
 
 public class AutoDivideLongRoadTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
     float3 direction = new(1, 0, 0);
+    const float LengthDiffTolerance = 5f;
     SortedDictionary<ulong, Road> Roads;
 
 
@@ -62,7 +62,7 @@ public class AutoDivideLongRoadTest
         float length = Roads.Values.First().Length;
         foreach (Road road in Roads.Values)
         {
-            Assert.True(MyNumerics.AreNumericallyEqual(length, road.Length, Constants.RoadDivisionLengthTestTolerance));
+            Assert.True(MyNumerics.AreNumericallyEqual(length, road.Length, LengthDiffTolerance));
             length = road.Length;
         }
     }

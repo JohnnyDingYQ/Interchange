@@ -99,8 +99,8 @@ public class BuildTargets
 
         void AddNodeIfWithinSnap(Node n)
         {
-            // if (n.Pos.y == 0)
-            //     return;
+            if (n.Pos.y == Constants.MinElevation)
+                return;
             float distance = Vector3.Distance(clickPos, n.Pos);
             if (distance < snapRadius)
             {

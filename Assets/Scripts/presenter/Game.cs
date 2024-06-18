@@ -196,8 +196,8 @@ public static class Game
 
     public static void SetElevation(float elevation)
     {
-        if (elevation < 0)
-            GameSave.Elevation = 0;
+        if (elevation < Constants.MinElevation)
+            GameSave.Elevation = Constants.MinElevation;
         else if (elevation > Constants.MaxElevation)
             GameSave.Elevation = Constants.MaxElevation;
         else

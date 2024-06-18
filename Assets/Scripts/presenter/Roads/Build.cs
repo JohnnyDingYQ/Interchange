@@ -83,7 +83,7 @@ public static class Build
         {
             startAssigned = true;
             startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            startZone = Game.Elevation == 0 ? Game.HoveredZone : null;
+            startZone = Game.Elevation == Constants.MinElevation ? Game.HoveredZone : null;
             return null;
         }
         else if (!pivotAssigned)
@@ -95,7 +95,7 @@ public static class Build
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            endZone = Game.Elevation == 0 ? Game.HoveredZone : null;
+            endZone = Game.Elevation == Constants.MinElevation ? Game.HoveredZone : null;
             Road road = null;
             if (!(startZone == endZone && startZone != null))
                 road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);

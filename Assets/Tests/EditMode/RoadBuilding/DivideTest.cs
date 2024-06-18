@@ -9,6 +9,7 @@ using UnityEngine;
 public class DivideTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    const float LengthDiffTolerance = 5f;
     SortedDictionary<ulong, Road> Roads;
     SortedDictionary<ulong, Node> Nodes;
 
@@ -159,7 +160,7 @@ public class DivideTest
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
     }
 
     [Test]
@@ -172,7 +173,7 @@ public class DivideTest
             3
         );
         SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, Constants.RoadDivisionLengthTestTolerance));
+        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
     }
 
     [Test]
