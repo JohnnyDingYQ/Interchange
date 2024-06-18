@@ -5,9 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 public class BranchingTest
 {
-    float3 pos1 = new(0, 0, 0);
-    float3 pos2 = Constants.MinimumLaneLength * new float3(1, 0, 1);
-    float3 pos3 = Constants.MinimumLaneLength * 2 * new float3(1, 0, 1);
+    float3 stride = Constants.MinimumLaneLength * new float3(1, 0.1f, 1);
     float3 offset = Constants.MinimumLaneLength * new float3(1, 0, 1);
 
     [SetUp]
@@ -19,7 +17,7 @@ public class BranchingTest
     [Test]
     public void TwoToOneOne_OnEnd()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 2);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].EndPos;
         float3 p2 = road.Lanes[1].EndPos;
         Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1);
@@ -33,7 +31,7 @@ public class BranchingTest
     [Test]
     public void TwoToOneOne_OnStart()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 2);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].StartPos;
         float3 p2 = road.Lanes[1].StartPos;
         Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
@@ -47,7 +45,7 @@ public class BranchingTest
     [Test]
     public void TwoToOne_OnEnd()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 2);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].EndPos;
         Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1); ;
 
@@ -59,7 +57,7 @@ public class BranchingTest
     [Test]
     public void TwoToOne_OnStart()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 2);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].StartPos;
         Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
 
@@ -71,7 +69,7 @@ public class BranchingTest
     [Test]
     public void ThreetoTwoOne_OnEnd()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 3);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].EndPos;
         float3 p2 = (road.Lanes[1].EndPos + road.Lanes[2].EndPos) / 2;
         Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1);
@@ -86,7 +84,7 @@ public class BranchingTest
     [Test]
     public void ThreetoTwoOne_OnStart()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 3);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].StartPos;
         float3 p2 = (road.Lanes[1].StartPos + road.Lanes[2].StartPos) / 2;
         Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
@@ -101,7 +99,7 @@ public class BranchingTest
     [Test]
     public void ThreetoOneOneOne_OnEnd()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 3);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].EndPos;
         float3 p2 = road.Lanes[1].EndPos;
         float3 p3 = road.Lanes[2].EndPos;
@@ -118,7 +116,7 @@ public class BranchingTest
     [Test]
     public void ThreetoOneOneOne_OnStart()
     {
-        Road road = RoadBuilder.B(pos1, pos2, pos3, 3);
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].StartPos;
         float3 p2 = road.Lanes[1].StartPos;
         float3 p3 = road.Lanes[2].StartPos;

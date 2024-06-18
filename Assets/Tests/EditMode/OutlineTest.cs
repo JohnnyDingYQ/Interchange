@@ -17,9 +17,7 @@ public class OutlineTest
     [Test]
     public void SingleOneLaneRoad()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
-        foreach (float3 pt in road.LeftOutline.Mid)
-            Debug.Log(pt);
+        RoadBuilder.B(0, stride, 2 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 

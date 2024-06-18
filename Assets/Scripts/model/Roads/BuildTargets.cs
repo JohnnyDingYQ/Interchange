@@ -85,11 +85,11 @@ public class BuildTargets
             {
                 float3 left = nodes.First().Pos + i * normal;
                 float3 right = nodes.Last().Pos - i * normal;
-                AddNodeIfWithinSnap(new(left, nodes.First().NodeIndex - i)
+                AddNodeIfWithinSnap(new(left, nodes.First().Pos.y, nodes.First().NodeIndex - i)
                 {
                     Intersection = Intersection
                 });
-                AddNodeIfWithinSnap(new(right, nodes.Last().NodeIndex + i)
+                AddNodeIfWithinSnap(new(right, nodes.Last().Pos.y, nodes.Last().NodeIndex + i)
                 {
                     Intersection = Intersection
                 });
@@ -99,6 +99,8 @@ public class BuildTargets
 
         void AddNodeIfWithinSnap(Node n)
         {
+            // if (n.Pos.y == 0)
+            //     return;
             float distance = Vector3.Distance(clickPos, n.Pos);
             if (distance < snapRadius)
             {

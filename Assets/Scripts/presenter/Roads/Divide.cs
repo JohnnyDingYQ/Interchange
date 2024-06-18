@@ -118,6 +118,7 @@ public static class DivideHandler
             {
                 Game.Zones[rightRoad.EndZoneId].RemoveRoad(road);
                 Game.Zones[rightRoad.EndZoneId].AddInRoad(rightRoad);
+                Assert.IsTrue(Game.Zones[rightRoad.EndZoneId].IsConsistent());
             }
         }
     }

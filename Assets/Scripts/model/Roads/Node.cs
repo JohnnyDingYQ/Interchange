@@ -30,29 +30,14 @@ public class Node : IComparable<Node>
     public Intersection Intersection { get; set; }
 
     public Node() { }
-    public Node(float3 pos, int order)
+    public Node(float3 pos, float elevation, int order)
     {
+        pos.y = elevation;
         Pos = pos;
         NodeIndex = order;
         Id = 0;
         inLanes = new();
         outLanes = new();
-    }
-
-    /// <summary>
-    /// Implicit assumption: all lanes at the node has the same tangent because of pivot adjustment
-    /// </summary>
-    public float3 GetTangent()
-    {
-        if (Lanes.Count == 0)
-            throw new InvalidOperationException("Node has no lane... Cannot get tangent");
-        if (GetRoads(Direction.In).Count() != 0)
-        {
-            BezierSeries bs = GetRoads(Direction.In).First().BezierSeries;
-            return bs.EvaluateTangent(1);
-        }
-        BezierSeries bt = GetRoads(Direction.Out).First().BezierSeries;
-        return bt.EvaluateTangent(0);
     }
 
     public void AddLane(Lane lane, Direction direction)

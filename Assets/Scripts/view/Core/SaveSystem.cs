@@ -34,12 +34,12 @@ public static class SaveSystem
         static void RestoreGameState()
         {
             Game.Graph.AddVerticesAndEdgeRange(Game.GameSave.GraphSave);
-            EvaluteIntersections();
             foreach (Road r in Game.Roads.Values)
             {
                 r.EvaluateBodyOutline();
                 Game.InvokeRoadAdded(r);
             }
+            EvaluteIntersections();
         }
 
         static void EvaluteIntersections()

@@ -121,48 +121,7 @@ public static class Game
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
-        Roads.Remove(road.Id);
-        foreach (Lane lane in road.Lanes)
-        {
-            Graph.RemoveEdgeIf(e => e.Source == lane.StartVertex && e.Target == lane.EndVertex);
-            if (!retainVertices)
-            {
-                Graph.RemoveVertex(lane.StartVertex);
-                Graph.RemoveVertex(lane.EndVertex);
-            }
-            foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
-            {
-                node.RemoveLane(lane);
-                if (node.Lanes.Count == 0)
-                {
-                    Nodes.Remove(node.Id);
-                    road.StartIntersection.RemoveNode(node);
-                    road.EndIntersection.RemoveNode(node);
-                }
-            }
-        }
-        road.StartIntersection.RemoveRoad(road, Side.Start);
-        road.EndIntersection.RemoveRoad(road, Side.End);
-        if (!road.StartIntersection.IsEmpty())
-        {
-            IntersectionUtil.EvaluatePaths(road.StartIntersection);
-            IntersectionUtil.EvaluateOutline(road.StartIntersection);
-        }
-
-        if (!road.EndIntersection.IsEmpty())
-        {
-            IntersectionUtil.EvaluatePaths(road.EndIntersection);
-            IntersectionUtil.EvaluateOutline(road.EndIntersection);
-        }
-
-        if (Zones.ContainsKey(road.StartZoneId))
-            Zones[road.StartZoneId].RemoveRoad(road);
-        
-        if (Zones.ContainsKey(road.EndZoneId))
-            Zones[road.EndZoneId].RemoveRoad(road);
-
-        RoadRemoved?.Invoke(road);
-        return true;
+        return Build.RemoveRoad(road, retainVertices);
     }
 
     public static void RegisterCar(Car car)
@@ -192,6 +151,11 @@ public static class Game
     public static void InvokeRoadAdded(Road road)
     {
         RoadAdded?.Invoke(road);
+    }
+
+    public static void InvokeRoadRemoved(Road road)
+    {
+        RoadRemoved?.Invoke(road);
     }
 
     public static void AddVertex(Vertex vertex)

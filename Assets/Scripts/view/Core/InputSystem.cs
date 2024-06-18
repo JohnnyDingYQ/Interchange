@@ -58,7 +58,7 @@ public class InputSystem : MonoBehaviour
     {
         UpdateCameraPos();
 
-        float3 mouseWorldPos = new(0)
+        float3 mouseWorldPos = new()
         {
             x = Input.mousePosition.x,
             y = Input.mousePosition.y,

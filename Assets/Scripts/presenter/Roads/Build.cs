@@ -96,7 +96,9 @@ public static class Build
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             endZone = Game.Elevation == 0 ? Game.HoveredZone : null;
-            Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            Road road = null;
+            if (!(startZone == endZone && startZone != null))
+                road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return road;
         }
@@ -283,6 +285,52 @@ public static class Build
         if (!startAssigned)
             return new(clickPos, LaneCount, Game.Nodes.Values);
         return new(clickPos, LaneCount, Game.Nodes.Values);
+    }
+
+    public static bool RemoveRoad(Road road, bool retainVertices)
+    {
+        Game.Roads.Remove(road.Id);
+        foreach (Lane lane in road.Lanes)
+        {
+            Game.Graph.RemoveEdgeIf(e => e.Source == lane.StartVertex && e.Target == lane.EndVertex);
+            if (!retainVertices)
+            {
+                Game.Graph.RemoveVertex(lane.StartVertex);
+                Game.Graph.RemoveVertex(lane.EndVertex);
+            }
+            foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
+            {
+                node.RemoveLane(lane);
+                if (node.Lanes.Count == 0)
+                {
+                    Game.Nodes.Remove(node.Id);
+                    road.StartIntersection.RemoveNode(node);
+                    road.EndIntersection.RemoveNode(node);
+                }
+            }
+        }
+        road.StartIntersection.RemoveRoad(road, Side.Start);
+        road.EndIntersection.RemoveRoad(road, Side.End);
+        if (!road.StartIntersection.IsEmpty())
+        {
+            IntersectionUtil.EvaluatePaths(road.StartIntersection);
+            IntersectionUtil.EvaluateOutline(road.StartIntersection);
+        }
+
+        if (!road.EndIntersection.IsEmpty())
+        {
+            IntersectionUtil.EvaluatePaths(road.EndIntersection);
+            IntersectionUtil.EvaluateOutline(road.EndIntersection);
+        }
+
+        if (Game.Zones.ContainsKey(road.StartZoneId))
+            Game.Zones[road.StartZoneId].RemoveRoad(road);
+        
+        if (Game.Zones.ContainsKey(road.EndZoneId))
+            Game.Zones[road.EndZoneId].RemoveRoad(road);
+
+        Game.InvokeRoadRemoved(road);
+        return true;
     }
 
     public static void Reset()
