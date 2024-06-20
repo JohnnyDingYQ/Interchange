@@ -46,7 +46,7 @@ public class OutlineDrawing : MonoBehaviour
         // rt.filterMode = FilterMode.Point;
 
         //pass the temporary texture through the material, and to the destination texture.
-        Graphics.Blit(rt, dst, _outlineMaterial);
+        Graphics.Blit(rt, dst, _outlineMaterial, -1);
 
         // TempCam.targetTexture = src;
 

@@ -94,7 +94,7 @@ Shader "Custom/Post Outline copy"
              
             float4 frag(v2f i) : SV_Target 
             {
-                return tex2D(_GrabTexture, i.uv);
+                // return tex2D(_GrabTexture, i.uv);
                 // Gaussian kernel
                 half4 sum = 0;
                 int samples = 2 * _KernelSize + 1;
