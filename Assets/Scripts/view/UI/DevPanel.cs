@@ -125,7 +125,7 @@ public class DevPanel : MonoBehaviour
         Elevation.text = "Elevation: " + newElevation;
     }
 
-    void UpdateCarServiced(ulong newCarServiced)
+    void UpdateCarServiced(uint newCarServiced)
     {
         CarServiced.text = "Car Serviced: " + newCarServiced;
     }

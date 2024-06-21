@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 public class CarDriver : MonoBehaviour
 {
     [SerializeField] CarHumbleObject carPrefab;
-    static Dictionary<ulong, CarHumbleObject> carMapping;
+    static Dictionary<uint, CarHumbleObject> carMapping;
     ObjectPool<CarHumbleObject> carPool;
     void Awake()
     {

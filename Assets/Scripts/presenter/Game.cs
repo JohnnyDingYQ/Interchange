@@ -16,17 +16,17 @@ public static class Game
     public static event Action<Car> CarRemoved;
     public static event Action UpdateHoveredZone;
     public static event Action<float> ElevationUpdated;
-    public static event Action<ulong> CarServicedUpdated;
+    public static event Action<uint> CarServicedUpdated;
     public static GameSave GameSave { get; set; }
-    public static Dictionary<ulong, Road> Roads { get { return GameSave.Roads; } }
-    public static Dictionary<ulong, Node> Nodes { get { return GameSave.Nodes; } }
-    public static Dictionary<ulong, Intersection> Intersections { get { return GameSave.Intersections; } }
-    public static Dictionary<ulong, Lane> Lanes { get { return GameSave.Lanes; } }
-    public static Dictionary<ulong, Zone> Zones { get { return GameSave.Zones; } }
-    public static Dictionary<ulong, Car> Cars { get { return GameSave.Cars; } }
+    public static Dictionary<uint, Road> Roads { get { return GameSave.Roads; } }
+    public static Dictionary<uint, Node> Nodes { get { return GameSave.Nodes; } }
+    public static Dictionary<uint, Intersection> Intersections { get { return GameSave.Intersections; } }
+    public static Dictionary<uint, Lane> Lanes { get { return GameSave.Lanes; } }
+    public static Dictionary<uint, Zone> Zones { get { return GameSave.Zones; } }
+    public static Dictionary<uint, Car> Cars { get { return GameSave.Cars; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
     public static float Elevation { get { return GameSave.Elevation; } }
-    public static ulong CarServiced {
+    public static uint CarServiced {
         get { return GameSave.CarServiced; }
         set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); } 
     }
@@ -60,9 +60,9 @@ public static class Game
         HoveredRoad = null;
     }
 
-    private static ulong FindNextAvailableKey(ICollection<ulong> dict)
+    private static uint FindNextAvailableKey(ICollection<uint> dict)
     {
-        ulong i = 1;
+        uint i = 1;
         while (dict.Contains(i))
             i++;
         return i;
@@ -133,7 +133,7 @@ public static class Game
         return Nodes.Values.Contains(node);
     }
 
-    public static bool RemoveRoad(ulong id)
+    public static bool RemoveRoad(uint id)
     {
         if (!Roads.ContainsKey(id))
             return false;

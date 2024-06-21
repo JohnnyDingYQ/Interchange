@@ -4,15 +4,15 @@ using System.Linq;
 using UnityEngine;
 public class Lane
 {
-    public ulong Id { get; set; }
+    public uint Id { get; set; }
     public Vertex StartVertex { get; set; }
     public Vertex EndVertex { get; set; }
     [JsonIgnore]
     public Node StartNode { get; set; }
     [JsonIgnore]
     public Node EndNode { get; set; }
-    public ulong StartNode_ { get; set; }
-    public ulong EndNode_ { get; set; }
+    public uint StartNode_ { get; set; }
+    public uint EndNode_ { get; set; }
     public BezierSeries BezierSeries { get; set; }
     [JsonIgnore]
     public float3 StartPos { get { return StartNode.Pos; } }
@@ -20,7 +20,7 @@ public class Lane
     public float3 EndPos { get { return EndNode.Pos; } }
     [JsonIgnore]
     public Road Road { get; set; }
-    public ulong Road_ {get; set; }
+    public uint Road_ {get; set; }
     [JsonProperty]
     public int LaneIndex { get; private set; }
     [JsonProperty]

@@ -7,7 +7,7 @@ public class AutoDivideLongRoadTest
 {
     float3 direction = new(1, 0, 0);
     const float LengthDiffTolerance = 5f;
-    Dictionary<ulong, Road> Roads;
+    Dictionary<uint, Road> Roads;
 
 
     [SetUp]

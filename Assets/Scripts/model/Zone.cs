@@ -6,9 +6,9 @@ using UnityEngine.Assertions;
 
 public class Zone
 {
-    public ulong Id { get; set; }
+    public uint Id { get; set; }
     public string Name { get; set; }
-    public SortedDictionary<ulong, int> Demands { get; set; }
+    public SortedDictionary<uint, int> Demands { get; set; }
     private readonly List<Vertex> inVertices;
     private readonly List<Road> inRoads;
     private readonly List<Vertex> outVertices;
@@ -18,7 +18,7 @@ public class Zone
     public ReadOnlyCollection<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
     public float CarSpawnInterval { get; set; }
 
-    public Zone(ulong id)
+    public Zone(uint id)
     {
         Assert.AreNotEqual(0, id);
         Id = id;

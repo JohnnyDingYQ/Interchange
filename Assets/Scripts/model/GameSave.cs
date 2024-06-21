@@ -5,20 +5,20 @@ using Unity.Plastic.Newtonsoft.Json;
 public class GameSave
 {
     [JsonProperty]
-    public Dictionary<ulong, Node> Nodes { get; private set; }
+    public Dictionary<uint, Node> Nodes { get; private set; }
     [JsonProperty]
-    public Dictionary<ulong, Road> Roads { get; private set; }
+    public Dictionary<uint, Road> Roads { get; private set; }
     [JsonIgnore]
     public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
     public List<Path> GraphSave { get; set; }
-    public Dictionary<ulong, Intersection> Intersections { get; private set; }
-    public Dictionary<ulong, Lane> Lanes { get; private set; }
+    public Dictionary<uint, Intersection> Intersections { get; private set; }
+    public Dictionary<uint, Lane> Lanes { get; private set; }
     [JsonIgnore]
-    public Dictionary<ulong, Zone> Zones { get; private set; }
+    public Dictionary<uint, Zone> Zones { get; private set; }
     [JsonIgnore]
-    public Dictionary<ulong, Car> Cars { get; private set; }
+    public Dictionary<uint, Car> Cars { get; private set; }
     public float Elevation { get; set; }
-    public ulong CarServiced { get; set; }
+    public uint CarServiced { get; set; }
     public GameSave()
     {
         Lanes = new();

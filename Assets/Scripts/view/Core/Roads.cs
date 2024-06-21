@@ -5,7 +5,7 @@ using UnityEngine;
 public class Roads : MonoBehaviour
 {
     [SerializeField] private RoadHumbleObject roadPrefab;
-    private static Dictionary<ulong, RoadHumbleObject> roadMapping;
+    private static Dictionary<uint, RoadHumbleObject> roadMapping;
     void Start()
     {
         Game.RoadAdded += InstantiateRoad;

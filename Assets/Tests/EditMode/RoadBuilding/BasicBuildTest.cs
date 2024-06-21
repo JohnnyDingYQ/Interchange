@@ -7,8 +7,8 @@ using UnityEngine;
 public class BasicBuildTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
-    Dictionary<ulong, Node> Nodes;
-    Dictionary<ulong, Road> Roads;
+    Dictionary<uint, Node> Nodes;
+    Dictionary<uint, Road> Roads;
 
     [SetUp]
     public void SetUp()

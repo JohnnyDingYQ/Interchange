@@ -7,41 +7,58 @@ using System;
 
 public class Intersection
 {
-    public ulong Id { get; set; }
-    [JsonProperty]
-    private readonly List<Node> nodes = new();
+    public uint Id { get; set; }
+    [JsonIgnore]
+    private List<Node> nodes = new();
     [JsonIgnore]
     public List<Node> Nodes { get { return new List<Node>(nodes); } }
+    [JsonProperty]
+    public List<uint> Nodes_ { get; set; }
     [JsonIgnore]
     public int Count { get { return Nodes.Count; } }
     [JsonProperty]
-    private readonly HashSet<Road> inRoads = new();
+    private HashSet<Road> inRoads = new();
     [JsonIgnore]
     public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }
     [JsonProperty]
-    private readonly HashSet<Road> outRoads = new();
+    public List<uint> InRoads_ { get; set; }
+    [JsonProperty]
+    private HashSet<Road> outRoads = new();
     [JsonIgnore]
     public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
+    [JsonProperty]
+    public List<uint> OutRoads_ { get; set; }
     [JsonIgnore]
     public HashSet<Road> Roads { get { return GetRoads(); } }
-    [JsonProperty]
-    public Plane Plane { get; private set; }
-    [JsonProperty]
-    public float3 Normal { get; private set; }
-    [JsonProperty]
-    public float3 Tangent { get; private set; }
-    [JsonProperty]
-    public float3 PointOnInSide { get; private set; }
+    [JsonIgnore]
+    public Plane Plane { get => GetPlane(); }
+    [JsonIgnore]
+    public float3 Normal { get => GetAttribute(AttributeTypes.Normal); }
+    [JsonIgnore]
+    public float3 Tangent { get => GetAttribute(AttributeTypes.Tangent); }
+    [JsonIgnore]
+    public float3 PointOnInSide { get => GetAttribute(AttributeTypes.PointOnInSide); }
 
     public Intersection() { }
 
     public Intersection(Road road, Side side)
     {
         AddRoad(road, side);
-        Normal = GetAttribute(AttributeTypes.Normal);
-        Tangent = GetAttribute(AttributeTypes.Tangent);
-        PointOnInSide = GetAttribute(AttributeTypes.PointOnInSide);
-        Plane = GetPlane();
+    }
+
+    public void SetNodes(List<Node> nodes)
+    {
+        this.nodes = nodes;
+    }
+
+    public void SetInRoads(HashSet<Road> roads)
+    {
+        inRoads = roads;
+    }
+
+    public void SetOutRoads(HashSet<Road> roads)
+    {
+        outRoads = roads;
     }
 
     public void AddRoad(Road road, Side side)
@@ -128,7 +145,7 @@ public class Intersection
 
     private enum AttributeTypes { Normal, PointOnInSide, Tangent }
 
-    public HashSet<Road> GetRoads()
+    private HashSet<Road> GetRoads()
     {
         HashSet<Road> h = new(inRoads);
         h.UnionWith(outRoads);
@@ -150,6 +167,4 @@ public class Intersection
                 return nodes[i];
         return null;
     }
-
- 
 }

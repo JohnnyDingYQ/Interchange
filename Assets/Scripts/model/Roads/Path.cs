@@ -12,7 +12,7 @@ using UnityEngine;
 public class Path : IEdge<Vertex>
 {
     [JsonProperty]
-    public ulong Id { get; set; }
+    public uint Id { get; set; }
     [JsonProperty]
     public BezierSeries BezierSeries { get; private set; }
     [JsonProperty]

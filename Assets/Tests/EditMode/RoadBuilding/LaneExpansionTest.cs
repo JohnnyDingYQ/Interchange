@@ -7,7 +7,7 @@ using UnityEngine;
 public class LaneExpansionTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(0, 0, 1);
-    Dictionary<ulong, Node> Nodes;
+    Dictionary<uint, Node> Nodes;
 
     [SetUp]
     public void SetUp()

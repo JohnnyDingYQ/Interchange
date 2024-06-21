@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Car
 {
-    public ulong Id { get; set; }
+    public uint Id { get; set; }
     public bool IsTraveling { get; set; }
     public bool IsDone { get; private set; }
     public float3 Pos { get; private set; }

@@ -47,7 +47,7 @@ public static class IntersectionUtil
                 r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
         }
 
-        foreach (Road r in i.GetRoads())
+        foreach (Road r in i.Roads)
             Game.InvokeRoadUpdated(r);
 
         #region extracted

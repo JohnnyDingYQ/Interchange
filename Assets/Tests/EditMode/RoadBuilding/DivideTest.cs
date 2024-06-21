@@ -10,8 +10,8 @@ public class DivideTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
     const float LengthDiffTolerance = 5f;
-    Dictionary<ulong, Road> Roads;
-    Dictionary<ulong, Node> Nodes;
+    Dictionary<uint, Road> Roads;
+    Dictionary<uint, Node> Nodes;
 
     public void ResetGame()
     {

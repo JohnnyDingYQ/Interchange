@@ -7,11 +7,11 @@ using UnityEngine.Splines;
 
 public class Road
 {
-    public ulong Id { get; set; }
+    public uint Id { get; set; }
     public BezierSeries BezierSeries { get; set; }
     [JsonIgnore]
     public List<Lane> Lanes { get; set; }
-    public List<ulong> Lanes_ { get; set; }
+    public List<uint> Lanes_ { get; set; }
     [JsonProperty]
     public int LaneCount { get; private set; }
     [JsonProperty]
@@ -28,10 +28,10 @@ public class Road
     public Intersection StartIntersection { get; set; }
     [JsonIgnore]
     public Intersection EndIntersection { get; set; }
-    public ulong StartIntersection_ { get; set; }
-    public ulong EndIntersection_ { get; set; }
-    public ulong StartZoneId { get; set; }
-    public ulong EndZoneId { get; set; }
+    public uint StartIntersection_ { get; set; }
+    public uint EndIntersection_ { get; set; }
+    public uint StartZoneId { get; set; }
+    public uint EndZoneId { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()

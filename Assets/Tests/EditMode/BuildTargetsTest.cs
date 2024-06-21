@@ -7,7 +7,7 @@ using UnityEngine;
 public class BuildTargetTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 0);
-    Dictionary<ulong, Road> Roads;
+    Dictionary<uint, Road> Roads;
 
     [SetUp]
     public void SetUp()
