@@ -8,18 +8,20 @@ using UnityEngine;
 public class Node : IComparable<Node>
 {
     public ulong Id { get; set; }
-    [JsonProperty]
-    private readonly HashSet<Lane> inLanes;
-    [JsonProperty]
-    private readonly HashSet<Lane> outLanes;
+    [JsonIgnore]
+    public HashSet<Lane> InLanes { get; set; }
+    [JsonIgnore]
+    public HashSet<Lane> OutLanes { get; set; }
+    public List<ulong> InLanes_ { get; set; }
+    public List<ulong> OutLanes_ { get; set; }
     [JsonIgnore]
     public HashSet<Lane> Lanes
     {
         get
         {
             HashSet<Lane> h = new();
-            h.UnionWith(inLanes);
-            h.UnionWith(outLanes);
+            h.UnionWith(InLanes);
+            h.UnionWith(OutLanes);
             return h;
         }
     }
@@ -36,32 +38,32 @@ public class Node : IComparable<Node>
         Pos = pos;
         NodeIndex = order;
         Id = 0;
-        inLanes = new();
-        outLanes = new();
+        InLanes = new();
+        OutLanes = new();
     }
 
     public void AddLane(Lane lane, Direction direction)
     {
-        if (inLanes.Contains(lane) || outLanes.Contains(lane))
+        if (InLanes.Contains(lane) || OutLanes.Contains(lane))
             throw new InvalidOperationException("lane already exists");
         if (direction == Direction.In)
-            inLanes.Add(lane);
+            InLanes.Add(lane);
         else if (direction == Direction.Out)
-            outLanes.Add(lane);
+            OutLanes.Add(lane);
         else
             throw new ArgumentException("direction");
     }
 
     public bool RemoveLane(Lane lane)
     {
-        if (inLanes.Contains(lane))
+        if (InLanes.Contains(lane))
         {
-            inLanes.Remove(lane);
+            InLanes.Remove(lane);
             return true;
         }
-        else if (outLanes.Contains(lane))
+        else if (OutLanes.Contains(lane))
         {
-            outLanes.Remove(lane);
+            OutLanes.Remove(lane);
             return true;
         }
         return false;
@@ -71,9 +73,9 @@ public class Node : IComparable<Node>
     public ReadOnlySet<Lane> GetLanes(Direction direction)
     {
         if (direction == Direction.In)
-            return inLanes.AsReadOnly();
+            return InLanes.AsReadOnly();
         if (direction == Direction.Out)
-            return outLanes.AsReadOnly();
+            return OutLanes.AsReadOnly();
         if (direction == Direction.Both)
             return Lanes.AsReadOnly();
         throw new ArgumentException("direction");

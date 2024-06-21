@@ -51,6 +51,12 @@ public static class SaveSystem
                 road.EndIntersection = Game.Intersections[road.EndIntersection_];
                 road.Lanes = road.Lanes_.Select(i => Game.Lanes[i]).ToList();
             }
+            foreach (Lane lane in Game.Lanes.Values)
+            {
+                lane.StartNode = Game.Nodes[lane.StartNode_];
+                lane.EndNode = Game.Nodes[lane.EndNode_];
+                lane.Road = Game.Roads[lane.Road_];
+            }
         }
 
         static void EvaluteIntersections()
@@ -85,6 +91,12 @@ public static class SaveSystem
                 road.StartIntersection_ = road.StartIntersection.Id;
                 road.EndIntersection_ = road.EndIntersection.Id;
                 road.Lanes_ = road.Lanes.Select(lane => lane.Id).ToList();
+            }
+            foreach (Lane lane in Game.Lanes.Values)
+            {
+                lane.StartNode_ = lane.StartNode.Id;
+                lane.EndNode_ = lane.EndNode.Id;
+                lane.Road_ = lane.Road.Id;
             }
         }
     }

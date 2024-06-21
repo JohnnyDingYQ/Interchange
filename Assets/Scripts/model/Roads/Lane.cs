@@ -7,15 +7,20 @@ public class Lane
     public ulong Id { get; set; }
     public Vertex StartVertex { get; set; }
     public Vertex EndVertex { get; set; }
+    [JsonIgnore]
     public Node StartNode { get; set; }
+    [JsonIgnore]
     public Node EndNode { get; set; }
+    public ulong StartNode_ { get; set; }
+    public ulong EndNode_ { get; set; }
     public BezierSeries BezierSeries { get; set; }
     [JsonIgnore]
     public float3 StartPos { get { return StartNode.Pos; } }
     [JsonIgnore]
     public float3 EndPos { get { return EndNode.Pos; } }
-    [JsonProperty]
-    public Road Road { get; private set; }
+    [JsonIgnore]
+    public Road Road { get; set; }
+    public ulong Road_ {get; set; }
     [JsonProperty]
     public int LaneIndex { get; private set; }
     [JsonProperty]
