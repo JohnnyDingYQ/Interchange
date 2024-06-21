@@ -316,12 +316,16 @@ public static class Build
             IntersectionUtil.EvaluatePaths(road.StartIntersection);
             IntersectionUtil.EvaluateOutline(road.StartIntersection);
         }
+        else
+            Game.RemoveIntersection(road.StartIntersection);
 
         if (!road.EndIntersection.IsEmpty())
         {
             IntersectionUtil.EvaluatePaths(road.EndIntersection);
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
         }
+        else
+            Game.RemoveIntersection(road.EndIntersection);
 
         if (Game.Zones.ContainsKey(road.StartZoneId))
             Game.Zones[road.StartZoneId].RemoveRoad(road);

@@ -7,11 +7,13 @@ public class RoadHumbleObject : MonoBehaviour
 
     void OnMouseOver()
     {
+        gameObject.layer = LayerMask.NameToLayer("Outline");
         Game.HoveredRoad = Road;
     }
 
     void OnMouseExit()
     {
+        gameObject.layer = LayerMask.NameToLayer("Default");
         Game.HoveredRoad = null;
     }
 }

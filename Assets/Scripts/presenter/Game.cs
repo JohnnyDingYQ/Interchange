@@ -19,6 +19,7 @@ public static class Game
     public static GameSave GameSave { get; set; }
     public static SortedDictionary<ulong, Road> Roads { get { return GameSave.Roads; } }
     public static SortedDictionary<ulong, Node> Nodes { get { return GameSave.Nodes; } }
+    public static SortedDictionary<ulong, Intersection> Intersections { get { return GameSave.Intersections; } }
     public static SortedDictionary<ulong, Zone> Zones { get { return GameSave.Zones; } }
     public static SortedDictionary<ulong, Car> Cars { get { return GameSave.Cars; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
@@ -64,6 +65,12 @@ public static class Game
         set { GameSave.NextAvailableCarId = value; }
     }
 
+    public static ulong NextAvailableIntersectionId
+    {
+        get { return GameSave.NextAvailableIntersectionId; }
+        set { GameSave.NextAvailableIntersectionId = value; }
+    }
+
     static Game()
     {
         GameSave = new();
@@ -90,11 +97,28 @@ public static class Game
         Roads.Add(road.Id, road);
         foreach (Lane lane in road.Lanes)
         {
-            AddVertex(lane.StartVertex);
-            AddVertex(lane.EndVertex);
-            AddEdge(lane.InnerPath);
+            RegisterVertex(lane.StartVertex);
+            RegisterVertex(lane.EndVertex);
+            RegisterEdge(lane.InnerPath);
         }
+        RegisterIntersection(road.StartIntersection);
+        RegisterIntersection(road.EndIntersection);
         RoadAdded?.Invoke(road);
+    }
+
+    public static void RegisterIntersection(Intersection i)
+    {
+        if (!Intersections.Values.Contains(i))
+        {
+            i.Id = NextAvailableIntersectionId++;
+            Intersections[i.Id] = i;
+        }
+    }
+
+    public static void RemoveIntersection(Intersection i)
+    {
+        Assert.IsTrue(Intersections.Keys.Contains(i.Id));
+        Intersections.Remove(i.Id);
     }
 
     public static void RegisterNode(Node node)
@@ -158,14 +182,15 @@ public static class Game
         RoadRemoved?.Invoke(road);
     }
 
-    public static void AddVertex(Vertex vertex)
+    public static void RegisterVertex(Vertex vertex)
     {
         if (!Graph.Vertices.Contains(vertex))
             Graph.AddVertex(vertex);
     }
 
-    public static void AddEdge(Path path)
+    public static void RegisterEdge(Path path)
     {
+        Assert.IsFalse(Graph.ContainsEdge(path));
         path.Id = NextAvailablePathId++;
         Graph.AddEdge(path);
     }

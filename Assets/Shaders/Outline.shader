@@ -78,12 +78,10 @@ Shader "Custom/Post Outline"
 
             struct VertexData {
 				float4 position : POSITION;
-                float2 uv: TEXCOORD0;
 			};
 
 			struct Interpolators {
 				float4 position : SV_POSITION;
-                float2 uv: TEXCOORD2;
 				float4 grabPos : TEXCOORD1;
 			};
 			
@@ -91,7 +89,6 @@ Shader "Custom/Post Outline"
 				Interpolators i;
                 i.position = UnityObjectToClipPos(v.position);
                 i.grabPos = ComputeGrabScreenPos(i.position);
-                i.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				return i;
 			}
 

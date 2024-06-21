@@ -7,7 +7,7 @@ using System;
 
 public class Intersection
 {
-    public int Id { get; set; }
+    public ulong Id { get; set; }
     [JsonProperty]
     private readonly List<Node> nodes = new();
     [JsonIgnore]

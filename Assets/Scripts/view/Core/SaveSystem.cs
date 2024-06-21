@@ -34,12 +34,22 @@ public static class SaveSystem
         static void RestoreGameState()
         {
             Game.Graph.AddVerticesAndEdgeRange(Game.GameSave.GraphSave);
+            IdToObjectReferences();
             foreach (Road r in Game.Roads.Values)
             {
-                r.EvaluateBodyOutline();
+                r.EvaluateInnerOutline();
                 Game.InvokeRoadAdded(r);
             }
             EvaluteIntersections();
+        }
+
+        static void IdToObjectReferences()
+        {
+            foreach (Road road in Game.Roads.Values)
+            {
+                road.StartIntersection = Game.Intersections[road.StartIntersection_];
+                road.EndIntersection = Game.Intersections[road.EndIntersection_];
+            }
         }
 
         static void EvaluteIntersections()
@@ -58,6 +68,7 @@ public static class SaveSystem
     public static void SaveGame()
     {
         Game.GameSave.GraphSave = Game.Graph.Edges.ToList();
+        ObjectReferencesToId();
 
         string s = JsonConvert.SerializeObject(Game.GameSave, Formatting.None, new JsonSerializerSettings
         {
@@ -65,5 +76,14 @@ public static class SaveSystem
             TypeNameHandling = TypeNameHandling.Auto,
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
+
+        static void ObjectReferencesToId()
+        {
+            foreach (Road road in Game.Roads.Values)
+            {
+                road.StartIntersection_ = road.StartIntersection.Id;
+                road.EndIntersection_ = road.EndIntersection.Id;
+            }
+        }
     }
 }

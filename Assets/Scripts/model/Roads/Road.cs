@@ -9,8 +9,9 @@ public class Road
 {
     public ulong Id { get; set; }
     public BezierSeries BezierSeries { get; set; }
-    [JsonProperty]
-    public List<Lane> Lanes { get; private set; }
+    [JsonIgnore]
+    public List<Lane> Lanes { get; set; }
+    public List<ulong> Lanes_ { get; set; }
     [JsonProperty]
     public int LaneCount { get; private set; }
     [JsonProperty]
@@ -23,8 +24,12 @@ public class Road
     public RoadOutline LeftOutline { get; set; }
     [JsonIgnore]
     public RoadOutline RightOutline { get; set; }
+    [JsonIgnore]
     public Intersection StartIntersection { get; set; }
+    [JsonIgnore]
     public Intersection EndIntersection { get; set; }
+    public ulong StartIntersection_ { get; set; }
+    public ulong EndIntersection_ { get; set; }
     public ulong StartZoneId { get; set; }
     public ulong EndZoneId { get; set; }
 
@@ -70,12 +75,12 @@ public class Road
         EndIntersection = new(this, Side.End);
         LeftOutline = new();
         RightOutline = new();
-        EvaluateBodyOutline();
+        EvaluateInnerOutline();
         StartZoneId = 0;
         EndZoneId = 0;
     }
 
-    public void EvaluateBodyOutline()
+    public void EvaluateInnerOutline()
     {
         LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(Orientation.Left);
         RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(Orientation.Right);
