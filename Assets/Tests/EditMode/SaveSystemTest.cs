@@ -216,7 +216,22 @@ public class SaveSystemTest
         Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.Normal, restored.EndIntersection.Normal));
         Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.Tangent, restored.EndIntersection.Tangent));
         Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.PointOnInSide, restored.EndIntersection.PointOnInSide));
+
+    }
+
+    [Test]
+    public void RecoverInterweavingPath()
+    {
+        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
+        uint id = road0.Id;
+        Assert.NotNull(Game.Graph.OutEdges(road0.Lanes.First().EndVertex).Last().InterweavingPath);
         
+        SaveSystem.SaveGame();
+        SaveSystem.LoadGame();
+        Road recovered = Game.Roads[id];
+        Assert.NotNull(Game.Graph.OutEdges(recovered.Lanes.First().EndVertex).Last().InterweavingPath);
+
     }
 
     // TODO: Complete further testing

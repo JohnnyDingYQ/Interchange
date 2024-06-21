@@ -15,13 +15,17 @@ public class Path : IEdge<Vertex>
     public uint Id { get; set; }
     [JsonProperty]
     public BezierSeries BezierSeries { get; private set; }
-    [JsonProperty]
-    public Vertex Source { get; private set; }
-    [JsonProperty]
-    public Vertex Target { get; private set; }
+    [JsonIgnore]
+    public Vertex Source { get; set; }
+    public uint Source_ { get; set; }
+    [JsonIgnore]
+    public Vertex Target { get; set; }
+    public uint Target_ { get; set; }
     [JsonIgnore]
     public float Length { get { return BezierSeries.Length; } }
+    [JsonIgnore]
     public Path InterweavingPath { get; set; }
+    public uint InterweavingPath_ { get; set; }
     [JsonIgnore]
     public List<Car> Cars { get; set; }
     [JsonIgnore]

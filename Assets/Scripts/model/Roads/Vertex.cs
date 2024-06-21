@@ -6,13 +6,13 @@ using UnityEngine.Splines;
 
 public class Vertex
 {
-    public int Id { get; set; }
+    public uint Id { get; set; }
     [JsonProperty]
     public float3 Pos { get; private set; }
     [JsonProperty]
     public float SeriesInterpolation { get; private set; }
-    [JsonProperty]
-    public float3 Tangent { get; private set; }
+    [JsonIgnore]
+    public float3 Tangent { get => math.normalizesafe(Lane.BezierSeries.EvaluateTangent(SeriesInterpolation)); }
     [JsonProperty]
     public Lane Lane { get; private set; }
     [JsonIgnore]
@@ -28,7 +28,6 @@ public class Vertex
         
         BezierSeries bs = lane.BezierSeries;
         Pos = bs.EvaluatePosition(SeriesInterpolation);
-        Tangent = math.normalizesafe(bs.EvaluateTangent(SeriesInterpolation));
     }
 
     public void SetOwnerLane(Lane l, Side side)

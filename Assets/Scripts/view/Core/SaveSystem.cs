@@ -33,8 +33,9 @@ public static class SaveSystem
 
         static void RestoreGameState()
         {
-            Game.Graph.AddVerticesAndEdgeRange(Game.GameSave.GraphSave);
             IdToObjectReferences();
+            foreach (Path p in Game.Paths.Values)
+                Game.Graph.AddVerticesAndEdge(p);
             foreach (Road r in Game.Roads.Values)
             {
                 r.EvaluateInnerOutline();
@@ -62,11 +63,10 @@ public static class SaveSystem
 
         string s = JsonConvert.SerializeObject(Game.GameSave, Formatting.None, new JsonSerializerSettings
         {
-            PreserveReferencesHandling = PreserveReferencesHandling.All,
+            PreserveReferencesHandling = PreserveReferencesHandling.None,
             TypeNameHandling = TypeNameHandling.Auto,
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
-
 
     }
 
@@ -83,6 +83,9 @@ public static class SaveSystem
             lane.StartNode_ = lane.StartNode.Id;
             lane.EndNode_ = lane.EndNode.Id;
             lane.Road_ = lane.Road.Id;
+            lane.StartVertex_ = lane.StartVertex.Id;
+            lane.EndVertex_ = lane.EndVertex.Id;
+            lane.InnerPath_ = lane.InnerPath.Id;
         }
         foreach (Node node in Game.Nodes.Values)
         {
@@ -95,6 +98,15 @@ public static class SaveSystem
             i.Nodes_ = i.Nodes.Select(n => n.Id).ToList();
             i.InRoads_ = i.InRoads.Select(r => r.Id).ToList();
             i.OutRoads_ = i.OutRoads.Select(r => r.Id).ToList();
+        }
+        foreach (Path p in Game.Paths.Values)
+        {
+            p.Source_ = p.Source.Id;
+            p.Target_ = p.Target.Id;
+            if (p.InterweavingPath != null)
+                p.InterweavingPath_ = p.InterweavingPath.Id;
+            else
+                p.InterweavingPath_ = 0;
         }
     }
 
@@ -111,6 +123,9 @@ public static class SaveSystem
             lane.StartNode = Game.Nodes[lane.StartNode_];
             lane.EndNode = Game.Nodes[lane.EndNode_];
             lane.Road = Game.Roads[lane.Road_];
+            lane.StartVertex = Game.Vertices[lane.StartVertex_];
+            lane.EndVertex = Game.Vertices[lane.EndVertex_];
+            lane.InnerPath = Game.Paths[lane.InnerPath_];
         }
         foreach (Node node in Game.Nodes.Values)
         {
@@ -123,6 +138,13 @@ public static class SaveSystem
             i.SetNodes(i.Nodes_.Select(n => Game.Nodes[n]).ToList());
             i.SetInRoads(i.InRoads_.Select(id => Game.Roads[id]).ToHashSet());
             i.SetOutRoads(i.OutRoads_.Select(id => Game.Roads[id]).ToHashSet());
+        }
+        foreach (Path p in Game.Paths.Values)
+        {
+            p.Source = Game.Vertices[p.Source_];
+            p.Target = Game.Vertices[p.Target_];
+            if (p.InterweavingPath_ != 0)
+                p.InterweavingPath = Game.Paths[p.InterweavingPath_];
         }
     }
 

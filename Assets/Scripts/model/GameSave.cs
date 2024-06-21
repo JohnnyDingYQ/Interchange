@@ -13,6 +13,8 @@ public class GameSave
     public List<Path> GraphSave { get; set; }
     public Dictionary<uint, Intersection> Intersections { get; private set; }
     public Dictionary<uint, Lane> Lanes { get; private set; }
+    public Dictionary<uint, Vertex> Vertices { get; private set; }
+    public Dictionary<uint, Path> Paths { get; private set; }
     [JsonIgnore]
     public Dictionary<uint, Zone> Zones { get; private set; }
     [JsonIgnore]
@@ -21,6 +23,8 @@ public class GameSave
     public uint CarServiced { get; set; }
     public GameSave()
     {
+        Vertices = new();
+        Paths = new();
         Lanes = new();
         Roads = new();
         Nodes = new();

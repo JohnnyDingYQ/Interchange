@@ -239,7 +239,7 @@ public static class IntersectionUtil
             float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
             BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
             Path p = new(bs, start, end);
-            Game.RegisterEdge(p);
+            Game.RegisterPath(p);
             return p;
         }
     }

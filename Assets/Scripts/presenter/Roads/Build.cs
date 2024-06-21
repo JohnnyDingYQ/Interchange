@@ -4,6 +4,7 @@ using System.Linq;
 using GraphExtensions;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public static class Build
 {
@@ -292,11 +293,17 @@ public static class Build
         Game.Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
-            Game.Graph.RemoveEdgeIf(e => e.Source == lane.StartVertex && e.Target == lane.EndVertex);
+            Path inner = null;
+            foreach (Path p in Game.Paths.Values)
+                if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
+                    inner = p;
+            Assert.IsNotNull(inner);
+            Game.RemovePath(inner);
+
             if (!retainVertices)
             {
-                Game.Graph.RemoveVertex(lane.StartVertex);
-                Game.Graph.RemoveVertex(lane.EndVertex);
+                Game.RemoveVertex(lane.StartVertex);
+                Game.RemoveVertex(lane.EndVertex);
             }
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
@@ -330,7 +337,7 @@ public static class Build
 
         if (Game.Zones.ContainsKey(road.StartZoneId))
             Game.Zones[road.StartZoneId].RemoveRoad(road);
-        
+
         if (Game.Zones.ContainsKey(road.EndZoneId))
             Game.Zones[road.EndZoneId].RemoveRoad(road);
 

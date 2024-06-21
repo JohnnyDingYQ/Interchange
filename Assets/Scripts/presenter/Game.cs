@@ -18,14 +18,16 @@ public static class Game
     public static event Action<float> ElevationUpdated;
     public static event Action<uint> CarServicedUpdated;
     public static GameSave GameSave { get; set; }
-    public static Dictionary<uint, Road> Roads { get { return GameSave.Roads; } }
-    public static Dictionary<uint, Node> Nodes { get { return GameSave.Nodes; } }
-    public static Dictionary<uint, Intersection> Intersections { get { return GameSave.Intersections; } }
-    public static Dictionary<uint, Lane> Lanes { get { return GameSave.Lanes; } }
-    public static Dictionary<uint, Zone> Zones { get { return GameSave.Zones; } }
-    public static Dictionary<uint, Car> Cars { get { return GameSave.Cars; } }
-    public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
-    public static float Elevation { get { return GameSave.Elevation; } }
+    public static Dictionary<uint, Road> Roads { get => GameSave.Roads;}
+    public static Dictionary<uint, Node> Nodes { get => GameSave.Nodes; }
+    public static Dictionary<uint, Intersection> Intersections { get => GameSave.Intersections;}
+    public static Dictionary<uint, Lane> Lanes { get => GameSave.Lanes;}
+    public static Dictionary<uint, Vertex> Vertices { get => GameSave.Vertices;}
+    public static Dictionary<uint, Path> Paths { get => GameSave.Paths;}
+    public static Dictionary<uint, Zone> Zones { get => GameSave.Zones;}
+    public static Dictionary<uint, Car> Cars { get => GameSave.Cars;}
+    public static AdjacencyGraph<Vertex, Path> Graph { get => GameSave.Graph;}
+    public static float Elevation { get => GameSave.Elevation;}
     public static uint CarServiced {
         get { return GameSave.CarServiced; }
         set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); } 
@@ -82,7 +84,7 @@ public static class Game
         {
             RegisterVertex(lane.StartVertex);
             RegisterVertex(lane.EndVertex);
-            RegisterEdge(lane.InnerPath);
+            RegisterPath(lane.InnerPath);
             RegisterLane(lane);
         }
         RegisterIntersection(road.StartIntersection);
@@ -118,6 +120,38 @@ public static class Game
     {
         Assert.IsTrue(Lanes.Keys.Contains(lane.Id));
         Lanes.Remove(lane.Id);
+    }
+
+    public static void RegisterVertex(Vertex v)
+    {
+        Assert.IsFalse(Graph.ContainsVertex(v) ^ Vertices.ContainsValue(v));
+        v.Id = FindNextAvailableKey(Vertices.Keys);
+        Vertices[v.Id] = v;
+        Graph.AddVertex(v);
+    }
+
+    public static void RemoveVertex(Vertex v)
+    {
+        Assert.IsTrue(Graph.ContainsVertex(v));
+        Assert.IsTrue(Vertices.ContainsValue(v));
+        Vertices.Remove(v.Id);
+        Graph.RemoveVertex(v);
+    }
+
+    public static void RegisterPath(Path p)
+    {
+        Assert.IsFalse(Graph.ContainsEdge(p) ^ Paths.ContainsValue(p));
+        p.Id = FindNextAvailableKey(Paths.Keys);
+        Paths[p.Id] = p;
+        Graph.AddEdge(p);
+    }
+
+    public static void RemovePath(Path p)
+    {
+        Assert.IsTrue(Graph.ContainsEdge(p));
+        Assert.IsTrue(Paths.ContainsValue(p));
+        Paths.Remove(p.Id);
+        Graph.RemoveEdge(p);
     }
 
     public static void RegisterNode(Node node)
@@ -179,19 +213,6 @@ public static class Game
     public static void InvokeRoadRemoved(Road road)
     {
         RoadRemoved?.Invoke(road);
-    }
-
-    public static void RegisterVertex(Vertex vertex)
-    {
-        if (!Graph.Vertices.Contains(vertex))
-            Graph.AddVertex(vertex);
-    }
-
-    public static void RegisterEdge(Path path)
-    {
-        Assert.IsFalse(Graph.ContainsEdge(path));
-        path.Id = FindNextAvailableKey(Graph.Edges.Select(path => path.Id).ToList());
-        Graph.AddEdge(path);
     }
 
     public static bool HasEdge(Lane from, Lane to)

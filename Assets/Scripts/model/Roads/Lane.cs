@@ -5,8 +5,12 @@ using UnityEngine;
 public class Lane
 {
     public uint Id { get; set; }
+    [JsonIgnore]
     public Vertex StartVertex { get; set; }
+    [JsonIgnore]
     public Vertex EndVertex { get; set; }
+    public uint StartVertex_ { get; set; }
+    public uint EndVertex_ { get; set; }
     [JsonIgnore]
     public Node StartNode { get; set; }
     [JsonIgnore]
@@ -25,7 +29,10 @@ public class Lane
     public int LaneIndex { get; private set; }
     [JsonProperty]
     public float Length { get; private set; }
+    [JsonIgnore]
     public Path InnerPath { get; set; }
+    [JsonProperty]
+    public uint InnerPath_ { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Lane() { }
