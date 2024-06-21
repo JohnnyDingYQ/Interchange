@@ -308,6 +308,7 @@ public static class Build
                     road.EndIntersection.RemoveNode(node);
                 }
             }
+            Game.RemoveLane(lane);
         }
         road.StartIntersection.RemoveRoad(road, Side.Start);
         road.EndIntersection.RemoveRoad(road, Side.End);

@@ -5,6 +5,7 @@ using QuikGraph;
 using Unity.Mathematics;
 using System.Linq;
 using UnityEngine.Assertions;
+using System.Collections.ObjectModel;
 
 public static class Game
 {
@@ -17,11 +18,12 @@ public static class Game
     public static event Action<float> ElevationUpdated;
     public static event Action<ulong> CarServicedUpdated;
     public static GameSave GameSave { get; set; }
-    public static SortedDictionary<ulong, Road> Roads { get { return GameSave.Roads; } }
-    public static SortedDictionary<ulong, Node> Nodes { get { return GameSave.Nodes; } }
-    public static SortedDictionary<ulong, Intersection> Intersections { get { return GameSave.Intersections; } }
-    public static SortedDictionary<ulong, Zone> Zones { get { return GameSave.Zones; } }
-    public static SortedDictionary<ulong, Car> Cars { get { return GameSave.Cars; } }
+    public static Dictionary<ulong, Road> Roads { get { return GameSave.Roads; } }
+    public static Dictionary<ulong, Node> Nodes { get { return GameSave.Nodes; } }
+    public static Dictionary<ulong, Intersection> Intersections { get { return GameSave.Intersections; } }
+    public static Dictionary<ulong, Lane> Lanes { get { return GameSave.Lanes; } }
+    public static Dictionary<ulong, Zone> Zones { get { return GameSave.Zones; } }
+    public static Dictionary<ulong, Car> Cars { get { return GameSave.Cars; } }
     public static AdjacencyGraph<Vertex, Path> Graph { get { return GameSave.Graph; } }
     public static float Elevation { get { return GameSave.Elevation; } }
     public static ulong CarServiced {
@@ -44,33 +46,6 @@ public static class Game
     }
     public static float3 MouseWorldPos { get { return InputSystem.MouseWorldPos; } }
 
-    public static ulong NextAvailableNodeId
-    {
-        get { return GameSave.NextAvailableNodeId; }
-        set { GameSave.NextAvailableNodeId = value; }
-    }
-    public static ulong NextAvailableRoadId
-    {
-        get { return GameSave.NextAvailableRoadId; }
-        set { GameSave.NextAvailableRoadId = value; }
-    }
-    public static ulong NextAvailablePathId
-    {
-        get { return GameSave.NextAvailablePathId; }
-        set { GameSave.NextAvailablePathId = value; }
-    }
-    public static ulong NextAvailableCarId
-    {
-        get { return GameSave.NextAvailableCarId; }
-        set { GameSave.NextAvailableCarId = value; }
-    }
-
-    public static ulong NextAvailableIntersectionId
-    {
-        get { return GameSave.NextAvailableIntersectionId; }
-        set { GameSave.NextAvailableIntersectionId = value; }
-    }
-
     static Game()
     {
         GameSave = new();
@@ -85,6 +60,14 @@ public static class Game
         HoveredRoad = null;
     }
 
+    private static ulong FindNextAvailableKey(ICollection<ulong> dict)
+    {
+        ulong i = 1;
+        while (dict.Contains(i))
+            i++;
+        return i;
+    }
+
     public static void RegisterRoad(Road road)
     {
         if (road.Id == Constants.GhostRoadId)
@@ -93,13 +76,14 @@ public static class Game
                 RemoveRoad(Roads[road.Id]);
         }
         else
-            road.Id = NextAvailableRoadId++;
+            road.Id = FindNextAvailableKey(Roads.Keys);
         Roads.Add(road.Id, road);
         foreach (Lane lane in road.Lanes)
         {
             RegisterVertex(lane.StartVertex);
             RegisterVertex(lane.EndVertex);
             RegisterEdge(lane.InnerPath);
+            RegisterLane(lane);
         }
         RegisterIntersection(road.StartIntersection);
         RegisterIntersection(road.EndIntersection);
@@ -110,7 +94,7 @@ public static class Game
     {
         if (!Intersections.Values.Contains(i))
         {
-            i.Id = NextAvailableIntersectionId++;
+            i.Id = FindNextAvailableKey(Intersections.Keys);
             Intersections[i.Id] = i;
         }
     }
@@ -121,11 +105,26 @@ public static class Game
         Intersections.Remove(i.Id);
     }
 
+    public static void RegisterLane(Lane lane)
+    {
+        if (!Lanes.Values.Contains(lane))
+        {
+            lane.Id = FindNextAvailableKey(Lanes.Keys);
+            Lanes[lane.Id] = lane;
+        }
+    }
+
+    public static void RemoveLane(Lane lane)
+    {
+        Assert.IsTrue(Lanes.Keys.Contains(lane.Id));
+        Lanes.Remove(lane.Id);
+    }
+
     public static void RegisterNode(Node node)
     {
         if (Nodes.ContainsKey(node.Id))
             return;
-        node.Id = NextAvailableNodeId++;
+        node.Id = FindNextAvailableKey(Nodes.Keys);
         Nodes[node.Id] = node;
     }
 
@@ -151,7 +150,7 @@ public static class Game
     public static void RegisterCar(Car car)
     {
         Assert.IsFalse(Cars.ContainsValue(car));
-        car.Id = NextAvailableCarId++;
+        car.Id = FindNextAvailableKey(Cars.Keys);
         Cars[car.Id] = car;
         CarAdded?.Invoke(car);
     }
@@ -191,7 +190,7 @@ public static class Game
     public static void RegisterEdge(Path path)
     {
         Assert.IsFalse(Graph.ContainsEdge(path));
-        path.Id = NextAvailablePathId++;
+        path.Id = FindNextAvailableKey(Graph.Edges.Select(path => path.Id).ToList());
         Graph.AddEdge(path);
     }
 

@@ -49,6 +49,7 @@ public static class SaveSystem
             {
                 road.StartIntersection = Game.Intersections[road.StartIntersection_];
                 road.EndIntersection = Game.Intersections[road.EndIntersection_];
+                road.Lanes = road.Lanes_.Select(i => Game.Lanes[i]).ToList();
             }
         }
 
@@ -83,6 +84,7 @@ public static class SaveSystem
             {
                 road.StartIntersection_ = road.StartIntersection.Id;
                 road.EndIntersection_ = road.EndIntersection.Id;
+                road.Lanes_ = road.Lanes.Select(lane => lane.Id).ToList();
             }
         }
     }

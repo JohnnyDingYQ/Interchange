@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 public class Lane
 {
+    public ulong Id { get; set; }
     public Vertex StartVertex { get; set; }
     public Vertex EndVertex { get; set; }
     public Node StartNode { get; set; }
