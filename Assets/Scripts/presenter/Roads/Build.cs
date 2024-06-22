@@ -298,17 +298,25 @@ public static class Build
         foreach (Lane lane in road.Lanes)
         {
             List<Path> toRemove = new();
-            foreach (Path p in Game.Paths.Values)
-                if (p.Source == lane.StartVertex || p.Target == lane.EndVertex || p.Source == lane.EndVertex || p.Target == lane.StartVertex)
-                    toRemove.Add(p);
-            foreach (Path p in toRemove)
-                Game.RemovePath(p);
-
             if (!retainVertices)
             {
+                foreach (Path p in Game.Paths.Values)
+                    if (p.Source == lane.StartVertex || p.Target == lane.EndVertex || p.Source == lane.EndVertex || p.Target == lane.StartVertex)
+                        toRemove.Add(p);
                 Game.RemoveVertex(lane.StartVertex);
                 Game.RemoveVertex(lane.EndVertex);
             }
+            else
+            {
+
+                foreach (Path p in Game.Paths.Values)
+                    if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
+                        toRemove.Add(p);
+            }
+
+            foreach (Path p in toRemove)
+                Game.RemovePath(p);
+                
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);
