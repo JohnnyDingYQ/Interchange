@@ -234,6 +234,21 @@ public class SaveSystemTest
 
     }
 
+    [Test]
+    public void SavingAfterRemovingRoad()
+    {
+        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        Game.RemoveRoad(road1);
+        // DivideHandler.DivideRoad(road0, 0.5f);
+        // RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
+        // RoadBuilder.B(-2 * stride, -stride, 0, 1);
+
+        SaveSystem.SaveGame();
+        SaveSystem.LoadGame();
+    }
+
+
     // TODO: Complete further testing
 
 }

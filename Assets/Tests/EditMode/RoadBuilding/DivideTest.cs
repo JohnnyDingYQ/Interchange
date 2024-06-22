@@ -261,4 +261,13 @@ public class DivideTest
         Assert.True(zone1.IsConsistent());
         Assert.True(zone2.IsConsistent());
     }
+
+    [Test]
+    public void DivideDoesNotCreateExtraVertices()
+    {
+        Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
+        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
+        
+        Assert.AreEqual(4, Game.Vertices.Count);
+    }
 }

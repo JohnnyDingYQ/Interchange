@@ -19,6 +19,7 @@ public class DrawGizmos : MonoBehaviour
 
     void Draw()
     {
+        // return;
         if (DrawCenter)
             Gizmos.DrawRoadCenter(DrawDuration);
         if (DrawPaths)

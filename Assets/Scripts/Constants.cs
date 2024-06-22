@@ -1,6 +1,6 @@
 public static class Constants
 {
-    public const float LaneWidth = 3f;
+    public const float LaneWidth = 2f;
     public const float BuildSnapTolerance = LaneWidth / 2.5f;
     public const float MinimumLaneLength = LaneWidth * 3;
     public const float MaximumLaneLength = LaneWidth * 20;
@@ -16,7 +16,7 @@ public static class Constants
     public const float CarDeceleration = 15f;
     public const float CarMaxSpeed = 20f;
     public const float CarMinSpeed = 0f;
-    public const float CarMinimumSeparation = 6f;
+    public const float CarMinimumSeparation = MinimumLaneLength / 5;
     public const int ZoneDemandCap = 20;
     public const int MaxVertexWaitingCar = 5;
     public const float ZoneDemandSatisfyCooldownSpeed = 20;

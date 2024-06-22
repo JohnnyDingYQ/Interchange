@@ -58,7 +58,6 @@ public static class SaveSystem
 
     public static void SaveGame()
     {
-        Game.GameSave.GraphSave = Game.Graph.Edges.ToList();
         ObjectReferencesToId();
 
         string s = JsonConvert.SerializeObject(Game.GameSave, Formatting.None, new JsonSerializerSettings

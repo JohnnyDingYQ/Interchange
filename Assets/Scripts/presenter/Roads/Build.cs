@@ -218,7 +218,11 @@ public static class Build
         {
             float3 v1 = pivotPos - startPos;
             float3 v2 = endPos - pivotPos;
-            float angle = MathF.Abs(MathF.Acos(math.dot(v1, v2) / math.length(v1) / math.length(v2)));
+            float angle = MathF.Abs(
+                MathF.Acos(
+                    Math.Clamp(math.dot(v1, v2) / math.length(v1) / math.length(v2), -1f, 1f)
+                    )
+            );
             if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
                 return true;
             return false;
@@ -293,12 +297,12 @@ public static class Build
         Game.Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
-            Path inner = null;
+            List<Path> toRemove = new();
             foreach (Path p in Game.Paths.Values)
-                if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
-                    inner = p;
-            Assert.IsNotNull(inner);
-            Game.RemovePath(inner);
+                if (p.Source == lane.StartVertex || p.Target == lane.EndVertex || p.Source == lane.EndVertex || p.Target == lane.StartVertex)
+                    toRemove.Add(p);
+            foreach (Path p in toRemove)
+                Game.RemovePath(p);
 
             if (!retainVertices)
             {

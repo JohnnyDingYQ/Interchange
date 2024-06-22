@@ -196,9 +196,15 @@ public static class IntersectionUtil
 
         void ClearAllPaths()
         {
+            List<Path> toRemove = new();
             foreach (Road r in i.InRoads)
                 foreach (Lane l in r.Lanes)
-                    Game.Graph.RemoveOutEdgeIf(l.EndVertex, (e) => true);
+                {
+                    Game.Graph.TryGetOutEdges(l.EndVertex, out IEnumerable<Path> outEdges);
+                    toRemove.AddRange(outEdges);
+                }
+            foreach (Path p in toRemove)
+                Game.RemovePath(p);
         }
 
         // i.e. nodes are internal to a a road

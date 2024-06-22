@@ -79,19 +79,36 @@ public class RemoveRoadTest
     }
 
     [Test]
+    public void RemoveLaneContraction()
+    {
+        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        Game.RemoveRoad(road1);
+
+        Assert.AreEqual(3, Game.Paths.Count);
+    }
+
+    [Test]
     public void BasicRemoveBranchAtEnd()
     {
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes[0].EndPos - road1.EndPos;
         Road road2 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        Assert.AreEqual(5, Game.Graph.EdgeCount);
+        Assert.AreEqual(5, Game.Paths.Count);
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        Assert.AreEqual(6, Game.Graph.EdgeCount);
+        Assert.AreEqual(6, Game.Paths.Count);
 
         Assert.True(Game.RemoveRoad(road3));
         Assert.True(Game.HasEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Game.HasEdge(road1.Lanes[1], road2.Lanes[0]));
+        Assert.AreEqual(5, Game.Graph.EdgeCount);
+        Assert.AreEqual(5, Game.Paths.Count);
 
         Assert.True(Game.RemoveRoad(road2));
         Assert.AreEqual(2, Game.Graph.EdgeCount);
+        Assert.AreEqual(2, Game.Paths.Count);
     }
 
     [Test]

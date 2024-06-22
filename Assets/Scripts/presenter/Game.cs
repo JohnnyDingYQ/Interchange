@@ -51,7 +51,6 @@ public static class Game
     static Game()
     {
         GameSave = new();
-        Assert.IsTrue(Constants.CarMinimumSeparation < Constants.MinimumLaneLength);
     }
 
     public static void WipeState()
@@ -125,6 +124,8 @@ public static class Game
     public static void RegisterVertex(Vertex v)
     {
         Assert.IsFalse(Graph.ContainsVertex(v) ^ Vertices.ContainsValue(v));
+        if (Graph.ContainsVertex(v))
+            return;
         v.Id = FindNextAvailableKey(Vertices.Keys);
         Vertices[v.Id] = v;
         Graph.AddVertex(v);
@@ -140,17 +141,21 @@ public static class Game
 
     public static void RegisterPath(Path p)
     {
+        // Debug.Log($"start {p.Source.Id} end {p.Target.Id}");
         Assert.IsFalse(Graph.ContainsEdge(p) ^ Paths.ContainsValue(p));
+        Graph.TryGetEdge(p.Source, p.Target, out Path edge);
+        if (edge != null)
+            return;
         p.Id = FindNextAvailableKey(Paths.Keys);
         Paths[p.Id] = p;
-        Graph.AddEdge(p);
+        Assert.IsTrue(Graph.AddEdge(p));
     }
 
     public static void RemovePath(Path p)
     {
+        Assert.IsTrue(Paths.ContainsKey(p.Id));
         Assert.IsTrue(Graph.ContainsEdge(p));
-        Assert.IsTrue(Paths.ContainsValue(p));
-        Paths.Remove(p.Id);
+        Assert.IsTrue(Paths.Remove(p.Id));
         Graph.RemoveEdge(p);
     }
 

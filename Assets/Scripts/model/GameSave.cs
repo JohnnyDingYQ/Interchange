@@ -10,7 +10,6 @@ public class GameSave
     public Dictionary<uint, Road> Roads { get; private set; }
     [JsonIgnore]
     public AdjacencyGraph<Vertex, Path> Graph { get; private set; }
-    public List<Path> GraphSave { get; set; }
     public Dictionary<uint, Intersection> Intersections { get; private set; }
     public Dictionary<uint, Lane> Lanes { get; private set; }
     public Dictionary<uint, Vertex> Vertices { get; private set; }
