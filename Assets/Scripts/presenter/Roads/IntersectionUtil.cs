@@ -54,11 +54,11 @@ public static class IntersectionUtil
 
         Path GetPath(Road road, Orientation orientation, Direction direction)
         {
-            IEnumerable<Path> edges = null;
+            List<Path> edges = null;
             if (direction == Direction.In)
-                Game.Graph.TryGetOutEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex, out edges);
+                edges = Game.GetOutPaths(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex);
             else if (direction == Direction.Out)
-                edges = Game.Graph.GetInEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
+                edges = Game.GetInPaths(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
             else
                 throw new ArgumentException("direction");
 
@@ -199,10 +199,8 @@ public static class IntersectionUtil
             List<Path> toRemove = new();
             foreach (Road r in i.InRoads)
                 foreach (Lane l in r.Lanes)
-                {
-                    Game.Graph.TryGetOutEdges(l.EndVertex, out IEnumerable<Path> outEdges);
-                    toRemove.AddRange(outEdges);
-                }
+                    toRemove.AddRange(Game.GetOutPaths(l.EndVertex));
+
             foreach (Path p in toRemove)
                 Game.RemovePath(p);
         }
@@ -238,8 +236,8 @@ public static class IntersectionUtil
 
         static Path BuildPath(Vertex start, Vertex end)
         {
-            Game.Graph.TryGetEdge(start, end, out Path edge);
-            if (edge != null)
+            Path path = Game.GetPath(start, end);
+            if (path != null)
                 return null;
             float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;

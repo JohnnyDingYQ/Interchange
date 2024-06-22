@@ -60,7 +60,7 @@ public static class Gizmos
 
     public static void DrawPaths(float duration)
     {
-        foreach (Path path in Game.Graph.Edges)
+        foreach (Path path in Game.Paths.Values)
         {
             DrawBeizerSeries(path.BezierSeries, Color.yellow, duration);
         }

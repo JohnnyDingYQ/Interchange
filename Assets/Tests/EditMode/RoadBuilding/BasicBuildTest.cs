@@ -166,7 +166,7 @@ public class BasicBuildTest
     [Test]
     public void LaneShorterThanMinimumLengthShouldNotBuild()
     {
-        Assert.AreEqual(0, Game.Graph.EdgeCount);
+        Assert.AreEqual(0, Game.Paths.Count);
         RoadBuilder.B(
             new(0, 0, 0),
             new(0, 0, Constants.MinimumLaneLength / 2),
@@ -174,7 +174,7 @@ public class BasicBuildTest
             1
         );
 
-        Assert.AreEqual(0, Game.Graph.EdgeCount);
+        Assert.AreEqual(0, Game.Paths.Count);
         Assert.AreEqual(0, Roads.Count);
     }
 

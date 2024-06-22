@@ -21,19 +21,6 @@ namespace GraphExtensions
             return inDegree;
         }
 
-        public static IEnumerable<Path> GetInEdges(this AdjacencyGraph<Vertex, Path> graph, Vertex vertex)
-        {
-            HashSet<Path> p = new();
-            foreach (Vertex v in graph.Vertices)
-            {
-                foreach (Path e in graph.OutEdges(v))
-                {
-                    if (e.Target.GetHashCode() == vertex.GetHashCode())
-                        p.Add(e);
-                }
-            }
-            return p;
-        }
         public static IEnumerable<Path> ShortestPathAStar(this AdjacencyGraph<Vertex, Path> graph, Vertex start, Vertex end)
         {
             TryFunc<Vertex, IEnumerable<Path>> tryFunc = graph.ShortestPathsAStar(

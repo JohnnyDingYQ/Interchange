@@ -201,7 +201,7 @@ public static class Build
             foreach (Vertex start in startV)
                 foreach (Vertex end in endV)
                 {
-                    List<Path> paths = Game.Graph.ShortestPathAStar(start, end)?.ToList();
+                    List<Path> paths = Game.ShortestPathAStar(start, end)?.ToList();
                     if (paths != null)
                         foreach (Path p in paths)
                         {
@@ -316,7 +316,7 @@ public static class Build
 
             foreach (Path p in toRemove)
                 Game.RemovePath(p);
-                
+
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);

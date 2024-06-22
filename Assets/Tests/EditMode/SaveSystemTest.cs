@@ -134,9 +134,9 @@ public class SaveSystemTest
         Game.WipeState();
         SaveSystem.LoadGame();
 
-        Assert.True(!Game.Graph.IsVerticesEmpty);
-        Assert.True(!Game.Graph.IsEdgesEmpty);
-        foreach (Path path in Game.Graph.Edges)
+        Assert.AreEqual(3, Game.Paths.Count);
+        Assert.AreEqual(4, Game.Vertices.Count);
+        foreach (Path path in Game.Paths.Values)
             Assert.NotNull(path.BezierSeries);
     }
 
@@ -192,8 +192,8 @@ public class SaveSystemTest
         Road restored2 = Game.Roads[saved2.Id];
         Road restored3 = Game.Roads[saved3.Id];
 
-        Assert.True(Game.HasEdge(restored1.Lanes[0], restored2.Lanes[0]));
-        Assert.True(Game.HasEdge(restored1.Lanes[1], restored3.Lanes[0]));
+        Assert.True(Game.ContainsPath(restored1.Lanes[0], restored2.Lanes[0]));
+        Assert.True(Game.ContainsPath(restored1.Lanes[1], restored3.Lanes[0]));
         Assert.AreEqual(2, restored1.Lanes[0].EndNode.Lanes.Count);
         Assert.AreEqual(2, restored1.Lanes[1].EndNode.Lanes.Count);
     }
@@ -225,12 +225,12 @@ public class SaveSystemTest
         Road road0 = RoadBuilder.B(0, stride, 2 * stride, 2);
         Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
         uint id = road0.Id;
-        Assert.NotNull(Game.Graph.OutEdges(road0.Lanes.First().EndVertex).Last().InterweavingPath);
+        Assert.NotNull(Game.GetOutPaths(road0.Lanes.First().EndVertex).Last().InterweavingPath);
         
         SaveSystem.SaveGame();
         SaveSystem.LoadGame();
         Road recovered = Game.Roads[id];
-        Assert.NotNull(Game.Graph.OutEdges(recovered.Lanes.First().EndVertex).Last().InterweavingPath);
+        Assert.NotNull(Game.GetOutPaths(recovered.Lanes.First().EndVertex).Last().InterweavingPath);
 
     }
 

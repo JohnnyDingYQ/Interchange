@@ -6,7 +6,7 @@ public static class CarControl
     static readonly HashSet<Car> toRemove = new();
     static bool IsOnValidPath(Car car)
     {
-        return Game.Graph.ContainsEdge(car.CurrentPath);
+        return Game.Paths.ContainsKey(car.CurrentPath.Id);
     }
 
     public static void PassTime(float deltaTime)
