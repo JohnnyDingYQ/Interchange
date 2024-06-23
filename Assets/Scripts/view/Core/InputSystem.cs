@@ -7,7 +7,6 @@ public class InputSystem : MonoBehaviour
 {
     public static bool MouseIsInGameWorld { get; set; }
     private GameActions gameActions;
-    private const int CameraSpeedMultiplier = 10;
     public static float3 MouseWorldPos { get; set; }
 
     void Awake()
@@ -72,20 +71,7 @@ public class InputSystem : MonoBehaviour
     void UpdateCameraPos()
     {
         Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
-        float cameraHeight = Camera.main.transform.position.y;
-        cameraOffset.x *= 1 + MathF.Pow(cameraHeight, 0.7f);
-        cameraOffset.z *= 1 + MathF.Pow(cameraHeight, 0.7f);
-        cameraOffset.y *= MathF.Pow(cameraHeight, 0.05f);
-        Camera.main.transform.position += CameraSpeedMultiplier * Time.deltaTime * cameraOffset;
-        Clamp();
-        Camera.main.orthographicSize = cameraHeight * 0.8f;
-
-        static void Clamp()
-        {
-            Vector3 pos = Camera.main.transform.position;
-            pos.y = MathF.Max(32, pos.y);
-            Camera.main.transform.position = pos;
-        }
+        CameraControl.CameraOffset = cameraOffset;
     }
 
     void OnBuild(InputAction.CallbackContext context)
