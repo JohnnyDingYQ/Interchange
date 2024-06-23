@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphExtensions;
 using UnityEngine;
 
 public static class DemandsSatisfer
@@ -42,7 +41,7 @@ public static class DemandsSatisfer
         Vertex endV = dest.GetRandomInVertex();
         if (startV == null || endV == null)
             return null;
-        IEnumerable<Path> paths = Game.ShortestPathAStar(startV, endV);
+        IEnumerable<Path> paths = Graph.ShortestPathAStar(startV, endV);
         if (!ScheduleAllowed(paths))
             return null;
         Car car = new(origin, dest, paths.ToArray());
@@ -52,7 +51,7 @@ public static class DemandsSatisfer
 
     public static Car AttemptSchedule(Vertex origin, Vertex dest)
     {
-        IEnumerable<Path> paths = Game.ShortestPathAStar(origin, dest);
+        IEnumerable<Path> paths = Graph.ShortestPathAStar(origin, dest);
         if (!ScheduleAllowed(paths))
             return null;
         Car car = new(null, null, paths.ToArray());

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphExtensions;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -212,8 +211,8 @@ public class DivideTest
             for (int j = 0; j < 3; j++)
                 if (Math.Abs(i - j) < 2)
                 {
-                    Assert.True(Game.ContainsPath(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
-                    Assert.NotNull(Game.ShortestPathAStar(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
+                    Assert.True(Graph.ContainsPath(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
+                    Assert.NotNull(Graph.ShortestPathAStar(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
                 }
     }
 
@@ -227,7 +226,7 @@ public class DivideTest
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
                 if (Math.Abs(i - j) < 2)
-                    Assert.True(Game.ContainsPath(road1.Lanes[i], subRoads.Left.Lanes[j]));
+                    Assert.True(Graph.ContainsPath(road1.Lanes[i], subRoads.Left.Lanes[j]));
     }
 
     [Test]

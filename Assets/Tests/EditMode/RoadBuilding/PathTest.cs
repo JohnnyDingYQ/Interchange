@@ -17,10 +17,10 @@ public class PathTest
     {
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 1);
         Lane lane1 = road1.Lanes[0];
-        Assert.True(Game.ContainsPath(lane1.StartVertex, lane1.EndVertex));
+        Assert.True(Graph.ContainsPath(lane1.StartVertex, lane1.EndVertex));
         Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         Lane lane2 = road2.Lanes[0];
-        Assert.True(Game.ContainsPath(lane1, lane2));
+        Assert.True(Graph.ContainsPath(lane1, lane2));
     }
 
 
@@ -29,19 +29,19 @@ public class PathTest
     {
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i].StartVertex, road1.Lanes[i].EndVertex));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i].StartVertex, road1.Lanes[i].EndVertex));
 
         Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road2.Lanes[2]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road2.Lanes[2]));
         for (int i = 0; i < 3; i++)
         {
             if (i - 1 >= 0)
-                Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[i - 1]));
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[i]));
+                Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[i - 1]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[i]));
             if (i + 1 < 3)
-                Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[i + 1]));
+                Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[i + 1]));
         }
     }
 
@@ -53,10 +53,10 @@ public class PathTest
         for (int i = 0; i < 3; i++)
         {
             if (i - 1 >= 0)
-                Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[i - 1]));
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[i]));
+                Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[i - 1]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[i]));
             if (i + 1 < 3)
-                Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[i + 1]));
+                Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[i + 1]));
         }
     }
 
@@ -68,7 +68,7 @@ public class PathTest
         
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[i]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[i]));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
     }
 
     [Test]
@@ -91,21 +91,21 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
 
         Assert.AreEqual(8, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
     }
 
     [Test]
@@ -117,21 +117,21 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
 
         Road road3 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
         Assert.AreEqual(8, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road2.Lanes[0]));
 
         Road road4 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
     }
 
     [Test]
@@ -143,18 +143,18 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.AreEqual(7, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride , 1);
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road4.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road4.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
     }
 
     [Test]
@@ -166,21 +166,21 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
 
         Assert.AreEqual(8, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
     }
 
     [Test]
@@ -192,21 +192,21 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
 
         Road road3 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
         Assert.AreEqual(8, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road2.Lanes[0]));
 
         Road road4 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road4.Lanes[0]));
     }
 
     [Test]
@@ -218,18 +218,18 @@ public class PathTest
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
-            Assert.True(Game.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
+            Assert.True(Graph.ContainsPath(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.AreEqual(7, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road4.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road4.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
     }
 
     [Test]
@@ -240,19 +240,19 @@ public class PathTest
         Road road2 = RoadBuilder.B(2 * stride + offset * 2, 3 * stride + offset * 2, 4 * stride + offset * 2, 2);
 
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road2.Lanes[1]));
 
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
         Assert.AreEqual(13, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
     }
 
     [Test]
@@ -263,19 +263,19 @@ public class PathTest
         Road road2 = RoadBuilder.B(2 * stride + offset * 2, 3 * stride + offset * 2, 4 * stride + offset * 2, 2);
 
         Assert.AreEqual(9, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road2.Lanes[1]));
 
         Road road3 = RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
         Assert.AreEqual(13, Game.Paths.Count);
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road3.Lanes[1]));
-        Assert.True(Game.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road3.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[2], road3.Lanes[0]));
     }
 
     [Test]
@@ -283,8 +283,8 @@ public class PathTest
     {
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
         Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
-        Path rightPath = Game.GetPath(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex);
-        Path leftPath = Game.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex);
+        Path rightPath = Graph.GetPath(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex);
+        Path leftPath = Graph.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex);
         Assert.AreSame(leftPath, rightPath.InterweavingPath);
         Assert.AreSame(rightPath, leftPath.InterweavingPath);
     }
@@ -294,12 +294,12 @@ public class PathTest
     {
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
         Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
-        Path rightPath = Game.GetPath(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex);
-        Path leftPath = Game.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex);
+        Path rightPath = Graph.GetPath(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex);
+        Path leftPath = Graph.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex);
         Assert.AreSame(leftPath, rightPath.InterweavingPath);
         Assert.AreSame(rightPath, leftPath.InterweavingPath);
-        rightPath = Game.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[2].StartVertex);
-        leftPath = Game.GetPath(road1.Lanes[2].EndVertex, road2.Lanes[1].StartVertex);
+        rightPath = Graph.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[2].StartVertex);
+        leftPath = Graph.GetPath(road1.Lanes[2].EndVertex, road2.Lanes[1].StartVertex);
         Assert.AreSame(leftPath, rightPath.InterweavingPath);
         Assert.AreSame(rightPath, leftPath.InterweavingPath);
     }
@@ -310,8 +310,8 @@ public class PathTest
         Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         Road road2 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
-        Path rightEdge = Game.GetPath(road1.Lanes[0].EndVertex, road2.Lanes[2].StartVertex);
-        Path leftEdge = Game.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[1].StartVertex);
+        Path rightEdge = Graph.GetPath(road1.Lanes[0].EndVertex, road2.Lanes[2].StartVertex);
+        Path leftEdge = Graph.GetPath(road1.Lanes[1].EndVertex, road2.Lanes[1].StartVertex);
         Assert.AreSame(leftEdge, rightEdge.InterweavingPath);
         Assert.AreSame(rightEdge, leftEdge.InterweavingPath);
     }

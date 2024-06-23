@@ -99,8 +99,8 @@ public class RemoveRoadTest
         Assert.AreEqual(6, Game.Paths.Count);
 
         Assert.True(Game.RemoveRoad(road3));
-        Assert.True(Game.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
-        Assert.True(Game.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road1.Lanes[1], road2.Lanes[0]));
         Assert.AreEqual(5, Game.Paths.Count);
 
         Assert.True(Game.RemoveRoad(road2));
@@ -116,8 +116,8 @@ public class RemoveRoadTest
         Road road3 = RoadBuilder.B(0 - offset, stride - offset, 2 * stride - offset, 1);
 
         Assert.True(Game.RemoveRoad(road3));
-        Assert.True(Game.ContainsPath(road2.Lanes[0], road1.Lanes[0]));
-        Assert.True(Game.ContainsPath(road2.Lanes[0], road1.Lanes[1]));
+        Assert.True(Graph.ContainsPath(road2.Lanes[0], road1.Lanes[0]));
+        Assert.True(Graph.ContainsPath(road2.Lanes[0], road1.Lanes[1]));
 
         Assert.True(Game.RemoveRoad(road2));
         Assert.AreEqual(2, Game.Paths.Count);

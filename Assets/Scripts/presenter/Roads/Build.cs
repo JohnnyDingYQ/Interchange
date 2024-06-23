@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphExtensions;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -201,7 +200,7 @@ public static class Build
             foreach (Vertex start in startV)
                 foreach (Vertex end in endV)
                 {
-                    List<Path> paths = Game.ShortestPathAStar(start, end)?.ToList();
+                    List<Path> paths = Graph.ShortestPathAStar(start, end)?.ToList();
                     if (paths != null)
                         foreach (Path p in paths)
                         {

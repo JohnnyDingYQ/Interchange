@@ -26,7 +26,6 @@ public static class Game
     public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
     public static Dictionary<uint, Zone> Zones { get => GameSave.Zones; }
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
-    public static AdjacencyGraph<Vertex, Path> Graph { get => GameSave.Graph; }
     public static float Elevation { get => GameSave.Elevation; }
     public static uint CarServiced
     {
@@ -57,6 +56,7 @@ public static class Game
     public static void WipeState()
     {
         Build.Reset();
+        Graph.Wipe();
         GameSave = new();
         hoveredZone = null;
         HoveredRoad = null;
@@ -143,13 +143,12 @@ public static class Game
     public static void RegisterPath(Path p)
     {
         // Debug.Log($"start {p.Source.Id} end {p.Target.Id}");
-        Assert.IsFalse(Graph.ContainsEdge(p) ^ Paths.ContainsValue(p));
-        Graph.TryGetEdge(p.Source, p.Target, out Path edge);
-        if (edge != null)
+        Assert.IsFalse(Graph.ContainsPath(p) ^ Paths.ContainsValue(p));
+        if (Graph.ContainsPath(p.Source, p.Target))
             return;
         p.Id = FindNextAvailableKey(Paths.Keys);
         Paths[p.Id] = p;
-        Graph.AddEdge(p);
+        Graph.AddPath(p);
     }
 
     public static void RemovePath(Path p)
@@ -157,7 +156,7 @@ public static class Game
         Assert.IsTrue(Paths.ContainsKey(p.Id));
         // Assert.IsTrue(Graph.ContainsEdge(p));
         Paths.Remove(p.Id);
-        Graph.RemoveEdge(p);
+        Graph.RemovePath(p);
     }
 
     public static void RegisterNode(Node node)
@@ -221,26 +220,7 @@ public static class Game
         RoadRemoved?.Invoke(road);
     }
 
-    public static bool ContainsPath(Lane from, Lane to)
-    {
-        return ContainsPath(from.EndVertex, to.StartVertex) || ContainsPath(to.EndVertex, from.StartVertex);
-    }
-
-    public static bool ContainsPath(Vertex from, Vertex to)
-    {
-        return Graph.ContainsEdge(from, to);
-    }
-
-    public static void AddVerticesAndEdge(Path p)
-    {
-        Graph.AddVerticesAndEdge(p);
-    }
-
-    public static List<Path> GetOutPaths(Vertex v)
-    {
-        Graph.TryGetOutEdges(v, out IEnumerable<Path> edges);
-        return edges.ToList();
-    }
+    
 
     public static void DivideSelectedRoad(float3 mouseWorldPos)
     {
@@ -265,34 +245,5 @@ public static class Game
         ElevationUpdated?.Invoke(elevation);
     }
 
-    public static IEnumerable<Path> ShortestPathAStar(Vertex start, Vertex end)
-    {
-        TryFunc<Vertex, IEnumerable<Path>> tryFunc = Graph.ShortestPathsAStar(
-        (Path p) => p.Length,
-        (Vertex to) => math.distance(start.Pos, to.Pos),
-        start
-    );
-        tryFunc(end, out IEnumerable<Path> paths);
-        return paths;
-    }
-
-    public static List<Path> GetInPaths(Vertex vertex)
-    {
-        HashSet<Path> p = new();
-        foreach (Vertex v in Graph.Vertices)
-        {
-            foreach (Path e in Graph.OutEdges(v))
-            {
-                if (e.Target.GetHashCode() == vertex.GetHashCode())
-                    p.Add(e);
-            }
-        }
-        return p.ToList();
-    }
-
-    public static Path GetPath(Vertex start, Vertex end)
-    {
-        Graph.TryGetEdge(start, end, out Path edge);
-        return edge;
-    }
+    
 }

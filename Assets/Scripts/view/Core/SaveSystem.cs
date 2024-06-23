@@ -35,7 +35,7 @@ public static class SaveSystem
         {
             IdToObjectReferences();
             foreach (Path p in Game.Paths.Values)
-                Game.AddVerticesAndEdge(p);
+                Graph.AddVerticesAndPath(p);
             foreach (Road r in Game.Roads.Values)
             {
                 r.EvaluateInnerOutline();
