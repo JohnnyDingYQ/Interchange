@@ -241,27 +241,6 @@ public class DivideTest
     }
 
     [Test]
-    public void SubRoadsInheritZones()
-    {
-        Zone zone1 = new(1);
-        Zone zone2 = new(2);
-        Game.Zones[1] = zone1;
-        Game.Zones[2] = zone2;
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
-        zone1.AddOutRoad(road);
-        zone2.AddInRoad(road);
-        SubRoads subRoads = DivideHandler.HandleDivideCommand(road, stride);
-        Assert.AreEqual(1, subRoads.Left.StartZoneId);
-        Assert.AreEqual(2, subRoads.Right.EndZoneId);
-        Assert.True(zone1.OutRoads.Contains(subRoads.Left));
-        Assert.True(zone2.InRoads.Contains(subRoads.Right));
-        Assert.False(zone1.OutRoads.Contains(road));
-        Assert.False(zone2.InRoads.Contains(road));
-        Assert.True(zone1.IsConsistent());
-        Assert.True(zone2.IsConsistent());
-    }
-
-    [Test]
     public void DivideDoesNotCreateExtraVertices()
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 1);

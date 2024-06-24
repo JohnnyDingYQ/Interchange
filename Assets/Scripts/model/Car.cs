@@ -11,8 +11,6 @@ public class Car
     public bool IsTraveling { get; set; }
     public bool IsDone { get; private set; }
     public float3 Pos { get; private set; }
-    private readonly Zone origin;
-    private readonly Zone destination;
     private readonly Path[] paths;
     public float DistanceOnPath { get; set; }
     private int pathIndex;
@@ -20,12 +18,9 @@ public class Car
     private float speed;
     private bool isBraking;
 
-    public Car(Zone origin, Zone destination, Path[] paths)
+    public Car(Path[] paths)
     {
         Assert.IsNotNull(paths);
-        Assert.IsFalse(origin == null ^ destination == null);
-        this.origin = origin;
-        this.destination = destination;
         this.paths = paths;
         IsTraveling = false;
         DistanceOnPath = 0;
@@ -126,8 +121,6 @@ public class Car
 
     public void Cancel()
     {
-        if (origin != null)
-            origin.Demands[destination.Id] += 1;
         IsDone = true;
     }
 }

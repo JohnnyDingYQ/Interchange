@@ -12,8 +12,6 @@ public static class Build
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
-    private static Zone startZone;
-    private static Zone endZone;
     public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3, float>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
@@ -83,7 +81,6 @@ public static class Build
         {
             startAssigned = true;
             startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            startZone = clickPos.y == Constants.MinElevation ? Game.HoveredZone : null;
             return null;
         }
         else if (!pivotAssigned)
@@ -95,10 +92,7 @@ public static class Build
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            endZone = clickPos.y == Constants.MinElevation ? Game.HoveredZone : null;
-            Road road = null;
-            if (!(startZone == endZone && startZone != null))
-                road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return road;
         }
@@ -147,8 +141,6 @@ public static class Build
         {
             RegisterUnregisteredNodes(road);
             ReplaceExistingRoad();
-            endZone?.AddInRoad(road);
-            startZone?.AddOutRoad(road);
             if (AutoDivideOn)
                 AutoDivideRoad(road);
         }
@@ -345,12 +337,6 @@ public static class Build
         }
         else
             Game.RemoveIntersection(road.EndIntersection);
-
-        if (Game.Zones.ContainsKey(road.StartZoneId))
-            Game.Zones[road.StartZoneId].RemoveRoad(road);
-
-        if (Game.Zones.ContainsKey(road.EndZoneId))
-            Game.Zones[road.EndZoneId].RemoveRoad(road);
 
         Game.InvokeRoadRemoved(road);
         return true;

@@ -15,8 +15,6 @@ public class GameSave
     public Dictionary<uint, Vertex> Vertices { get; private set; }
     public Dictionary<uint, Path> Paths { get; private set; }
     [JsonIgnore]
-    public Dictionary<uint, Zone> Zones { get; private set; }
-    [JsonIgnore]
     public Dictionary<uint, Car> Cars { get; private set; }
     public float Elevation { get; set; }
     public uint CarServiced { get; set; }
@@ -29,7 +27,6 @@ public class GameSave
         Nodes = new();
         Graph = new(false);
         Intersections = new();
-        Zones = new();
         Cars = new();
         CarServiced = 0;
     }

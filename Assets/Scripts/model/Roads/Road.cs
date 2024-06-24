@@ -30,8 +30,6 @@ public class Road
     public Intersection EndIntersection { get; set; }
     public uint StartIntersection_ { get; set; }
     public uint EndIntersection_ { get; set; }
-    public uint StartZoneId { get; set; }
-    public uint EndZoneId { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()
@@ -76,8 +74,6 @@ public class Road
         LeftOutline = new();
         RightOutline = new();
         EvaluateInnerOutline();
-        StartZoneId = 0;
-        EndZoneId = 0;
     }
 
     public void EvaluateInnerOutline()

@@ -24,7 +24,6 @@ public static class Game
     public static Dictionary<uint, Lane> Lanes { get => GameSave.Lanes; }
     public static Dictionary<uint, Vertex> Vertices { get => GameSave.Vertices; }
     public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
-    public static Dictionary<uint, Zone> Zones { get => GameSave.Zones; }
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
     public static float Elevation { get => GameSave.Elevation; }
     public static uint CarServiced
@@ -33,19 +32,6 @@ public static class Game
         set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); }
     }
     public static Road HoveredRoad { get; set; }
-    private static Zone hoveredZone;
-    public static Zone HoveredZone
-    {
-        get
-        {
-            UpdateHoveredZone?.Invoke();
-            return hoveredZone;
-        }
-        set
-        {
-            hoveredZone = value;
-        }
-    }
     public static float3 MouseWorldPos { get { return InputSystem.MouseWorldPos; } }
 
     static Game()
@@ -58,7 +44,6 @@ public static class Game
         Build.Reset();
         Graph.Wipe();
         GameSave = new();
-        hoveredZone = null;
         HoveredRoad = null;
     }
 

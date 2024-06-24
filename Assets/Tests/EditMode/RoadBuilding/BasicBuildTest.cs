@@ -200,23 +200,6 @@ public class BasicBuildTest
         Assert.AreEqual(2, Roads.Count);
     }
 
-    [Test]
-    public void RoadStartsAndEndWithSameZone()
-    {
-        Zone zone = new(1);
-        Game.HoveredZone = zone;
-        Road road = RoadBuilder.B(
-            new (0, Constants.MinElevation, 0),
-            stride,
-            new (2 * Constants.MinimumLaneLength, Constants.MinElevation, 2 * Constants.MinimumLaneLength), 
-            3
-        );
-        
-        Assert.Null(road);
-        Assert.AreEqual(0, Game.Roads.Count);
-        Assert.AreEqual(0, Game.Nodes.Count);
-    }
-
     #region Helpers
     public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)
     {
