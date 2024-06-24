@@ -14,7 +14,6 @@ public static class Game
     public static event Action<Road> RoadRemoved;
     public static event Action<Car> CarAdded;
     public static event Action<Car> CarRemoved;
-    public static event Action UpdateHoveredZone;
     public static event Action<float> ElevationUpdated;
     public static event Action<uint> CarServicedUpdated;
     public static GameSave GameSave { get; set; }

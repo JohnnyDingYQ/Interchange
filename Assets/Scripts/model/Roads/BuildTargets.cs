@@ -35,22 +35,19 @@ public class BuildTargets
     List<Node> GetBuildNodes(float3 clickPos, int laneCount, IEnumerable<Node> GameNodes)
     {
         float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
-        List<FloatContainer> floatContainers = new();
+        List<Tuple<float, Node>> candidates = new();
         foreach (Node node in GameNodes)
             AddNodeIfWithinSnap(node);
 
-        if (floatContainers.Count == 0)
+        if (candidates.Count == 0)
             return null;
 
         // this sorts nodes with ascending order of distance (descending proximity)
-        floatContainers.Sort();
-
-        List<Node> nodes = FloatContainer.Unwrap<Node>(floatContainers);
+        List<Node> nodes = candidates.OrderBy(t => t.Item1).Select(t => t.Item2).ToList();
         while (nodes.Count > laneCount)
             nodes.Remove(nodes.Last());
 
-
-        // this sorts nodes with their order in the road, left to right in the direction of the roads
+        // this sorts nodes with their order in the road, left to right in the direction of the road
         nodes.Sort();
         Intersection intersection = nodes.First().Intersection;
         foreach (Node n in nodes)
@@ -62,16 +59,12 @@ public class BuildTargets
 
         else
         {
+            candidates = new();
             GetInterpolatedCandidates(2);
-            if (floatContainers.Count + nodes.Count < laneCount)
-            {
+            if (candidates.Count + nodes.Count < laneCount)
                 return null;
-            }
-            int i = 0;
-            while (nodes.Count < laneCount)
-            {
-                nodes.Add((Node)floatContainers[i++].Object);
-            }
+            
+            nodes.AddRange(candidates.Select(t => t.Item2));
             nodes.Sort();
             return nodes;
         }
@@ -80,7 +73,6 @@ public class BuildTargets
         void GetInterpolatedCandidates(int interpolationReach)
         {
             float3 normal = Intersection.Normal * Constants.LaneWidth;
-            floatContainers = new();
             for (int i = 1; i <= interpolationReach; i++)
             {
                 float3 left = nodes.First().Pos + i * normal;
@@ -94,7 +86,6 @@ public class BuildTargets
                     Intersection = Intersection
                 });
             }
-            floatContainers.Sort();
         }
 
         void AddNodeIfWithinSnap(Node n)
@@ -103,9 +94,7 @@ public class BuildTargets
                 return;
             float distance = Vector3.Distance(clickPos, n.Pos);
             if (distance < snapRadius)
-            {
-                floatContainers.Add(new(distance, n));
-            }
+                candidates.Add(new(distance, n));
         }
         #endregion
     }

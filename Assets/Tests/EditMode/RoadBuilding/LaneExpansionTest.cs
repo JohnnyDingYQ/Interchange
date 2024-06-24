@@ -75,7 +75,8 @@ public class LaneExpansionTest
     public void OneLaneToThreeLane_Left()
     {
         Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.B(2 * stride + 1.5f * Constants.BuildSnapTolerance * new float3(-1, 0, 0), 3 * stride, 4 * stride, 3);
+        float3 offset = road0.BezierSeries.Evaluate2DNormalizedNormal(1) * Constants.LaneWidth;
+        Road road1 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -93,7 +94,8 @@ public class LaneExpansionTest
     public void OneLaneToThreeLane_Right()
     {
         Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.B(2 * stride + 1.5f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 3 * stride, 4 * stride, 3);
+        float3 offset = -1 * Constants.LaneWidth * road0.BezierSeries.Evaluate2DNormalizedNormal(1);
+        Road road1 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];

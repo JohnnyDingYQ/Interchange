@@ -174,7 +174,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Left()
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Vector3 buildPoint = 2 * stride + 1.5f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
+        Vector3 buildPoint = 2 * stride + road.BezierSeries.Evaluate2DNormalizedNormal(1) * Constants.LaneWidth;
         BuildTargets bt = new(buildPoint, 3, Game.Nodes.Values);
         Assert.AreEqual(3, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
@@ -190,7 +190,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Right()
     {
         Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Vector3 buildPoint = 2 * stride + 1.5f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
+        Vector3 buildPoint = 2 * stride + -1 * Constants.LaneWidth * road.BezierSeries.Evaluate2DNormalizedNormal(1);
         BuildTargets bt = new(buildPoint, 3, Game.Nodes.Values);
         Assert.AreEqual(3, bt.Nodes.Count);
         Node node0 = bt.Nodes[0];
