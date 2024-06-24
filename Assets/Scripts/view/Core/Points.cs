@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class PointInitialization : MonoBehaviour
+public class Points : MonoBehaviour
 {
     [SerializeField]
     GameObject targets;
@@ -15,28 +15,39 @@ public class PointInitialization : MonoBehaviour
             Point target = new(uint.Parse(child.gameObject.name));
             Game.Targets.Add(target.Id, target);
 
-            Node n = new(child.transform.position, 0, 0);
+            Node n = new(child.transform.position, 0, 0)
+            {
+                IsPersistent = true
+            };
             Intersection i = new();
             i.SetNodes(new() { n });
             n.Intersection = i;
+            target.Node = n;
             Game.RegisterIntersection(i);
             Game.RegisterNode(n);
         }
 
         foreach (Transform child in sources.transform)
         {
-            Point target = new(uint.Parse(child.gameObject.name));
-            Game.Sources.Add(target.Id, target);
+            SourcePoint source = new(uint.Parse(child.gameObject.name));
+            Game.Sources.Add(source.Id, source);
 
-            Node n = new(child.transform.position, 0, 0);
+            Node n = new(child.transform.position, 0, 0)
+            {
+                IsPersistent = true
+            };
             Intersection i = new();
             i.SetNodes(new() { n });
             n.Intersection = i;
+            source.Node = n;
             Game.RegisterIntersection(i);
             Game.RegisterNode(n);
         }
+    }
 
-        Debug.Log(Game.Targets.Keys.First());
-        Debug.Log(Game.Sources.Keys.First());
+    void Update()
+    {
+        DemandsGenerator.GenerateDemands(Time.deltaTime);
+        DemandsSatisfer.SatisfyDemands(Time.deltaTime);
     }
 }

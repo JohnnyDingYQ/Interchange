@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class Point
 {
     public uint Id { get; set; }

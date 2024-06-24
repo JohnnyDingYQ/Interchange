@@ -25,7 +25,7 @@ public static class Game
     public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
     public static Dictionary<uint, Point> Targets { get => GameSave.Targets; }
-    public static Dictionary<uint, Point> Sources { get => GameSave.Sources; }
+    public static Dictionary<uint, SourcePoint> Sources { get => GameSave.Sources; }
     public static float Elevation { get => GameSave.Elevation; }
     public static uint CarServiced
     {

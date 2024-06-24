@@ -16,7 +16,7 @@ public static class Constants
     public const float CarMaxSpeed = 20f;
     public const float CarMinSpeed = 0f;
     public const float CarMinimumSeparation = MinimumLaneLength / 5;
-    public const int ZoneDemandCap = 20;
+    public const int DestinationCap = 20;
     public const int MaxVertexWaitingCar = 5;
     public const float ZoneDemandSatisfyCooldownSpeed = 20;
 }

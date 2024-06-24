@@ -15,7 +15,7 @@ public class GameSave
     public Dictionary<uint, Vertex> Vertices { get; private set; }
     public Dictionary<uint, Path> Paths { get; private set; }
     public Dictionary<uint, Point> Targets { get; private set; }
-    public Dictionary<uint, Point> Sources { get; private set; }
+    public Dictionary<uint, SourcePoint> Sources { get; private set; }
     [JsonIgnore]
     public Dictionary<uint, Car> Cars { get; private set; }
     public float Elevation { get; set; }

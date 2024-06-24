@@ -311,7 +311,7 @@ public static class Build
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);
-                if (node.Lanes.Count == 0)
+                if (node.Lanes.Count == 0 && !node.IsPersistent)
                 {
                     Game.Nodes.Remove(node.Id);
                     road.StartIntersection.RemoveNode(node);
