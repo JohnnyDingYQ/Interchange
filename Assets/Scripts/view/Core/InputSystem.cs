@@ -8,6 +8,8 @@ public class InputSystem : MonoBehaviour
     public static bool MouseIsInGameWorld { get; set; }
     private GameActions gameActions;
     public static float3 MouseWorldPos { get; set; }
+    private float2 prevScreenMousePos;
+    const float MouseDragScreenMultiplier = 0.17f;
 
     void Awake()
     {
@@ -66,11 +68,19 @@ public class InputSystem : MonoBehaviour
         mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
         mouseWorldPos.y = Game.Elevation;
         MouseWorldPos = mouseWorldPos;
+
+        prevScreenMousePos.x = Input.mousePosition.x;
+        prevScreenMousePos.y = Input.mousePosition.y;
     }
 
     void UpdateCameraPos()
     {
         Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
+        if (Input.GetMouseButton(1))
+        {
+            cameraOffset.x += (prevScreenMousePos.x - Input.mousePosition.x) * MouseDragScreenMultiplier;
+            cameraOffset.z += (prevScreenMousePos.y - Input.mousePosition.y) * MouseDragScreenMultiplier;
+        }
         CameraControl.CameraOffset = cameraOffset;
     }
 

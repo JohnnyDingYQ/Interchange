@@ -62,5 +62,5 @@ MonoBehaviour:
     m_RotationOrder: 4
   MinHeight: 20
   MaxHeight: 800
-  ZoomMultiplier: 35
-  PanMultiplier: 130
+  ZoomMultiplier: 350
+  PanMultiplier: 1500
