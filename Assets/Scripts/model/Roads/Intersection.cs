@@ -61,6 +61,11 @@ public class Intersection
         outRoads = roads;
     }
 
+    public bool IsRoadEmpty()
+    {
+        return inRoads.Count == 0 && outRoads.Count == 0;
+    }
+
     public void AddRoad(Road road, Side side)
     {
         if (side != Side.Start && side != Side.End)

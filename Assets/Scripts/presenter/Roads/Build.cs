@@ -224,9 +224,9 @@ public static class Build
     static float3 AlignPivotPos(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
     {
         float oldY = pivotPos.y;
-        if (startTarget != null && startTarget.SnapNotNull)
+        if (startTarget != null && startTarget.SnapNotNull && !startTarget.Intersection.IsRoadEmpty())
             pivotPos = math.project(pivotPos - startTarget.MedianPoint, startTarget.Intersection.Tangent) + startTarget.MedianPoint;
-        if (endTarget != null && endTarget.SnapNotNull)
+        if (endTarget != null && endTarget.SnapNotNull && !endTarget.Intersection.IsRoadEmpty())
             pivotPos = math.project(pivotPos - endTarget.MedianPoint, endTarget.Intersection.Tangent) + endTarget.MedianPoint;
         pivotPos.y = oldY;
         return pivotPos;

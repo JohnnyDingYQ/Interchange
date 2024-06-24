@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class BuildTargets
 {
@@ -49,11 +50,17 @@ public class BuildTargets
 
         // this sorts nodes with their order in the road, left to right in the direction of the road
         nodes.Sort();
+
+        // check all snapped nodes belong to the same intersection
         Intersection intersection = nodes.First().Intersection;
         foreach (Node n in nodes)
+        {
+            Assert.IsNotNull(n.Intersection);
             if (n.Intersection != intersection)
                 return null;
+        }
         Intersection = intersection;
+
         if (nodes.Count == laneCount)
             return nodes;
 
@@ -90,8 +97,6 @@ public class BuildTargets
 
         void AddNodeIfWithinSnap(Node n)
         {
-            if (n.Pos.y == Constants.MinElevation)
-                return;
             float distance = Vector3.Distance(clickPos, n.Pos);
             if (distance < snapRadius)
                 candidates.Add(new(distance, n));
