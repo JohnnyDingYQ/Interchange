@@ -16,6 +16,7 @@ public class Main : MonoBehaviour
     void FixedUpdate()
     {
         Build.HandleHover(InputSystem.MouseWorldPos);
+        Roads.UpdateHoveredRoad();
     }
 
 }

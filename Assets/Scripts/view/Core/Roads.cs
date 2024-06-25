@@ -11,6 +11,7 @@ public class Roads : MonoBehaviour
         Game.RoadAdded += InstantiateRoad;
         Game.RoadUpdated += UpdateRoadMesh;
         Game.RoadRemoved += DestroyRoad;
+        Game.UpdateHoveredRoad += UpdateHoveredRoad;
         roadMapping = new();
     }
 
@@ -19,6 +20,7 @@ public class Roads : MonoBehaviour
         Game.RoadAdded -= InstantiateRoad;
         Game.RoadUpdated -= UpdateRoadMesh;
         Game.RoadRemoved -= DestroyRoad;
+        Game.UpdateHoveredRoad -= UpdateHoveredRoad;
     }
 
     void InstantiateRoad(Road road)
@@ -29,6 +31,7 @@ public class Roads : MonoBehaviour
         RoadHumbleObject roadGameObject = Instantiate(roadPrefab, transform, true);
         roadGameObject.name = $"Road-{road.Id}";
         roadGameObject.Road = road;
+        roadGameObject.gameObject.isStatic = true;
         roadMapping[road.Id] = roadGameObject;
         UpdateRoadMesh(road);
     }
@@ -44,5 +47,27 @@ public class Roads : MonoBehaviour
     {
         Destroy(roadMapping[road.Id].gameObject);
         roadMapping.Remove(road.Id);
+    }
+
+    public static void UpdateHoveredRoad()
+    {
+        if (Game.HoveredRoad != null && roadMapping.ContainsKey(Game.HoveredRoad.Id))
+            roadMapping[Game.HoveredRoad.Id].gameObject.layer = LayerMask.NameToLayer("Default");
+        float3 mousePos = InputSystem.MouseWorldPos;
+        mousePos.y = Constants.MaxElevation + 1;
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(mousePos, new float3(0, -1, 0), 100);
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider.gameObject.TryGetComponent<RoadHumbleObject>(out var roadObject))
+            {
+                if (roadObject.Road.IsGhost)
+                    continue;
+                Game.HoveredRoad = roadObject.Road;
+                roadMapping[Game.HoveredRoad.Id].gameObject.layer = LayerMask.NameToLayer("Outline");
+                return;
+            }
+        }
+        Game.HoveredRoad = null;
     }
 }

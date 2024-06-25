@@ -318,14 +318,11 @@ public static class Build
             }
             else
             {
-
                 foreach (Path p in Game.Paths.Values)
                     if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
                         toRemove.Add(p);
             }
-
-            foreach (Path p in toRemove)
-                Game.RemovePath(p);
+            toRemove.ForEach(p => Game.RemovePath(p));
 
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {

@@ -134,6 +134,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DragCamera"",
+                    ""type"": ""Button"",
+                    ""id"": ""b37da4a0-cfbf-49f6-ac50-c78e369e4621"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -141,7 +150,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""7298c412-af08-40c2-9d8d-b43e6400c512"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap(duration=0.15)"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Build"",
@@ -356,6 +365,17 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""Lower"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""00a3e5ab-669c-4301-a5fd-f9e13a3f6127"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Hold(duration=1.401298E-45)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DragCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -376,6 +396,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_AbandonBuild = m_InGame.FindAction("AbandonBuild", throwIfNotFound: true);
         m_InGame_Elevate = m_InGame.FindAction("Elevate", throwIfNotFound: true);
         m_InGame_Lower = m_InGame.FindAction("Lower", throwIfNotFound: true);
+        m_InGame_DragCamera = m_InGame.FindAction("DragCamera", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -449,6 +470,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_AbandonBuild;
     private readonly InputAction m_InGame_Elevate;
     private readonly InputAction m_InGame_Lower;
+    private readonly InputAction m_InGame_DragCamera;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -465,6 +487,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @AbandonBuild => m_Wrapper.m_InGame_AbandonBuild;
         public InputAction @Elevate => m_Wrapper.m_InGame_Elevate;
         public InputAction @Lower => m_Wrapper.m_InGame_Lower;
+        public InputAction @DragCamera => m_Wrapper.m_InGame_DragCamera;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -510,6 +533,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @Lower.started += instance.OnLower;
             @Lower.performed += instance.OnLower;
             @Lower.canceled += instance.OnLower;
+            @DragCamera.started += instance.OnDragCamera;
+            @DragCamera.performed += instance.OnDragCamera;
+            @DragCamera.canceled += instance.OnDragCamera;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -550,6 +576,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @Lower.started -= instance.OnLower;
             @Lower.performed -= instance.OnLower;
             @Lower.canceled -= instance.OnLower;
+            @DragCamera.started -= instance.OnDragCamera;
+            @DragCamera.performed -= instance.OnDragCamera;
+            @DragCamera.canceled -= instance.OnDragCamera;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -581,5 +610,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnAbandonBuild(InputAction.CallbackContext context);
         void OnElevate(InputAction.CallbackContext context);
         void OnLower(InputAction.CallbackContext context);
+        void OnDragCamera(InputAction.CallbackContext context);
     }
 }

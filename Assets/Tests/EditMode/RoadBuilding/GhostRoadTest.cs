@@ -80,9 +80,7 @@ public class GhostRoadTest
         Build.HandleHover(2 * Constants.MaximumLaneLength);
         Assert.IsTrue(Game.Roads.Count > 1);
         Assert.IsFalse(ThereIsNoGhostRoad());
-        // Debug.Log(Game.Roads.Count);
         Build.HandleBuildCommand(2 * Constants.MaximumLaneLength);
-        // Debug.Log(Game.Roads.Count);
         Assert.IsTrue(ThereIsNoGhostRoad());
     }
 
@@ -91,7 +89,6 @@ public class GhostRoadTest
         foreach (Road r in Game.Roads.Values)
             if (r.IsGhost)
                 return false;
-        Debug.Log(Build.GhostRoads.Count);
         return Build.GhostRoads.Count == 0;
     }
 }

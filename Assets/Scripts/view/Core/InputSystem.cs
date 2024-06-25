@@ -9,6 +9,7 @@ public class InputSystem : MonoBehaviour
     private GameActions gameActions;
     public static float3 MouseWorldPos { get; set; }
     private float2 prevScreenMousePos;
+    public static bool IsDraggingCamera;
     const float MouseDragScreenMultiplier = 0.17f;
 
     void Awake()
@@ -34,6 +35,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.AbandonBuild.performed += AbandonBuild;
         gameActions.InGame.Elevate.performed += Elevate;
         gameActions.InGame.Lower.performed += Lower;
+        gameActions.InGame.DragCamera.performed += DragScreenStarted;
+        gameActions.InGame.DragCamera.canceled += DragScreenCanceled;
 
         gameActions.InGame.Enable();
     }
@@ -51,6 +54,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.AbandonBuild.performed -= AbandonBuild;
         gameActions.InGame.Elevate.performed -= Elevate;
         gameActions.InGame.Lower.performed -= Lower;
+        gameActions.InGame.DragCamera.performed -= DragScreenStarted;
+        gameActions.InGame.DragCamera.canceled -= DragScreenCanceled;
 
         gameActions.InGame.Disable();
     }
@@ -76,7 +81,7 @@ public class InputSystem : MonoBehaviour
     void UpdateCameraPos()
     {
         Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
-        if (Input.GetMouseButton(1))
+        if (IsDraggingCamera)
         {
             cameraOffset.x += (prevScreenMousePos.x - Input.mousePosition.x) * MouseDragScreenMultiplier;
             cameraOffset.z += (prevScreenMousePos.y - Input.mousePosition.y) * MouseDragScreenMultiplier;
@@ -130,5 +135,13 @@ public class InputSystem : MonoBehaviour
     void Lower(InputAction.CallbackContext context)
     {
         Game.SetElevation(Game.Elevation - 2);
+    }
+    void DragScreenStarted(InputAction.CallbackContext context)
+    {
+        IsDraggingCamera = true;
+    }
+    void DragScreenCanceled(InputAction.CallbackContext context)
+    {
+        IsDraggingCamera = false;
     }
 }
