@@ -17,11 +17,11 @@ public class BranchingTest
     [Test]
     public void TwoToOneOne_OnEnd()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].EndPos;
         float3 p2 = road.Lanes[1].EndPos;
-        Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1);
-        Road branch2 = RoadBuilder.B(p2, p2 + offset, p2 + 2 * offset, 1);
+        Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1);
+        Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 1);
 
         Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
@@ -31,11 +31,11 @@ public class BranchingTest
     [Test]
     public void TwoToOneOne_OnStart()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].StartPos;
         float3 p2 = road.Lanes[1].StartPos;
-        Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
-        Road branch2 = RoadBuilder.B(p2 - 2 * offset, p2 - offset, p2, 1);
+        Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
+        Road branch2 = RoadBuilder.Single(p2 - 2 * offset, p2 - offset, p2, 1);
 
         Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
@@ -45,9 +45,9 @@ public class BranchingTest
     [Test]
     public void TwoToOne_OnEnd()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].EndPos;
-        Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1); ;
+        Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1); ;
 
         Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
@@ -57,9 +57,9 @@ public class BranchingTest
     [Test]
     public void TwoToOne_OnStart()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 p1 = road.Lanes[0].StartPos;
-        Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
+        Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
 
         Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
@@ -69,11 +69,11 @@ public class BranchingTest
     [Test]
     public void ThreetoTwoOne_OnEnd()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].EndPos;
         float3 p2 = (road.Lanes[1].EndPos + road.Lanes[2].EndPos) / 2;
-        Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1);
-        Road branch2 = RoadBuilder.B(p2, p2 + offset, p2 + 2 * offset, 2);
+        Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1);
+        Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 2);
 
         Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
@@ -84,11 +84,11 @@ public class BranchingTest
     [Test]
     public void ThreetoTwoOne_OnStart()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].StartPos;
         float3 p2 = (road.Lanes[1].StartPos + road.Lanes[2].StartPos) / 2;
-        Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
-        Road branch2 = RoadBuilder.B(p2 - 2 * offset, p2 - offset, p2, 2);
+        Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
+        Road branch2 = RoadBuilder.Single(p2 - 2 * offset, p2 - offset, p2, 2);
 
         Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
@@ -99,13 +99,13 @@ public class BranchingTest
     [Test]
     public void ThreetoOneOneOne_OnEnd()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].EndPos;
         float3 p2 = road.Lanes[1].EndPos;
         float3 p3 = road.Lanes[2].EndPos;
-        Road branch1 = RoadBuilder.B(p1, p1 + offset, p1 + 2 * offset, 1);
-        Road branch2 = RoadBuilder.B(p2, p2 + offset, p2 + 2 * offset, 1);
-        Road branch3 = RoadBuilder.B(p3, p3 + offset, p3 + 2 * offset, 1);
+        Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1);
+        Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 1);
+        Road branch3 = RoadBuilder.Single(p3, p3 + offset, p3 + 2 * offset, 1);
 
         Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
@@ -116,13 +116,13 @@ public class BranchingTest
     [Test]
     public void ThreetoOneOneOne_OnStart()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 p1 = road.Lanes[0].StartPos;
         float3 p2 = road.Lanes[1].StartPos;
         float3 p3 = road.Lanes[2].StartPos;
-        Road branch1 = RoadBuilder.B(p1 - 2 * offset, p1 - offset, p1, 1);
-        Road branch2 = RoadBuilder.B(p2 - 2 * offset, p2 - offset, p2, 1);
-        Road branch3 = RoadBuilder.B(p3 - 2 * offset, p3 - offset, p3, 1);
+        Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
+        Road branch2 = RoadBuilder.Single(p2 - 2 * offset, p2 - offset, p2, 1);
+        Road branch3 = RoadBuilder.Single(p3 - 2 * offset, p3 - offset, p3, 1);
 
         Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
         Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));

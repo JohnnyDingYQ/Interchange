@@ -20,7 +20,7 @@ public class AutoDivideLongRoadTest
     [Test]
     public void DivideToTwo()
     {
-        RoadBuilder.B(
+        RoadBuilder.Many(
             0,
             direction * Constants.MaximumLaneLength / 2,
             direction * (Constants.MaximumLaneLength + 0.1f),
@@ -33,7 +33,7 @@ public class AutoDivideLongRoadTest
     public void DivideToFive()
     {
         float targetLength = Constants.MaximumLaneLength * 5 - 0.3f;
-        RoadBuilder.B(
+        RoadBuilder.Many(
             0,
             direction * targetLength / 2,
             direction * targetLength,
@@ -53,7 +53,7 @@ public class AutoDivideLongRoadTest
     public void CurvedRoadDividedEvenly()
     {
         float targetLength = Constants.MaximumLaneLength * 5 - 0.3f;
-        RoadBuilder.B(
+        RoadBuilder.Many(
             0,
             targetLength / 2 * new float3(1, 0, 0),
             targetLength * new float3(1, 0, 1),

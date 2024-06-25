@@ -28,8 +28,14 @@ public static class DivideHandler
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         int laneCount = road.LaneCount;
         road.BezierSeries.Split(t, out BezierSeries left, out BezierSeries right);
-        Road leftRoad = new(left, laneCount);
-        Road rightRoad = new(right, laneCount);
+        Road leftRoad = new(left, laneCount)
+        {
+            IsGhost = road.IsGhost
+        };
+        Road rightRoad = new(right, laneCount)
+        {
+            IsGhost = road.IsGhost
+        };
         if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
             return null;
         OperateNodes();

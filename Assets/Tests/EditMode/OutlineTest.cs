@@ -17,135 +17,135 @@ public class OutlineTest
     [Test]
     public void SingleOneLaneRoad()
     {
-        RoadBuilder.B(0, stride, 2 * stride, 1);
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneLaneRepeated_OnEnd()
     {
-        RoadBuilder.B(0, stride, 2 * stride, 1);
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneLaneRepeated_OnStart()
     {
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
-        RoadBuilder.B(0, stride, 2 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void ThreeLaneRepeated_OnEnd()
     {
-        RoadBuilder.B(0, stride, 2 * stride, 3);
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        RoadBuilder.Single(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void ThreeLaneRepeated_OnStart()
     {
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
-        RoadBuilder.B(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
+        RoadBuilder.Single(0, stride, 2 * stride, 3);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void TwoLaneRoadBranched_OnStart()
     {
-        Road road1 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 2);
+        Road road1 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 2);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void TwoLaneRoadBranched_OnEnd()
     {
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneTwoThreeLanesRoadInAtunction_OnEnd()
     {
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset / 2, 3 * stride - offset / 2, 4 * stride - offset / 2, 2);
+        RoadBuilder.Single(2 * stride - offset / 2, 3 * stride - offset / 2, 4 * stride - offset / 2, 2);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneTwoThreeLanesRoadInAtunction_OnStart()
     {
-        Road road1 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
+        Road road1 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset / 2, 3 * stride - offset / 2, 4 * stride - offset / 2, 2);
+        RoadBuilder.Single(2 * stride - offset / 2, 3 * stride - offset / 2, 4 * stride - offset / 2, 2);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneThreeLanetoThreeOneLane_SideFirst_OnEnd()
     {
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneThreeLanetoThreeOneLane_MidFirst_OnEnd()
     {
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneThreeLanetoThreeOneLane_SidesFirst_OnEnd()
     {
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneThreeLanetoThreeOneLane_SideFirst_OnStart()
     {
-        Road road1 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
+        Road road1 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
 
     }
@@ -153,26 +153,26 @@ public class OutlineTest
     [Test]
     public void OneThreeLanetoThreeOneLane_MidFirst_OnStart()
     {
-        Road road1 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
+        Road road1 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 
     [Test]
     public void OneThreeLanetoThreeOneLane_SidesFirst_OnStart()
     {
-        Road road1 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
+        Road road1 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 3);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
-        RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
+        RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
-        RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(AllRoadsOutLineValid());
     }
 

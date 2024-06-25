@@ -19,7 +19,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawOneLaneRoad()
     {
         float3 origin = new(0, 1, 10);
-        RoadBuilder.B(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 1);
+        RoadBuilder.Single(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 1);
         yield return null;
     }
 
@@ -27,7 +27,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawTwoLanesRoad()
     {
         float3 origin = new(20, 1, 10);
-        RoadBuilder.B(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 2);
+        RoadBuilder.Single(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 2);
         yield return null;
     }
 
@@ -35,7 +35,7 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawThreeLanesRoad()
     {
         float3 origin = new(40, 1, 10);
-        RoadBuilder.B(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 3);
+        RoadBuilder.Single(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 3);
         yield return null;
     }
 
@@ -43,9 +43,9 @@ public class RoadsSplineVisualCheck
     public IEnumerator DrawOneLaneRepeated()
     {
         float3 origin = new(0, 1, 30);
-        RoadBuilder.B(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 1);
+        RoadBuilder.Single(origin, origin + new float3(Offset, 0, 0), origin + new float3(Offset, 0, Offset), 1);
 
-        RoadBuilder.B(
+        RoadBuilder.Single(
             origin + new float3(Offset, 0, Offset),
             origin + new float3(Offset, 0, 2 * Offset),
             origin + new float3(0, 0, 2 * Offset),
@@ -60,12 +60,12 @@ public class RoadsSplineVisualCheck
     {
         float3 origin = new(20, 1, 30);
 
-        RoadBuilder.B(
+        RoadBuilder.Single(
             origin,
             origin + new float3(Offset, 0, 0),
             origin + new float3(Offset, 0, Offset), 2
         );
-        RoadBuilder.B(
+        RoadBuilder.Single(
             origin + new float3(Offset, 0, Offset),
             origin + new float3(Offset, 0, 2 * Offset),
             origin + new float3(0, 0, 2 * Offset),

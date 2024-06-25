@@ -16,7 +16,7 @@ public static class Build
     public static List<Tuple<float3, float3, float>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
     public static bool EnforcesTangent { get; set; }
-    public static HashSet<Road> GhostRoads { get; private set; }
+    public static List<uint> GhostRoads { get; private set; }
 
     static Build()
     {
@@ -57,14 +57,20 @@ public static class Build
         return SupportLines;
     }
 
-    public static Road BuildGhostRoad(float3 endTargetClickPos)
+    static void RemoveAllGhostRoads()
     {
-        foreach (Road r in GhostRoads)
-            Game.RemoveRoad(r.Id);
+        foreach (uint id in GhostRoads)
+        {
+            Game.RemoveRoad(id);
+        }
         GhostRoads.Clear();
+    }
+
+    public static void BuildGhostRoad(float3 endTargetClickPos)
+    {
+        RemoveAllGhostRoads();
         endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
-        Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
-        return road;
+        BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
     }
 
     public static void HandleHover(float3 hoverPos)
@@ -78,7 +84,7 @@ public static class Build
         SetSupportLines();
     }
 
-    public static Road HandleBuildCommand(float3 clickPos)
+    public static List<Road> HandleBuildCommand(float3 clickPos)
     {
         if (!startAssigned)
         {
@@ -95,14 +101,14 @@ public static class Build
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            List<Road> road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return road;
         }
 
     }
 
-    static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
+    static List<Road> BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
@@ -115,7 +121,11 @@ public static class Build
         if (RoadIsTooBent())
             return null;
 
-        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        Road road = new(startPos, pivotPos, endPos, LaneCount)
+        {
+            IsGhost = buildMode == BuildMode.Ghost
+        };
+
         if (road.HasLaneShorterThanMinimumLaneLength())
             return null;
 
@@ -137,19 +147,20 @@ public static class Build
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
+        List<Road> resultingRoads = new() { road };
+
+        RegisterUnregisteredNodes(road);
         if (buildMode == BuildMode.Actual)
         {
-            RegisterUnregisteredNodes(road);
             ReplaceExistingRoad();
-            if (AutoDivideOn)
-                AutoDivideRoad(road);
         }
-        else
-        {
-            road.IsGhost = true;
-            GhostRoads.Add(road);
-        }
-        return road;
+
+        if (AutoDivideOn)
+            AutoDivideRoad(road);
+
+        if (buildMode == BuildMode.Ghost)
+            GhostRoads.AddRange(resultingRoads.Select(r => r.Id));
+        return resultingRoads;
 
         # region extracted funcitons
         static float GetLongestLaneLength(Road road)
@@ -161,24 +172,26 @@ public static class Build
         }
 
         // Returns last road
-        static Road AutoDivideRoad(Road road)
+        void AutoDivideRoad(Road road)
         {
-            // HashSet<Road> resultingRoads = new() {road};
             float longestLength = GetLongestLaneLength(road);
             if (longestLength <= Constants.MaximumLaneLength)
-                return road;
+                return;
             int divisions = 2;
             while (longestLength / divisions > Constants.MaximumLaneLength)
                 divisions++;
-            return RecursiveRoadDivision(road, divisions);
+            RecursiveRoadDivision(road, divisions);
         }
 
-        static Road RecursiveRoadDivision(Road road, int divisions)
+        void RecursiveRoadDivision(Road road, int divisions)
         {
             if (divisions == 1)
-                return road;
+                return;
             SubRoads subRoads = DivideHandler.DivideRoad(road, 1 / (float)divisions);
-            return RecursiveRoadDivision(subRoads.Right, divisions - 1);
+            resultingRoads.Remove(road);
+            resultingRoads.Add(subRoads.Left);
+            resultingRoads.Add(subRoads.Right);
+            RecursiveRoadDivision(subRoads.Right, divisions - 1);
         }
 
         void ReplaceExistingRoad()
@@ -351,6 +364,7 @@ public static class Build
     public static void Reset()
     {
         ResetSelection();
+        RemoveAllGhostRoads();
         AutoDivideOn = true;
         EnforcesTangent = true;
         BuildsGhostRoad = true;
@@ -364,8 +378,6 @@ public static class Build
         startTarget = null;
         endTarget = null;
         pivotPos = 0;
-        foreach (Road r in GhostRoads)
-            Game.RemoveRoad(r.Id);
-        GhostRoads.Clear();
+        RemoveAllGhostRoads();
     }
 }

@@ -5,6 +5,7 @@ using Unity.Mathematics;
 public class GhostRoadTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 direction = new(1, 0, 0);
 
     [SetUp]
     public void SetUp()
@@ -69,6 +70,20 @@ public class GhostRoadTest
         Build.HandleHover(stride * 2);
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.False(ThereIsNoGhostRoad());
+    }
+
+    [Test]
+    public void BasicDividedGhostRoad()
+    {
+        Build.HandleBuildCommand(0);
+        Build.HandleBuildCommand(Constants.MaximumLaneLength);
+        Build.HandleHover(2 * Constants.MaximumLaneLength);
+        Assert.IsTrue(Game.Roads.Count > 1);
+        Assert.IsFalse(ThereIsNoGhostRoad());
+        // Debug.Log(Game.Roads.Count);
+        Build.HandleBuildCommand(2 * Constants.MaximumLaneLength);
+        // Debug.Log(Game.Roads.Count);
+        Assert.IsTrue(ThereIsNoGhostRoad());
     }
 
     bool ThereIsNoGhostRoad()

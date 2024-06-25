@@ -27,7 +27,7 @@ public class BasicBuildTest
     [Test]
     public void BuildOneLaneRoad()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Lane lane = road.Lanes[0];
 
         Assert.AreEqual(1, Roads.Count);
@@ -49,7 +49,7 @@ public class BasicBuildTest
     [Test]
     public void BuildTwoLaneRoad()
     {
-        Road road = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
@@ -74,8 +74,8 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtEnd_OneLane()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
         CheckLanesConnection(road0, road1, 1);
     }
@@ -83,8 +83,8 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtStart_OneLane()
     {
-        Road road0 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
 
         CheckLanesConnection(road1, road0, 1);
     }
@@ -92,8 +92,8 @@ public class BasicBuildTest
     [Test]
     public void SnapAtEnd_OneLane()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.B(2 * stride + new float3(1, 0, 0) * (Constants.BuildSnapTolerance - 1), 3 * stride, 4 * stride, 1);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride + new float3(1, 0, 0) * (Constants.BuildSnapTolerance - 1), 3 * stride, 4 * stride, 1);
 
         CheckLanesConnection(road0, road1, 1);
     }
@@ -102,8 +102,8 @@ public class BasicBuildTest
     public void OutOfSnapRangeDoesNotCreatesIntersection()
     {
         float3 exitingRoadStartPos = 2 * stride + new float3(Constants.BuildSnapTolerance + Constants.LaneWidth + 1, 0, 0);
-        Road enteringRoad = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road exitingRoad = RoadBuilder.B(exitingRoadStartPos, 3 * stride, 4 * stride, 1);
+        Road enteringRoad = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road exitingRoad = RoadBuilder.Single(exitingRoadStartPos, 3 * stride, 4 * stride, 1);
 
         Assert.AreEqual(1, enteringRoad.Lanes[0].EndNode.Lanes.Count);
         Assert.AreEqual(1, exitingRoad.Lanes[0].StartNode.Lanes.Count);
@@ -112,8 +112,8 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtEnd_TwoLanes()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 2);
-        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 2);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
 
         CheckLanesConnection(road0, road1, 2);
     }
@@ -121,8 +121,8 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtStart_TwoLanes()
     {
-        Road road0 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 2);
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 2);
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 2);
 
         CheckLanesConnection(road1, road0, 2);
     }
@@ -130,8 +130,8 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtEnd_ThreeLanes()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 3);
-        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
 
         CheckLanesConnection(road0, road1, 3);
     }
@@ -139,8 +139,8 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtStart_ThreeLanes()
     {
-        Road road0 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 3);
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
 
         CheckLanesConnection(road1, road0, 3);
     }
@@ -148,9 +148,9 @@ public class BasicBuildTest
     [Test]
     public void ConnectionAtBothSides_OneLane()
     {
-        Road road1 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road2 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
-        Road road3 = RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 1);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road3 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
         Lane lane1 = road1.Lanes[0];
         Lane lane2 = road2.Lanes[0];
         Lane lane3 = road3.Lanes[0];
@@ -167,7 +167,7 @@ public class BasicBuildTest
     public void LaneShorterThanMinimumLengthShouldNotBuild()
     {
         Assert.AreEqual(0, Game.Paths.Count);
-        RoadBuilder.B(
+        RoadBuilder.Single(
             new(0, 0, 0),
             new(0, 0, Constants.MinimumLaneLength / 2),
             new(0, 0, Constants.MinimumLaneLength - 0.01f),
@@ -181,7 +181,7 @@ public class BasicBuildTest
     [Test]
     public void RoadTooBentShoudNotBuild()
     {
-        RoadBuilder.B(0, stride, 0, 3);
+        RoadBuilder.Single(0, stride, 0, 3);
 
         Assert.AreEqual(0, Roads.Count);
     }
@@ -189,8 +189,8 @@ public class BasicBuildTest
     [Test]
     public void TwoRoadWithSameEnd()
     {
-        RoadBuilder.B(0, stride, 2 * stride, 3);
-        RoadBuilder.B(
+        RoadBuilder.Single(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(
             new float3(1, 0, 0) * Constants.MinimumLaneLength,
             new float3(1.3f, 0, 0.75f) * Constants.MinimumLaneLength,
             2 * stride,

@@ -19,8 +19,8 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToTwoLane_Left()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.B(2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1), 3 * stride, 4 * stride, 2);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1), 3 * stride, 4 * stride, 2);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -35,8 +35,8 @@ public class LaneExpansionTest
     [Test]
     public void TwoLaneToThreeLane_Right()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 2);
-        Road road1 = RoadBuilder.B(2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 3 * stride, 4 * stride, 3);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 2);
+        Road road1 = RoadBuilder.Single(2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 3 * stride, 4 * stride, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane01 = road0.Lanes[1];
         Lane lane10 = road1.Lanes[0];
@@ -55,8 +55,8 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToThreeLane_Mid()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 3);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -74,9 +74,9 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToThreeLane_Left()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         float3 offset = road0.BezierSeries.Evaluate2DNormalizedNormal(1) * Constants.LaneWidth;
-        Road road1 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
+        Road road1 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -93,9 +93,9 @@ public class LaneExpansionTest
     [Test]
     public void OneLaneToThreeLane_Right()
     {
-        Road road0 = RoadBuilder.B(0, stride, 2 * stride, 1);
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         float3 offset = -1 * Constants.LaneWidth * road0.BezierSeries.Evaluate2DNormalizedNormal(1);
-        Road road1 = RoadBuilder.B(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
+        Road road1 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -112,8 +112,8 @@ public class LaneExpansionTest
     [Test]
     public void ThreeLaneToOneLane_Mid()
     {
-        Road road0 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
-        Road road1 = RoadBuilder.B(0, stride , 2 * stride, 3);
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road1 = RoadBuilder.Single(0, stride , 2 * stride, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
@@ -128,8 +128,8 @@ public class LaneExpansionTest
     [Test]
     public void ThreeLaneToOneLane_Left()
     {
-        Road road0 = RoadBuilder.B(2 * stride, 3 * stride, 4 * stride, 1);
-        Road road1 = RoadBuilder.B(0, stride , 2 * stride, 3);
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road1 = RoadBuilder.Single(0, stride , 2 * stride, 3);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
