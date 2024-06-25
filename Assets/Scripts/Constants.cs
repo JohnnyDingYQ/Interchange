@@ -8,7 +8,6 @@ public static class Constants
     public const float RoadOutlineSeparation = LaneWidth / 2;
     public const float VertexDistanceFromRoadEnds = MinimumLaneLength / 2; 
     public const float MaxRoadBendAngle = 130;
-    public const uint GhostRoadId = uint.MaxValue;
     public const int MaxElevation = 10;
     public const int MinElevation = 0;
     public const float CarAcceleration = 15;

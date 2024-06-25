@@ -58,13 +58,7 @@ public static class Game
 
     public static void RegisterRoad(Road road)
     {
-        if (road.Id == Constants.GhostRoadId)
-        {
-            if (Roads.ContainsKey(road.Id))
-                RemoveRoad(Roads[road.Id]);
-        }
-        else
-            road.Id = FindNextAvailableKey(Roads.Keys);
+        road.Id = FindNextAvailableKey(Roads.Keys);
         Roads.Add(road.Id, road);
         foreach (Lane lane in road.Lanes)
         {

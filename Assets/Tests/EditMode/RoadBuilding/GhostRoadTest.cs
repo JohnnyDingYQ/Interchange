@@ -1,10 +1,11 @@
+using UnityEngine;
 using NUnit.Framework;
 using Unity.Mathematics;
 
 public class GhostRoadTest
 {
     float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
-    
+
     [SetUp]
     public void SetUp()
     {
@@ -14,14 +15,14 @@ public class GhostRoadTest
     [Test]
     public void DoesNotBuildByItself()
     {
-        Assert.False(Game.Roads.ContainsKey(Constants.GhostRoadId));
+        Assert.True(ThereIsNoGhostRoad());
     }
 
     [Test]
     public void AfterAssigingStartGhostRoadDoesNotBuild()
     {
         Build.HandleBuildCommand(0);
-        Assert.False(Game.Roads.ContainsKey(Constants.GhostRoadId));   
+        Assert.True(ThereIsNoGhostRoad());
     }
 
     [Test]
@@ -29,9 +30,9 @@ public class GhostRoadTest
     {
         Build.HandleBuildCommand(0);
         Build.HandleBuildCommand(stride);
-        Assert.False(Game.Roads.ContainsKey(Constants.GhostRoadId));   
+        Assert.True(ThereIsNoGhostRoad());
         Build.HandleHover(stride * 2);
-        Assert.True(Game.Roads.ContainsKey(Constants.GhostRoadId));
+        Assert.False(ThereIsNoGhostRoad());
     }
 
     [Test]
@@ -41,7 +42,7 @@ public class GhostRoadTest
         Build.HandleBuildCommand(stride);
         Build.HandleHover(stride * 2);
         Build.HandleBuildCommand(2 * stride);
-        Assert.False(Game.Roads.ContainsKey(Constants.GhostRoadId));   
+        Assert.True(ThereIsNoGhostRoad());
         Assert.AreEqual(1, Game.Roads.Count);
     }
 
@@ -51,9 +52,11 @@ public class GhostRoadTest
         Build.HandleBuildCommand(0);
         Build.HandleBuildCommand(stride);
         Build.HandleHover(stride * 2);
-        Build.HandleBuildCommand(0); // should fail because road is too bent
+        Debug.Log(Build.GhostRoads.Count);
+        Build.HandleBuildCommand(0); // build should fail because road is too bent
+        Debug.Log(Build.GhostRoads.Count);
         Assert.AreEqual(0, Game.Roads.Count);
-        Assert.False(Game.Roads.ContainsKey(Constants.GhostRoadId));
+        Assert.True(ThereIsNoGhostRoad());
     }
 
     [Test]
@@ -65,6 +68,15 @@ public class GhostRoadTest
         Build.HandleHover(stride * 2);
         Build.HandleHover(stride * 2);
         Assert.AreEqual(1, Game.Roads.Count);
-        Assert.True(Game.Roads.ContainsKey(Constants.GhostRoadId));
+        Assert.False(ThereIsNoGhostRoad());
+    }
+
+    bool ThereIsNoGhostRoad()
+    {
+        foreach (Road r in Game.Roads.Values)
+            if (r.IsGhost)
+                return false;
+        Debug.Log(Build.GhostRoads.Count);
+        return Build.GhostRoads.Count == 0;
     }
 }

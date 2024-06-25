@@ -7,6 +7,8 @@ public class RoadHumbleObject : MonoBehaviour
 
     void OnMouseOver()
     {
+        if (Road.IsGhost)
+            return;
         gameObject.layer = LayerMask.NameToLayer("Outline");
         Game.HoveredRoad = Road;
     }

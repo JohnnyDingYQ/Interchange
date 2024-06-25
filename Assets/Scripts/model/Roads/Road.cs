@@ -30,6 +30,8 @@ public class Road
     public Intersection EndIntersection { get; set; }
     public uint StartIntersection_ { get; set; }
     public uint EndIntersection_ { get; set; }
+    [JsonIgnore]
+    public bool IsGhost { get; set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()

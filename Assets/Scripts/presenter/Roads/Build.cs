@@ -16,6 +16,7 @@ public static class Build
     public static List<Tuple<float3, float3, float>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
     public static bool EnforcesTangent { get; set; }
+    public static HashSet<Road> GhostRoads { get; private set; }
 
     static Build()
     {
@@ -26,6 +27,7 @@ public static class Build
         SupportLines = new();
         BuildsGhostRoad = true;
         EnforcesTangent = true;
+        GhostRoads = new();
     }
 
     public static BuildTargets GetStartTarget()
@@ -57,10 +59,11 @@ public static class Build
 
     public static Road BuildGhostRoad(float3 endTargetClickPos)
     {
+        foreach (Road r in GhostRoads)
+            Game.RemoveRoad(r.Id);
+        GhostRoads.Clear();
         endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
         Road road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
-        if (road == null)
-            Game.RemoveRoad(Constants.GhostRoadId);
         return road;
     }
 
@@ -112,10 +115,7 @@ public static class Build
         if (RoadIsTooBent())
             return null;
 
-        Road road = new(startPos, pivotPos, endPos, LaneCount)
-        {
-            Id = buildMode == BuildMode.Ghost ? Constants.GhostRoadId : 0
-        };
+        Road road = new(startPos, pivotPos, endPos, LaneCount);
         if (road.HasLaneShorterThanMinimumLaneLength())
             return null;
 
@@ -144,6 +144,11 @@ public static class Build
             if (AutoDivideOn)
                 AutoDivideRoad(road);
         }
+        else
+        {
+            road.IsGhost = true;
+            GhostRoads.Add(road);
+        }
         return road;
 
         # region extracted funcitons
@@ -155,9 +160,10 @@ public static class Build
             return length;
         }
 
-        /// Returns last road
+        // Returns last road
         static Road AutoDivideRoad(Road road)
         {
+            // HashSet<Road> resultingRoads = new() {road};
             float longestLength = GetLongestLaneLength(road);
             if (longestLength <= Constants.MaximumLaneLength)
                 return road;
@@ -348,6 +354,7 @@ public static class Build
         AutoDivideOn = true;
         EnforcesTangent = true;
         BuildsGhostRoad = true;
+        GhostRoads = new();
     }
 
     public static void ResetSelection()
@@ -357,6 +364,8 @@ public static class Build
         startTarget = null;
         endTarget = null;
         pivotPos = 0;
-        Game.RemoveRoad(Constants.GhostRoadId);
+        foreach (Road r in GhostRoads)
+            Game.RemoveRoad(r.Id);
+        GhostRoads.Clear();
     }
 }

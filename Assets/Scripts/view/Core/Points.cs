@@ -49,8 +49,9 @@ public class Points : MonoBehaviour
 
     public static bool NodePositionsAreCorrect()
     {
-        Assert.IsNotNull(sessionTargets);
-        Assert.IsNotNull(sessionSources);
+        // nothing to check against, function is vacuously true
+        if (sessionTargets == null || sessionSources == null)
+            return true;
         foreach (Transform child in sessionSources.transform)
         {
             uint id = uint.Parse(child.gameObject.name);

@@ -75,7 +75,6 @@ public static class SaveSystem
             TypeNameHandling = TypeNameHandling.Auto,
         });
         File.WriteAllText(Application.persistentDataPath + "/save0.json", s);
-
     }
 
     static void ObjectReferencesToId()
