@@ -7,14 +7,13 @@ using UnityEngine;
 
 public class Float3Converter : JsonConverter<float3>
 {
-    int decimalPlaces = 3;
     public override void WriteJson(JsonWriter writer, float3 value, JsonSerializer serializer)
     {
         JObject obj = new JObject()
         {
-            ["x"] = value.x.ToString($"F{decimalPlaces}"),
-            ["y"] = value.y.ToString($"F{decimalPlaces}"),
-            ["z"] = value.z.ToString($"F{decimalPlaces}")
+            ["x"] = value.x,
+            ["y"] = value.y,
+            ["z"] = value.z
         };
         obj.WriteTo(writer);
     }

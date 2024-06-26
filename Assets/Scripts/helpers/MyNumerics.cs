@@ -27,11 +27,17 @@ public static class MyNumerics
 
     public static bool AreNumericallyEqual(List<float3> a, List<float3> b)
     {
+        return AreNumericallyEqual(a, b, DefaultTolerance);
+    }
+
+    public static bool AreNumericallyEqual(List<float3> a, List<float3> b, float tolerance)
+    {
         if (a.Count != b.Count)
             return false;
         for (int i = 0; i < a.Count; i++)
-            if (!AreNumericallyEqual(a[i], b[i]))
+            if (!AreNumericallyEqual(a[i], b[i], tolerance))
                 return false;
+            
         return true;
     }
 

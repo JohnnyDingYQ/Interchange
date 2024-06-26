@@ -19,9 +19,6 @@ public static class Build
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
     public static float ParallelSpacing { get; set; }
-    private static BuildTargets startTargetParallel;
-    private static BuildTargets endTargetParallel;
-    private static float3 pivotPosParallel;
 
     static Build()
     {
@@ -54,8 +51,6 @@ public static class Build
         pivotAssigned = false;
         startTarget = null;
         endTarget = null;
-        startTargetParallel = null;
-        endTargetParallel = null;
         pivotPos = 0;
         RemoveAllGhostRoads();
     }
@@ -100,7 +95,7 @@ public static class Build
     {
         RemoveAllGhostRoads();
         endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
-        BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Ghost);
+        BuildRoads(startTarget, pivotPos, endTarget, BuildMode.Ghost);
     }
 
     public static void HandleHover(float3 hoverPos)
@@ -117,11 +112,6 @@ public static class Build
     public static void ToggletParallelBuild()
     {
         ParallelBuildOn = !ParallelBuildOn;
-        if (!ParallelBuildOn)
-        {
-            startTargetParallel = null;
-            endTargetParallel = null;
-        }
     }
 
     public static List<Road> HandleBuildCommand(float3 clickPos)
@@ -136,70 +126,81 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
-            if (ParallelBuildOn)
-            {
-                startTargetParallel = new(startTarget.ClickPos + GetParallelOffsetA(), LaneCount, Game.Nodes.Values);
-                pivotPosParallel = pivotPos + GetParallelOffsetA();
-            }
             return null;
         }
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            List<Road> roads = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            List<Road> roads;
             if (ParallelBuildOn)
-            {
-                endTargetParallel = new(clickPos + GetParallelOffsetB(), LaneCount, Game.Nodes.Values);
-                roads.AddRange(BuildRoad(startTargetParallel, pivotPosParallel, endTargetParallel, BuildMode.Actual));
-            }
+                roads = BuildParallelRoads(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            else
+                roads = BuildRoads(startTarget, pivotPos, endTarget, BuildMode.Actual);
             ResetSelection();
             return roads;
         }
+    }
 
-        static float3 GetParallelOffsetA()
-        {
-            Assert.IsNotNull(startTarget);
-            Assert.IsTrue(pivotAssigned);
-            float3 l = pivotPos - startTarget.ClickPos;
-            return math.normalize(math.cross(l, Vector3.up)) * ParallelSpacing;
-        }
+    static List<Road> BuildRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
+    {
+        Road road = InitRoad(startTarget, pivotPos, endTarget);
+        if (road == null)
+            return null;
+        if (buildMode == BuildMode.Ghost)
+            road.IsGhost = true;
+        return ProcessRoad(road, startTarget, endTarget);
+    }
 
-        static float3 GetParallelOffsetB()
+    static List<Road> BuildParallelRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
+    {
+        Road road = InitRoad(startTarget, pivotPos, endTarget);
+        if (road == null)
+            return null;
+        BezierSeries offsetted = road.BezierSeries.Offset(ParallelSpacing);
+        BuildTargets startTargetParallel = new(offsetted.EvaluatePosition(0), LaneCount, Game.Nodes.Values);
+        BuildTargets endTargetParallel = new(offsetted.EvaluatePosition(1), LaneCount, Game.Nodes.Values);
+        Road parallel = new(offsetted, LaneCount);
+        List<Road> roads = ProcessRoad(road, startTarget, endTarget);
+        roads.AddRange(ProcessRoad(parallel, startTargetParallel, endTargetParallel));
+        return roads;
+    }
+
+    static Road InitRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
+    {
+        float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
+        float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
+        if (EnforcesTangent)
+            pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
+        if (RoadIsTooBent())
+            return null;
+        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        return road;
+
+        bool RoadIsTooBent()
         {
-            Assert.IsNotNull(endTarget);
-            Assert.IsTrue(pivotAssigned);
-            float3 l =  endTarget.ClickPos - pivotPos;
-            return math.normalize(math.cross(l, Vector3.up)) * ParallelSpacing;
+            float3 v1 = pivotPos - startPos;
+            float3 v2 = endPos - pivotPos;
+            float angle = MathF.Abs(
+                MathF.Acos(
+                    Math.Clamp(math.dot(v1, v2) / math.length(v1) / math.length(v2), -1f, 1f)
+                    )
+            );
+            if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
+                return true;
+            return false;
         }
     }
 
-    static List<Road> BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
+    static List<Road> ProcessRoad(Road road, BuildTargets startTarget, BuildTargets endTarget)
     {
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
-        float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
-        float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-
-        if (EnforcesTangent)
-            pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
-
-        if (RoadIsTooBent())
-            return null;
-
-        Road road = new(startPos, pivotPos, endPos, LaneCount)
-        {
-            IsGhost = buildMode == BuildMode.Ghost
-        };
-
         if (road.HasLaneShorterThanMinimumLaneLength())
             return null;
-
         if (startTarget.SnapNotNull)
             road.StartIntersection = startTarget.Intersection;
-
         if (endTarget.SnapNotNull)
             road.EndIntersection = endTarget.Intersection;
-
         Game.RegisterRoad(road);
 
         if (startTarget.SnapNotNull)
@@ -215,14 +216,14 @@ public static class Build
         List<Road> resultingRoads = new() { road };
 
         RegisterUnregisteredNodes(road);
-        if (buildMode == BuildMode.Actual)
+        if (!road.IsGhost)
         {
             ReplaceExistingRoad();
             if (AutoDivideOn)
                 AutoDivideRoad(road);
         }
 
-        if (buildMode == BuildMode.Ghost)
+        if (road.IsGhost)
             GhostRoads.AddRange(resultingRoads.Select(r => r.Id));
         return resultingRoads;
 
@@ -235,7 +236,6 @@ public static class Build
             return length;
         }
 
-        // Returns last road
         void AutoDivideRoad(Road road)
         {
             float longestLength = GetLongestLaneLength(road);
@@ -286,20 +286,6 @@ public static class Build
             foreach (Road r in roads)
                 if (r != road)
                     Game.RemoveRoad(r);
-        }
-
-        bool RoadIsTooBent()
-        {
-            float3 v1 = pivotPos - startPos;
-            float3 v2 = endPos - pivotPos;
-            float angle = MathF.Abs(
-                MathF.Acos(
-                    Math.Clamp(math.dot(v1, v2) / math.length(v1) / math.length(v2), -1f, 1f)
-                    )
-            );
-            if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
-                return true;
-            return false;
         }
         #endregion
     }

@@ -53,9 +53,7 @@ public class GhostRoadTest
         Build.HandleBuildCommand(0);
         Build.HandleBuildCommand(stride);
         Build.HandleHover(stride * 2);
-        Debug.Log(Build.GhostRoads.Count);
         Build.HandleBuildCommand(0); // build should fail because road is too bent
-        Debug.Log(Build.GhostRoads.Count);
         Assert.AreEqual(0, Game.Roads.Count);
         Assert.True(ThereIsNoGhostRoad());
     }
