@@ -37,6 +37,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.Lower.performed += Lower;
         gameActions.InGame.DragCamera.performed += DragScreenStarted;
         gameActions.InGame.DragCamera.canceled += DragScreenCanceled;
+        gameActions.InGame.ToggleParallelBuildMode.performed += ToggleParallelBuild;
 
         gameActions.InGame.Enable();
     }
@@ -56,6 +57,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.Lower.performed -= Lower;
         gameActions.InGame.DragCamera.performed -= DragScreenStarted;
         gameActions.InGame.DragCamera.canceled -= DragScreenCanceled;
+        gameActions.InGame.ToggleParallelBuildMode.performed -= ToggleParallelBuild;
 
         gameActions.InGame.Disable();
     }
@@ -143,5 +145,9 @@ public class InputSystem : MonoBehaviour
     void DragScreenCanceled(InputAction.CallbackContext context)
     {
         IsDraggingCamera = false;
+    }
+    void ToggleParallelBuild(InputAction.CallbackContext context)
+    {
+        Build.ToggletParallelBuild();
     }
 }

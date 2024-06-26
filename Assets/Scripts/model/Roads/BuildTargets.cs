@@ -21,11 +21,11 @@ public class BuildTargets
     /// <param name="gameNodes">Nodes eligible for consideration</param>
     public BuildTargets(float3 clickPos, int laneCount, IEnumerable<Node> gameNodes)
     {
+        ClickPos = clickPos;
         Nodes = GetBuildNodes(clickPos, laneCount, gameNodes);
         if (Nodes == null)
         {
             SnapNotNull = false;
-            ClickPos = clickPos;
         }
         else
         {

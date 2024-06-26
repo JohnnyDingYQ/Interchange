@@ -17,6 +17,11 @@ public static class Build
     public static bool BuildsGhostRoad { get; set; }
     public static bool EnforcesTangent { get; set; }
     public static List<uint> GhostRoads { get; private set; }
+    public static bool ParallelBuildOn { get; set; }
+    public static float ParallelSpacing { get; set; }
+    private static BuildTargets startTargetParallel;
+    private static BuildTargets endTargetParallel;
+    private static float3 pivotPosParallel;
 
     static Build()
     {
@@ -28,6 +33,31 @@ public static class Build
         BuildsGhostRoad = true;
         EnforcesTangent = true;
         GhostRoads = new();
+        ParallelSpacing = Constants.DefaultParallelSpacing;
+    }
+
+    public static void Reset()
+    {
+        ResetSelection();
+        RemoveAllGhostRoads();
+        AutoDivideOn = true;
+        EnforcesTangent = true;
+        BuildsGhostRoad = true;
+        GhostRoads = new();
+        ParallelBuildOn = false;
+        ParallelSpacing = Constants.DefaultParallelSpacing;
+    }
+
+    public static void ResetSelection()
+    {
+        startAssigned = false;
+        pivotAssigned = false;
+        startTarget = null;
+        endTarget = null;
+        startTargetParallel = null;
+        endTargetParallel = null;
+        pivotPos = 0;
+        RemoveAllGhostRoads();
     }
 
     public static BuildTargets GetStartTarget()
@@ -84,6 +114,16 @@ public static class Build
         SetSupportLines();
     }
 
+    public static void ToggletParallelBuild()
+    {
+        ParallelBuildOn = !ParallelBuildOn;
+        if (!ParallelBuildOn)
+        {
+            startTargetParallel = null;
+            endTargetParallel = null;
+        }
+    }
+
     public static List<Road> HandleBuildCommand(float3 clickPos)
     {
         if (!startAssigned)
@@ -96,16 +136,41 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
+            if (ParallelBuildOn)
+            {
+                startTargetParallel = new(startTarget.ClickPos + GetParallelOffsetA(), LaneCount, Game.Nodes.Values);
+                pivotPosParallel = pivotPos + GetParallelOffsetA();
+            }
             return null;
         }
         else
         {
             endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
-            List<Road> road = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            List<Road> roads = BuildRoad(startTarget, pivotPos, endTarget, BuildMode.Actual);
+            if (ParallelBuildOn)
+            {
+                endTargetParallel = new(clickPos + GetParallelOffsetB(), LaneCount, Game.Nodes.Values);
+                roads.AddRange(BuildRoad(startTargetParallel, pivotPosParallel, endTargetParallel, BuildMode.Actual));
+            }
             ResetSelection();
-            return road;
+            return roads;
         }
 
+        static float3 GetParallelOffsetA()
+        {
+            Assert.IsNotNull(startTarget);
+            Assert.IsTrue(pivotAssigned);
+            float3 l = pivotPos - startTarget.ClickPos;
+            return math.normalize(math.cross(l, Vector3.up)) * ParallelSpacing;
+        }
+
+        static float3 GetParallelOffsetB()
+        {
+            Assert.IsNotNull(endTarget);
+            Assert.IsTrue(pivotAssigned);
+            float3 l =  endTarget.ClickPos - pivotPos;
+            return math.normalize(math.cross(l, Vector3.up)) * ParallelSpacing;
+        }
     }
 
     static List<Road> BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
@@ -355,25 +420,5 @@ public static class Build
 
         Game.InvokeRoadRemoved(road);
         return true;
-    }
-
-    public static void Reset()
-    {
-        ResetSelection();
-        RemoveAllGhostRoads();
-        AutoDivideOn = true;
-        EnforcesTangent = true;
-        BuildsGhostRoad = true;
-        GhostRoads = new();
-    }
-
-    public static void ResetSelection()
-    {
-        startAssigned = false;
-        pivotAssigned = false;
-        startTarget = null;
-        endTarget = null;
-        pivotPos = 0;
-        RemoveAllGhostRoads();
     }
 }

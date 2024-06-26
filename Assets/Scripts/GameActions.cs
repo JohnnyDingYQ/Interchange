@@ -143,6 +143,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleParallelBuildMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""354b1c2c-d354-4896-bb11-dbcdc1c9205e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -150,7 +159,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""7298c412-af08-40c2-9d8d-b43e6400c512"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": ""Tap(duration=0.15)"",
+                    ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Build"",
@@ -369,11 +378,22 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""00a3e5ab-669c-4301-a5fd-f9e13a3f6127"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": ""Hold(duration=1.401298E-45)"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""DragCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""41e7c391-159f-4531-80d9-bcc1ccdc366f"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleParallelBuildMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -397,6 +417,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_Elevate = m_InGame.FindAction("Elevate", throwIfNotFound: true);
         m_InGame_Lower = m_InGame.FindAction("Lower", throwIfNotFound: true);
         m_InGame_DragCamera = m_InGame.FindAction("DragCamera", throwIfNotFound: true);
+        m_InGame_ToggleParallelBuildMode = m_InGame.FindAction("ToggleParallelBuildMode", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -471,6 +492,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_Elevate;
     private readonly InputAction m_InGame_Lower;
     private readonly InputAction m_InGame_DragCamera;
+    private readonly InputAction m_InGame_ToggleParallelBuildMode;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -488,6 +510,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @Elevate => m_Wrapper.m_InGame_Elevate;
         public InputAction @Lower => m_Wrapper.m_InGame_Lower;
         public InputAction @DragCamera => m_Wrapper.m_InGame_DragCamera;
+        public InputAction @ToggleParallelBuildMode => m_Wrapper.m_InGame_ToggleParallelBuildMode;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -536,6 +559,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @DragCamera.started += instance.OnDragCamera;
             @DragCamera.performed += instance.OnDragCamera;
             @DragCamera.canceled += instance.OnDragCamera;
+            @ToggleParallelBuildMode.started += instance.OnToggleParallelBuildMode;
+            @ToggleParallelBuildMode.performed += instance.OnToggleParallelBuildMode;
+            @ToggleParallelBuildMode.canceled += instance.OnToggleParallelBuildMode;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -579,6 +605,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @DragCamera.started -= instance.OnDragCamera;
             @DragCamera.performed -= instance.OnDragCamera;
             @DragCamera.canceled -= instance.OnDragCamera;
+            @ToggleParallelBuildMode.started -= instance.OnToggleParallelBuildMode;
+            @ToggleParallelBuildMode.performed -= instance.OnToggleParallelBuildMode;
+            @ToggleParallelBuildMode.canceled -= instance.OnToggleParallelBuildMode;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -611,5 +640,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnElevate(InputAction.CallbackContext context);
         void OnLower(InputAction.CallbackContext context);
         void OnDragCamera(InputAction.CallbackContext context);
+        void OnToggleParallelBuildMode(InputAction.CallbackContext context);
     }
 }

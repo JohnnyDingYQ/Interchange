@@ -7,29 +7,21 @@ using UnityEngine;
 
 public class Float3Converter : JsonConverter<float3>
 {
+    int decimalPlaces = 3;
     public override void WriteJson(JsonWriter writer, float3 value, JsonSerializer serializer)
     {
-        JObject obj = new JObject() { ["x"] = value.x, ["y"] = value.y, ["z"] = value.z };
+        JObject obj = new JObject()
+        {
+            ["x"] = value.x.ToString($"F{decimalPlaces}"),
+            ["y"] = value.y.ToString($"F{decimalPlaces}"),
+            ["z"] = value.z.ToString($"F{decimalPlaces}")
+        };
         obj.WriteTo(writer);
     }
     public override float3 ReadJson(JsonReader reader, Type objectType, float3 existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         JObject obj = JObject.Load(reader);
         return new float3((float)obj.GetValue("x"), (float)obj.GetValue("y"), (float)obj.GetValue("z"));
-    }
-}
-
-public class PlaneConverter : JsonConverter<Plane>
-{
-    public override void WriteJson(JsonWriter writer, Plane value, JsonSerializer serializer)
-    {
-        JObject obj = new JObject() { ["n.x"] = value.normal.x, ["n.y"] = value.normal.y, ["n.z"] = value.normal.z, ["d"] = value.distance};
-        obj.WriteTo(writer);
-    }
-    public override Plane ReadJson(JsonReader reader, Type objectType, Plane existingValue, bool hasExistingValue, JsonSerializer serializer)
-    {
-        JObject obj = JObject.Load(reader);
-        return new Plane(new float3((float)obj.GetValue("n.x"), (float)obj.GetValue("n.y"), (float)obj.GetValue("n.z")), (float) obj.GetValue("d"));
     }
 }
 
@@ -41,7 +33,6 @@ public static class JsonCustomSettings
         {
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new Float3Converter());
-            settings.Converters.Add(new PlaneConverter());
             return settings;
         };
     }
