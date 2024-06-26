@@ -31,7 +31,7 @@ public class Node : IComparable<Node>
     public int NodeIndex { get; private set; }
     [JsonIgnore]
     public Intersection Intersection { get; set; }
-    public bool IsPersistent { get; set; }
+    public bool BelongsToPoint { get; set; }
     public uint Intersection_ { get; set; }
     public Node() { }
     public Node(float3 pos, float elevation, int order)

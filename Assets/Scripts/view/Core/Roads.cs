@@ -11,7 +11,6 @@ public class Roads : MonoBehaviour
         Game.RoadAdded += InstantiateRoad;
         Game.RoadUpdated += UpdateRoadMesh;
         Game.RoadRemoved += DestroyRoad;
-        Game.UpdateHoveredRoad += UpdateHoveredRoad;
         roadMapping = new();
     }
 
@@ -20,7 +19,6 @@ public class Roads : MonoBehaviour
         Game.RoadAdded -= InstantiateRoad;
         Game.RoadUpdated -= UpdateRoadMesh;
         Game.RoadRemoved -= DestroyRoad;
-        Game.UpdateHoveredRoad -= UpdateHoveredRoad;
     }
 
     void InstantiateRoad(Road road)

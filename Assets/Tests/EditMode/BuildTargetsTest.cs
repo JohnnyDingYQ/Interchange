@@ -234,4 +234,20 @@ public class BuildTargetTest
         
         Assert.False(bt.SnapNotNull);
     }
+
+    [Test]
+    public void NodeBelongsToPointOnlyAcceptsOneLaneSnap()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        road.Lanes[0].StartNode.BelongsToPoint = true;
+
+        BuildTargets bt = new(0, 1, Game.Nodes.Values);
+        Assert.True(bt.SnapNotNull);
+
+        bt = new(0, 2, Game.Nodes.Values);
+        Assert.False(bt.SnapNotNull);
+
+        bt = new(0, 3, Game.Nodes.Values);
+        Assert.False(bt.SnapNotNull);
+    }
 }

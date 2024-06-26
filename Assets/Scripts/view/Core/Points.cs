@@ -36,7 +36,7 @@ public class Points : MonoBehaviour
         {
             Node n = new(pos, 0, 0)
             {
-                IsPersistent = true
+                BelongsToPoint = true
             };
             Intersection i = new();
             i.SetNodes(new() { n });

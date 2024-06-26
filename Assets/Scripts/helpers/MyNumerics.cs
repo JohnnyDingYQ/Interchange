@@ -25,7 +25,7 @@ public static class MyNumerics
         return Math.Abs(a - b) < tolerance;
     }
 
-    public static bool AreNumericallyEqual(List<float3> a, List<float3> b)
+    public static bool AreNumericallyEqual(IList<float3> a, IList<float3> b)
     {
         if (a.Count != b.Count)
             return false;

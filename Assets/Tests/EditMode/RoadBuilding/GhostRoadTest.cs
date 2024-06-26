@@ -72,17 +72,18 @@ public class GhostRoadTest
         Assert.False(ThereIsNoGhostRoad());
     }
 
-    [Test]
-    public void BasicDividedGhostRoad()
-    {
-        Build.HandleBuildCommand(0);
-        Build.HandleBuildCommand(Constants.MaximumLaneLength);
-        Build.HandleHover(2 * Constants.MaximumLaneLength);
-        Assert.IsTrue(Game.Roads.Count > 1);
-        Assert.IsFalse(ThereIsNoGhostRoad());
-        Build.HandleBuildCommand(2 * Constants.MaximumLaneLength);
-        Assert.IsTrue(ThereIsNoGhostRoad());
-    }
+    // Uncomment if I decide to divide ghost roads again
+    // [Test]
+    // public void BasicDividedGhostRoad()
+    // {
+    //     Build.HandleBuildCommand(0);
+    //     Build.HandleBuildCommand(Constants.MaximumLaneLength);
+    //     Build.HandleHover(2 * Constants.MaximumLaneLength);
+    //     Assert.IsTrue(Game.Roads.Count > 1);
+    //     Assert.IsFalse(ThereIsNoGhostRoad());
+    //     Build.HandleBuildCommand(2 * Constants.MaximumLaneLength);
+    //     Assert.IsTrue(ThereIsNoGhostRoad());
+    // }
 
     bool ThereIsNoGhostRoad()
     {

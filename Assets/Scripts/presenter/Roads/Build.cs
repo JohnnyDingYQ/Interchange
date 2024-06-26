@@ -153,10 +153,9 @@ public static class Build
         if (buildMode == BuildMode.Actual)
         {
             ReplaceExistingRoad();
+            if (AutoDivideOn)
+                AutoDivideRoad(road);
         }
-
-        if (AutoDivideOn)
-            AutoDivideRoad(road);
 
         if (buildMode == BuildMode.Ghost)
             GhostRoads.AddRange(resultingRoads.Select(r => r.Id));
@@ -327,7 +326,7 @@ public static class Build
             foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
             {
                 node.RemoveLane(lane);
-                if (node.Lanes.Count == 0 && !node.IsPersistent)
+                if (node.Lanes.Count == 0 && !node.BelongsToPoint)
                 {
                     Game.Nodes.Remove(node.Id);
                     road.StartIntersection.RemoveNode(node);

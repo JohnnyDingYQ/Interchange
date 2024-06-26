@@ -17,7 +17,7 @@ public class BezierSeries
     public ReadOnlyCollection<BezierCurve> Curves { get { return curves.AsReadOnly(); } }
     public float Length { get; set; }
     [JsonProperty]
-    private List<List<float3>> serializedCurves;
+    private List<float3[]> serializedCurves;
 
     [JsonConstructor]
     public BezierSeries(List<List<float3>> serializedCurves)
@@ -111,7 +111,7 @@ public class BezierSeries
     {
         serializedCurves = new();
         foreach (BezierCurve curve in curves)
-            serializedCurves.Add(new List<float3>() { curve.P0, curve.P1, curve.P2, curve.P3 });
+            serializedCurves.Add(new float3[4] { curve.P0, curve.P1, curve.P2, curve.P3 });
     }
 
     public void RestoreFromSerialization(List<List<float3>> serializeCurves)

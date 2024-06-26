@@ -16,7 +16,6 @@ public static class Game
     public static event Action<Car> CarRemoved;
     public static event Action<float> ElevationUpdated;
     public static event Action<uint> CarServicedUpdated;
-    public static event Action UpdateHoveredRoad;
     public static GameSave GameSave { get; set; }
     public static Dictionary<uint, Road> Roads { get => GameSave.Roads; }
     public static Dictionary<uint, Node> Nodes { get => GameSave.Nodes; }
@@ -33,19 +32,7 @@ public static class Game
         get { return GameSave.CarServiced; }
         set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); }
     }
-    // private static Road hoveredRoad;
     public static Road HoveredRoad { get; set; }
-    // {
-    //     get
-    //     {
-    //         UpdateHoveredRoad?.Invoke();
-    //         return hoveredRoad;
-    //     }
-    //     set
-    //     {
-    //         hoveredRoad = value;
-    //     }
-    // }
     public static float3 MouseWorldPos { get { return InputSystem.MouseWorldPos; } }
 
     static Game()

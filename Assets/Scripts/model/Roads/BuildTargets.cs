@@ -63,7 +63,8 @@ public class BuildTargets
 
         if (nodes.Count == laneCount)
             return nodes;
-
+        else if (nodes.Count == 1 && nodes.First().BelongsToPoint)
+            return null;
         else
         {
             candidates = new();

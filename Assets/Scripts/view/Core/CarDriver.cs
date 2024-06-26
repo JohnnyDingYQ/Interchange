@@ -10,7 +10,7 @@ public class CarDriver : MonoBehaviour
     ObjectPool<CarHumbleObject> carPool;
     void Awake()
     {
-        Game.CarAdded += Drive;
+        Game.CarAdded += CarAdded;
         Game.CarRemoved += RemoveCar;
         carMapping = new();
         carPool = new(
@@ -27,20 +27,15 @@ public class CarDriver : MonoBehaviour
     void Update()
     {
         CarControl.PassTime(Time.deltaTime);
-        foreach (Car car in Game.Cars.Values)
-        {
-            CarHumbleObject carObject = carMapping[car.Id];
-            carObject.transform.position = car.Pos;
-        }
     }
 
     void OnDestroy()
     {
-        Game.CarAdded -= Drive;
+        Game.CarAdded -= CarAdded;
         Game.CarRemoved -= RemoveCar;
     }
 
-    void Drive(Car car)
+    void CarAdded(Car car)
     {
         CarHumbleObject carObject = carPool.Get();
         carObject.Car = car;

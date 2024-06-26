@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -36,7 +37,9 @@ public class SnapPoints : MonoBehaviour
             foreach (Node node in polled.Nodes)
             {
                 SnapPoint snapPoint = snapPointPool.Get();
-                snapPoint.transform.position = node.Pos;
+                float3 pos = node.Pos;
+                pos.y = Constants.MaxElevation + 1;
+                snapPoint.transform.position = pos;
                 activeSnapPoints.Add(snapPoint);
             }
         BuildTargets startTarget = Build.GetStartTarget();
@@ -44,7 +47,9 @@ public class SnapPoints : MonoBehaviour
             foreach (Node node in startTarget.Nodes)
             {
                 SnapPoint snapPoint = snapPointPool.Get();
-                snapPoint.transform.position = node.Pos;
+                float3 pos = node.Pos;
+                pos.y = Constants.MaxElevation + 1;
+                snapPoint.transform.position = pos;
                 activeSnapPoints.Add(snapPoint);
             }
     }
