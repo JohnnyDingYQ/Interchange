@@ -18,16 +18,16 @@ public class AngleLabels : MonoBehaviour
 
     void FixedUpdate()
     {
-        List<Tuple<float3, float3, float>> t = Build.SupportLines;
+        List<Tuple<float3, float3>> t = Build.SupportLines;
         for (int i = 1; i < Build.SupportLines.Count; i++)
         {
             TextLabel l = labels[i];
-            Tuple<float3, float3, float> s1 = Build.SupportLines[i - 1];
-            Tuple<float3, float3, float> s2 = Build.SupportLines[i];
+            Tuple<float3, float3> s1 = Build.SupportLines[i - 1];
+            Tuple<float3, float3> s2 = Build.SupportLines[i];
 
             l.gameObject.SetActive(true);
             l.ApplyWorldPos(s1.Item2);
-            l.SetText(Round(GetAngleInDegree(s2.Item2 - s2.Item1, s1.Item2 - s1.Item1), 1) + "°");
+            l.SetText(Round(GetAngleInDegree(s2.Item1 - s2.Item2, s1.Item2 - s1.Item1), 1) + "°");
         }
         for (int i = Build.SupportLines.Count; i < labels.Count; i++)
             labels[i].gameObject.SetActive(false);

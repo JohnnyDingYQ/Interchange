@@ -23,11 +23,11 @@ public class LengthLabels : MonoBehaviour
         for (int i = 0; i < Build.SupportLines.Count; i++)
         {
             TextLabel l = labels[i];
-            Tuple<float3, float3, float> s = Build.SupportLines[i];
+            Tuple<float3, float3> s = Build.SupportLines[i];
 
             l.gameObject.SetActive(true);
             l.ApplyWorldPos((s.Item1 + s.Item2) / 2);
-            l.SetText(Round(s.Item3, 1) + "u");
+            l.SetText(Round(math.length(s.Item1 - s.Item2), 1) + "u");
         }
         for (int i = Build.SupportLines.Count; i < labels.Count; i++)
             labels[i].gameObject.SetActive(false);

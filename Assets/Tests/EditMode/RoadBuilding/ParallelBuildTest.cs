@@ -40,7 +40,7 @@ public class ParallelBuildTest
         List<Road> roads0 = RoadBuilder.Many(0, stride, 2 * stride, 1);
         List<Road> roads1 = RoadBuilder.Many(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.IsTrue(AreConnected(roads0.First(), roads1.First()));
-        Assert.IsTrue(AreConnected(roads0.Last(), roads1.Last()));
+        Assert.IsTrue(AreConnected(roads1.Last(), roads0.Last()));
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class ParallelBuildTest
         List<Road> roads0 = RoadBuilder.Many(0, stride, 2 * stride, 3);
         List<Road> roads1 = RoadBuilder.Many(2 * stride, 3 * stride, 4 * stride, 3);
         Assert.IsTrue(AreConnected(roads0.First(), roads1.First()));
-        Assert.IsTrue(AreConnected(roads0.Last(), roads1.Last()));
+        Assert.IsTrue(AreConnected(roads1.Last(), roads0.Last()));
     }
 
     bool AreConnected(Road left, Road right)

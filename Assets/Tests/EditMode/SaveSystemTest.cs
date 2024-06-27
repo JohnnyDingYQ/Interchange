@@ -30,7 +30,7 @@ public class SaveSystemTest
         Assert.AreEqual(1, road.Lanes.Count);
         Lane lane = road.Lanes.First();
         Assert.AreEqual(new float3(0), lane.StartPos);
-        Assert.AreEqual(2 * stride, lane.EndPos);
+        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndPos));
         HashSet<Lane> expected = new() { lane };
         Assert.AreEqual(2, Game.Nodes.Count);
         Assert.True(lane.StartNode.Lanes.SetEquals(expected));
@@ -52,7 +52,7 @@ public class SaveSystemTest
         Assert.AreEqual(3, road.Lanes.Count);
         Lane lane = road.Lanes[1];
         Assert.AreEqual(new float3(0), lane.StartPos);
-        Assert.AreEqual(2 * stride, lane.EndPos);
+        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndPos));
         Assert.AreEqual(6, Game.Nodes.Count);
         Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
         Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
@@ -98,7 +98,7 @@ public class SaveSystemTest
         Assert.AreEqual(2, Game.Roads.Count);
         Assert.AreEqual(new float3(0), road0.StartPos);
         Assert.AreEqual(2 * stride, road0.EndPos);
-        Assert.AreEqual(2 * stride, road1.StartPos);
+        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, road1.StartPos));
         Assert.AreEqual(4 * stride, road1.EndPos);
         Assert.AreEqual(3, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));

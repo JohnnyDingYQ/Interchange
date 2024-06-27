@@ -9,12 +9,12 @@ using UnityEngine.Splines;
 public static class Build
 {
     private static float3 pivotPos;
-    private static bool startAssigned, pivotAssigned;
+    private static bool startAssigned, pivotAssigned, pivotAligned;
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
     public static bool AutoDivideOn { get; set; }
-    public static List<Tuple<float3, float3, float>> SupportLines { get; }
+    public static List<Tuple<float3, float3>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
     public static bool EnforcesTangent { get; set; }
     public static List<uint> GhostRoads { get; private set; }
@@ -26,6 +26,7 @@ public static class Build
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
+        pivotAligned = false;
         AutoDivideOn = true;
         SupportLines = new();
         BuildsGhostRoad = true;
@@ -50,6 +51,7 @@ public static class Build
     {
         startAssigned = false;
         pivotAssigned = false;
+        pivotAligned = false;
         startTarget = null;
         endTarget = null;
         pivotPos = 0;
@@ -61,7 +63,7 @@ public static class Build
         return startTarget;
     }
 
-    public static List<Tuple<float3, float3, float>> SetSupportLines()
+    public static List<Tuple<float3, float3>> SetSupportLines()
     {
         SupportLines.Clear();
         if (startAssigned)
@@ -70,7 +72,7 @@ public static class Build
             float3 pivotPoint = pivotPos;
             startPoint.y = 0;
             pivotPoint.y = 0;
-            SupportLines.Add(new(startPoint, pivotPoint, math.length(startPoint - pivotPoint)));
+            SupportLines.Add(new(startPoint, pivotPoint));
         }
         if (pivotAssigned && endTarget != null)
         {
@@ -78,7 +80,7 @@ public static class Build
             float3 pivotPoint = pivotPos;
             endPoint.y = 0;
             pivotPoint.y = 0;
-            SupportLines.Add(new(pivotPoint, endPoint, math.length(endPoint - pivotPoint)));
+            SupportLines.Add(new(pivotPoint, endPoint));
         }
         return SupportLines;
     }
@@ -106,8 +108,8 @@ public static class Build
     {
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
-        if (EnforcesTangent && !pivotAssigned)
-            pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
+        if (EnforcesTangent && !pivotAssigned && startAssigned)
+            AlignPivotStart(startTarget, pivotPos);
         if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
         SetSupportLines();
@@ -130,6 +132,8 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
+            if (EnforcesTangent)
+                AlignPivotStart(startTarget, pivotPos);
             return null;
         }
         else
@@ -179,12 +183,11 @@ public static class Build
     {
         float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
         float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
-        if (EnforcesTangent)
-            pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
+        if (EnforcesTangent && !pivotAligned)
+            AlignPivotEnd(endTarget, pivotPos);
         if (RoadIsTooBent())
             return null;
-        ApproximateCircularArc(startPos, pivotPos, endPos);
-        Road road = new(startPos, pivotPos, endPos, LaneCount);
+        Road road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
         return road;
 
         bool RoadIsTooBent()
@@ -301,57 +304,43 @@ public static class Build
         #endregion
     }
 
-    static void ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
+    static BezierSeries ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
     {
+        // reference: https://pomax.github.io/bezierinfo/#circles_cubic
+        float k = 0.551785f;
         float2 start = q0.xz;
         float2 pivot = q1.xz;
         float2 end = q2.xz;
-        float height = math.length(start - pivot);
-        float width = math.length(end - pivot);
-        float theta = MathF.Acos(math.dot(start - pivot, end - pivot) / height / width);
-        float k = 4.0f / 3.0f * MathF.Tan(theta / 4);
-        float2 eclipticRadii = new(width, height);
-        float2 c0 = eclipticRadii * new float2(1, 0);
-        float2 c1 = eclipticRadii * new float2(1, k);
-        float2 c2 = eclipticRadii * new float2(MathF.Cos(theta) + k * MathF.Sin(theta), MathF.Sin(theta) - k * MathF.Cos(theta));
-        float2 c3 = eclipticRadii * new float2(MathF.Cos(theta), MathF.Sin(theta));
+        float2 c1 = Vector2.Lerp(start, pivot, k);
+        float2 c2 = Vector2.Lerp(end, pivot, k);
 
-        // DebugExtension.DebugPoint(new float3(c0.x, 0, c0.y), Color.cyan, 5, 0.5f);
-        // DebugExtension.DebugPoint(new float3(c3.x, 0, c3.y), Color.magenta, 5, 0.5f);
-
-        float2 shiftedXAxis = pivot - end;
-        float angleToXAxis = MathF.Acos(math.dot(shiftedXAxis, Vector2.right) / width);
-        // if (shiftedXAxis.y < 0)
-        //     angleToXAxis += MathF.PI;
-        float2x2 rotMatrix = new(
-            MathF.Cos(angleToXAxis), -MathF.Sin(angleToXAxis),
-            MathF.Sin(angleToXAxis), MathF.Cos(angleToXAxis)
-        );
-
-        c0 = ApplyTransformation(c0);
-        c1 = ApplyTransformation(c1);
-        c2 = ApplyTransformation(c2);
-        c3 = ApplyTransformation(c3);
-
-        DebugExtension.DebugPoint(new float3(c0.x, 0, c0.y), Color.cyan, 5, 0.5f);
-        DebugExtension.DebugPoint(new float3(c3.x, 0, c3.y), Color.magenta, 5, 0.5f);
-        
-        float2 ApplyTransformation(float2 input)
-        {
-            return  math.mul(rotMatrix, input) + start + end - pivot;
-        }
-        Debug.Log(theta / MathF.PI * 180);
+        return new(new BezierCurve(q0, new float3(c1.x, 0, c1.y), new float3(c2.x, 0, c2.y), q2));
     }
 
-    static float3 AlignPivotPos(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
+    static void AlignPivotStart(BuildTargets startTarget, float3 p)
     {
-        float oldY = pivotPos.y;
-        if (startTarget != null && startTarget.SnapNotNull && !startTarget.Intersection.IsRoadEmpty())
-            pivotPos = math.project(pivotPos - startTarget.MedianPoint, startTarget.Intersection.Tangent) + startTarget.MedianPoint;
-        if (endTarget != null && endTarget.SnapNotNull && !endTarget.Intersection.IsRoadEmpty())
-            pivotPos = math.project(pivotPos - endTarget.MedianPoint, endTarget.Intersection.Tangent) + endTarget.MedianPoint;
-        pivotPos.y = oldY;
-        return pivotPos;
+        Assert.IsNotNull(startTarget);
+        float oldY = p.y;
+        if (startTarget.SnapNotNull && !startTarget.Intersection.IsRoadEmpty())
+            p = math.project(p - startTarget.MedianPoint, startTarget.Intersection.Tangent) + startTarget.MedianPoint;
+        else
+            return;
+        p.y = oldY;
+        pivotPos = p;
+        pivotAligned = true;
+    }
+
+    static void AlignPivotEnd(BuildTargets endTarget, float3 p)
+    {
+        Assert.IsNotNull(endTarget);
+        float oldY = p.y;
+        if (endTarget.SnapNotNull && !endTarget.Intersection.IsRoadEmpty())
+            p = math.project(p - endTarget.MedianPoint, endTarget.Intersection.Tangent) + endTarget.MedianPoint;
+        else
+            return;
+        p.y = oldY;
+        pivotPos = p;
+        pivotAligned = true;
     }
 
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
