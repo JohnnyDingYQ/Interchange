@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Splines;
 
 public static class Build
 {
@@ -95,7 +96,10 @@ public static class Build
     {
         RemoveAllGhostRoads();
         endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
-        BuildRoads(startTarget, pivotPos, endTarget, BuildMode.Ghost);
+        if (ParallelBuildOn)
+            BuildParallelRoads(startTarget, pivotPos, endTarget, BuildMode.Ghost);
+        else
+            BuildRoads(startTarget, pivotPos, endTarget, BuildMode.Ghost);
     }
 
     public static void HandleHover(float3 hoverPos)
@@ -159,9 +163,15 @@ public static class Build
         BezierSeries offsetted = road.BezierSeries.Offset(ParallelSpacing);
         BuildTargets startTargetParallel = new(offsetted.EvaluatePosition(0), LaneCount, Game.Nodes.Values);
         BuildTargets endTargetParallel = new(offsetted.EvaluatePosition(1), LaneCount, Game.Nodes.Values);
+        offsetted.Reverse();
         Road parallel = new(offsetted, LaneCount);
+        if (buildMode == BuildMode.Ghost)
+        {
+            road.IsGhost = true;
+            parallel.IsGhost = true;
+        }
         List<Road> roads = ProcessRoad(road, startTarget, endTarget);
-        roads.AddRange(ProcessRoad(parallel, startTargetParallel, endTargetParallel));
+        roads.AddRange(ProcessRoad(parallel, endTargetParallel, startTargetParallel));
         return roads;
     }
 
@@ -173,6 +183,7 @@ public static class Build
             pivotPos = AlignPivotPos(startTarget, pivotPos, endTarget);
         if (RoadIsTooBent())
             return null;
+        ApproximateCircularArc(startPos, pivotPos, endPos);
         Road road = new(startPos, pivotPos, endPos, LaneCount);
         return road;
 
@@ -288,6 +299,48 @@ public static class Build
                     Game.RemoveRoad(r);
         }
         #endregion
+    }
+
+    static void ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
+    {
+        float2 start = q0.xz;
+        float2 pivot = q1.xz;
+        float2 end = q2.xz;
+        float height = math.length(start - pivot);
+        float width = math.length(end - pivot);
+        float theta = MathF.Acos(math.dot(start - pivot, end - pivot) / height / width);
+        float k = 4.0f / 3.0f * MathF.Tan(theta / 4);
+        float2 eclipticRadii = new(width, height);
+        float2 c0 = eclipticRadii * new float2(1, 0);
+        float2 c1 = eclipticRadii * new float2(1, k);
+        float2 c2 = eclipticRadii * new float2(MathF.Cos(theta) + k * MathF.Sin(theta), MathF.Sin(theta) - k * MathF.Cos(theta));
+        float2 c3 = eclipticRadii * new float2(MathF.Cos(theta), MathF.Sin(theta));
+
+        // DebugExtension.DebugPoint(new float3(c0.x, 0, c0.y), Color.cyan, 5, 0.5f);
+        // DebugExtension.DebugPoint(new float3(c3.x, 0, c3.y), Color.magenta, 5, 0.5f);
+
+        float2 shiftedXAxis = pivot - end;
+        float angleToXAxis = MathF.Acos(math.dot(shiftedXAxis, Vector2.right) / width);
+        // if (shiftedXAxis.y < 0)
+        //     angleToXAxis += MathF.PI;
+        float2x2 rotMatrix = new(
+            MathF.Cos(angleToXAxis), -MathF.Sin(angleToXAxis),
+            MathF.Sin(angleToXAxis), MathF.Cos(angleToXAxis)
+        );
+
+        c0 = ApplyTransformation(c0);
+        c1 = ApplyTransformation(c1);
+        c2 = ApplyTransformation(c2);
+        c3 = ApplyTransformation(c3);
+
+        DebugExtension.DebugPoint(new float3(c0.x, 0, c0.y), Color.cyan, 5, 0.5f);
+        DebugExtension.DebugPoint(new float3(c3.x, 0, c3.y), Color.magenta, 5, 0.5f);
+        
+        float2 ApplyTransformation(float2 input)
+        {
+            return  math.mul(rotMatrix, input) + start + end - pivot;
+        }
+        Debug.Log(theta / MathF.PI * 180);
     }
 
     static float3 AlignPivotPos(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)

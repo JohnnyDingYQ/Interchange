@@ -67,6 +67,15 @@ public class BezierSeries
         return length;
     }
 
+    public void Reverse()
+    {
+        List<BezierCurve> reversed = new();
+        foreach (BezierCurve c in curves)
+            reversed.Add(c.GetInvertedCurve());
+        reversed.Reverse();
+        curves = reversed;
+    }
+
     public BezierSeries Offset(float distance)
     {
         List<BezierCurve> offset = new();

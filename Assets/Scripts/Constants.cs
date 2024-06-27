@@ -18,5 +18,5 @@ public static class Constants
     public const int DestinationCap = 20;
     public const int MaxVertexWaitingCar = 5;
     public const float ZoneDemandSatisfyCooldownSpeed = 20;
-    public const float DefaultParallelSpacing = LaneWidth * 2.5f;
+    public const float DefaultParallelSpacing = LaneWidth * 4.5f;
 }
