@@ -96,7 +96,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Elevate",
+                    "name": "ElevationDrag",
                     "type": "Button",
                     "id": "6d5ae660-34f7-4554-8f69-a764e81bdf22",
                     "expectedControlType": "Button",
@@ -105,7 +105,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Lower",
+                    "name": "ParallelSpacingDrag",
                     "type": "Button",
                     "id": "676f582d-b29b-4a4a-8d86-c26f57cdb8e5",
                     "expectedControlType": "Button",
@@ -126,6 +126,15 @@
                     "name": "ToggleParallelBuildMode",
                     "type": "Button",
                     "id": "354b1c2c-d354-4896-bb11-dbcdc1c9205e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleBuildMode",
+                    "type": "Button",
+                    "id": "cd1fb85d-9bfc-42eb-9ae7-24fb551a6bb8",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -311,34 +320,34 @@
                 },
                 {
                     "name": "",
-                    "id": "69fcf976-c80a-4ba3-a234-88990b533433",
-                    "path": "<Mouse>/forwardButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Elevate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "924d7ac7-d01e-4a80-a91b-29b23a523fe3",
                     "path": "<Keyboard>/period",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Elevate",
+                    "action": "ElevationDrag",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cbf8a344-c484-4995-ad4f-7f7cef647cb7",
+                    "path": "<Mouse>/backButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ElevationDrag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "e8929b3b-afa8-4bbd-8afc-bf97bc86de06",
-                    "path": "<Mouse>/backButton",
+                    "path": "<Mouse>/forwardButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Lower",
+                    "action": "ParallelSpacingDrag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -349,7 +358,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Lower",
+                    "action": "ParallelSpacingDrag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -367,11 +376,22 @@
                 {
                     "name": "",
                     "id": "41e7c391-159f-4531-80d9-bcc1ccdc366f",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ToggleParallelBuildMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b2d9ddd9-d625-4afb-8b4b-f843b4506154",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleBuildMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

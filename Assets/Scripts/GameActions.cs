@@ -118,7 +118,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Elevate"",
+                    ""name"": ""ElevationDrag"",
                     ""type"": ""Button"",
                     ""id"": ""6d5ae660-34f7-4554-8f69-a764e81bdf22"",
                     ""expectedControlType"": ""Button"",
@@ -127,7 +127,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Lower"",
+                    ""name"": ""ParallelSpacingDrag"",
                     ""type"": ""Button"",
                     ""id"": ""676f582d-b29b-4a4a-8d86-c26f57cdb8e5"",
                     ""expectedControlType"": ""Button"",
@@ -148,6 +148,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""name"": ""ToggleParallelBuildMode"",
                     ""type"": ""Button"",
                     ""id"": ""354b1c2c-d354-4896-bb11-dbcdc1c9205e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleBuildMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""cd1fb85d-9bfc-42eb-9ae7-24fb551a6bb8"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -333,34 +342,34 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""69fcf976-c80a-4ba3-a234-88990b533433"",
-                    ""path"": ""<Mouse>/forwardButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Elevate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""924d7ac7-d01e-4a80-a91b-29b23a523fe3"",
                     ""path"": ""<Keyboard>/period"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Elevate"",
+                    ""action"": ""ElevationDrag"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cbf8a344-c484-4995-ad4f-7f7cef647cb7"",
+                    ""path"": ""<Mouse>/backButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ElevationDrag"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""e8929b3b-afa8-4bbd-8afc-bf97bc86de06"",
-                    ""path"": ""<Mouse>/backButton"",
+                    ""path"": ""<Mouse>/forwardButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Lower"",
+                    ""action"": ""ParallelSpacingDrag"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -371,7 +380,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Lower"",
+                    ""action"": ""ParallelSpacingDrag"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -389,11 +398,22 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""41e7c391-159f-4531-80d9-bcc1ccdc366f"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ToggleParallelBuildMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b2d9ddd9-d625-4afb-8b4b-f843b4506154"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleBuildMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -414,10 +434,11 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_DivideRoad = m_InGame.FindAction("DivideRoad", throwIfNotFound: true);
         m_InGame_RemoveRoad = m_InGame.FindAction("RemoveRoad", throwIfNotFound: true);
         m_InGame_AbandonBuild = m_InGame.FindAction("AbandonBuild", throwIfNotFound: true);
-        m_InGame_Elevate = m_InGame.FindAction("Elevate", throwIfNotFound: true);
-        m_InGame_Lower = m_InGame.FindAction("Lower", throwIfNotFound: true);
+        m_InGame_ElevationDrag = m_InGame.FindAction("ElevationDrag", throwIfNotFound: true);
+        m_InGame_ParallelSpacingDrag = m_InGame.FindAction("ParallelSpacingDrag", throwIfNotFound: true);
         m_InGame_DragCamera = m_InGame.FindAction("DragCamera", throwIfNotFound: true);
         m_InGame_ToggleParallelBuildMode = m_InGame.FindAction("ToggleParallelBuildMode", throwIfNotFound: true);
+        m_InGame_ToggleBuildMode = m_InGame.FindAction("ToggleBuildMode", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -489,10 +510,11 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_DivideRoad;
     private readonly InputAction m_InGame_RemoveRoad;
     private readonly InputAction m_InGame_AbandonBuild;
-    private readonly InputAction m_InGame_Elevate;
-    private readonly InputAction m_InGame_Lower;
+    private readonly InputAction m_InGame_ElevationDrag;
+    private readonly InputAction m_InGame_ParallelSpacingDrag;
     private readonly InputAction m_InGame_DragCamera;
     private readonly InputAction m_InGame_ToggleParallelBuildMode;
+    private readonly InputAction m_InGame_ToggleBuildMode;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -507,10 +529,11 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @DivideRoad => m_Wrapper.m_InGame_DivideRoad;
         public InputAction @RemoveRoad => m_Wrapper.m_InGame_RemoveRoad;
         public InputAction @AbandonBuild => m_Wrapper.m_InGame_AbandonBuild;
-        public InputAction @Elevate => m_Wrapper.m_InGame_Elevate;
-        public InputAction @Lower => m_Wrapper.m_InGame_Lower;
+        public InputAction @ElevationDrag => m_Wrapper.m_InGame_ElevationDrag;
+        public InputAction @ParallelSpacingDrag => m_Wrapper.m_InGame_ParallelSpacingDrag;
         public InputAction @DragCamera => m_Wrapper.m_InGame_DragCamera;
         public InputAction @ToggleParallelBuildMode => m_Wrapper.m_InGame_ToggleParallelBuildMode;
+        public InputAction @ToggleBuildMode => m_Wrapper.m_InGame_ToggleBuildMode;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -550,18 +573,21 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @AbandonBuild.started += instance.OnAbandonBuild;
             @AbandonBuild.performed += instance.OnAbandonBuild;
             @AbandonBuild.canceled += instance.OnAbandonBuild;
-            @Elevate.started += instance.OnElevate;
-            @Elevate.performed += instance.OnElevate;
-            @Elevate.canceled += instance.OnElevate;
-            @Lower.started += instance.OnLower;
-            @Lower.performed += instance.OnLower;
-            @Lower.canceled += instance.OnLower;
+            @ElevationDrag.started += instance.OnElevationDrag;
+            @ElevationDrag.performed += instance.OnElevationDrag;
+            @ElevationDrag.canceled += instance.OnElevationDrag;
+            @ParallelSpacingDrag.started += instance.OnParallelSpacingDrag;
+            @ParallelSpacingDrag.performed += instance.OnParallelSpacingDrag;
+            @ParallelSpacingDrag.canceled += instance.OnParallelSpacingDrag;
             @DragCamera.started += instance.OnDragCamera;
             @DragCamera.performed += instance.OnDragCamera;
             @DragCamera.canceled += instance.OnDragCamera;
             @ToggleParallelBuildMode.started += instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.performed += instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.canceled += instance.OnToggleParallelBuildMode;
+            @ToggleBuildMode.started += instance.OnToggleBuildMode;
+            @ToggleBuildMode.performed += instance.OnToggleBuildMode;
+            @ToggleBuildMode.canceled += instance.OnToggleBuildMode;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -596,18 +622,21 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @AbandonBuild.started -= instance.OnAbandonBuild;
             @AbandonBuild.performed -= instance.OnAbandonBuild;
             @AbandonBuild.canceled -= instance.OnAbandonBuild;
-            @Elevate.started -= instance.OnElevate;
-            @Elevate.performed -= instance.OnElevate;
-            @Elevate.canceled -= instance.OnElevate;
-            @Lower.started -= instance.OnLower;
-            @Lower.performed -= instance.OnLower;
-            @Lower.canceled -= instance.OnLower;
+            @ElevationDrag.started -= instance.OnElevationDrag;
+            @ElevationDrag.performed -= instance.OnElevationDrag;
+            @ElevationDrag.canceled -= instance.OnElevationDrag;
+            @ParallelSpacingDrag.started -= instance.OnParallelSpacingDrag;
+            @ParallelSpacingDrag.performed -= instance.OnParallelSpacingDrag;
+            @ParallelSpacingDrag.canceled -= instance.OnParallelSpacingDrag;
             @DragCamera.started -= instance.OnDragCamera;
             @DragCamera.performed -= instance.OnDragCamera;
             @DragCamera.canceled -= instance.OnDragCamera;
             @ToggleParallelBuildMode.started -= instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.performed -= instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.canceled -= instance.OnToggleParallelBuildMode;
+            @ToggleBuildMode.started -= instance.OnToggleBuildMode;
+            @ToggleBuildMode.performed -= instance.OnToggleBuildMode;
+            @ToggleBuildMode.canceled -= instance.OnToggleBuildMode;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -637,9 +666,10 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnDivideRoad(InputAction.CallbackContext context);
         void OnRemoveRoad(InputAction.CallbackContext context);
         void OnAbandonBuild(InputAction.CallbackContext context);
-        void OnElevate(InputAction.CallbackContext context);
-        void OnLower(InputAction.CallbackContext context);
+        void OnElevationDrag(InputAction.CallbackContext context);
+        void OnParallelSpacingDrag(InputAction.CallbackContext context);
         void OnDragCamera(InputAction.CallbackContext context);
         void OnToggleParallelBuildMode(InputAction.CallbackContext context);
+        void OnToggleBuildMode(InputAction.CallbackContext context);
     }
 }

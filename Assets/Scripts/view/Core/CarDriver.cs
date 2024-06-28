@@ -8,6 +8,7 @@ public class CarDriver : MonoBehaviour
     [SerializeField] CarHumbleObject carPrefab;
     static Dictionary<uint, CarHumbleObject> carMapping;
     ObjectPool<CarHumbleObject> carPool;
+    public static float TimeScale = 1;
     void Awake()
     {
         Game.CarAdded += CarAdded;
@@ -15,7 +16,7 @@ public class CarDriver : MonoBehaviour
         carMapping = new();
         carPool = new(
             () => Instantiate(carPrefab, transform),
-            (o) => o.gameObject.SetActive(true),
+            (o) => { o.gameObject.SetActive(true); o.gameObject.transform.position = new(0, -100, 0); },
             (o) => o.gameObject.SetActive(false),
             (o) => Destroy(o.gameObject),
             false,
@@ -26,7 +27,7 @@ public class CarDriver : MonoBehaviour
 
     void Update()
     {
-        CarControl.PassTime(Time.deltaTime);
+        CarControl.PassTime(Time.deltaTime * TimeScale);
     }
 
     void OnDestroy()
@@ -40,6 +41,7 @@ public class CarDriver : MonoBehaviour
         CarHumbleObject carObject = carPool.Get();
         carObject.Car = car;
         carMapping[car.Id] = carObject;
+        carObject.gameObject.layer = LayerMask.NameToLayer("Cars");
     }
 
     void RemoveCar(Car car)

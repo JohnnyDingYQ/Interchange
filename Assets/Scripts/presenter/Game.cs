@@ -33,11 +33,12 @@ public static class Game
         set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); }
     }
     public static Road HoveredRoad { get; set; }
-    public static float3 MouseWorldPos { get { return InputSystem.MouseWorldPos; } }
+    public static bool BuildModeOn { get; set; }
 
     static Game()
     {
         GameSave = new();
+        BuildModeOn = false;
     }
 
     public static void WipeState()
@@ -46,6 +47,7 @@ public static class Game
         Graph.Wipe();
         GameSave = new();
         HoveredRoad = null;
+        BuildModeOn = false;
     }
 
     private static uint FindNextAvailableKey(ICollection<uint> dict)
@@ -224,6 +226,4 @@ public static class Game
             GameSave.Elevation = elevation;
         ElevationUpdated?.Invoke(elevation);
     }
-
-    
 }

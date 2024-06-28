@@ -9,8 +9,10 @@ public class InputSystem : MonoBehaviour
     private GameActions gameActions;
     public static float3 MouseWorldPos { get; set; }
     private float2 prevScreenMousePos;
-    public static bool IsDraggingCamera;
     const float MouseDragScreenMultiplier = 0.17f;
+    private bool isDraggingCamera;
+    private bool elevationDragEnabled;
+    private bool parallelSpacingDragEnabled;
 
     void Awake()
     {
@@ -33,11 +35,14 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DivideRoad.performed += DivideRoad;
         gameActions.InGame.RemoveRoad.performed += RemoveRoad;
         gameActions.InGame.AbandonBuild.performed += AbandonBuild;
-        gameActions.InGame.Elevate.performed += Elevate;
-        gameActions.InGame.Lower.performed += Lower;
+        gameActions.InGame.ElevationDrag.performed += EnableElevationDrag;
+        gameActions.InGame.ElevationDrag.canceled += DisableElevationDrag;
+        gameActions.InGame.ParallelSpacingDrag.performed += EnableParallelSpacingDrag;
+        gameActions.InGame.ParallelSpacingDrag.canceled += DisableParallelSpacingDrag;
         gameActions.InGame.DragCamera.performed += DragScreenStarted;
         gameActions.InGame.DragCamera.canceled += DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed += ToggleParallelBuild;
+        gameActions.InGame.ToggleBuildMode.performed += ToggleBuildMode;
 
         gameActions.InGame.Enable();
     }
@@ -53,11 +58,14 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DivideRoad.performed -= DivideRoad;
         gameActions.InGame.RemoveRoad.performed -= RemoveRoad;
         gameActions.InGame.AbandonBuild.performed -= AbandonBuild;
-        gameActions.InGame.Elevate.performed -= Elevate;
-        gameActions.InGame.Lower.performed -= Lower;
+        gameActions.InGame.ElevationDrag.performed -= EnableElevationDrag;
+        gameActions.InGame.ElevationDrag.canceled -= DisableElevationDrag;
+        gameActions.InGame.ParallelSpacingDrag.performed -= EnableParallelSpacingDrag;
+        gameActions.InGame.ParallelSpacingDrag.canceled -= DisableParallelSpacingDrag;
         gameActions.InGame.DragCamera.performed -= DragScreenStarted;
         gameActions.InGame.DragCamera.canceled -= DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed -= ToggleParallelBuild;
+        gameActions.InGame.ToggleBuildMode.performed -= ToggleBuildMode;
 
         gameActions.InGame.Disable();
     }
@@ -65,7 +73,24 @@ public class InputSystem : MonoBehaviour
     void Update()
     {
         UpdateCameraPos();
+        ProcessElevationDrag();
+        ProcessParallelSpacingDrag();
+        UpdateMouseWorldPos();
+    }
 
+    void UpdateCameraPos()
+    {
+        Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
+        if (isDraggingCamera)
+        {
+            cameraOffset.x += (prevScreenMousePos.x - Input.mousePosition.x) * MouseDragScreenMultiplier;
+            cameraOffset.z += (prevScreenMousePos.y - Input.mousePosition.y) * MouseDragScreenMultiplier;
+        }
+        CameraControl.CameraOffset = cameraOffset;
+    }
+
+    void UpdateMouseWorldPos()
+    {
         float3 mouseWorldPos = new()
         {
             x = Input.mousePosition.x,
@@ -80,15 +105,23 @@ public class InputSystem : MonoBehaviour
         prevScreenMousePos.y = Input.mousePosition.y;
     }
 
-    void UpdateCameraPos()
+    void ProcessElevationDrag()
     {
-        Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
-        if (IsDraggingCamera)
+        if(elevationDragEnabled)
         {
-            cameraOffset.x += (prevScreenMousePos.x - Input.mousePosition.x) * MouseDragScreenMultiplier;
-            cameraOffset.z += (prevScreenMousePos.y - Input.mousePosition.y) * MouseDragScreenMultiplier;
+            float delta = Input.mousePosition.y - prevScreenMousePos.y;
+            Game.SetElevation(Game.Elevation + delta * 0.02f);
         }
-        CameraControl.CameraOffset = cameraOffset;
+    }
+
+    void ProcessParallelSpacingDrag()
+    {
+        if (parallelSpacingDragEnabled)
+        {
+            float delta = Input.mousePosition.y - prevScreenMousePos.y;
+            Build.ParallelSpacing += delta * 0.03f;
+            Debug.Log(Build.ParallelSpacing);
+        }
     }
 
     void OnBuild(InputAction.CallbackContext context)
@@ -130,24 +163,36 @@ public class InputSystem : MonoBehaviour
     {
         Build.ResetSelection();
     }
-    void Elevate(InputAction.CallbackContext context)
+    void EnableElevationDrag(InputAction.CallbackContext context)
     {
-        Game.SetElevation(Game.Elevation + 2);
+        elevationDragEnabled = true;
     }
-    void Lower(InputAction.CallbackContext context)
+    void DisableElevationDrag(InputAction.CallbackContext context)
     {
-        Game.SetElevation(Game.Elevation - 2);
+        elevationDragEnabled = false;
+    }
+    void EnableParallelSpacingDrag(InputAction.CallbackContext context)
+    {
+        parallelSpacingDragEnabled = true;
+    }
+    void DisableParallelSpacingDrag(InputAction.CallbackContext context)
+    {
+        parallelSpacingDragEnabled = false;
     }
     void DragScreenStarted(InputAction.CallbackContext context)
     {
-        IsDraggingCamera = true;
+        isDraggingCamera = true;
     }
     void DragScreenCanceled(InputAction.CallbackContext context)
     {
-        IsDraggingCamera = false;
+        isDraggingCamera = false;
     }
     void ToggleParallelBuild(InputAction.CallbackContext context)
     {
         Build.ToggletParallelBuild();
+    }
+    void ToggleBuildMode(InputAction.CallbackContext context)
+    {
+        ModeToggle.ToggleMode();
     }
 }

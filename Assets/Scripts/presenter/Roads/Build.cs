@@ -122,6 +122,8 @@ public static class Build
 
     public static List<Road> HandleBuildCommand(float3 clickPos)
     {
+        if (!Game.BuildModeOn)
+            return null;
         if (!startAssigned)
         {
             startAssigned = true;
@@ -308,13 +310,10 @@ public static class Build
     {
         // reference: https://pomax.github.io/bezierinfo/#circles_cubic
         float k = 0.551785f;
-        float2 start = q0.xz;
-        float2 pivot = q1.xz;
-        float2 end = q2.xz;
-        float2 c1 = Vector2.Lerp(start, pivot, k);
-        float2 c2 = Vector2.Lerp(end, pivot, k);
+        float3 c1 = Vector3.Lerp(q0, q1, k);
+        float3 c2 = Vector3.Lerp(q2, q1, k);
 
-        return new(new BezierCurve(q0, new float3(c1.x, 0, c1.y), new float3(c2.x, 0, c2.y), q2));
+        return new(new BezierCurve(q0, c1, c2, q2));
     }
 
     static void AlignPivotStart(BuildTargets startTarget, float3 p)
