@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class Main : MonoBehaviour
 {
+
+    bool flip = false;
+
     void Start()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 165;
         Physics.queriesHitTriggers = false;
         int now = (int)DateTime.Now.Ticks;
         UnityEngine.Random.InitState(now); // different seed for each game session
@@ -15,8 +18,17 @@ public class Main : MonoBehaviour
 
     void FixedUpdate()
     {
-        Build.HandleHover(InputSystem.MouseWorldPos);
-        Roads.UpdateHoveredRoad();
+
+    }
+
+    void Update()
+    {
+        flip = !flip;
+        if (flip)
+        {
+            Build.HandleHover(InputSystem.MouseWorldPos);
+            Roads.UpdateHoveredRoad();
+        }
     }
 
 }

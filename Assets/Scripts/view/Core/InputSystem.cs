@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,6 +15,8 @@ public class InputSystem : MonoBehaviour
     private bool isDraggingCamera;
     private bool elevationDragEnabled;
     private bool parallelSpacingDragEnabled;
+    private bool bulkSelectStarted;
+    private float3 bulkSelectStart;
 
     void Awake()
     {
@@ -34,7 +38,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.LoadGame.performed += LoadGame;
         gameActions.InGame.DivideRoad.performed += DivideRoad;
         gameActions.InGame.RemoveRoad.performed += RemoveRoad;
-        gameActions.InGame.AbandonBuild.performed += AbandonBuild;
+        gameActions.InGame.AbandonBuild.performed += Deselect;
         gameActions.InGame.ElevationDrag.performed += EnableElevationDrag;
         gameActions.InGame.ElevationDrag.canceled += DisableElevationDrag;
         gameActions.InGame.ParallelSpacingDrag.performed += EnableParallelSpacingDrag;
@@ -43,6 +47,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DragCamera.canceled += DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed += ToggleParallelBuild;
         gameActions.InGame.ToggleBuildMode.performed += ToggleBuildMode;
+        gameActions.InGame.BulkSelect.performed += BulkSelectStart;
+        gameActions.InGame.BulkSelect.canceled += BulkSelectEnd;
 
         gameActions.InGame.Enable();
     }
@@ -57,7 +63,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.LoadGame.performed -= LoadGame;
         gameActions.InGame.DivideRoad.performed -= DivideRoad;
         gameActions.InGame.RemoveRoad.performed -= RemoveRoad;
-        gameActions.InGame.AbandonBuild.performed -= AbandonBuild;
+        gameActions.InGame.AbandonBuild.performed -= Deselect;
         gameActions.InGame.ElevationDrag.performed -= EnableElevationDrag;
         gameActions.InGame.ElevationDrag.canceled -= DisableElevationDrag;
         gameActions.InGame.ParallelSpacingDrag.performed -= EnableParallelSpacingDrag;
@@ -66,6 +72,9 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DragCamera.canceled -= DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed -= ToggleParallelBuild;
         gameActions.InGame.ToggleBuildMode.performed -= ToggleBuildMode;
+        gameActions.InGame.BulkSelect.performed -= BulkSelectStart;
+        gameActions.InGame.BulkSelect.canceled -= BulkSelectEnd;
+
 
         gameActions.InGame.Disable();
     }
@@ -107,7 +116,7 @@ public class InputSystem : MonoBehaviour
 
     void ProcessElevationDrag()
     {
-        if(elevationDragEnabled)
+        if (elevationDragEnabled)
         {
             float delta = Input.mousePosition.y - prevScreenMousePos.y;
             Game.SetElevation(Game.Elevation + delta * 0.02f);
@@ -153,15 +162,20 @@ public class InputSystem : MonoBehaviour
     }
     void DivideRoad(InputAction.CallbackContext context)
     {
-        Game.DivideSelectedRoad(MouseWorldPos);
+        if (Roads.HoveredRoad != null)
+            DivideHandler.HandleDivideCommand(Roads.HoveredRoad.Road, MouseWorldPos);
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {
-        Game.RemoveSelectedRoad();
+        if (Roads.HoveredRoad != null)
+            Game.RemoveRoad(Roads.HoveredRoad.Road);
+        foreach (Road road in Roads.SelectedRoads.Select(r => r.Road))
+            Game.RemoveRoad(road);
     }
-    void AbandonBuild(InputAction.CallbackContext context)
+    void Deselect(InputAction.CallbackContext context)
     {
         Build.ResetSelection();
+        Roads.ClearSelected();
     }
     void EnableElevationDrag(InputAction.CallbackContext context)
     {
@@ -194,5 +208,18 @@ public class InputSystem : MonoBehaviour
     void ToggleBuildMode(InputAction.CallbackContext context)
     {
         ModeToggle.ToggleMode();
+    }
+    void BulkSelectStart(InputAction.CallbackContext context)
+    {
+        bulkSelectStart = MouseWorldPos;
+        bulkSelectStarted = true;
+    }
+    void BulkSelectEnd(InputAction.CallbackContext context)
+    {
+        if (bulkSelectStarted)
+        {
+            Roads.BulkSelect(bulkSelectStart, MouseWorldPos);
+        }
+        bulkSelectStarted = false;
     }
 }

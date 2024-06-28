@@ -42,7 +42,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""id"": ""3d2e49d8-a3e2-4c8e-9d2b-f0d113fa15ee"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -157,6 +157,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""name"": ""ToggleBuildMode"",
                     ""type"": ""Button"",
                     ""id"": ""cd1fb85d-9bfc-42eb-9ae7-24fb551a6bb8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""BulkSelect"",
+                    ""type"": ""Button"",
+                    ""id"": ""99aae0c1-9675-4abe-bc25-ae19dcb7f1c5"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -416,6 +425,17 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""ToggleBuildMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""543f1518-d923-4e6a-a778-1eca6be43005"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Hold(duration=1.401298E-45)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""BulkSelect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -439,6 +459,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_DragCamera = m_InGame.FindAction("DragCamera", throwIfNotFound: true);
         m_InGame_ToggleParallelBuildMode = m_InGame.FindAction("ToggleParallelBuildMode", throwIfNotFound: true);
         m_InGame_ToggleBuildMode = m_InGame.FindAction("ToggleBuildMode", throwIfNotFound: true);
+        m_InGame_BulkSelect = m_InGame.FindAction("BulkSelect", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -515,6 +536,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_DragCamera;
     private readonly InputAction m_InGame_ToggleParallelBuildMode;
     private readonly InputAction m_InGame_ToggleBuildMode;
+    private readonly InputAction m_InGame_BulkSelect;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -534,6 +556,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @DragCamera => m_Wrapper.m_InGame_DragCamera;
         public InputAction @ToggleParallelBuildMode => m_Wrapper.m_InGame_ToggleParallelBuildMode;
         public InputAction @ToggleBuildMode => m_Wrapper.m_InGame_ToggleBuildMode;
+        public InputAction @BulkSelect => m_Wrapper.m_InGame_BulkSelect;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -588,6 +611,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @ToggleBuildMode.started += instance.OnToggleBuildMode;
             @ToggleBuildMode.performed += instance.OnToggleBuildMode;
             @ToggleBuildMode.canceled += instance.OnToggleBuildMode;
+            @BulkSelect.started += instance.OnBulkSelect;
+            @BulkSelect.performed += instance.OnBulkSelect;
+            @BulkSelect.canceled += instance.OnBulkSelect;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -637,6 +663,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @ToggleBuildMode.started -= instance.OnToggleBuildMode;
             @ToggleBuildMode.performed -= instance.OnToggleBuildMode;
             @ToggleBuildMode.canceled -= instance.OnToggleBuildMode;
+            @BulkSelect.started -= instance.OnBulkSelect;
+            @BulkSelect.performed -= instance.OnBulkSelect;
+            @BulkSelect.canceled -= instance.OnBulkSelect;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -671,5 +700,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnDragCamera(InputAction.CallbackContext context);
         void OnToggleParallelBuildMode(InputAction.CallbackContext context);
         void OnToggleBuildMode(InputAction.CallbackContext context);
+        void OnBulkSelect(InputAction.CallbackContext context);
     }
 }

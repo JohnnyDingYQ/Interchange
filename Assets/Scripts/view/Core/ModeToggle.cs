@@ -31,5 +31,6 @@ public class ModeToggle : MonoBehaviour
     {
         Camera.main.cullingMask = LayerMask.NameToLayer("Everything");
         CarDriver.TimeScale = 1;
+        Build.ResetSelection();
     }
 }

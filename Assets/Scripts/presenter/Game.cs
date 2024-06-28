@@ -32,7 +32,6 @@ public static class Game
         get { return GameSave.CarServiced; }
         set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); }
     }
-    public static Road HoveredRoad { get; set; }
     public static bool BuildModeOn { get; set; }
 
     static Game()
@@ -46,7 +45,6 @@ public static class Game
         Build.Reset();
         Graph.Wipe();
         GameSave = new();
-        HoveredRoad = null;
         BuildModeOn = false;
     }
 
@@ -202,18 +200,6 @@ public static class Game
     public static void InvokeRoadRemoved(Road road)
     {
         RoadRemoved?.Invoke(road);
-    }
-
-    public static void DivideSelectedRoad(float3 mouseWorldPos)
-    {
-        if (HoveredRoad != null)
-            DivideHandler.HandleDivideCommand(HoveredRoad, mouseWorldPos);
-    }
-
-    public static void RemoveSelectedRoad()
-    {
-        if (HoveredRoad != null)
-            RemoveRoad(HoveredRoad);
     }
 
     public static void SetElevation(float elevation)

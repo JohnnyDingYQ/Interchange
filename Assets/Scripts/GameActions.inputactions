@@ -20,7 +20,7 @@
                     "id": "3d2e49d8-a3e2-4c8e-9d2b-f0d113fa15ee",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Tap",
                     "initialStateCheck": false
                 },
                 {
@@ -135,6 +135,15 @@
                     "name": "ToggleBuildMode",
                     "type": "Button",
                     "id": "cd1fb85d-9bfc-42eb-9ae7-24fb551a6bb8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "BulkSelect",
+                    "type": "Button",
+                    "id": "99aae0c1-9675-4abe-bc25-ae19dcb7f1c5",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -392,6 +401,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleBuildMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "543f1518-d923-4e6a-a778-1eca6be43005",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Hold(duration=1.401298E-45)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BulkSelect",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
