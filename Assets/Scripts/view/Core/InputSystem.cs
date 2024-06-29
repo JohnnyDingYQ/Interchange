@@ -17,6 +17,9 @@ public class InputSystem : MonoBehaviour
     private bool parallelSpacingDragEnabled;
     private bool bulkSelectStarted;
     private float3 bulkSelectStart;
+    private SquareSelector squareSelector;
+    [SerializeField]
+    private SquareSelector squareSelectorPrefab;
 
     void Awake()
     {
@@ -26,6 +29,7 @@ public class InputSystem : MonoBehaviour
     {
         MouseIsInGameWorld = true;
         MouseWorldPos = new(0, 0, 0);
+        squareSelector = Instantiate(squareSelectorPrefab, transform);
     }
 
     void OnEnable()
@@ -75,7 +79,6 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.BulkSelect.performed -= BulkSelectStart;
         gameActions.InGame.BulkSelect.canceled -= BulkSelectEnd;
 
-
         gameActions.InGame.Disable();
     }
 
@@ -84,6 +87,7 @@ public class InputSystem : MonoBehaviour
         UpdateCameraPos();
         ProcessElevationDrag();
         ProcessParallelSpacingDrag();
+        UpdateSquareSelector();
         UpdateMouseWorldPos();
     }
 
@@ -114,6 +118,18 @@ public class InputSystem : MonoBehaviour
         prevScreenMousePos.y = Input.mousePosition.y;
     }
 
+    void UpdateSquareSelector()
+    {
+        if (bulkSelectStarted)
+        {
+            squareSelector.gameObject.SetActive(true);
+            float width = Math.Abs(bulkSelectStart.x - MouseWorldPos.x);
+            float height = Math.Abs(bulkSelectStart.z - MouseWorldPos.z);
+            squareSelector.SetTransform(width, height, bulkSelectStart + (MouseWorldPos - bulkSelectStart) / 2);
+        }
+        else
+            squareSelector.gameObject.SetActive(false);
+    }
     void ProcessElevationDrag()
     {
         if (elevationDragEnabled)
@@ -171,11 +187,13 @@ public class InputSystem : MonoBehaviour
             Game.RemoveRoad(Roads.HoveredRoad.Road);
         foreach (Road road in Roads.SelectedRoads.Select(r => r.Road))
             Game.RemoveRoad(road);
+        Roads.ClearSelected();
     }
     void Deselect(InputAction.CallbackContext context)
     {
         Build.ResetSelection();
         Roads.ClearSelected();
+        bulkSelectStarted = false;
     }
     void EnableElevationDrag(InputAction.CallbackContext context)
     {
@@ -217,9 +235,7 @@ public class InputSystem : MonoBehaviour
     void BulkSelectEnd(InputAction.CallbackContext context)
     {
         if (bulkSelectStarted)
-        {
             Roads.BulkSelect(bulkSelectStart, MouseWorldPos);
-        }
         bulkSelectStarted = false;
     }
 }

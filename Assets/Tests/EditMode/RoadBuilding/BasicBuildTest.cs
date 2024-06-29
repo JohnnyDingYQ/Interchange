@@ -28,6 +28,7 @@ public class BasicBuildTest
     public void BuildOneLaneRoad()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Assert.NotNull(road);
         Lane lane = road.Lanes[0];
 
         Assert.AreEqual(1, Roads.Count);

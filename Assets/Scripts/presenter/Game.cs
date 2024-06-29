@@ -37,7 +37,7 @@ public static class Game
     static Game()
     {
         GameSave = new();
-        BuildModeOn = false;
+        BuildModeOn = true;
     }
 
     public static void WipeState()
@@ -45,7 +45,7 @@ public static class Game
         Build.Reset();
         Graph.Wipe();
         GameSave = new();
-        BuildModeOn = false;
+        BuildModeOn = true;
     }
 
     private static uint FindNextAvailableKey(ICollection<uint> dict)

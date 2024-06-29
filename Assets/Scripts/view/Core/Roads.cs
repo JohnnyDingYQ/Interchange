@@ -104,8 +104,9 @@ public class Roads : MonoBehaviour
 
     public static void ClearSelected()
     {
-        foreach (GameObject g in SelectedRoads.Select(r => r.gameObject))
-            UnHighLight(g);
+        foreach (RoadHumbleObject g in SelectedRoads)
+            if (g != null)
+            UnHighLight(g.gameObject);
         SelectedRoads.Clear();
     }
 
