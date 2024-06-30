@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using QuikGraph;
-using QuikGraph.Collections;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public static class SaveSystem
 {
@@ -45,23 +43,15 @@ public static class SaveSystem
             IdToObjectReferences();
             foreach (Path p in Game.Paths.Values)
                 Graph.AddVerticesAndPath(p);
+            foreach (Lane l in Game.Lanes.Values)
+                l.InitCurve();
             foreach (Road r in Game.Roads.Values)
             {
                 r.EvaluateInnerOutline();
                 Game.InvokeRoadAdded(r);
             }
-            EvaluteIntersections();
-        }
-        static void EvaluteIntersections()
-        {
-            HashSet<Intersection> evaluated = new();
-            foreach (Road r in Game.Roads.Values)
-                foreach (Intersection i in new Intersection[] { r.StartIntersection, r.EndIntersection })
-                    if (!evaluated.Contains(i))
-                    {
-                        evaluated.Add(i);
-                        IntersectionUtil.EvaluateOutline(i);
-                    }
+            foreach (Intersection i in Game.Intersections.Values)
+                IntersectionUtil.EvaluateOutline(i);
         }
     }
 
@@ -123,6 +113,10 @@ public static class SaveSystem
         {
             p.Node_ = p.Node.Id;
         }
+        foreach (Vertex v in Game.Vertices.Values)
+        {
+            v.Lane_ = v.Lane.Id;
+        }
     }
 
     static void IdToObjectReferences()
@@ -168,6 +162,10 @@ public static class SaveSystem
         foreach (Point p in Game.Targets.Values)
         {
             p.Node = Game.Nodes[p.Node_];
+        }
+        foreach (Vertex v in Game.Vertices.Values)
+        {
+            v.Lane = Game.Lanes[v.Lane_];
         }
     }
 

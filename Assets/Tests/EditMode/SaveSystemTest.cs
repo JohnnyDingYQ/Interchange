@@ -237,15 +237,24 @@ public class SaveSystemTest
     [Test]
     public void SavingAfterRemovingRoad()
     {
-        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Game.RemoveRoad(road1);
-        // DivideHandler.DivideRoad(road0, 0.5f);
-        // RoadBuilder.B(4 * stride, 5 * stride, 6 * stride, 3);
-        // RoadBuilder.B(-2 * stride, -stride, 0, 1);
 
         SaveSystem.SaveGame();
         SaveSystem.LoadGame();
+    }
+
+    [Test]
+    public void SimpleBuildAfterSaveLoad()
+    {
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
+        SaveSystem.SaveGame();
+        SaveSystem.LoadGame();
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+
+        Assert.AreEqual(2, Game.Roads.Count);
+        Assert.AreEqual(3, Game.Nodes.Count);
     }
 
 

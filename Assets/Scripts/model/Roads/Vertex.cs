@@ -13,8 +13,9 @@ public class Vertex
     public float SeriesInterpolation { get; private set; }
     [JsonIgnore]
     public float3 Tangent { get => math.normalizesafe(Lane.BezierSeries.EvaluateTangent(SeriesInterpolation)); }
-    [JsonProperty]
-    public Lane Lane { get; private set; }
+    [JsonIgnore]
+    public Lane Lane { get; set; }
+    public uint Lane_ { get; set; }
     [JsonIgnore]
     public Road Road { get { return Lane.Road; } }
     [JsonIgnore]

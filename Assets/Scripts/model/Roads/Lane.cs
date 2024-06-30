@@ -2,6 +2,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.Mathematics;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 public class Lane
 {
     public uint Id { get; set; }
@@ -17,7 +18,7 @@ public class Lane
     public Node EndNode { get; set; }
     public uint StartNode_ { get; set; }
     public uint EndNode_ { get; set; }
-    public BezierSeries BezierSeries { get; set; }
+    public BezierSeries BezierSeries { get; private set; }
     [JsonIgnore]
     public float3 StartPos { get { return StartNode.Pos; } }
     [JsonIgnore]
@@ -27,7 +28,6 @@ public class Lane
     public uint Road_ {get; set; }
     [JsonProperty]
     public int LaneIndex { get; private set; }
-    [JsonProperty]
     public float Length { get; private set; }
     [JsonIgnore]
     public Path InnerPath { get; set; }
@@ -40,8 +40,14 @@ public class Lane
     public Lane(Road road, int laneIndex)
     {
         LaneIndex = laneIndex;
-        BezierSeries = road.BezierSeries.Offset(((float)road.LaneCount / 2 - 0.5f - laneIndex) * Constants.LaneWidth);
         Road = road;
+        InitCurve();
+    }
+
+    public void InitCurve()
+    {
+        Assert.IsNotNull(Road);
+        BezierSeries = Road.BezierSeries.Offset(((float)Road.LaneCount / 2 - 0.5f - LaneIndex) * Constants.LaneWidth);
         Length = BezierSeries.Length;
     }
 
