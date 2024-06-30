@@ -107,7 +107,7 @@ public class Road
     public bool HasLaneShorterThanMinimumLaneLength()
     {
         foreach (Lane lane in Lanes)
-            if (lane.Length < Constants.MinimumLaneLength)
+            if (lane.Length < Constants.MinLaneLength)
                 return true;
         return false;
     }

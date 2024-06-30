@@ -66,6 +66,7 @@ public class Roads : MonoBehaviour
         int hitCount = Physics.RaycastNonAlloc(new Ray(mousePos, new float3(0, -1, 0)), hitResults, Constants.MaxElevation + 2);
 
         HoveredRoad = null; // Reset HoveredRoad initially
+        Game.HoveredRoad = null;
 
         for (int i = 0; i < hitCount; i++)
         {
@@ -76,6 +77,7 @@ public class Roads : MonoBehaviour
                     continue;
 
                 HoveredRoad = roadComp;
+                Game.HoveredRoad = roadComp.Road;
                 HighLight(roadComp.gameObject);
                 return;
             }

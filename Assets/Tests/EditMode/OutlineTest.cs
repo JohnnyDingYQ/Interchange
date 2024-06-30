@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class OutlineTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 0);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 0);
 
     [SetUp]
     public void SetUp()

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BasicBuildTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
     Dictionary<uint, Node> Nodes;
     Dictionary<uint, Road> Roads;
 
@@ -170,8 +170,8 @@ public class BasicBuildTest
         Assert.AreEqual(0, Game.Paths.Count);
         RoadBuilder.Single(
             new(0, 0, 0),
-            new(0, 0, Constants.MinimumLaneLength / 2),
-            new(0, 0, Constants.MinimumLaneLength - 0.01f),
+            new(0, 0, Constants.MinLaneLength / 2),
+            new(0, 0, Constants.MinLaneLength - 0.01f),
             1
         );
 
@@ -192,13 +192,34 @@ public class BasicBuildTest
     {
         RoadBuilder.Single(0, stride, 2 * stride, 3);
         RoadBuilder.Single(
-            new float3(1, 0, 0) * Constants.MinimumLaneLength,
-            new float3(1.3f, 0, 0.75f) * Constants.MinimumLaneLength,
+            new float3(1, 0, 0) * Constants.MinLaneLength,
+            new float3(1.3f, 0, 0.75f) * Constants.MinLaneLength,
             2 * stride,
             3
         );
 
         Assert.AreEqual(2, Roads.Count);
+    }
+
+    [Test]
+    public void EnforcesTangentAtEnd()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride + new float3(Constants.MinLaneLength, 0 , 0), 4 * stride, 1);
+        float3 inTangent = road0.BezierSeries.Evaluate2DNormalizedNormal(1);
+        float3 outTangent = road1.BezierSeries.Evaluate2DNormalizedNormal(0);
+
+        Assert.True(MyNumerics.AreNumericallyEqual(inTangent, outTangent));
+    }
+    [Test]
+    public void EnforcesTangentAtStart()
+    {
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road0 = RoadBuilder.Single(0, stride + new float3(Constants.MinLaneLength, 0 , 0), 2 * stride, 1);
+        float3 inTangent = road0.BezierSeries.Evaluate2DNormalizedNormal(1);
+        float3 outTangent = road1.BezierSeries.Evaluate2DNormalizedNormal(0);
+
+        Assert.True(MyNumerics.AreNumericallyEqual(inTangent, outTangent));
     }
 
     #region Helpers

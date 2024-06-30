@@ -24,6 +24,7 @@ public static class Game
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
     public static Dictionary<uint, Point> Targets { get => GameSave.Targets; }
     public static Dictionary<uint, SourcePoint> Sources { get => GameSave.Sources; }
+    public static Road HoveredRoad { get; set; }
 
     public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
@@ -40,6 +41,7 @@ public static class Game
         Graph.Wipe();
         GameSave = new();
         BuildModeOn = true;
+        HoveredRoad = null;
     }
 
     private static uint FindNextAvailableKey(ICollection<uint> dict)

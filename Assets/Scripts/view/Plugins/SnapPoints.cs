@@ -33,7 +33,7 @@ public class SnapPoints : MonoBehaviour
             snapPointPool.Release(snapPoint);
         activeSnapPoints.Clear();
         BuildTargets polled = Build.PollBuildTarget(InputSystem.MouseWorldPos);
-        if (polled.SnapNotNull)
+        if (polled.Snapped)
             foreach (Node node in polled.Nodes)
             {
                 SnapPoint snapPoint = snapPointPool.Get();
@@ -43,7 +43,7 @@ public class SnapPoints : MonoBehaviour
                 activeSnapPoints.Add(snapPoint);
             }
         BuildTargets startTarget = Build.GetStartTarget();
-        if (startTarget != null && startTarget.SnapNotNull)
+        if (startTarget != null && startTarget.Snapped)
             foreach (Node node in startTarget.Nodes)
             {
                 SnapPoint snapPoint = snapPointPool.Get();

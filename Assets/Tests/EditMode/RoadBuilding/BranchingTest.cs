@@ -5,8 +5,8 @@ using Unity.Mathematics;
 using UnityEngine;
 public class BranchingTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0.1f, 1);
-    float3 offset = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0.1f, 1);
+    float3 offset = Constants.MinLaneLength * new float3(1, 0, 1);
 
     [SetUp]
     public void SetUp()

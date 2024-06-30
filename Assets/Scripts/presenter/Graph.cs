@@ -78,6 +78,8 @@ public static class Graph
 
     public static IEnumerable<Path> ShortestPathAStar(Vertex start, Vertex end)
     {
+        Assert.IsNotNull(start);
+        Assert.IsNotNull(end);
         TryFunc<Vertex, IEnumerable<Path>> tryFunc = graph.ShortestPathsAStar(
         (Path p) => p.Length,
         (Vertex to) => math.distance(start.Pos, to.Pos),

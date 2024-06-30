@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BuildTargetTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 0);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 0);
     Dictionary<uint, Road> Roads;
 
     [SetUp]
@@ -21,8 +21,8 @@ public class BuildTargetTest
     {
         BuildTargets bt1 = new(0, 1, Game.Nodes.Values);
         BuildTargets bt2 = new(0, 2, Game.Nodes.Values);
-        Assert.False(bt1.SnapNotNull);
-        Assert.False(bt2.SnapNotNull);
+        Assert.False(bt1.Snapped);
+        Assert.False(bt2.Snapped);
         Assert.AreEqual(new float3(0), bt1.ClickPos);
         Assert.AreEqual(new float3(0), bt2.ClickPos);
     }
@@ -35,7 +35,7 @@ public class BuildTargetTest
         Node node = bt.Nodes[0];
         Lane lane = road.Lanes[0];
 
-        Assert.True(bt.SnapNotNull);
+        Assert.True(bt.Snapped);
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, bt.MedianPoint));
         Assert.AreSame(lane.EndNode, node);
     }
@@ -51,7 +51,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.True(bt.SnapNotNull);
+        Assert.True(bt.Snapped);
         Assert.AreEqual(new float3(0), bt.MedianPoint);
         Assert.AreEqual(lane0.StartNode, node0);
         Assert.AreEqual(lane1.StartNode, node1);
@@ -67,7 +67,7 @@ public class BuildTargetTest
         Node node = bt.Nodes[0];
 
 
-        Assert.True(bt.SnapNotNull);
+        Assert.True(bt.Snapped);
         Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.MedianPoint));
         Assert.AreSame(lane.EndNode, node);
     }
@@ -84,7 +84,7 @@ public class BuildTargetTest
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
 
-        Assert.True(bt.SnapNotNull);
+        Assert.True(bt.Snapped);
         Assert.AreEqual(midPoint, bt.MedianPoint);
         Assert.AreEqual(lane0.StartNode, node0);
         Assert.AreEqual(lane1.StartNode, node1);
@@ -223,7 +223,7 @@ public class BuildTargetTest
     {
         RoadBuilder.Single(0, stride, 2 * stride, 1);
         BuildTargets bt = new(0, 3, Game.Nodes.Values);
-        Assert.True(bt.SnapNotNull);
+        Assert.True(bt.Snapped);
     }
 
     [Test]
@@ -232,7 +232,7 @@ public class BuildTargetTest
         RoadBuilder.Single(new float3(0, -2, 0), stride, 2 * stride, 1);
         BuildTargets bt = new(0, 1, Game.Nodes.Values);
         
-        Assert.False(bt.SnapNotNull);
+        Assert.False(bt.Snapped);
     }
 
     [Test]
@@ -242,12 +242,12 @@ public class BuildTargetTest
         road.Lanes[0].StartNode.BelongsToPoint = true;
 
         BuildTargets bt = new(0, 1, Game.Nodes.Values);
-        Assert.True(bt.SnapNotNull);
+        Assert.True(bt.Snapped);
 
         bt = new(0, 2, Game.Nodes.Values);
-        Assert.False(bt.SnapNotNull);
+        Assert.False(bt.Snapped);
 
         bt = new(0, 3, Game.Nodes.Values);
-        Assert.False(bt.SnapNotNull);
+        Assert.False(bt.Snapped);
     }
 }

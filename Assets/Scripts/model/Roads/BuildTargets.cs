@@ -9,7 +9,7 @@ public class BuildTargets
 {
     public List<Node> Nodes { get; set; }
     public float3 ClickPos { get; set; }
-    public bool SnapNotNull { get; set; }
+    public bool Snapped { get; set; }
     public float3 MedianPoint { get; set; }
     public Intersection Intersection { get; set; }
 
@@ -25,11 +25,11 @@ public class BuildTargets
         Nodes = GetBuildNodes(clickPos, laneCount, gameNodes);
         if (Nodes == null)
         {
-            SnapNotNull = false;
+            Snapped = false;
         }
         else
         {
-            SnapNotNull = true;
+            Snapped = true;
             MedianPoint = Vector3.Lerp(Nodes.First().Pos, Nodes.Last().Pos, 0.5f);
         }
     }

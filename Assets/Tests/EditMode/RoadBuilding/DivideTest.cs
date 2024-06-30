@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class DivideTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
     const float LengthDiffTolerance = 5f;
     Dictionary<uint, Road> Roads;
     Dictionary<uint, Node> Nodes;
@@ -167,8 +167,8 @@ public class DivideTest
     {
         Road road = RoadBuilder.Single(
             0,
-            Constants.MinimumLaneLength * new float3(1, 0, 0),
-            2 * Constants.MinimumLaneLength * new float3(1, 0, 1),
+            Constants.MinLaneLength * new float3(1, 0, 0),
+            2 * Constants.MinLaneLength * new float3(1, 0, 1),
             3
         );
         SubRoads subRoads = DivideHandler.DivideRoad(road, 0.5f);

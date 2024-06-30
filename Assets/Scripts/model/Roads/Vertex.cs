@@ -36,8 +36,8 @@ public class Vertex
         Lane = l;
         BezierSeries bs = l.BezierSeries;
         if (side == Side.Start)
-            SeriesInterpolation = Constants.MinimumLaneLength / 2 / bs.Length;
+            SeriesInterpolation = Constants.MinLaneLength / 2 / bs.Length;
         else
-            SeriesInterpolation = (bs.Length - Constants.MinimumLaneLength / 2) / bs.Length;
+            SeriesInterpolation = (bs.Length - Constants.MinLaneLength / 2) / bs.Length;
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RemoveRoadTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
     Dictionary<uint, Road> Roads;
     Dictionary<uint, Node> Nodes;
     [SetUp]

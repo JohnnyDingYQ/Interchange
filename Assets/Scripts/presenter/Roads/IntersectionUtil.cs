@@ -238,8 +238,8 @@ public static class IntersectionUtil
             Path path = Graph.GetPath(start, end);
             if (path != null)
                 return null;
-            float3 pos1 = start.Pos + Constants.MinimumLaneLength / 3 * start.Tangent;
-            float3 pos2 = end.Pos - Constants.MinimumLaneLength / 3 * end.Tangent;
+            float3 pos1 = start.Pos + Constants.MinLaneLength / 3 * start.Tangent;
+            float3 pos2 = end.Pos - Constants.MinLaneLength / 3 * end.Tangent;
             BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
             Path p = new(bs, start, end);
             Game.RegisterPath(p);

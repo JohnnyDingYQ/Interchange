@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 public class GhostRoadTest
 {
-    float3 stride = Constants.MinimumLaneLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
     float3 direction = new(1, 0, 0);
 
     [SetUp]

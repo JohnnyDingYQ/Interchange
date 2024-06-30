@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -13,6 +14,7 @@ public static class Build
     public static int LaneCount { get; set; }
     private static BuildTargets startTarget;
     private static BuildTargets endTarget;
+    private static Road hoveredRoadAtStart;
     public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
@@ -69,7 +71,7 @@ public static class Build
         SupportLines.Clear();
         if (startAssigned)
         {
-            float3 startPoint = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
+            float3 startPoint = startTarget.Snapped ? startTarget.MedianPoint : startTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             startPoint.y = 0;
             pivotPoint.y = 0;
@@ -77,7 +79,7 @@ public static class Build
         }
         if (pivotAssigned && endTarget != null)
         {
-            float3 endPoint = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
+            float3 endPoint = endTarget.Snapped ? endTarget.MedianPoint : endTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             endPoint.y = 0;
             pivotPoint.y = 0;
@@ -127,6 +129,7 @@ public static class Build
             return null;
         if (!startAssigned)
         {
+            hoveredRoadAtStart = Game.HoveredRoad;
             startAssigned = true;
             startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             return null;
@@ -154,6 +157,16 @@ public static class Build
 
     static List<Road> BuildRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
+        if (!startTarget.Snapped && hoveredRoadAtStart != null)
+        {
+            if (DivideHandler.HandleDivideCommand(hoveredRoadAtStart, startTarget.ClickPos) != null)
+                startTarget = new(startTarget.ClickPos, LaneCount, Game.Nodes.Values);
+        }
+        if (!endTarget.Snapped && Game.HoveredRoad != null)
+        {
+            if (DivideHandler.HandleDivideCommand(Game.HoveredRoad, endTarget.ClickPos) != null)
+                endTarget = new(endTarget.ClickPos, LaneCount, Game.Nodes.Values);
+        }
         Road road = InitRoad(startTarget, pivotPos, endTarget);
         if (road == null)
             return null;
@@ -184,10 +197,10 @@ public static class Build
 
     static Road InitRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
     {
-        float3 startPos = startTarget.SnapNotNull ? startTarget.MedianPoint : startTarget.ClickPos;
-        float3 endPos = endTarget.SnapNotNull ? endTarget.MedianPoint : endTarget.ClickPos;
+        float3 startPos = startTarget.Snapped ? startTarget.MedianPoint : startTarget.ClickPos;
+        float3 endPos = endTarget.Snapped ? endTarget.MedianPoint : endTarget.ClickPos;
         if (EnforcesTangent && !pivotAligned)
-            AlignPivotEnd(endTarget, pivotPos);
+            pivotPos = AlignPivotEnd(endTarget, pivotPos);
         if (RoadIsTooBent())
             return null;
         Road road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
@@ -214,18 +227,18 @@ public static class Build
         List<Node> endNodes = endTarget.Nodes;
         if (road.HasLaneShorterThanMinimumLaneLength())
             return null;
-        if (startTarget.SnapNotNull)
+        if (startTarget.Snapped)
             road.StartIntersection = startTarget.Intersection;
-        if (endTarget.SnapNotNull)
+        if (endTarget.Snapped)
             road.EndIntersection = endTarget.Intersection;
         Game.RegisterRoad(road);
 
-        if (startTarget.SnapNotNull)
+        if (startTarget.Snapped)
             ConnectRoadStartToNodes(startNodes, road);
         else
             IntersectionUtil.EvaluateOutline(road.StartIntersection);
 
-        if (endTarget.SnapNotNull)
+        if (endTarget.Snapped)
             ConnectRoadEndToNodes(endNodes, road);
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
@@ -256,10 +269,10 @@ public static class Build
         void AutoDivideRoad(Road road)
         {
             float longestLength = GetLongestLaneLength(road);
-            if (longestLength <= Constants.MaximumLaneLength)
+            if (longestLength <= Constants.MaxLaneLength)
                 return;
             int divisions = 2;
-            while (longestLength / divisions > Constants.MaximumLaneLength)
+            while (longestLength / divisions > Constants.MaxLaneLength)
                 divisions++;
             RecursiveRoadDivision(road, divisions);
         }
@@ -277,7 +290,7 @@ public static class Build
 
         void ReplaceExistingRoad()
         {
-            if (!(startTarget.SnapNotNull && endTarget.SnapNotNull))
+            if (!(startTarget.Snapped && endTarget.Snapped))
                 return;
             List<Vertex> startV = new();
             foreach (Node n in startNodes)
@@ -317,30 +330,32 @@ public static class Build
         return new(new BezierCurve(q0, c1, c2, q2));
     }
 
-    static void AlignPivotStart(BuildTargets startTarget, float3 p)
+    static float3 AlignPivotStart(BuildTargets startTarget, float3 p)
     {
         Assert.IsNotNull(startTarget);
         float oldY = p.y;
-        if (startTarget.SnapNotNull && !startTarget.Intersection.IsRoadEmpty())
+        if (startTarget.Snapped && !startTarget.Intersection.IsRoadEmpty())
             p = math.project(p - startTarget.MedianPoint, startTarget.Intersection.Tangent) + startTarget.MedianPoint;
         else
-            return;
+            return p;
         p.y = oldY;
         pivotPos = p;
         pivotAligned = true;
+        return p;
     }
 
-    static void AlignPivotEnd(BuildTargets endTarget, float3 p)
+    static float3 AlignPivotEnd(BuildTargets endTarget, float3 p)
     {
         Assert.IsNotNull(endTarget);
         float oldY = p.y;
-        if (endTarget.SnapNotNull && !endTarget.Intersection.IsRoadEmpty())
+        if (endTarget.Snapped && !endTarget.Intersection.IsRoadEmpty())
             p = math.project(p - endTarget.MedianPoint, endTarget.Intersection.Tangent) + endTarget.MedianPoint;
         else
-            return;
+            return p;
         p.y = oldY;
         pivotPos = p;
         pivotAligned = true;
+        return p;
     }
 
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
