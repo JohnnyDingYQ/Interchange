@@ -6,17 +6,17 @@ using UnityEngine;
 public class SquareSelector : MonoBehaviour
 {
     Mesh square;
+    List<Vector3> unitSquareVerts;
+    List<Vector3> updatedVerts;
     void Start()
     {
-        List<Vector3> verts = new() {
+        updatedVerts = new();
+        unitSquareVerts = new() {
             new(-0.5f, 0, 0.5f), new(0.5f, 0, 0.5f),
             new(-0.5f, 0, -0.5f), new(0.5f, 0 ,-0.5f),
-            // new(-0.5f, 0, 0.5f), new(0.5f, 0, 0.5f),
-            // new(-0.5f, 0, -0.5f), new(0.5f, 0 ,-0.5f)
         };
         List<Vector3> normals = new() {
             Vector3.up, Vector3.up, Vector3.up, Vector3.up,
-            // Vector3.Normalize(new(-1, 0, 1)), Vector3.Normalize(new(1, 0, 1)), Vector3.Normalize(new(-1, 0, -1)), Vector3.Normalize(new(1, 0, -1))
         };
         List<Vector2> uvs = new() {
             new(-1, 1), new(1, 1),
@@ -24,7 +24,7 @@ public class SquareSelector : MonoBehaviour
         };
         List<int> tris = new() { 0, 1, 2, 2, 1, 3 };
         square = new();
-        square.SetVertices(verts);
+        square.SetVertices(unitSquareVerts);
         square.SetNormals(normals);
         square.SetTriangles(tris, 0);
         square.SetUVs(0, uvs);
@@ -33,7 +33,15 @@ public class SquareSelector : MonoBehaviour
 
     public void SetTransform(float widthScale, float heightScale, float3 center)
     {
-        gameObject.transform.localScale = new(widthScale, 1, heightScale);
+        updatedVerts.Clear();
+        foreach (Vector3 vector in unitSquareVerts)
+        {
+            Vector3 copy = vector;
+            copy.x *= widthScale;
+            copy.z *= heightScale;
+            updatedVerts.Add(copy);
+        }
+        square.SetVertices(updatedVerts);
         center.y = Constants.MaxElevation + 1;
         gameObject.transform.position = center;
     }

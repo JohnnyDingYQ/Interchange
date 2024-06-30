@@ -10,6 +10,7 @@ public static class Constants
     public const float MaxRoadBendAngle = 130;
     public const int MaxElevation = 10;
     public const int MinElevation = 0;
+    public const int ElevationStep = 2;
     public const float CarAcceleration = 15;
     public const float CarDeceleration = 15f;
     public const float CarMaxSpeed = 20f;

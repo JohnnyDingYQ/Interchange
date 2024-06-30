@@ -18,7 +18,6 @@ public class GameSave
     public Dictionary<uint, SourcePoint> Sources { get; private set; }
     [JsonIgnore]
     public Dictionary<uint, Car> Cars { get; private set; }
-    public float Elevation { get; set; }
     public uint CarServiced { get; set; }
     public GameSave()
     {

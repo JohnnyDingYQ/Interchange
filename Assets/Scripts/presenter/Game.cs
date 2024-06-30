@@ -14,8 +14,6 @@ public static class Game
     public static event Action<Road> RoadRemoved;
     public static event Action<Car> CarAdded;
     public static event Action<Car> CarRemoved;
-    public static event Action<float> ElevationUpdated;
-    public static event Action<uint> CarServicedUpdated;
     public static GameSave GameSave { get; set; }
     public static Dictionary<uint, Road> Roads { get => GameSave.Roads; }
     public static Dictionary<uint, Node> Nodes { get => GameSave.Nodes; }
@@ -26,12 +24,8 @@ public static class Game
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
     public static Dictionary<uint, Point> Targets { get => GameSave.Targets; }
     public static Dictionary<uint, SourcePoint> Sources { get => GameSave.Sources; }
-    public static float Elevation { get => GameSave.Elevation; }
-    public static uint CarServiced
-    {
-        get { return GameSave.CarServiced; }
-        set { GameSave.CarServiced = value; CarServicedUpdated?.Invoke(value); }
-    }
+
+    public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
 
     static Game()
@@ -200,16 +194,5 @@ public static class Game
     public static void InvokeRoadRemoved(Road road)
     {
         RoadRemoved?.Invoke(road);
-    }
-
-    public static void SetElevation(float elevation)
-    {
-        if (elevation < Constants.MinElevation)
-            GameSave.Elevation = Constants.MinElevation;
-        else if (elevation > Constants.MaxElevation)
-            GameSave.Elevation = Constants.MaxElevation;
-        else
-            GameSave.Elevation = elevation;
-        ElevationUpdated?.Invoke(elevation);
     }
 }

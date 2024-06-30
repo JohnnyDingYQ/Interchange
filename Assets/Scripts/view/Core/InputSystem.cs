@@ -13,7 +13,6 @@ public class InputSystem : MonoBehaviour
     private float2 prevScreenMousePos;
     const float MouseDragScreenMultiplier = 0.17f;
     private bool isDraggingCamera;
-    private bool elevationDragEnabled;
     private bool parallelSpacingDragEnabled;
     private bool bulkSelectStarted;
     private float3 bulkSelectStart;
@@ -43,8 +42,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DivideRoad.performed += DivideRoad;
         gameActions.InGame.RemoveRoad.performed += RemoveRoad;
         gameActions.InGame.AbandonBuild.performed += Deselect;
-        gameActions.InGame.ElevationDrag.performed += EnableElevationDrag;
-        gameActions.InGame.ElevationDrag.canceled += DisableElevationDrag;
+        gameActions.InGame.IncreaseElevation.performed += IncreaseElevation;
+        gameActions.InGame.DecreaseElevation.performed += DecreaseElevation;
         gameActions.InGame.ParallelSpacingDrag.performed += EnableParallelSpacingDrag;
         gameActions.InGame.ParallelSpacingDrag.canceled += DisableParallelSpacingDrag;
         gameActions.InGame.DragCamera.performed += DragScreenStarted;
@@ -68,8 +67,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DivideRoad.performed -= DivideRoad;
         gameActions.InGame.RemoveRoad.performed -= RemoveRoad;
         gameActions.InGame.AbandonBuild.performed -= Deselect;
-        gameActions.InGame.ElevationDrag.performed -= EnableElevationDrag;
-        gameActions.InGame.ElevationDrag.canceled -= DisableElevationDrag;
+        gameActions.InGame.IncreaseElevation.performed -= IncreaseElevation;
+        gameActions.InGame.DecreaseElevation.performed -= DecreaseElevation;
         gameActions.InGame.ParallelSpacingDrag.performed -= EnableParallelSpacingDrag;
         gameActions.InGame.ParallelSpacingDrag.canceled -= DisableParallelSpacingDrag;
         gameActions.InGame.DragCamera.performed -= DragScreenStarted;
@@ -85,7 +84,6 @@ public class InputSystem : MonoBehaviour
     void Update()
     {
         UpdateCameraPos();
-        ProcessElevationDrag();
         ProcessParallelSpacingDrag();
         UpdateSquareSelector();
         UpdateMouseWorldPos();
@@ -111,7 +109,7 @@ public class InputSystem : MonoBehaviour
             z = Camera.main.transform.position.y
         };
         mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
-        mouseWorldPos.y = Game.Elevation;
+        mouseWorldPos.y = Build.Elevation;
         MouseWorldPos = mouseWorldPos;
 
         prevScreenMousePos.x = Input.mousePosition.x;
@@ -129,14 +127,6 @@ public class InputSystem : MonoBehaviour
         }
         else
             squareSelector.gameObject.SetActive(false);
-    }
-    void ProcessElevationDrag()
-    {
-        if (elevationDragEnabled)
-        {
-            float delta = Input.mousePosition.y - prevScreenMousePos.y;
-            Game.SetElevation(Game.Elevation + delta * 0.02f);
-        }
     }
 
     void ProcessParallelSpacingDrag()
@@ -195,13 +185,13 @@ public class InputSystem : MonoBehaviour
         Roads.ClearSelected();
         bulkSelectStarted = false;
     }
-    void EnableElevationDrag(InputAction.CallbackContext context)
+    void IncreaseElevation(InputAction.CallbackContext context)
     {
-        elevationDragEnabled = true;
+        Build.IncreaseElevation();
     }
-    void DisableElevationDrag(InputAction.CallbackContext context)
+    void DecreaseElevation(InputAction.CallbackContext context)
     {
-        elevationDragEnabled = false;
+        Build.DecreaseElevation();
     }
     void EnableParallelSpacingDrag(InputAction.CallbackContext context)
     {

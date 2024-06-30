@@ -118,15 +118,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ElevationDrag"",
-                    ""type"": ""Button"",
-                    ""id"": ""6d5ae660-34f7-4554-8f69-a764e81bdf22"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""ParallelSpacingDrag"",
                     ""type"": ""Button"",
                     ""id"": ""676f582d-b29b-4a4a-8d86-c26f57cdb8e5"",
@@ -166,6 +157,24 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""name"": ""BulkSelect"",
                     ""type"": ""Button"",
                     ""id"": ""99aae0c1-9675-4abe-bc25-ae19dcb7f1c5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DecreaseElevation"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d5ae660-34f7-4554-8f69-a764e81bdf22"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""IncreaseElevation"",
+                    ""type"": ""Button"",
+                    ""id"": ""36eff879-62ea-412a-82cd-42db15916346"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -351,41 +360,8 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""924d7ac7-d01e-4a80-a91b-29b23a523fe3"",
-                    ""path"": ""<Keyboard>/period"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ElevationDrag"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""cbf8a344-c484-4995-ad4f-7f7cef647cb7"",
-                    ""path"": ""<Mouse>/backButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ElevationDrag"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""e8929b3b-afa8-4bbd-8afc-bf97bc86de06"",
-                    ""path"": ""<Mouse>/forwardButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ParallelSpacingDrag"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""1a6edfec-232e-435d-86b4-1b9530bf7332"",
-                    ""path"": ""<Keyboard>/comma"",
+                    ""path"": ""<Keyboard>/z"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -436,6 +412,50 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""BulkSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2ca46d08-7aa0-42c6-b4d4-a148b1c31a4f"",
+                    ""path"": ""<Mouse>/forwardButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""IncreaseElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d76672b9-cae0-4dbb-8407-77ff724ffe13"",
+                    ""path"": ""<Keyboard>/period"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""IncreaseElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""924d7ac7-d01e-4a80-a91b-29b23a523fe3"",
+                    ""path"": ""<Keyboard>/comma"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DecreaseElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cbf8a344-c484-4995-ad4f-7f7cef647cb7"",
+                    ""path"": ""<Mouse>/backButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DecreaseElevation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -454,12 +474,13 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_DivideRoad = m_InGame.FindAction("DivideRoad", throwIfNotFound: true);
         m_InGame_RemoveRoad = m_InGame.FindAction("RemoveRoad", throwIfNotFound: true);
         m_InGame_AbandonBuild = m_InGame.FindAction("AbandonBuild", throwIfNotFound: true);
-        m_InGame_ElevationDrag = m_InGame.FindAction("ElevationDrag", throwIfNotFound: true);
         m_InGame_ParallelSpacingDrag = m_InGame.FindAction("ParallelSpacingDrag", throwIfNotFound: true);
         m_InGame_DragCamera = m_InGame.FindAction("DragCamera", throwIfNotFound: true);
         m_InGame_ToggleParallelBuildMode = m_InGame.FindAction("ToggleParallelBuildMode", throwIfNotFound: true);
         m_InGame_ToggleBuildMode = m_InGame.FindAction("ToggleBuildMode", throwIfNotFound: true);
         m_InGame_BulkSelect = m_InGame.FindAction("BulkSelect", throwIfNotFound: true);
+        m_InGame_DecreaseElevation = m_InGame.FindAction("DecreaseElevation", throwIfNotFound: true);
+        m_InGame_IncreaseElevation = m_InGame.FindAction("IncreaseElevation", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -531,12 +552,13 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_DivideRoad;
     private readonly InputAction m_InGame_RemoveRoad;
     private readonly InputAction m_InGame_AbandonBuild;
-    private readonly InputAction m_InGame_ElevationDrag;
     private readonly InputAction m_InGame_ParallelSpacingDrag;
     private readonly InputAction m_InGame_DragCamera;
     private readonly InputAction m_InGame_ToggleParallelBuildMode;
     private readonly InputAction m_InGame_ToggleBuildMode;
     private readonly InputAction m_InGame_BulkSelect;
+    private readonly InputAction m_InGame_DecreaseElevation;
+    private readonly InputAction m_InGame_IncreaseElevation;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -551,12 +573,13 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @DivideRoad => m_Wrapper.m_InGame_DivideRoad;
         public InputAction @RemoveRoad => m_Wrapper.m_InGame_RemoveRoad;
         public InputAction @AbandonBuild => m_Wrapper.m_InGame_AbandonBuild;
-        public InputAction @ElevationDrag => m_Wrapper.m_InGame_ElevationDrag;
         public InputAction @ParallelSpacingDrag => m_Wrapper.m_InGame_ParallelSpacingDrag;
         public InputAction @DragCamera => m_Wrapper.m_InGame_DragCamera;
         public InputAction @ToggleParallelBuildMode => m_Wrapper.m_InGame_ToggleParallelBuildMode;
         public InputAction @ToggleBuildMode => m_Wrapper.m_InGame_ToggleBuildMode;
         public InputAction @BulkSelect => m_Wrapper.m_InGame_BulkSelect;
+        public InputAction @DecreaseElevation => m_Wrapper.m_InGame_DecreaseElevation;
+        public InputAction @IncreaseElevation => m_Wrapper.m_InGame_IncreaseElevation;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -596,9 +619,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @AbandonBuild.started += instance.OnAbandonBuild;
             @AbandonBuild.performed += instance.OnAbandonBuild;
             @AbandonBuild.canceled += instance.OnAbandonBuild;
-            @ElevationDrag.started += instance.OnElevationDrag;
-            @ElevationDrag.performed += instance.OnElevationDrag;
-            @ElevationDrag.canceled += instance.OnElevationDrag;
             @ParallelSpacingDrag.started += instance.OnParallelSpacingDrag;
             @ParallelSpacingDrag.performed += instance.OnParallelSpacingDrag;
             @ParallelSpacingDrag.canceled += instance.OnParallelSpacingDrag;
@@ -614,6 +634,12 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @BulkSelect.started += instance.OnBulkSelect;
             @BulkSelect.performed += instance.OnBulkSelect;
             @BulkSelect.canceled += instance.OnBulkSelect;
+            @DecreaseElevation.started += instance.OnDecreaseElevation;
+            @DecreaseElevation.performed += instance.OnDecreaseElevation;
+            @DecreaseElevation.canceled += instance.OnDecreaseElevation;
+            @IncreaseElevation.started += instance.OnIncreaseElevation;
+            @IncreaseElevation.performed += instance.OnIncreaseElevation;
+            @IncreaseElevation.canceled += instance.OnIncreaseElevation;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -648,9 +674,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @AbandonBuild.started -= instance.OnAbandonBuild;
             @AbandonBuild.performed -= instance.OnAbandonBuild;
             @AbandonBuild.canceled -= instance.OnAbandonBuild;
-            @ElevationDrag.started -= instance.OnElevationDrag;
-            @ElevationDrag.performed -= instance.OnElevationDrag;
-            @ElevationDrag.canceled -= instance.OnElevationDrag;
             @ParallelSpacingDrag.started -= instance.OnParallelSpacingDrag;
             @ParallelSpacingDrag.performed -= instance.OnParallelSpacingDrag;
             @ParallelSpacingDrag.canceled -= instance.OnParallelSpacingDrag;
@@ -666,6 +689,12 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @BulkSelect.started -= instance.OnBulkSelect;
             @BulkSelect.performed -= instance.OnBulkSelect;
             @BulkSelect.canceled -= instance.OnBulkSelect;
+            @DecreaseElevation.started -= instance.OnDecreaseElevation;
+            @DecreaseElevation.performed -= instance.OnDecreaseElevation;
+            @DecreaseElevation.canceled -= instance.OnDecreaseElevation;
+            @IncreaseElevation.started -= instance.OnIncreaseElevation;
+            @IncreaseElevation.performed -= instance.OnIncreaseElevation;
+            @IncreaseElevation.canceled -= instance.OnIncreaseElevation;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -695,11 +724,12 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnDivideRoad(InputAction.CallbackContext context);
         void OnRemoveRoad(InputAction.CallbackContext context);
         void OnAbandonBuild(InputAction.CallbackContext context);
-        void OnElevationDrag(InputAction.CallbackContext context);
         void OnParallelSpacingDrag(InputAction.CallbackContext context);
         void OnDragCamera(InputAction.CallbackContext context);
         void OnToggleParallelBuildMode(InputAction.CallbackContext context);
         void OnToggleBuildMode(InputAction.CallbackContext context);
         void OnBulkSelect(InputAction.CallbackContext context);
+        void OnDecreaseElevation(InputAction.CallbackContext context);
+        void OnIncreaseElevation(InputAction.CallbackContext context);
     }
 }

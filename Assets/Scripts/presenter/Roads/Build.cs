@@ -20,6 +20,7 @@ public static class Build
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
     public static float ParallelSpacing { get; set; }
+    public static int Elevation { get; set; }
 
     static Build()
     {
@@ -447,5 +448,19 @@ public static class Build
 
         Game.InvokeRoadRemoved(road);
         return true;
+    }
+
+    public static void IncreaseElevation()
+    {
+        if (Elevation >= Constants.MaxElevation)
+            return;
+        Elevation += Constants.ElevationStep;
+    }
+
+    public static void DecreaseElevation()
+    {
+        if (Elevation <= Constants.MinElevation)
+            return;
+        Elevation -= Constants.ElevationStep;
     }
 }

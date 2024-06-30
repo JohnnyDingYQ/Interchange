@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,16 +14,17 @@ public class DevPanel : MonoBehaviour
     private Toggle ghostRoad;
     private Toggle supportLines;
     private Toggle enforceTangent;
-    public static TextElement Elevation { get; private set; }
-    public static TextElement CarServiced { get; private set; }
+    private static TextElement elevation;
+    private static TextElement carServiced;
+    private readonly StringBuilder stringBuilder = new();
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
         root.RegisterCallback<MouseEnterEvent>(MouseReturnGameWorld);
         root.RegisterCallback<MouseLeaveEvent>(MouseLeaveGameWorld);
 
-        Elevation = root.Q<TextElement>("Elevation");
-        CarServiced = root.Q<TextElement>("CarServiced");
+        elevation = root.Q<TextElement>("Elevation");
+        carServiced = root.Q<TextElement>("CarServiced");
 
         drawCenter = root.Q<Toggle>("RoadCenter");
         drawLanes = root.Q<Toggle>("RoadLanes");
@@ -52,9 +54,19 @@ public class DevPanel : MonoBehaviour
         ghostRoad.value = true;
         enforceTangent.RegisterCallback<ChangeEvent<bool>>(EnforceTangent);
         enforceTangent.value = true;
+    }
 
-        Game.ElevationUpdated += UpdateElevation;
-        Game.CarServicedUpdated += UpdateCarServiced;
+    void Update()
+    {
+        stringBuilder.Clear();
+        stringBuilder.Append("Elevation: ");
+        stringBuilder.Append(Build.Elevation);
+        elevation.text = stringBuilder.ToString();
+
+        stringBuilder.Clear();
+        stringBuilder.Append("Cara Serviced: ");
+        stringBuilder.Append(Game.CarServiced);
+        carServiced.text = stringBuilder.ToString();
     }
 
     void OnDisable()
@@ -70,9 +82,6 @@ public class DevPanel : MonoBehaviour
         supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
         ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
         enforceTangent.UnregisterCallback<ChangeEvent<bool>>(EnforceTangent);
-
-        Game.ElevationUpdated -= UpdateElevation;
-        Game.CarServicedUpdated -= UpdateCarServiced;
     }
 
     void MouseReturnGameWorld(MouseEnterEvent e)
@@ -118,15 +127,5 @@ public class DevPanel : MonoBehaviour
     void EnforceTangent(ChangeEvent<bool> e)
     {
         Build.EnforcesTangent = e.newValue;
-    }
-
-    void UpdateElevation(float newElevation)
-    {
-        Elevation.text = "Elevation: " + newElevation;
-    }
-
-    void UpdateCarServiced(uint newCarServiced)
-    {
-        CarServiced.text = "Car Serviced: " + newCarServiced;
     }
 }
