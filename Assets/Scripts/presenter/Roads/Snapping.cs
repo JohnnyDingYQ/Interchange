@@ -9,12 +9,35 @@ public static class Snapping
 {
     public static BuildTargets Snap(float3 pos, int laneCount)
     {
-        BuildTargets bt = new();
-        bt.ClickPos = pos;
-        bt.Nodes = GetBuildNodes(pos, laneCount);
+        BuildTargets bt = new()
+        {
+            ClickPos = pos,
+            Nodes = GetBuildNodes(pos, laneCount),
+            SelectedRoad = Game.HoveredRoad
+        };
         if (bt.Nodes == null)
         {
             bt.Snapped = false;
+            if (bt.SelectedRoad != null)
+            {
+
+                float interpolation = Divide.GetInterpolation(bt.SelectedRoad, bt.ClickPos);
+                bt.DividePossible = Divide.RoadDividable(bt.SelectedRoad, interpolation);
+                if (bt.DividePossible)
+                {
+                    // float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
+                    bt.NodesIfDivded = new();
+                    float3 center = bt.SelectedRoad.BezierSeries.EvaluatePosition(interpolation);
+                    float3 offset = bt.SelectedRoad.BezierSeries.Evaluate2DNormalizedNormal(interpolation);
+                    for (int i = 2; i >= -2; i--)
+                    {
+                        float3 p = center + offset * i * Constants.LaneWidth;
+                        // if (math.length(p - bt.ClickPos) < snapRadius)
+                        bt.NodesIfDivded.Add(p);
+                    }
+                    bt.NodesIfDivded = bt.NodesIfDivded.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
+                }
+            }
         }
         else
         {
@@ -62,7 +85,7 @@ public static class Snapping
             GetInterpolatedCandidates(2, intersection);
             if (candidates.Count + nodes.Count < laneCount)
                 return null;
-            
+
             nodes.AddRange(candidates.Select(t => t.Item2));
             nodes.Sort();
             return nodes;

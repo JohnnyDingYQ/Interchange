@@ -244,7 +244,7 @@ public class DivideTest
     public void DivideDoesNotCreateExtraVertices()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
+        Divide.HandleDivideCommand(road, stride);
         
         Assert.AreEqual(4, Game.Vertices.Count);
     }
@@ -264,5 +264,19 @@ public class DivideTest
 
         Assert.AreEqual(road.IsGhost, subRoads.Left.IsGhost);
         Assert.AreEqual(road.IsGhost, subRoads.Right.IsGhost);
+    }
+
+    [Test]
+    public void DivideExtremelyShortRoad()
+    {
+        Road road = RoadBuilder.Single(
+            0,
+            Vector3.up * Constants.MinLaneLength,
+            2.01f * Constants.MinLaneLength * Vector3.up,
+            3
+        );
+        SubRoads subRoads = Divide.DivideRoad(road, 0.5f);
+        Assert.NotNull(subRoads);
+        Assert.AreEqual(2, Game.Roads.Count);
     }
 }

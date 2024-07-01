@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -14,7 +13,6 @@ public static class Build
     public static int LaneCount { get; set; }
     public static BuildTargets StartTarget;
     public static BuildTargets EndTarget;
-    private static Road hoveredRoadAtStart;
     public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
@@ -126,7 +124,6 @@ public static class Build
             return null;
         if (!startAssigned)
         {
-            hoveredRoadAtStart = Game.HoveredRoad;
             startAssigned = true;
             StartTarget = Snapping.Snap(clickPos, LaneCount);
             return null;
@@ -157,13 +154,15 @@ public static class Build
     {
         if (buildMode == BuildMode.Actual)
         {
-            if (!startTarget.Snapped && hoveredRoadAtStart != null)
-                if (Divide.HandleDivideCommand(hoveredRoadAtStart, startTarget.ClickPos) != null)
-                    startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
-            if (!endTarget.Snapped && Game.HoveredRoad != null)
+            if (!startTarget.Snapped && startTarget.DividePossible)
             {
-                if (Divide.HandleDivideCommand(Game.HoveredRoad, endTarget.ClickPos) != null)
-                    endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
+                Divide.HandleDivideCommand(startTarget.SelectedRoad, startTarget.ClickPos);
+                startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
+            }
+            if (!endTarget.Snapped && endTarget.DividePossible)
+            {
+                Divide.HandleDivideCommand(endTarget.SelectedRoad, endTarget.ClickPos);
+                endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
             }
         }
         Road road = InitRoad(startTarget, pivotPos, endTarget);

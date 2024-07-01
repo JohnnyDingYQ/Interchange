@@ -33,24 +33,48 @@ public class SnapPoints : MonoBehaviour
             snapPointPool.Release(snapPoint);
         activeSnapPoints.Clear();
         BuildTargets endTarget = Build.EndTarget;
-        if (endTarget != null && endTarget.Snapped)
-            foreach (Node node in endTarget.Nodes)
-            {
-                SnapPoint snapPoint = snapPointPool.Get();
-                float3 pos = node.Pos;
-                pos.y = Constants.MaxElevation + 1;
-                snapPoint.transform.position = pos;
-                activeSnapPoints.Add(snapPoint);
-            }
+        if (endTarget != null)
+        {
+            if (endTarget.Snapped)
+                foreach (Node node in endTarget.Nodes)
+                {
+                    SnapPoint snapPoint = snapPointPool.Get();
+                    float3 pos = node.Pos;
+                    pos.y = Constants.MaxElevation + 1;
+                    snapPoint.transform.position = pos;
+                    activeSnapPoints.Add(snapPoint);
+                }
+            else if (endTarget.DividePossible)
+                foreach (float3 pos in endTarget.NodesIfDivded)
+                {
+                    SnapPoint snapPoint = snapPointPool.Get();
+                    float3 posCopy = pos;
+                    posCopy.y = Constants.MaxElevation + 1;
+                    snapPoint.transform.position = pos;
+                    activeSnapPoints.Add(snapPoint);
+                }
+        }
         BuildTargets startTarget = Build.StartTarget;
-        if (startTarget != null && startTarget.Snapped)
-            foreach (Node node in startTarget.Nodes)
-            {
-                SnapPoint snapPoint = snapPointPool.Get();
-                float3 pos = node.Pos;
-                pos.y = Constants.MaxElevation + 1;
-                snapPoint.transform.position = pos;
-                activeSnapPoints.Add(snapPoint);
-            }
+        if (startTarget != null)
+        {
+            if (startTarget.Snapped)
+                foreach (Node node in startTarget.Nodes)
+                {
+                    SnapPoint snapPoint = snapPointPool.Get();
+                    float3 pos = node.Pos;
+                    pos.y = Constants.MaxElevation + 1;
+                    snapPoint.transform.position = pos;
+                    activeSnapPoints.Add(snapPoint);
+                }
+            else if (startTarget.DividePossible)
+                foreach (float3 pos in startTarget.NodesIfDivded)
+                {
+                    SnapPoint snapPoint = snapPointPool.Get();
+                    float3 posCopy = pos;
+                    posCopy.y = Constants.MaxElevation + 1;
+                    snapPoint.transform.position = pos;
+                    activeSnapPoints.Add(snapPoint);
+                }
+        }
     }
 }

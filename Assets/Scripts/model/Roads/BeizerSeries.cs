@@ -41,6 +41,11 @@ public class BezierSeries
 
     public BezierSeries(BezierSeries bs, float startInterpolation, float endInterpolation)
     {
+        Assert.IsTrue(startInterpolation <= 1);
+        Assert.IsTrue(startInterpolation >= 0);
+        Assert.IsTrue(endInterpolation <= 1);
+        Assert.IsTrue(endInterpolation >= 0);
+        Assert.IsTrue(startInterpolation < endInterpolation);
         float startDistance = startInterpolation * bs.Length;
         bs.Split(endInterpolation, out BezierSeries left, out _);
         left.Split(startDistance / left.Length, out _, out BezierSeries right);
@@ -175,7 +180,7 @@ public class BezierSeries
         {
             int numPoints = (int)(CurveUtility.CalculateLength(curve) * Constants.MeshResolution);
             if (numPoints == 0) // curve is too short
-                continue;
+                numPoints = 1;
             for (int j = 0; j <= numPoints; j++)
             {
                 float t = (float)j / numPoints;
