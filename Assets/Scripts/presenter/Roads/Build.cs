@@ -12,8 +12,8 @@ public static class Build
     private static float3 pivotPos;
     private static bool startAssigned, pivotAssigned, pivotAligned;
     public static int LaneCount { get; set; }
-    private static BuildTargets startTarget;
-    private static BuildTargets endTarget;
+    public static BuildTargets StartTarget;
+    public static BuildTargets EndTarget;
     private static Road hoveredRoadAtStart;
     public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3>> SupportLines { get; }
@@ -55,15 +55,10 @@ public static class Build
         startAssigned = false;
         pivotAssigned = false;
         pivotAligned = false;
-        startTarget = null;
-        endTarget = null;
+        StartTarget = null;
+        EndTarget = null;
         pivotPos = 0;
         RemoveAllGhostRoads();
-    }
-
-    public static BuildTargets GetStartTarget()
-    {
-        return startTarget;
     }
 
     public static List<Tuple<float3, float3>> SetSupportLines()
@@ -71,15 +66,15 @@ public static class Build
         SupportLines.Clear();
         if (startAssigned)
         {
-            float3 startPoint = startTarget.Snapped ? startTarget.MedianPoint : startTarget.ClickPos;
+            float3 startPoint = StartTarget.Snapped ? StartTarget.MedianPoint : StartTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             startPoint.y = 0;
             pivotPoint.y = 0;
             SupportLines.Add(new(startPoint, pivotPoint));
         }
-        if (pivotAssigned && endTarget != null)
+        if (pivotAssigned && EndTarget != null)
         {
-            float3 endPoint = endTarget.Snapped ? endTarget.MedianPoint : endTarget.ClickPos;
+            float3 endPoint = EndTarget.Snapped ? EndTarget.MedianPoint : EndTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             endPoint.y = 0;
             pivotPoint.y = 0;
@@ -100,19 +95,21 @@ public static class Build
     public static void BuildGhostRoad(float3 endTargetClickPos)
     {
         RemoveAllGhostRoads();
-        endTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
+        EndTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
         if (ParallelBuildOn)
-            BuildParallelRoads(startTarget, pivotPos, endTarget, BuildMode.Ghost);
+            BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
         else
-            BuildRoads(startTarget, pivotPos, endTarget, BuildMode.Ghost);
+            BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
     }
 
     public static void HandleHover(float3 hoverPos)
     {
+        if (!startAssigned)
+            StartTarget = new(hoverPos, LaneCount, Game.Nodes.Values);
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
         if (EnforcesTangent && !pivotAssigned && startAssigned)
-            AlignPivotStart(startTarget, pivotPos);
+            AlignPivotByStart(StartTarget, pivotPos);
         if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
         SetSupportLines();
@@ -131,7 +128,7 @@ public static class Build
         {
             hoveredRoadAtStart = Game.HoveredRoad;
             startAssigned = true;
-            startTarget = new(clickPos, LaneCount, Game.Nodes.Values);
+            StartTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             return null;
         }
         else if (!pivotAssigned)
@@ -139,17 +136,18 @@ public static class Build
             pivotAssigned = true;
             pivotPos = clickPos;
             if (EnforcesTangent)
-                AlignPivotStart(startTarget, pivotPos);
+                AlignPivotByStart(StartTarget, pivotPos);
             return null;
         }
         else
         {
-            endTarget = new(clickPos, LaneCount, Game.Nodes.Values);
+            RemoveAllGhostRoads();
+            EndTarget = new(clickPos, LaneCount, Game.Nodes.Values);
             List<Road> roads;
             if (ParallelBuildOn)
-                roads = BuildParallelRoads(startTarget, pivotPos, endTarget, BuildMode.Actual);
+                roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
             else
-                roads = BuildRoads(startTarget, pivotPos, endTarget, BuildMode.Actual);
+                roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
             ResetSelection();
             return roads;
         }
@@ -157,15 +155,16 @@ public static class Build
 
     static List<Road> BuildRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
-        if (!startTarget.Snapped && hoveredRoadAtStart != null)
+        if (buildMode == BuildMode.Actual)
         {
-            if (DivideHandler.HandleDivideCommand(hoveredRoadAtStart, startTarget.ClickPos) != null)
-                startTarget = new(startTarget.ClickPos, LaneCount, Game.Nodes.Values);
-        }
-        if (!endTarget.Snapped && Game.HoveredRoad != null)
-        {
-            if (DivideHandler.HandleDivideCommand(Game.HoveredRoad, endTarget.ClickPos) != null)
-                endTarget = new(endTarget.ClickPos, LaneCount, Game.Nodes.Values);
+            if (!startTarget.Snapped && hoveredRoadAtStart != null)
+                if (DivideHandler.HandleDivideCommand(hoveredRoadAtStart, startTarget.ClickPos) != null)
+                    startTarget = new(startTarget.ClickPos, LaneCount, Game.Nodes.Values);
+            if (!endTarget.Snapped && Game.HoveredRoad != null)
+            {
+                if (DivideHandler.HandleDivideCommand(Game.HoveredRoad, endTarget.ClickPos) != null)
+                    endTarget = new(endTarget.ClickPos, LaneCount, Game.Nodes.Values);
+            }
         }
         Road road = InitRoad(startTarget, pivotPos, endTarget);
         if (road == null)
@@ -249,6 +248,7 @@ public static class Build
         if (!road.IsGhost)
         {
             ReplaceExistingRoad();
+            // move if statement below out of this block to divide ghost road
             if (AutoDivideOn)
                 AutoDivideRoad(road);
         }
@@ -330,7 +330,7 @@ public static class Build
         return new(new BezierCurve(q0, c1, c2, q2));
     }
 
-    static float3 AlignPivotStart(BuildTargets startTarget, float3 p)
+    static float3 AlignPivotByStart(BuildTargets startTarget, float3 p)
     {
         Assert.IsNotNull(startTarget);
         float oldY = p.y;
@@ -360,10 +360,8 @@ public static class Build
 
     public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
     {
-        if (nodes.First().Intersection != road.StartIntersection)
-            throw new InvalidOperationException("Not the same intersection");
-        if (!Game.Roads.ContainsKey(road.Id))
-            throw new InvalidOperationException("Road to connect not registered");
+        Assert.IsTrue(nodes.First().Intersection == road.StartIntersection);
+        Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         for (int i = 0; i < road.LaneCount; i++)
         {
             nodes[i].AddLane(road.Lanes[i], Direction.Out);
@@ -376,10 +374,8 @@ public static class Build
 
     public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
     {
-        if (nodes.First().Intersection != road.EndIntersection)
-            throw new InvalidOperationException("Not the same intersection");
-        if (!Game.Roads.ContainsKey(road.Id))
-            throw new InvalidOperationException("Road to connect not registered");
+        Assert.IsTrue(nodes.First().Intersection == road.EndIntersection);
+        Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         for (int i = 0; i < road.LaneCount; i++)
         {
             nodes[i].AddLane(road.Lanes[i], Direction.In);
@@ -400,13 +396,6 @@ public static class Build
             if (!Game.HasNode(lane.EndNode))
                 Game.RegisterNode(lane.EndNode);
         }
-    }
-
-    public static BuildTargets PollBuildTarget(float3 clickPos)
-    {
-        if (!startAssigned)
-            return new(clickPos, LaneCount, Game.Nodes.Values);
-        return new(clickPos, LaneCount, Game.Nodes.Values);
     }
 
     public static bool RemoveRoad(Road road, bool retainVertices)

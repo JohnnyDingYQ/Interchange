@@ -32,9 +32,9 @@ public class SnapPoints : MonoBehaviour
         foreach (SnapPoint snapPoint in activeSnapPoints)
             snapPointPool.Release(snapPoint);
         activeSnapPoints.Clear();
-        BuildTargets polled = Build.PollBuildTarget(InputSystem.MouseWorldPos);
-        if (polled.Snapped)
-            foreach (Node node in polled.Nodes)
+        BuildTargets endTarget = Build.EndTarget;
+        if (endTarget != null && endTarget.Snapped)
+            foreach (Node node in endTarget.Nodes)
             {
                 SnapPoint snapPoint = snapPointPool.Get();
                 float3 pos = node.Pos;
@@ -42,7 +42,7 @@ public class SnapPoints : MonoBehaviour
                 snapPoint.transform.position = pos;
                 activeSnapPoints.Add(snapPoint);
             }
-        BuildTargets startTarget = Build.GetStartTarget();
+        BuildTargets startTarget = Build.StartTarget;
         if (startTarget != null && startTarget.Snapped)
             foreach (Node node in startTarget.Nodes)
             {

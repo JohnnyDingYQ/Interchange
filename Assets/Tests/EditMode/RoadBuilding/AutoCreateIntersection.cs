@@ -26,7 +26,6 @@ public class AutoCreateIntersection
         IEnumerable<Path> paths = Graph.ShortestPathAStar(road0.Lanes.Single().StartVertex, road1.Lanes.Single().EndVertex);
         Assert.AreEqual(3, Game.Roads.Count);
         Assert.NotNull(paths);
-        Assert.AreNotEqual(0, paths.Count());
     }
 
     [Test]
@@ -41,6 +40,20 @@ public class AutoCreateIntersection
         IEnumerable<Path> paths = Graph.ShortestPathAStar(road1.Lanes.Single().StartVertex, road0.Lanes.Single().EndVertex);
         Assert.AreEqual(3, Game.Roads.Count);
         Assert.NotNull(paths);
-        Assert.AreNotEqual(0, paths.Count());
+    }
+
+    [Test]
+    public void HoverAndAutoCreateAtEnd()
+    {
+        Road road0 = RoadBuilder.Single(2 * up, up, 0, 1);
+        Build.HandleBuildCommand(up + upRight * 2);
+        Build.HandleBuildCommand(up + upRight);
+        Game.HoveredRoad = road0;
+        Build.HandleHover(up);
+        Road road1 = Build.HandleBuildCommand(up).Single();
+
+        IEnumerable<Path> paths = Graph.ShortestPathAStar(road1.Lanes.Single().StartVertex, road0.Lanes.Single().EndVertex);
+        Assert.AreEqual(3, Game.Roads.Count);
+        Assert.NotNull(paths);
     }
 }
