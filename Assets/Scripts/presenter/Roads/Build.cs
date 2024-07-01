@@ -95,7 +95,7 @@ public static class Build
     public static void BuildGhostRoad(float3 endTargetClickPos)
     {
         RemoveAllGhostRoads();
-        EndTarget = new(endTargetClickPos, LaneCount, Game.Nodes.Values);
+        EndTarget = Snapping.Snap(endTargetClickPos, LaneCount);
         if (ParallelBuildOn)
             BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
         else
@@ -105,7 +105,7 @@ public static class Build
     public static void HandleHover(float3 hoverPos)
     {
         if (!startAssigned)
-            StartTarget = new(hoverPos, LaneCount, Game.Nodes.Values);
+            StartTarget = Snapping.Snap(hoverPos, LaneCount);
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
         if (EnforcesTangent && !pivotAssigned && startAssigned)
@@ -128,7 +128,7 @@ public static class Build
         {
             hoveredRoadAtStart = Game.HoveredRoad;
             startAssigned = true;
-            StartTarget = new(clickPos, LaneCount, Game.Nodes.Values);
+            StartTarget = Snapping.Snap(clickPos, LaneCount);
             return null;
         }
         else if (!pivotAssigned)
@@ -142,7 +142,7 @@ public static class Build
         else
         {
             RemoveAllGhostRoads();
-            EndTarget = new(clickPos, LaneCount, Game.Nodes.Values);
+            EndTarget = Snapping.Snap(clickPos, LaneCount);
             List<Road> roads;
             if (ParallelBuildOn)
                 roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
@@ -158,12 +158,12 @@ public static class Build
         if (buildMode == BuildMode.Actual)
         {
             if (!startTarget.Snapped && hoveredRoadAtStart != null)
-                if (DivideHandler.HandleDivideCommand(hoveredRoadAtStart, startTarget.ClickPos) != null)
-                    startTarget = new(startTarget.ClickPos, LaneCount, Game.Nodes.Values);
+                if (Divide.HandleDivideCommand(hoveredRoadAtStart, startTarget.ClickPos) != null)
+                    startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
             if (!endTarget.Snapped && Game.HoveredRoad != null)
             {
-                if (DivideHandler.HandleDivideCommand(Game.HoveredRoad, endTarget.ClickPos) != null)
-                    endTarget = new(endTarget.ClickPos, LaneCount, Game.Nodes.Values);
+                if (Divide.HandleDivideCommand(Game.HoveredRoad, endTarget.ClickPos) != null)
+                    endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
             }
         }
         Road road = InitRoad(startTarget, pivotPos, endTarget);
@@ -180,8 +180,8 @@ public static class Build
         if (road == null)
             return null;
         BezierSeries offsetted = road.BezierSeries.Offset(ParallelSpacing);
-        BuildTargets startTargetParallel = new(offsetted.EvaluatePosition(0), LaneCount, Game.Nodes.Values);
-        BuildTargets endTargetParallel = new(offsetted.EvaluatePosition(1), LaneCount, Game.Nodes.Values);
+        BuildTargets startTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(0), LaneCount);
+        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(1), LaneCount);
         offsetted.Reverse();
         Road parallel = new(offsetted, LaneCount);
         if (buildMode == BuildMode.Ghost)
@@ -224,7 +224,7 @@ public static class Build
     {
         List<Node> startNodes = startTarget.Nodes;
         List<Node> endNodes = endTarget.Nodes;
-        if (road.HasLaneShorterThanMinimumLaneLength())
+        if (road.HasLaneShorterThanMinLaneLength())
             return null;
         if (startTarget.Snapped)
             road.StartIntersection = startTarget.Intersection;
@@ -281,7 +281,7 @@ public static class Build
         {
             if (divisions == 1)
                 return;
-            SubRoads subRoads = DivideHandler.DivideRoad(road, 1 / (float)divisions);
+            SubRoads subRoads = Divide.DivideRoad(road, 1 / (float)divisions);
             resultingRoads.Remove(road);
             resultingRoads.Add(subRoads.Left);
             resultingRoads.Add(subRoads.Right);
@@ -456,15 +456,13 @@ public static class Build
 
     public static void IncreaseElevation()
     {
-        if (Elevation >= Constants.MaxElevation)
-            return;
-        Elevation += Constants.ElevationStep;
+        if (Elevation + Constants.ElevationStep <= Constants.MaxElevation)
+            Elevation += Constants.ElevationStep;
     }
 
     public static void DecreaseElevation()
     {
-        if (Elevation <= Constants.MinElevation)
-            return;
-        Elevation -= Constants.ElevationStep;
+        if (Elevation - Constants.ElevationStep >= Constants.MinElevation)
+            Elevation -= Constants.ElevationStep;
     }
 }

@@ -6,13 +6,16 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
-public static class DivideHandler
+public static class Divide
 {
     public static SubRoads HandleDivideCommand(Road road, float3 clickPos)
     {
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
-        return DivideRoad(road, GetInterpolation(road, clickPos));
+        float interpolation = GetInterpolation(road, clickPos);
+        if (RoadDividable(road, interpolation))
+            return DivideRoad(road, GetInterpolation(road, clickPos));
+        return null;
     }
 
     public static float GetInterpolation(Road road, float3 clickPos)
@@ -21,6 +24,11 @@ public static class DivideHandler
         Ray ray = new(clickPos, Vector3.up);
         road.BezierSeries.GetNearestPoint(ray, out _, out float interpolation);
         return interpolation;
+    }
+
+    public static bool RoadDividable(Road road, float t)
+    {
+        return road.SplitIsValid(t);
     }
 
     public static SubRoads DivideRoad(Road road, float t)
@@ -36,7 +44,7 @@ public static class DivideHandler
         {
             IsGhost = road.IsGhost
         };
-        if (leftRoad.HasLaneShorterThanMinimumLaneLength() || rightRoad.HasLaneShorterThanMinimumLaneLength())
+        if (leftRoad.HasLaneShorterThanMinLaneLength() || rightRoad.HasLaneShorterThanMinLaneLength())
             return null;
         OperateNodes();
         OperateIntersections();

@@ -70,6 +70,13 @@ public class GhostRoadTest
         Assert.False(ThereIsNoGhostRoad());
     }
 
+    [Test]
+    public void HoverSetsStartTarget()
+    {
+        Build.HandleHover(0);
+        Assert.NotNull(Build.StartTarget);
+    }
+
     // Uncomment if I decide to divide ghost roads again
     // [Test]
     // public void BasicDividedGhostRoad()

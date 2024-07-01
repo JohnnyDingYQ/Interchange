@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
 public class Road
@@ -64,7 +65,7 @@ public class Road
     {
         Length = BezierSeries.Length;
         InitLanes();
-        if (HasLaneShorterThanMinimumLaneLength())
+        if (HasLaneShorterThanMinLaneLength())
             return;
         foreach (Lane l in Lanes)
         {
@@ -104,7 +105,7 @@ public class Road
         return HasNoneEmptyOutline() && LeftOutline.IsPlausible() && RightOutline.IsPlausible();
     }
 
-    public bool HasLaneShorterThanMinimumLaneLength()
+    public bool HasLaneShorterThanMinLaneLength()
     {
         foreach (Lane lane in Lanes)
             if (lane.Length < Constants.MinLaneLength)
@@ -128,22 +129,15 @@ public class Road
             Lanes.Add(new(this, i));
     }
 
-    public HashSet<Road> GetConnectedRoads(Side side)
+    public bool SplitIsValid(float interpolation)
     {
-        HashSet<Road> r = new();
-        foreach (Lane lane in Lanes)
-        {
-            if (side == Side.Both)
-            {
-                r.UnionWith(lane.StartNode.GetRoads(Direction.In));
-                r.UnionWith(lane.EndNode.GetRoads(Direction.Out));
-            }
-            if (side == Side.Start)
-                r.UnionWith(lane.StartNode.GetRoads(Direction.In));
-            if (side == Side.End)
-                r.UnionWith(lane.EndNode.GetRoads(Direction.Out));
-        }
-        return r;
+        Assert.IsTrue(interpolation <= 1 && interpolation >= 0);
+        if (interpolation > 0.5f)
+            interpolation = 1 - interpolation;
+        foreach (Lane l in Lanes)
+            if (l.Length * interpolation < Constants.MinLaneLength)
+                return false;
+        return true;
     }
 
     public override string ToString()

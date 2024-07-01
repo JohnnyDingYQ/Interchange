@@ -169,7 +169,7 @@ public class InputSystem : MonoBehaviour
     void DivideRoad(InputAction.CallbackContext context)
     {
         if (Roads.HoveredRoad != null)
-            DivideHandler.HandleDivideCommand(Roads.HoveredRoad.Road, MouseWorldPos);
+            Divide.HandleDivideCommand(Roads.HoveredRoad.Road, MouseWorldPos);
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {
