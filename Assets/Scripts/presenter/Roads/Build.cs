@@ -333,8 +333,8 @@ public static class Build
     {
         Assert.IsNotNull(startTarget);
         float oldY = p.y;
-        if (startTarget.Snapped && !startTarget.Intersection.IsRoadEmpty())
-            p = math.project(p - startTarget.MedianPoint, startTarget.Intersection.Tangent) + startTarget.MedianPoint;
+        if (startTarget.TangentAssigned)
+            p = math.project(p - startTarget.MedianPoint, startTarget.Tangent) + startTarget.MedianPoint;
         else
             return p;
         p.y = oldY;
@@ -347,8 +347,8 @@ public static class Build
     {
         Assert.IsNotNull(endTarget);
         float oldY = p.y;
-        if (endTarget.Snapped && !endTarget.Intersection.IsRoadEmpty())
-            p = math.project(p - endTarget.MedianPoint, endTarget.Intersection.Tangent) + endTarget.MedianPoint;
+        if (endTarget.TangentAssigned)
+            p = math.project(p - endTarget.MedianPoint, endTarget.Tangent) + endTarget.MedianPoint;
         else
             return p;
         p.y = oldY;

@@ -25,17 +25,19 @@ public static class Snapping
                 bt.DividePossible = Divide.RoadDividable(bt.SelectedRoad, interpolation);
                 if (bt.DividePossible)
                 {
-                    // float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
                     bt.NodesIfDivded = new();
                     float3 center = bt.SelectedRoad.BezierSeries.EvaluatePosition(interpolation);
                     float3 offset = bt.SelectedRoad.BezierSeries.Evaluate2DNormalizedNormal(interpolation);
                     for (int i = 2; i >= -2; i--)
                     {
                         float3 p = center + offset * i * Constants.LaneWidth;
-                        // if (math.length(p - bt.ClickPos) < snapRadius)
                         bt.NodesIfDivded.Add(p);
                     }
+                    bt.MedianPoint = center;
                     bt.NodesIfDivded = bt.NodesIfDivded.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
+                    bt.TangentAssigned = true;
+                    bt.Tangent = math.normalize(bt.SelectedRoad.BezierSeries.EvaluateTangent(interpolation));
+                    // Debug.DrawLine(center, center + bt.Tangent, Color.blue, 1);
                 }
             }
         }
@@ -44,6 +46,11 @@ public static class Snapping
             bt.Snapped = true;
             bt.MedianPoint = Vector3.Lerp(bt.Nodes.First().Pos, bt.Nodes.Last().Pos, 0.5f);
             bt.Intersection = bt.Nodes.First().Intersection;
+            if (!bt.Intersection.IsRoadEmpty())
+            {
+                bt.TangentAssigned = true;
+                bt.Tangent = bt.Intersection.Tangent;
+            }
         }
         return bt;
     }

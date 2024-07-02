@@ -56,4 +56,22 @@ public class AutoCreateIntersection
         Assert.AreEqual(3, Game.Roads.Count);
         Assert.NotNull(paths);
     }
+
+    [Test]
+    public void HoverAndAlignPivot()
+    {
+        Road road0 = RoadBuilder.Single(2 * up, up, 0, 1);
+        Build.HandleBuildCommand(up + upRight * 2);
+        Build.HandleBuildCommand(up + upRight);
+        Game.HoveredRoad = road0;
+        Build.HandleHover(up);
+        Build.HandleHover(up);
+
+        Road ghost = Game.Roads[Build.GhostRoads.Single()];
+        float3 ghostTangent = math.normalize(ghost.BezierSeries.EvaluateTangent(1));
+        float3 roadTangent = math.normalize(road0.BezierSeries.EvaluateTangent(1));
+        Debug.Log(ghostTangent);
+        Debug.Log(roadTangent);
+        Assert.True(MyNumerics.AreNumericallyEqual(ghostTangent, roadTangent));
+    }
 }
