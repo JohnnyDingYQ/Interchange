@@ -64,7 +64,7 @@ public class DevPanel : MonoBehaviour
         elevation.text = stringBuilder.ToString();
 
         stringBuilder.Clear();
-        stringBuilder.Append("Cara Serviced: ");
+        stringBuilder.Append("Cars Serviced: ");
         stringBuilder.Append(Game.CarServiced);
         carServiced.text = stringBuilder.ToString();
     }

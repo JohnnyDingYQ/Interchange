@@ -159,7 +159,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""id"": ""99aae0c1-9675-4abe-bc25-ae19dcb7f1c5"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold(duration=0.25)"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -406,7 +406,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""543f1518-d923-4e6a-a778-1eca6be43005"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": ""Hold(duration=1.401298E-45)"",
+                    ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""BulkSelect"",

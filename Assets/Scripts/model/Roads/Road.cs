@@ -15,10 +15,10 @@ public class Road
     public List<uint> Lanes_ { get; set; }
     [JsonProperty]
     public int LaneCount { get; private set; }
-    [JsonProperty]
-    public float3 StartPos { get; private set; }
-    [JsonProperty]
-    public float3 EndPos { get; private set; }
+    [JsonIgnore]
+    public float3 StartPos { get => BezierSeries.EvaluatePosition(0); }
+    [JsonIgnore]
+    public float3 EndPos { get => BezierSeries.EvaluatePosition(1); }
     [JsonProperty]
     public float Length { get; private set; }
     [JsonIgnore]
@@ -45,8 +45,6 @@ public class Road
     {
         LaneCount = laneCount;
         BezierSeries = new(new BezierCurve(startPos, pivotPos, endPos));
-        StartPos = startPos;
-        EndPos = endPos;
 
         InitRoad();
     }
@@ -55,8 +53,6 @@ public class Road
     {
         BezierSeries = bs;
         LaneCount = laneCount;
-        StartPos = bs.Curves.First().P0;
-        EndPos = bs.Curves.Last().P3;
 
         InitRoad();
     }

@@ -50,7 +50,7 @@ public class Points : MonoBehaviour
     public static bool NodePositionsAreCorrect()
     {
         // nothing to check against, function is vacuously true
-        if (sessionTargets == null || sessionSources == null)
+        if (sessionTargets == null && sessionSources == null)
             return true;
         foreach (Transform child in sessionSources.transform)
         {

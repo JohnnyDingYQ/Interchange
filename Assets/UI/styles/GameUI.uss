@@ -1,0 +1,3 @@
+.arrow {
+    background-image: url("/Assets/UI/static/arrow.svg");
+}

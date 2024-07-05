@@ -14,8 +14,8 @@ public class InputSystem : MonoBehaviour
     const float MouseDragScreenMultiplier = 0.17f;
     private bool isDraggingCamera;
     private bool parallelSpacingDragEnabled;
-    private bool bulkSelectStarted;
-    private float3 bulkSelectStart;
+    private bool bulkSelectPerformed;
+    private float3 bulkSelectStartPos;
     private SquareSelector squareSelector;
     [SerializeField]
     private SquareSelector squareSelectorPrefab;
@@ -50,7 +50,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DragCamera.canceled += DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed += ToggleParallelBuild;
         gameActions.InGame.ToggleBuildMode.performed += ToggleBuildMode;
-        gameActions.InGame.BulkSelect.performed += BulkSelectStart;
+        gameActions.InGame.BulkSelect.started += BulkSelectStarted;
+        gameActions.InGame.BulkSelect.performed += BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled += BulkSelectEnd;
 
         gameActions.InGame.Enable();
@@ -75,7 +76,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DragCamera.canceled -= DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed -= ToggleParallelBuild;
         gameActions.InGame.ToggleBuildMode.performed -= ToggleBuildMode;
-        gameActions.InGame.BulkSelect.performed -= BulkSelectStart;
+        gameActions.InGame.BulkSelect.started -= BulkSelectStarted;
+        gameActions.InGame.BulkSelect.performed -= BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled -= BulkSelectEnd;
 
         gameActions.InGame.Disable();
@@ -118,12 +120,12 @@ public class InputSystem : MonoBehaviour
 
     void UpdateSquareSelector()
     {
-        if (bulkSelectStarted)
+        if (bulkSelectPerformed)
         {
             squareSelector.gameObject.SetActive(true);
-            float width = Math.Abs(bulkSelectStart.x - MouseWorldPos.x);
-            float height = Math.Abs(bulkSelectStart.z - MouseWorldPos.z);
-            squareSelector.SetTransform(width, height, bulkSelectStart + (MouseWorldPos - bulkSelectStart) / 2);
+            float width = Math.Abs(bulkSelectStartPos.x - MouseWorldPos.x);
+            float height = Math.Abs(bulkSelectStartPos.z - MouseWorldPos.z);
+            squareSelector.SetTransform(width, height, bulkSelectStartPos + (MouseWorldPos - bulkSelectStartPos) / 2);
         }
         else
             squareSelector.gameObject.SetActive(false);
@@ -183,7 +185,7 @@ public class InputSystem : MonoBehaviour
     {
         Build.ResetSelection();
         Roads.ClearSelected();
-        bulkSelectStarted = false;
+        bulkSelectPerformed = false;
     }
     void IncreaseElevation(InputAction.CallbackContext context)
     {
@@ -217,15 +219,18 @@ public class InputSystem : MonoBehaviour
     {
         ModeToggle.ToggleMode();
     }
-    void BulkSelectStart(InputAction.CallbackContext context)
+    void BulkSelectStarted(InputAction.CallbackContext context)
     {
-        bulkSelectStart = MouseWorldPos;
-        bulkSelectStarted = true;
+        bulkSelectStartPos = MouseWorldPos;
+    }
+    void BulkSelectPerformed(InputAction.CallbackContext context)
+    {
+        bulkSelectPerformed = true;
     }
     void BulkSelectEnd(InputAction.CallbackContext context)
     {
-        if (bulkSelectStarted)
-            Roads.BulkSelect(bulkSelectStart, MouseWorldPos);
-        bulkSelectStarted = false;
+        if (bulkSelectPerformed)
+            Roads.BulkSelect(bulkSelectStartPos, MouseWorldPos);
+        bulkSelectPerformed = false;
     }
 }
