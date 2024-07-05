@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class ModeToggle : MonoBehaviour
 {
+    [SerializeField]
+    GameUI gameUI;
 
-    static bool IsInBuildMode { get; set; }
+    bool IsInBuildMode { get; set; }
 
     void Start()
     {
@@ -11,7 +13,7 @@ public class ModeToggle : MonoBehaviour
         ToggleMode();
     }
 
-    public static void ToggleMode()
+    public void ToggleMode()
     {
         if (IsInBuildMode)
             SwitchToViewMode();
@@ -21,16 +23,18 @@ public class ModeToggle : MonoBehaviour
         Game.BuildModeOn = IsInBuildMode;
     }
 
-    static void SwitchToBuildMode()
+    void SwitchToBuildMode()
     {
         Camera.main.cullingMask = ~(1 << LayerMask.NameToLayer("Cars"));
         CarDriver.TimeScale = 0;
+        gameUI.ShowStartIcon();
     }
 
-    static void SwitchToViewMode()
+    void SwitchToViewMode()
     {
         Camera.main.cullingMask = LayerMask.NameToLayer("Everything");
         CarDriver.TimeScale = 1;
         Build.ResetSelection();
+        gameUI.ShowStopIcon();
     }
 }

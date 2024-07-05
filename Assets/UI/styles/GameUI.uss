@@ -1,3 +1,19 @@
-.arrow {
+.root {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.start {
     background-image: url("/Assets/UI/static/arrow.svg");
+    height: 150px;
+    width: 150px;
+    display: none;
+}
+
+.pause {
+    background-image: url("/Assets/UI/static/pause.svg");
+    height: 150px;
+    width: 150px;
+    display: none;
 }

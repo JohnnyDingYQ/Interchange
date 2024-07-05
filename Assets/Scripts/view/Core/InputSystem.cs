@@ -19,6 +19,8 @@ public class InputSystem : MonoBehaviour
     private SquareSelector squareSelector;
     [SerializeField]
     private SquareSelector squareSelectorPrefab;
+    [SerializeField]
+    ModeToggle modeToggle;
 
     void Awake()
     {
@@ -217,7 +219,7 @@ public class InputSystem : MonoBehaviour
     }
     void ToggleBuildMode(InputAction.CallbackContext context)
     {
-        ModeToggle.ToggleMode();
+        modeToggle.ToggleMode();
     }
     void BulkSelectStarted(InputAction.CallbackContext context)
     {
