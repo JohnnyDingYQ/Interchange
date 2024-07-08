@@ -5,36 +5,44 @@ using UnityEngine.UIElements;
 public class GameUI: MonoBehaviour
 {
     private VisualElement root;
-    private static VisualElement start;
+    private static VisualElement unpause;
     private static VisualElement pause;
     private const float animationDuration = 1;
-    WaitForSeconds waitAnimationDuration = new(animationDuration);
+    readonly WaitForSeconds waitAnimationDuration = new(animationDuration);
+    Coroutine unpauseAnimation;
+    Coroutine pauseAnimation;
 
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
-        start = root.Q<VisualElement>("start");
+        unpause = root.Q<VisualElement>("start");
         pause = root.Q<VisualElement>("pause");
     }
 
-    public void ShowStartIcon()
+    public void StartUnpauseAnimation()
     {
-        StartCoroutine(StartIconCoroutine());
+        pause.style.display = DisplayStyle.None;
+        if (pauseAnimation != null)
+            StopCoroutine(pauseAnimation);
+        unpauseAnimation = StartCoroutine(UnpauseAnimation());
     }
 
-    public void ShowStopIcon()
+    public void StartPauseAnimation()
     {
-        StartCoroutine(PauseIconCoroutine());
+        unpause.style.display = DisplayStyle.None;
+        if (unpauseAnimation != null)
+            StopCoroutine(unpauseAnimation);
+        pauseAnimation = StartCoroutine(PauseAnimation());
     }
 
-    IEnumerator StartIconCoroutine()
+    IEnumerator UnpauseAnimation()
     {
-        start.style.display = DisplayStyle.Flex;
+        unpause.style.display = DisplayStyle.Flex;
         yield return waitAnimationDuration;
-        start.style.display = DisplayStyle.None;
+        unpause.style.display = DisplayStyle.None;
     }
 
-    IEnumerator PauseIconCoroutine()
+    IEnumerator PauseAnimation()
     {
         pause.style.display = DisplayStyle.Flex;
         yield return waitAnimationDuration;

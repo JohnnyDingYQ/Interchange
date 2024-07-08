@@ -5,7 +5,7 @@ public class Main : MonoBehaviour
 {
 
     bool flip = false;
-    readonly bool debugMode = false;
+    readonly bool debugMode = true;
     [SerializeField]
     DevPanel devPanel;
 

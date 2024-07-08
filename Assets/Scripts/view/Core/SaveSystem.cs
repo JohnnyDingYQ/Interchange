@@ -21,11 +21,10 @@ public static class SaveSystem
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
             });
             if (!Points.NodePositionsAreCorrect())
             {
-                Debug.Log("Point position have changed, adorting load");
+                Debug.Log("Point position have changed, aborting load");
                 Game.GameSave = backup;
             }
             else
@@ -47,6 +46,7 @@ public static class SaveSystem
                 l.InitCurve();
             foreach (Road r in Game.Roads.Values)
             {
+                r.SetArrowPositions();
                 r.EvaluateInnerOutline();
                 Game.InvokeRoadAdded(r);
             }

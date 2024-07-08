@@ -13,7 +13,6 @@ public static class Build
     public static int LaneCount { get; set; }
     public static BuildTargets StartTarget;
     public static BuildTargets EndTarget;
-    public static bool AutoDivideOn { get; set; }
     public static List<Tuple<float3, float3>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
     public static bool EnforcesTangent { get; set; }
@@ -28,7 +27,6 @@ public static class Build
         startAssigned = false;
         pivotAssigned = false;
         pivotAligned = false;
-        AutoDivideOn = true;
         SupportLines = new();
         BuildsGhostRoad = true;
         EnforcesTangent = true;
@@ -40,7 +38,6 @@ public static class Build
     {
         ResetSelection();
         RemoveAllGhostRoads();
-        AutoDivideOn = true;
         EnforcesTangent = true;
         BuildsGhostRoad = true;
         GhostRoads = new();
@@ -247,9 +244,8 @@ public static class Build
         if (!road.IsGhost)
         {
             ReplaceExistingRoad();
-            // move if statement below out of this block to divide ghost road
-            if (AutoDivideOn)
-                AutoDivideRoad(road);
+            // move statement below out of this block to divide ghost road
+            AutoDivideRoad(road);
         }
 
         if (road.IsGhost)

@@ -77,7 +77,7 @@ public class SaveSystemTest
         Assert.AreEqual(new float3(0), road0.StartPos);
         Assert.AreEqual(2 * stride, road0.EndPos);
         Assert.AreEqual(3 * stride, road1.StartPos);
-        Assert.AreEqual(5 * stride, road1.EndPos);
+        Assert.True(MyNumerics.AreNumericallyEqual(5 * stride, road1.EndPos));
         Assert.AreEqual(4, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
@@ -99,7 +99,7 @@ public class SaveSystemTest
         Assert.AreEqual(new float3(0), road0.StartPos);
         Assert.AreEqual(2 * stride, road0.EndPos);
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, road1.StartPos));
-        Assert.AreEqual(4 * stride, road1.EndPos);
+        Assert.True(MyNumerics.AreNumericallyEqual(4 * stride, road1.EndPos));
         Assert.AreEqual(3, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
@@ -257,6 +257,14 @@ public class SaveSystemTest
         Assert.AreEqual(3, Game.Nodes.Count);
     }
 
+    [Test]
+    public void RecoverArrowPositions()
+    {
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
+        SaveSystem.SaveGame();
+        SaveSystem.LoadGame();
+        Assert.NotNull(Game.Roads.Values.First().ArrowInterpolations);
+    }
 
     // TODO: Complete further testing
 

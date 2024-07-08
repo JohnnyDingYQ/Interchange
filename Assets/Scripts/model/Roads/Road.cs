@@ -19,8 +19,8 @@ public class Road
     public float3 StartPos { get => BezierSeries.EvaluatePosition(0); }
     [JsonIgnore]
     public float3 EndPos { get => BezierSeries.EvaluatePosition(1); }
-    [JsonProperty]
-    public float Length { get; private set; }
+    [JsonIgnore]
+    public float Length { get => BezierSeries.Length; }
     [JsonIgnore]
     public RoadOutline LeftOutline { get; set; }
     [JsonIgnore]
@@ -33,6 +33,8 @@ public class Road
     public uint EndIntersection_ { get; set; }
     [JsonIgnore]
     public bool IsGhost { get; set; }
+    [JsonIgnore]
+    public List<float> ArrowInterpolations { get; private set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()
@@ -59,7 +61,6 @@ public class Road
 
     private void InitRoad()
     {
-        Length = BezierSeries.Length;
         InitLanes();
         if (HasLaneShorterThanMinLaneLength())
             return;
@@ -73,6 +74,7 @@ public class Road
         LeftOutline = new();
         RightOutline = new();
         EvaluateInnerOutline();
+        SetArrowPositions();
     }
 
     public void EvaluateInnerOutline()
@@ -134,6 +136,19 @@ public class Road
             if (l.Length * interpolation < Constants.MinLaneLength)
                 return false;
         return true;
+    }
+
+    public void SetArrowPositions()
+    {
+        Assert.IsNotNull(BezierSeries);
+        ArrowInterpolations = new();
+        int arrowCount = (int) (BezierSeries.Length / Constants.RoadArrowSeparation);
+        if (arrowCount == 0)
+            arrowCount++;
+        for (float i = 0; i < arrowCount + 1; i++)
+            ArrowInterpolations.Add(i / (arrowCount + 1));
+        // foreach (float3 pos in ArrowPositions)
+        //     DebugExtension.DebugPoint(pos, Color.cyan, 2, 5);
     }
 
     public override string ToString()

@@ -27,7 +27,7 @@ public class ModeToggle : MonoBehaviour
     {
         Camera.main.cullingMask = ~(1 << LayerMask.NameToLayer("Cars"));
         CarDriver.TimeScale = 0;
-        gameUI.ShowStartIcon();
+        gameUI.StartPauseAnimation();
     }
 
     void SwitchToViewMode()
@@ -35,6 +35,6 @@ public class ModeToggle : MonoBehaviour
         Camera.main.cullingMask = LayerMask.NameToLayer("Everything");
         CarDriver.TimeScale = 1;
         Build.ResetSelection();
-        gameUI.ShowStopIcon();
+        gameUI.StartUnpauseAnimation();
     }
 }

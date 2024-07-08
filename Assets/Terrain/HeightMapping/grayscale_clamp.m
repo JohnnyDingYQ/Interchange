@@ -1,8 +1,8 @@
 img = imread("in.png", "png");
 threshold = 2500;
-clamp_high = 2000;
+clamp_high = 10000;
 clamp_low = 0;
-img = imresize(img, 4, "bicubic");
+img = imresize(img, [4096, 4096], "bicubic");
 for i = 1:numel(img)
     h = img(i);
     if h > threshold

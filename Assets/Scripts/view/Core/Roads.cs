@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Roads : MonoBehaviour
 {
     [SerializeField] private RoadHumbleObject roadPrefab;
+    [SerializeField] private GameObject arrowPrefab;
     private static Dictionary<uint, RoadHumbleObject> roadMapping;
     public static RoadHumbleObject HoveredRoad { get; set; }
     public static List<RoadHumbleObject> SelectedRoads { get; set; }
@@ -39,10 +41,30 @@ public class Roads : MonoBehaviour
         roadGameObject.Road = road;
         roadGameObject.gameObject.isStatic = true;
         roadMapping[road.Id] = roadGameObject;
+        CreateRoadArrows(roadGameObject);
         UpdateRoadMesh(road);
     }
 
-    public static void UpdateRoadMesh(Road road)
+    void CreateRoadArrows(RoadHumbleObject roadObject)
+    {
+        Assert.IsNotNull(roadObject.Road);
+        foreach (float t in roadObject.Road.ArrowInterpolations)
+        {
+            GameObject arrow = Instantiate(arrowPrefab, roadObject.transform);
+            arrow.transform.position = roadObject.Road.BezierSeries.EvaluatePosition(t);
+            float angle = Vector3.Angle(roadObject.Road.BezierSeries.EvaluateTangent(t), Vector3.forward);
+            if (math.cross(roadObject.Road.BezierSeries.EvaluateTangent(t), Vector3.forward).y > 0)
+                angle = 360 - angle;
+            arrow.transform.eulerAngles = new(
+                0,
+                180 + angle,
+                0
+            );
+            arrow.transform.localScale = new(0.8f, 0.8f, 0.8f);
+        }
+    }
+
+    public void UpdateRoadMesh(Road road)
     {
         Mesh m = MeshUtil.GetMesh(road);
         roadMapping[road.Id].GetComponent<MeshFilter>().mesh = m;

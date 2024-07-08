@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
 
@@ -47,8 +48,9 @@ public class ReplaceTest
     {
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
-        RoadBuilder.Single(road1.Lanes[0].StartPos, 2 * stride, road2.Lanes[0].EndPos, 2);
-        Assert.AreEqual(1, Game.Roads.Count);
+        RoadBuilder.Many(road1.Lanes[0].StartPos, 2 * stride, road2.Lanes[0].EndPos, 2);
+        Assert.False(Game.Roads.Values.Contains(road1));
+        Assert.False(Game.Roads.Values.Contains(road2));
     }
 
     [Test]
@@ -57,9 +59,10 @@ public class ReplaceTest
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
         Road road3 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 3);
-        Build.AutoDivideOn = false;
-        RoadBuilder.Single(road1.Lanes[0].StartPos, 2 * stride, road3.Lanes[0].EndPos, 1);
+        RoadBuilder.Many(road1.Lanes[0].StartPos, 2 * stride, road3.Lanes[0].EndPos, 1);
 
-        Assert.AreEqual(1, Game.Roads.Count);
+        Assert.False(Game.Roads.Values.Contains(road1));
+        Assert.False(Game.Roads.Values.Contains(road2));
+        Assert.False(Game.Roads.Values.Contains(road3));
     }
 }
