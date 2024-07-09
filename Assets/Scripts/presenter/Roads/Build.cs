@@ -196,7 +196,7 @@ public static class Build
         float3 endPos = endTarget.Snapped ? endTarget.MedianPoint : endTarget.ClickPos;
         if (EnforcesTangent && !pivotAligned)
             pivotPos = AlignPivotEnd(endTarget, pivotPos);
-        if (RoadIsTooBent())
+        if (RoadIsTooBent() || BadSegmentRatio())
             return null;
         Road road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
         return road;
@@ -213,6 +213,14 @@ public static class Build
             if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
                 return true;
             return false;
+        }
+
+        bool BadSegmentRatio()
+        {
+            float segA = math.length(pivotPos - startPos);
+            float segB = math.length(pivotPos - endPos);
+            float ratio = segA > segB ? segB / segA : segA / segB;
+            return ratio < Constants.MinSegmentRatio;
         }
     }
 

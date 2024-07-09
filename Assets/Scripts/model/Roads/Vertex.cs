@@ -1,8 +1,6 @@
 using System;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
-using UnityEngine.Splines;
 
 public class Vertex
 {
@@ -36,8 +34,8 @@ public class Vertex
         Lane = l;
         BezierSeries bs = l.BezierSeries;
         if (side == Side.Start)
-            SeriesInterpolation = Constants.MinLaneLength / 2 / bs.Length;
+            SeriesInterpolation = Constants.VertexDistanceFromRoadEnds / bs.Length;
         else
-            SeriesInterpolation = (bs.Length - Constants.MinLaneLength / 2) / bs.Length;
+            SeriesInterpolation = (bs.Length - Constants.VertexDistanceFromRoadEnds) / bs.Length;
     }
 }

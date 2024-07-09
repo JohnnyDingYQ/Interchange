@@ -139,7 +139,6 @@ public class InputSystem : MonoBehaviour
         {
             float delta = Input.mousePosition.y - prevScreenMousePos.y;
             Build.ParallelSpacing += delta * 0.03f;
-            Debug.Log(Build.ParallelSpacing);
         }
     }
 

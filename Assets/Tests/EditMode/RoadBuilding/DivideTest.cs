@@ -181,8 +181,8 @@ public class DivideTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
         SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
-        Assert.True(subRoads.Left.OutLinePlausible());
-        Assert.True(subRoads.Right.OutLinePlausible());
+        Assert.True(subRoads.Left.OutlinePlausible());
+        Assert.True(subRoads.Right.OutlinePlausible());
         Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
         Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
         Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Right.LeftOutline.End.Last(), road1.LeftOutline.Start.First()));

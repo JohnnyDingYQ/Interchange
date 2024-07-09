@@ -182,7 +182,7 @@ public class OutlineTest
         {
             r.LeftOutline.IsPlausible();
             // Debug.Log(r.HasNoneEmptyOutline());
-            if (!r.OutLinePlausible())
+            if (!r.OutlinePlausible())
             {
                 Debug.Log("Road " + r.Id + ": Outline not plausible");   
                 return false;

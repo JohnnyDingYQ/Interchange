@@ -41,8 +41,8 @@ public class Roads : MonoBehaviour
         roadGameObject.Road = road;
         roadGameObject.gameObject.isStatic = true;
         roadMapping[road.Id] = roadGameObject;
-        CreateRoadArrows(roadGameObject);
         UpdateRoadMesh(road);
+        // CreateRoadArrows(roadGameObject);
     }
 
     void CreateRoadArrows(RoadHumbleObject roadObject)

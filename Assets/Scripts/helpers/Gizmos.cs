@@ -85,7 +85,7 @@ public static class Gizmos
 
     public static void DrawBeizerSeries(BezierSeries bs, Color color, float duration)
     {
-        int resolution = 15;
+        int resolution = 30;
         float3 prev = bs.EvaluatePosition(0);
         for (int i = 1; i <= resolution; i++)
         {

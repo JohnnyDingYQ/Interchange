@@ -7,14 +7,10 @@ using UnityEngine;
 public class RemoveRoadTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
-    Dictionary<uint, Road> Roads;
-    Dictionary<uint, Node> Nodes;
     [SetUp]
     public void SetUp()
     {
         Game.WipeState();
-        Roads = Game.Roads;
-        Nodes = Game.Nodes;
     }
 
     [Test]
@@ -23,7 +19,7 @@ public class RemoveRoadTest
         RoadBuilder.Single(0, stride, 2 * stride, 1);
         Road road = new();
         Assert.False(Game.RemoveRoad(road));
-        Assert.AreEqual(1, Roads.Count);
+        Assert.AreEqual(1, Game.Roads.Count);
     }
 
     [Test]
@@ -31,8 +27,8 @@ public class RemoveRoadTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Assert.True(Game.RemoveRoad(road));
-        Assert.AreEqual(0, Roads.Count);
-        Assert.AreEqual(0, Nodes.Count);
+        Assert.AreEqual(0, Game.Roads.Count);
+        Assert.AreEqual(0, Game.Nodes.Count);
     }
 
     [Test]
@@ -40,9 +36,9 @@ public class RemoveRoadTest
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
-        Assert.AreEqual(6, Nodes.Count);
+        Assert.AreEqual(6, Game.Nodes.Count);
         Assert.True(Game.RemoveRoad(road0));
-        Assert.AreEqual(4, Nodes.Count);
+        Assert.AreEqual(4, Game.Nodes.Count);
         Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
         Assert.True(road0.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[1] }));
     }

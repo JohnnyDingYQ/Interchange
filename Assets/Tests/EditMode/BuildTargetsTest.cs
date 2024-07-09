@@ -7,13 +7,10 @@ using UnityEngine;
 public class BuildTargetTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 0);
-    Dictionary<uint, Road> Roads;
-
     [SetUp]
     public void SetUp()
     {
         Game.WipeState();
-        Roads = Game.Roads;
     }
 
     [Test]
@@ -47,7 +44,7 @@ public class BuildTargetTest
         BuildTargets bt = Snapping.Snap(0, 2);
         Node node0 = bt.Nodes[0];
         Node node1 = bt.Nodes[1];
-        Road road = Roads.Values.First();
+        Road road = Game.Roads.Values.First();
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 

@@ -7,14 +7,11 @@ public class AutoDivideLongRoadTest
 {
     float3 direction = new(1, 0, 0);
     const float LengthDiffTolerance = 5f;
-    Dictionary<uint, Road> Roads;
-
 
     [SetUp]
     public void SetUp()
     {
         Game.WipeState();
-        Roads = Game.Roads;
     }
 
     [Test]
@@ -26,7 +23,7 @@ public class AutoDivideLongRoadTest
             direction * (Constants.MaxLaneLength + 0.1f),
             1
         );
-        Assert.AreEqual(2, Roads.Count);
+        Assert.AreEqual(2, Game.Roads.Count);
     }
 
     [Test]
@@ -39,9 +36,9 @@ public class AutoDivideLongRoadTest
             direction * targetLength,
             1
         );
-        Assert.AreEqual(5, Roads.Count);
-        float length = Roads.Values.First().Length;
-        foreach (Road road in Roads.Values)
+        Assert.AreEqual(5, Game.Roads.Count);
+        float length = Game.Roads.Values.First().Length;
+        foreach (Road road in Game.Roads.Values)
         {
             Assert.True(MyNumerics.AreNumericallyEqual(length, road.Length));
             length = road.Length;
@@ -59,8 +56,8 @@ public class AutoDivideLongRoadTest
             targetLength * new float3(1, 0, 1),
             1
         );
-        float length = Roads.Values.First().Length;
-        foreach (Road road in Roads.Values)
+        float length = Game.Roads.Values.First().Length;
+        foreach (Road road in Game.Roads.Values)
         {
             Assert.True(MyNumerics.AreNumericallyEqual(length, road.Length, LengthDiffTolerance));
             length = road.Length;

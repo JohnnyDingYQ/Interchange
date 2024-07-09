@@ -20,7 +20,6 @@ public static class Snapping
             bt.Snapped = false;
             if (bt.SelectedRoad != null)
             {
-
                 float interpolation = Divide.GetInterpolation(bt.SelectedRoad, bt.ClickPos);
                 bt.DividePossible = Divide.RoadDividable(bt.SelectedRoad, interpolation);
                 if (bt.DividePossible)
@@ -37,7 +36,6 @@ public static class Snapping
                     bt.NodesIfDivded = bt.NodesIfDivded.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
                     bt.TangentAssigned = true;
                     bt.Tangent = math.normalize(bt.SelectedRoad.BezierSeries.EvaluateTangent(interpolation));
-                    // Debug.DrawLine(center, center + bt.Tangent, Color.blue, 1);
                 }
             }
         }
@@ -93,7 +91,7 @@ public static class Snapping
             if (candidates.Count + nodes.Count < laneCount)
                 return null;
 
-            nodes.AddRange(candidates.Select(t => t.Item2));
+            nodes.AddRange(candidates.Select(t => t.Item2).Take(laneCount - nodes.Count));
             nodes.Sort();
             return nodes;
         }

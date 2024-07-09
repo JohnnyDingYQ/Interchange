@@ -7,15 +7,11 @@ using UnityEngine;
 public class BasicBuildTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
-    Dictionary<uint, Node> Nodes;
-    Dictionary<uint, Road> Roads;
 
     [SetUp]
     public void SetUp()
     {
         Game.WipeState();
-        Nodes = Game.Nodes;
-        Roads = Game.Roads;
     }
 
     [Test]
@@ -31,12 +27,12 @@ public class BasicBuildTest
         Assert.NotNull(road);
         Lane lane = road.Lanes[0];
 
-        Assert.AreEqual(1, Roads.Count);
+        Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(1, road.Lanes.Count);
         Assert.True(MyNumerics.AreNumericallyEqual(0, lane.StartNode.Pos));
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndNode.Pos));
-        Assert.True(Nodes.ContainsKey(lane.StartNode.Id));
-        Assert.True(Nodes.ContainsKey(lane.EndNode.Id));
+        Assert.True(Game.Nodes.ContainsKey(lane.StartNode.Id));
+        Assert.True(Game.Nodes.ContainsKey(lane.EndNode.Id));
         Assert.True(lane.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
         Assert.True(lane.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane }));
         Assert.AreSame(lane.StartNode, road.StartIntersection.Nodes.Single());
@@ -54,14 +50,14 @@ public class BasicBuildTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
 
-        Assert.AreEqual(1, Roads.Count);
+        Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(new float3(0), road.StartPos);
         Assert.AreEqual(2 * stride, road.EndPos);
-        Assert.True(Nodes.ContainsKey(lane0.StartNode.Id));
-        Assert.True(Nodes.ContainsKey(lane0.EndNode.Id));
-        Assert.True(Nodes.ContainsKey(lane1.StartNode.Id));
-        Assert.True(Nodes.ContainsKey(lane1.EndNode.Id));
+        Assert.True(Game.Nodes.ContainsKey(lane0.StartNode.Id));
+        Assert.True(Game.Nodes.ContainsKey(lane0.EndNode.Id));
+        Assert.True(Game.Nodes.ContainsKey(lane1.StartNode.Id));
+        Assert.True(Game.Nodes.ContainsKey(lane1.EndNode.Id));
         Assert.True(lane0.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane0 }));
         Assert.True(lane0.EndNode.Lanes.SetEquals(new HashSet<Lane>() { lane0 }));
         Assert.True(lane1.StartNode.Lanes.SetEquals(new HashSet<Lane>() { lane1 }));
@@ -160,7 +156,7 @@ public class BasicBuildTest
 
         Assert.True(lane1.EndNode.Lanes.SetEquals(expectedLanes0));
         Assert.True(lane2.EndNode.Lanes.SetEquals(expectedLanes1));
-        Assert.AreEqual(4, Nodes.Count);
+        Assert.AreEqual(4, Game.Nodes.Count);
     }
 
 
@@ -176,7 +172,7 @@ public class BasicBuildTest
         );
 
         Assert.AreEqual(0, Game.Paths.Count);
-        Assert.AreEqual(0, Roads.Count);
+        Assert.AreEqual(0, Game.Roads.Count);
     }
 
     [Test]
@@ -184,7 +180,7 @@ public class BasicBuildTest
     {
         RoadBuilder.Single(0, stride, 0, 3);
 
-        Assert.AreEqual(0, Roads.Count);
+        Assert.AreEqual(0, Game.Roads.Count);
     }
 
     [Test]
@@ -198,7 +194,7 @@ public class BasicBuildTest
             3
         );
 
-        Assert.AreEqual(2, Roads.Count);
+        Assert.AreEqual(2, Game.Roads.Count);
     }
 
     [Test]
@@ -235,12 +231,34 @@ public class BasicBuildTest
         Assert.AreNotEqual(0, road1.ArrowInterpolations.Count);
     }
 
+    [Test]
+    public void BadSegmentRatio()
+    {
+        Road road1 = RoadBuilder.Single(
+            0,
+            new(0, 0, Constants.MinLaneLength),
+            new(0, 0, Constants.MinLaneLength + Constants.MinLaneLength * (Constants.MinSegmentRatio - 0.01f)),
+            1
+        );
+
+        Road road2 = RoadBuilder.Single(
+            0,
+            new(0, 0, Constants.MinLaneLength  * (Constants.MinSegmentRatio - 0.01f)),
+            new(0, 0, Constants.MinLaneLength  * (Constants.MinSegmentRatio - 0.01f) + Constants.MinLaneLength),
+            1
+        );
+
+        Assert.Null(road1);
+        Assert.Null(road2);
+        Assert.AreEqual(0, Game.Roads.Count);
+    }
+
     #region Helpers
     public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)
     {
         Assert.NotNull(inRoad);
         Assert.NotNull(outRoad);
-        Assert.AreEqual(laneCount * 3, Nodes.Count);
+        Assert.AreEqual(laneCount * 3, Game.Nodes.Count);
         Assert.AreSame(inRoad.EndIntersection, outRoad.StartIntersection);
         for (int i = 0; i < laneCount; i++)
         {
