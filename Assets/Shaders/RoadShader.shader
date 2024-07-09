@@ -44,8 +44,8 @@ Shader "Custom/RoadShader" {
 			float4 FragmentProgram (Interpolators i) : SV_TARGET {
 				float4 tex = tex2D(_MainTex, i.uv);
 				// if (all(tex == float4(1, 1, 1, 1)))
-				// return tex;
-				return _Color + i.worldPos.y / 20;
+				return tex;
+				// return _Color + i.worldPos.y / 20;
 			}
 			ENDCG
 		}
