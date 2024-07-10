@@ -61,7 +61,7 @@ public static class Build
         SupportLines.Clear();
         if (startAssigned)
         {
-            float3 startPoint = StartTarget.Snapped ? StartTarget.MedianPoint : StartTarget.ClickPos;
+            float3 startPoint = StartTarget.Snapped ? StartTarget.Pos : StartTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             startPoint.y = 0;
             pivotPoint.y = 0;
@@ -69,7 +69,7 @@ public static class Build
         }
         if (pivotAssigned && EndTarget != null)
         {
-            float3 endPoint = EndTarget.Snapped ? EndTarget.MedianPoint : EndTarget.ClickPos;
+            float3 endPoint = EndTarget.Snapped ? EndTarget.Pos : EndTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             endPoint.y = 0;
             pivotPoint.y = 0;
@@ -151,12 +151,12 @@ public static class Build
     {
         if (buildMode == BuildMode.Actual)
         {
-            if (!startTarget.Snapped && startTarget.DividePossible)
+            if (!startTarget.Snapped && startTarget.DivideIsPossible)
             {
                 Divide.HandleDivideCommand(startTarget.SelectedRoad, startTarget.ClickPos);
                 startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
             }
-            if (!endTarget.Snapped && endTarget.DividePossible)
+            if (!endTarget.Snapped && endTarget.DivideIsPossible)
             {
                 Divide.HandleDivideCommand(endTarget.SelectedRoad, endTarget.ClickPos);
                 endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
@@ -192,8 +192,8 @@ public static class Build
 
     static Road InitRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget)
     {
-        float3 startPos = startTarget.Snapped ? startTarget.MedianPoint : startTarget.ClickPos;
-        float3 endPos = endTarget.Snapped ? endTarget.MedianPoint : endTarget.ClickPos;
+        float3 startPos = startTarget.Pos;
+        float3 endPos = endTarget.Pos;
         if (EnforcesTangent && !pivotAligned)
             pivotPos = AlignPivotEnd(endTarget, pivotPos);
         if (RoadIsTooBent() || BadSegmentRatio())
@@ -338,7 +338,7 @@ public static class Build
         Assert.IsNotNull(startTarget);
         float oldY = p.y;
         if (startTarget.TangentAssigned)
-            p = math.project(p - startTarget.MedianPoint, startTarget.Tangent) + startTarget.MedianPoint;
+            p = math.project(p - startTarget.Pos, startTarget.Tangent) + startTarget.Pos;
         else
             return p;
         p.y = oldY;
@@ -352,7 +352,7 @@ public static class Build
         Assert.IsNotNull(endTarget);
         float oldY = p.y;
         if (endTarget.TangentAssigned)
-            p = math.project(p - endTarget.MedianPoint, endTarget.Tangent) + endTarget.MedianPoint;
+            p = math.project(p - endTarget.Pos, endTarget.Tangent) + endTarget.Pos;
         else
             return p;
         p.y = oldY;

@@ -7,42 +7,61 @@ using UnityEngine.Assertions;
 
 public static class Snapping
 {
+    static readonly float3[] bufferList = new float3[Constants.MaxLaneCount];
     public static BuildTargets Snap(float3 pos, int laneCount)
     {
         BuildTargets bt = new()
         {
             ClickPos = pos,
             Nodes = GetBuildNodes(pos, laneCount),
-            SelectedRoad = Game.HoveredRoad
+            SelectedRoad = Game.HoveredRoad,
+            Pos = pos,
+            Snapped = false
         };
         if (bt.Nodes == null)
+            AttemptDivide(laneCount, bt);
+        else
+            SetupSnapInfo(bt);
+        return bt;
+
+        static void SetupDivideInfo(int laneCount, BuildTargets bt, float interpolation)
         {
-            bt.Snapped = false;
+            bt.Pos = bt.SelectedRoad.EvaluatePosition(interpolation);
+            bt.NodesPosIfDivded = new();
+            float3 offset = bt.SelectedRoad.Evaluate2DNormalizedNormal(interpolation);
+            float3 center = bt.SelectedRoad.EvaluatePosition(interpolation);
+            for (int i = 0; i < bt.SelectedRoad.LaneCount; i++)
+            {
+                bufferList[i] = bt.SelectedRoad.Lanes[i].EvaluatePosition(interpolation);
+            }
+
+            int interpolateRange = Constants.MaxLaneCount / 2 + 1;
+            for (int i = interpolateRange; i >= -interpolateRange; i--)
+            {
+                float3 p = center + offset * i * Constants.LaneWidth;
+                bt.NodesPosIfDivded.Add(p);
+            }
+            bt.Pos = center;
+            bt.NodesPosIfDivded = bt.NodesPosIfDivded.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
+            bt.TangentAssigned = true;
+            bt.Tangent = math.normalize(bt.SelectedRoad.EvaluateTangent(interpolation));
+        }
+
+        static void AttemptDivide(int laneCount, BuildTargets bt)
+        {
             if (bt.SelectedRoad != null)
             {
                 float interpolation = Divide.GetInterpolation(bt.SelectedRoad, bt.ClickPos);
-                bt.DividePossible = Divide.RoadDividable(bt.SelectedRoad, interpolation);
-                if (bt.DividePossible)
-                {
-                    bt.NodesIfDivded = new();
-                    float3 center = bt.SelectedRoad.BezierSeries.EvaluatePosition(interpolation);
-                    float3 offset = bt.SelectedRoad.BezierSeries.Evaluate2DNormalizedNormal(interpolation);
-                    for (int i = 2; i >= -2; i--)
-                    {
-                        float3 p = center + offset * i * Constants.LaneWidth;
-                        bt.NodesIfDivded.Add(p);
-                    }
-                    bt.MedianPoint = center;
-                    bt.NodesIfDivded = bt.NodesIfDivded.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
-                    bt.TangentAssigned = true;
-                    bt.Tangent = math.normalize(bt.SelectedRoad.BezierSeries.EvaluateTangent(interpolation));
-                }
+                bt.DivideIsPossible = Divide.RoadDividable(bt.SelectedRoad, interpolation);
+                if (bt.DivideIsPossible)
+                    SetupDivideInfo(laneCount, bt, interpolation);
             }
         }
-        else
+
+        static void SetupSnapInfo(BuildTargets bt)
         {
             bt.Snapped = true;
-            bt.MedianPoint = Vector3.Lerp(bt.Nodes.First().Pos, bt.Nodes.Last().Pos, 0.5f);
+            bt.Pos = Vector3.Lerp(bt.Nodes.First().Pos, bt.Nodes.Last().Pos, 0.5f);
             bt.Intersection = bt.Nodes.First().Intersection;
             if (!bt.Intersection.IsRoadEmpty())
             {
@@ -50,7 +69,6 @@ public static class Snapping
                 bt.Tangent = bt.Intersection.Tangent;
             }
         }
-        return bt;
     }
 
     static List<Node> GetBuildNodes(float3 clickPos, int laneCount)

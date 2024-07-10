@@ -67,7 +67,7 @@ public class Road
         foreach (Lane l in Lanes)
         {
             l.InitNodes();
-            l.InitVertices();
+            l.InitVerticesAndInnerPath();
         }
         StartIntersection = new(this, Side.Start);
         EndIntersection = new(this, Side.End);
@@ -145,10 +145,25 @@ public class Road
         int arrowCount = (int) (BezierSeries.Length / Constants.RoadArrowSeparation);
         if (arrowCount == 0)
             arrowCount++;
-        for (float i = 0; i < arrowCount + 1; i++)
+        for (float i = 1; i <= arrowCount + 1; i++)
             ArrowInterpolations.Add(i / (arrowCount + 1));
         // foreach (float3 pos in ArrowPositions)
         //     DebugExtension.DebugPoint(pos, Color.cyan, 2, 5);
+    }
+
+    public float3 EvaluatePosition(float t)
+    {
+        return BezierSeries.EvaluatePosition(t);
+    }
+
+    public float3 EvaluateTangent(float t)
+    {
+        return BezierSeries.EvaluateTangent(t);
+    }
+
+    public float3 Evaluate2DNormalizedNormal(float t)
+    {
+        return BezierSeries.Evaluate2DNormalizedNormal(t);
     }
 
     public override string ToString()

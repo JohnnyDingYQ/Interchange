@@ -25,7 +25,7 @@ public class Lane
     public float3 EndPos { get { return EndNode.Pos; } }
     [JsonIgnore]
     public Road Road { get; set; }
-    public uint Road_ {get; set; }
+    public uint Road_ { get; set; }
     [JsonProperty]
     public int LaneIndex { get; private set; }
     public float Length { get; private set; }
@@ -59,7 +59,7 @@ public class Lane
         EndNode.AddLane(this, Direction.In);
     }
 
-    public void InitVertices()
+    public void InitVerticesAndInnerPath()
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
@@ -68,6 +68,21 @@ public class Lane
         BezierSeries bs = new(BezierSeries, startInterpolation, endInterpolation);
         Path path = new(bs, StartVertex, EndVertex);
         InnerPath = path;
+    }
+
+    public float3 EvaluatePosition(float t)
+    {
+        return BezierSeries.EvaluatePosition(t);
+    }
+
+    public float3 EvaluateTangent(float t)
+    {
+        return BezierSeries.EvaluateTangent(t);
+    }
+
+    public float3 Evaluate2DNormalizedNormal(float t)
+    {
+        return BezierSeries.Evaluate2DNormalizedNormal(t);
     }
 
     public override string ToString()

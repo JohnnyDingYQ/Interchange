@@ -33,7 +33,7 @@ public class BuildTargetTest
         Lane lane = road.Lanes[0];
 
         Assert.True(bt.Snapped);
-        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, bt.MedianPoint));
+        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, bt.Pos));
         Assert.AreSame(lane.EndNode, node);
     }
 
@@ -49,7 +49,7 @@ public class BuildTargetTest
         Lane lane1 = road.Lanes[1];
 
         Assert.True(bt.Snapped);
-        Assert.AreEqual(new float3(0), bt.MedianPoint);
+        Assert.AreEqual(new float3(0), bt.Pos);
         Assert.AreEqual(lane0.StartNode, node0);
         Assert.AreEqual(lane1.StartNode, node1);
     }
@@ -65,7 +65,7 @@ public class BuildTargetTest
 
 
         Assert.True(bt.Snapped);
-        Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.MedianPoint));
+        Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.Pos));
         Assert.AreSame(lane.EndNode, node);
     }
 
@@ -82,7 +82,7 @@ public class BuildTargetTest
         Node node1 = bt.Nodes[1];
 
         Assert.True(bt.Snapped);
-        Assert.AreEqual(midPoint, bt.MedianPoint);
+        Assert.AreEqual(midPoint, bt.Pos);
         Assert.AreEqual(lane0.StartNode, node0);
         Assert.AreEqual(lane1.StartNode, node1);
     }

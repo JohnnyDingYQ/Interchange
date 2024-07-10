@@ -42,7 +42,7 @@ public class Roads : MonoBehaviour
         roadGameObject.gameObject.isStatic = true;
         roadMapping[road.Id] = roadGameObject;
         UpdateRoadMesh(road);
-        // CreateRoadArrows(roadGameObject);
+        CreateRoadArrows(roadGameObject);
     }
 
     void CreateRoadArrows(RoadHumbleObject roadObject)
@@ -51,9 +51,9 @@ public class Roads : MonoBehaviour
         foreach (float t in roadObject.Road.ArrowInterpolations)
         {
             GameObject arrow = Instantiate(arrowPrefab, roadObject.transform);
-            arrow.transform.position = roadObject.Road.BezierSeries.EvaluatePosition(t);
-            float angle = Vector3.Angle(roadObject.Road.BezierSeries.EvaluateTangent(t), Vector3.forward);
-            if (math.cross(roadObject.Road.BezierSeries.EvaluateTangent(t), Vector3.forward).y > 0)
+            arrow.transform.position = roadObject.Road.EvaluatePosition(t);
+            float angle = Vector3.Angle(roadObject.Road.EvaluateTangent(t), Vector3.forward);
+            if (math.cross(roadObject.Road.EvaluateTangent(t), Vector3.forward).y > 0)
                 angle = 360 - angle;
             arrow.transform.eulerAngles = new(
                 0,

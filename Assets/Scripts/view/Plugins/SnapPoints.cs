@@ -39,8 +39,8 @@ public class SnapPoints : MonoBehaviour
             IEnumerable<float3> nodePos = null;
             if (endTarget.Snapped)
                 nodePos = endTarget.Nodes.Select(n => n.Pos);
-            else if (endTarget.DividePossible)
-                nodePos = endTarget.NodesIfDivded;
+            else if (endTarget.DivideIsPossible)
+                nodePos = endTarget.NodesPosIfDivded;
             if (nodePos != null)
                 foreach (float3 pos in nodePos)
                 {
@@ -57,8 +57,8 @@ public class SnapPoints : MonoBehaviour
             IEnumerable<float3> nodePos = null;
             if (startTarget.Snapped)
                 nodePos = startTarget.Nodes.Select(n => n.Pos);
-            else if (startTarget.DividePossible)
-                nodePos = startTarget.NodesIfDivded;
+            else if (startTarget.DivideIsPossible)
+                nodePos = startTarget.NodesPosIfDivded;
             if (nodePos != null)
                 foreach (float3 pos in nodePos)
                 {
