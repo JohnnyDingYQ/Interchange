@@ -424,14 +424,17 @@ public static class Build
             }
             toRemove.ForEach(p => Game.RemovePath(p));
 
-            foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
+            if (option != RoadRemovalOption.Combine)
             {
-                node.RemoveLane(lane);
-                if (node.Lanes.Count == 0 && !node.BelongsToPoint)
+                foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
                 {
-                    Game.Nodes.Remove(node.Id);
-                    road.StartIntersection.RemoveNode(node);
-                    road.EndIntersection.RemoveNode(node);
+                    node.RemoveLane(lane);
+                    if (node.Lanes.Count == 0 && !node.BelongsToPoint)
+                    {
+                        Game.Nodes.Remove(node.Id);
+                        road.StartIntersection.RemoveNode(node);
+                        road.EndIntersection.RemoveNode(node);
+                    }
                 }
             }
             Game.RemoveLane(lane);

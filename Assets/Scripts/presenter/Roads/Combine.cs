@@ -43,7 +43,8 @@ public static class Combine
         for (int i = 0; i < left.LaneCount; i++)
         {
             left.Lanes[i].BezierSeries.Add(right.Lanes[i].BezierSeries);
-            left.Lanes[i].EndNode = right.Lanes[i].EndNode;
+            Game.RemoveVertex(left.Lanes[i].EndVertex);
+            Game.RemoveVertex(right.Lanes[i].StartVertex);
             left.Lanes[i].EndVertex = right.Lanes[i].EndVertex;
             left.Lanes[i].InnerPath.Target = right.Lanes[i].InnerPath.Target;
             left.Lanes[i].InnerPath.Cars.AddRange(right.Lanes[i].InnerPath.Cars);
@@ -54,8 +55,10 @@ public static class Combine
         Game.RemoveIntersection(right.StartIntersection);
         for (int i = 0; i < left.LaneCount; i++)
         {
-            Game.RemoveVertex(left.Lanes[i].EndVertex);
-            Game.RemoveVertex(right.Lanes[i].StartVertex);
+            Game.Nodes.Remove(left.Lanes[i].EndNode.Id);
+            left.Lanes[i].EndNode = right.Lanes[i].EndNode;
+            left.Lanes[i].EndNode.RemoveLane(right.Lanes[i]);
+            left.Lanes[i].EndNode.AddLane(left.Lanes[i], Direction.In);
         }
         Game.InvokeRoadUpdated(left);
 

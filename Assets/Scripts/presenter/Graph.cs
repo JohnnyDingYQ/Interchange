@@ -73,6 +73,8 @@ public static class Graph
     public static List<Path> GetOutPaths(Vertex v)
     {
         graph.TryGetOutEdges(v, out IEnumerable<Path> edges);
+        if (edges == null)
+            return new();
         return edges.ToList();
     }
 

@@ -227,11 +227,12 @@ public static class IntersectionUtil
             foreach (Lane inLane in n1.GetLanes(Direction.In))
                 foreach (Lane outLane in n2.GetLanes(Direction.Out))
                     BuildPathLane2Lane(inLane, outLane);
-
         }
 
         static Path BuildPathLane2Lane(Lane l1, Lane l2)
         {
+            Debug.Log(l1);
+            Debug.Log(l2);
             return BuildPath(l1.EndVertex, l2.StartVertex);
         }
 

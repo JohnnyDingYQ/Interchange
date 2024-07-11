@@ -126,7 +126,7 @@ public static class Game
     public static void RemovePath(Path p)
     {
         Assert.IsTrue(Paths.ContainsKey(p.Id));
-        // Assert.IsTrue(Graph.ContainsEdge(p));
+        // Assert.IsTrue(Graph.ContainsPath(p));
         Paths.Remove(p.Id);
         Graph.RemovePath(p);
     }
