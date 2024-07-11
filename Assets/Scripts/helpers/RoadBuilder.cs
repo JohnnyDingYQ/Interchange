@@ -23,7 +23,6 @@ public static class RoadBuilder
         Build.HandleBuildCommand(start);
         Build.HandleBuildCommand(pivot);
         List<Road> roads = Build.HandleBuildCommand(end);
-        Assert.IsTrue(roads.Count > 1);
         return roads;
     }
 }

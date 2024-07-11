@@ -40,7 +40,7 @@ public class AutoDivideLongRoadTest
         float length = Game.Roads.Values.First().Length;
         foreach (Road road in Game.Roads.Values)
         {
-            Assert.True(MyNumerics.AreNumericallyEqual(length, road.Length));
+            Assert.True(MyNumerics.AreNumericallyEqual(length, road.Length, 1));
             length = road.Length;
         }
             

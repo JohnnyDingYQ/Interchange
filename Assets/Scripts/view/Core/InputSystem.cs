@@ -176,6 +176,9 @@ public class InputSystem : MonoBehaviour
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {
+        Intersection ix = Snapping.Snap(MouseWorldPos, Build.LaneCount).Intersection;
+        if (ix != null)
+            Combine.CombineRoads(ix);
         if (Roads.HoveredRoad != null)
             Game.RemoveRoad(Roads.HoveredRoad.Road);
         foreach (Road road in Roads.SelectedRoads.Select(r => r.Road))

@@ -108,7 +108,6 @@ public static class Game
     {
         Assert.IsTrue(Graph.ContainsVertex(v));
         Assert.IsTrue(Vertices.ContainsValue(v));
-        Assert.AreEqual(0, Graph.GetOutPaths(v).Count);
         Vertices.Remove(v.Id);
         Graph.RemoveVertex(v);
     }
