@@ -6,8 +6,12 @@ using UnityEngine.Assertions;
 
 public class Roads : MonoBehaviour
 {
-    [SerializeField] private RoadHumbleObject roadPrefab;
-    [SerializeField] private GameObject arrowPrefab;
+    [SerializeField]
+    private RoadHumbleObject roadPrefab;
+    [SerializeField]
+    private GameObject arrowPrefab;
+    [SerializeField]
+    Texture oneLaneTex, twoLandTex;
     private static Dictionary<uint, RoadHumbleObject> roadMapping;
     public static RoadHumbleObject HoveredRoad { get; set; }
     public static List<RoadHumbleObject> SelectedRoads { get; set; }
@@ -43,6 +47,17 @@ public class Roads : MonoBehaviour
         roadMapping[road.Id] = roadGameObject;
         UpdateRoadMesh(road);
         CreateRoadArrows(roadGameObject);
+
+        SetupTexture(roadGameObject);
+
+        void SetupTexture(RoadHumbleObject roadGameObject)
+        {
+            Material material = roadGameObject.GetComponent<Renderer>().material;
+            if (road.LaneCount == 1)
+                material.SetTexture("_MainTex", oneLaneTex);
+            else
+                material.SetTexture("_MainTex", twoLandTex);
+        }
     }
 
     void CreateRoadArrows(RoadHumbleObject roadObject)

@@ -142,13 +142,12 @@ public class Road
     {
         Assert.IsNotNull(BezierSeries);
         ArrowInterpolations = new();
-        int arrowCount = (int) (BezierSeries.Length / Constants.RoadArrowSeparation);
-        if (arrowCount == 0)
-            arrowCount++;
-        for (float i = 1; i <= arrowCount + 1; i++)
+        int arrowCount = 1;
+        // int arrowCount = (int) (BezierSeries.Length / Constants.RoadArrowSeparation);
+        // if (arrowCount == 0)
+        //     arrowCount++;
+        for (float i = 1; i < arrowCount + 1; i++)
             ArrowInterpolations.Add(i / (arrowCount + 1));
-        // foreach (float3 pos in ArrowPositions)
-        //     DebugExtension.DebugPoint(pos, Color.cyan, 2, 5);
     }
 
     public float3 EvaluatePosition(float t)

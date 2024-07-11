@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 
 public static class Snapping
 {
-    static readonly float3[] bufferList = new float3[Constants.MaxLaneCount];
+    static readonly List<float3> bufferList = new();
     public static BuildTargets Snap(float3 pos, int laneCount)
     {
         BuildTargets bt = new()
@@ -29,11 +29,14 @@ public static class Snapping
             bt.Pos = bt.SelectedRoad.EvaluatePosition(interpolation);
             bt.NodesPosIfDivded = new();
             float3 offset = bt.SelectedRoad.Evaluate2DNormalizedNormal(interpolation);
-            float3 center = bt.SelectedRoad.EvaluatePosition(interpolation);
+
+            bufferList.Clear();
             for (int i = 0; i < bt.SelectedRoad.LaneCount; i++)
             {
-                bufferList[i] = bt.SelectedRoad.Lanes[i].EvaluatePosition(interpolation);
+                float3 pos = bt.SelectedRoad.Lanes[i].EvaluatePosition(interpolation);
+                bufferList.Add(pos);
             }
+            float3 center = bufferList.OrderBy(p => math.length(p - bt.ClickPos)).First();
 
             int interpolateRange = Constants.MaxLaneCount / 2 + 1;
             for (int i = interpolateRange; i >= -interpolateRange; i--)

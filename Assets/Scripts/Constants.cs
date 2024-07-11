@@ -9,7 +9,7 @@ public static class Constants
     public const float MeshResolution = 10 / LaneWidth;
     public const float RoadOutlineSeparation = LaneWidth / 2;
     public const float VertexDistanceFromRoadEnds = MinLaneLength / 2.1f; 
-    public const float RoadArrowSeparation = LaneWidth * 7f;
+    public const float RoadArrowSeparation = LaneWidth * 10f;
     public const float MaxRoadBendAngle = 130;
     public const int MaxElevation = 10;
     public const int MinElevation = 0;

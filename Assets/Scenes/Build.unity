@@ -169,6 +169,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roadPrefab: {fileID: 6831116549096913646, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
   arrowPrefab: {fileID: 6178782724906258381, guid: 528684144c7744a3588fa9ada8f6d9cd, type: 3}
+  oneLaneTex: {fileID: 2800000, guid: e2128e34564eb4955b4a346cdb4a97ec, type: 3}
+  twoLandTex: {fileID: 2800000, guid: 4bdaebe95e7d24c77bf3dc1dad796a67, type: 3}
 --- !u!1 &18878158
 GameObject:
   m_ObjectHideFlags: 0

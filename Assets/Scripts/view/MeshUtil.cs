@@ -6,7 +6,6 @@ using UnityEngine;
 
 public static class MeshUtil
 {
-    const float uvCycleLength = Constants.LaneWidth * 10;
     public static Mesh GetMesh(Road road)
     {
         int leftLength, rightLength;
@@ -30,28 +29,12 @@ public static class MeshUtil
             tris.Add(i < leftLength ? i : leftLength - 1);
             tris.Add(leftLength + i);
         }
-        float totalLength = 0;
-        for (int i = 0; i < leftLength; i++)
-        {
-            if (i == 0)
-                uvs.Add(new(0, 0));
-            else
-            {
-                totalLength += math.length(verts[i] - verts[i - 1]);
-                uvs.Add(new(0, totalLength % uvCycleLength / uvCycleLength));
-            }
-        }
-        totalLength = 0;
-        for (int i = leftLength; i < verts.Count; i++)
-        {
-            if (i == leftLength)
-                uvs.Add(new(1, 0));
-            else
-            {
-                totalLength += math.length(verts[i] - verts[i - 1]);
-                uvs.Add(new(1, totalLength % uvCycleLength / uvCycleLength));
-            }
-        }
+        float numRepeat = road.Length / (Constants.LaneWidth * 3.8f);
+        for (float i = 0; i < leftLength; i++)
+            uvs.Add(new(0, i / (leftLength - 1) * numRepeat));
+        for (float i = 0; i < rightLength; i++)
+            uvs.Add(new(1, i / (rightLength - 1) * numRepeat));
+
         mesh.SetVertices(v3Verts);
         mesh.SetTriangles(tris, 0);
         mesh.SetNormals(Enumerable.Repeat(Vector3.up, v3Verts.Count).ToList());
