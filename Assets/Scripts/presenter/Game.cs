@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using UnityEngine.Assertions;
 
@@ -39,7 +40,7 @@ public static class Game
         HoveredRoad = null;
     }
 
-    private static uint FindNextAvailableKey(ICollection<uint> dict)
+    public static uint FindNextAvailableKey(ICollection<uint> dict)
     {
         uint i = 1;
         while (dict.Contains(i))
@@ -53,10 +54,10 @@ public static class Game
         Roads.Add(road.Id, road);
         foreach (Lane lane in road.Lanes)
         {
-            RegisterVertex(lane.StartVertex);
-            RegisterVertex(lane.EndVertex);
+            Graph.AddVertex(lane.StartVertex);
+            Graph.AddVertex(lane.EndVertex);
             if (!road.IsGhost)
-                RegisterPath(lane.InnerPath);
+                Graph.AddPath(lane.InnerPath);
             RegisterLane(lane);
         }
         RegisterIntersection(road.StartIntersection);
@@ -92,43 +93,6 @@ public static class Game
     {
         Assert.IsTrue(Lanes.Keys.Contains(lane.Id));
         Lanes.Remove(lane.Id);
-    }
-
-    public static void RegisterVertex(Vertex v)
-    {
-        Assert.IsFalse(Graph.ContainsVertex(v) ^ Vertices.ContainsValue(v));
-        if (Graph.ContainsVertex(v))
-            return;
-        v.Id = FindNextAvailableKey(Vertices.Keys);
-        Vertices[v.Id] = v;
-        Graph.AddVertex(v);
-    }
-
-    public static void RemoveVertex(Vertex v)
-    {
-        Assert.IsTrue(Graph.ContainsVertex(v));
-        Assert.IsTrue(Vertices.ContainsValue(v));
-        Vertices.Remove(v.Id);
-        Graph.RemoveVertex(v);
-    }
-
-    public static void RegisterPath(Path p)
-    {
-        // Debug.Log($"start {p.Source.Id} end {p.Target.Id}");
-        Assert.IsFalse(Graph.ContainsPath(p) ^ Paths.ContainsValue(p));
-        if (Graph.ContainsPath(p.Source, p.Target))
-            return;
-        p.Id = FindNextAvailableKey(Paths.Keys);
-        Paths[p.Id] = p;
-        Graph.AddPath(p);
-    }
-
-    public static void RemovePath(Path p)
-    {
-        Assert.IsTrue(Paths.ContainsKey(p.Id));
-        // Assert.IsTrue(Graph.ContainsPath(p));
-        Paths.Remove(p.Id);
-        Graph.RemovePath(p);
     }
 
     public static void RegisterNode(Node node)

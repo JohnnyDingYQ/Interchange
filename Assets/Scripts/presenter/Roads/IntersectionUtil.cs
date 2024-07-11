@@ -203,7 +203,7 @@ public static class IntersectionUtil
                     toRemove.AddRange(Graph.GetOutPaths(l.EndVertex));
 
             foreach (Path p in toRemove)
-                Game.RemovePath(p);
+                Graph.RemovePath(p);
         }
 
         // i.e. nodes are internal to a a road
@@ -231,8 +231,6 @@ public static class IntersectionUtil
 
         static Path BuildPathLane2Lane(Lane l1, Lane l2)
         {
-            Debug.Log(l1);
-            Debug.Log(l2);
             return BuildPath(l1.EndVertex, l2.StartVertex);
         }
 
@@ -245,7 +243,7 @@ public static class IntersectionUtil
             float3 pos2 = end.Pos - Constants.MinLaneLength / 3 * end.Tangent;
             BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
             Path p = new(bs, start, end);
-            Game.RegisterPath(p);
+            Graph.AddPath(p);
             return p;
         }
     }

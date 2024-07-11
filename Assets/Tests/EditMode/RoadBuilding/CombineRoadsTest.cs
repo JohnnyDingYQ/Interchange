@@ -28,6 +28,7 @@ public class CombineRoadsTest
         Assert.AreEqual(2, Game.Intersections.Count);
         Assert.AreEqual(1, Game.Paths.Count);
         Assert.AreEqual(2, Game.Nodes.Count);
+        Assert.AreEqual(1, Game.Lanes.Count);
         Assert.True(Game.Nodes.Values.Contains(combined.Lanes[0].StartNode));
         Assert.True(Game.Nodes.Values.Contains(combined.Lanes[0].EndNode));
         Assert.AreSame(combined.Lanes[0], combined.Lanes[0].StartNode.Lanes.Single());
@@ -74,13 +75,12 @@ public class CombineRoadsTest
         Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road combined = Combine.CombineRoads(left.EndIntersection);
-        Debug.Log(combined.Lanes[0]);
 
         Road connected = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
 
         Assert.AreEqual(2, Game.Roads.Count);
         Assert.True(combined.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { combined.Lanes[0], connected.Lanes[0] }));
-        Assert.NotNull(Graph.GetPath(combined.Lanes[0].StartVertex, connected.Lanes[0].EndVertex));
+        Assert.NotNull(Graph.GetPath(combined.Lanes[0].EndVertex, connected.Lanes[0].StartVertex));
     }
 
     bool AllRoadsOutLineValid()

@@ -410,11 +410,8 @@ public static class Build
             List<Path> toRemove = new();
             if (option == RoadRemovalOption.Default)
             {
-                foreach (Path p in Game.Paths.Values)
-                    if (p.Source == lane.StartVertex || p.Target == lane.EndVertex || p.Source == lane.EndVertex || p.Target == lane.StartVertex)
-                        toRemove.Add(p);
-                Game.RemoveVertex(lane.StartVertex);
-                Game.RemoveVertex(lane.EndVertex);
+                Graph.RemoveVertex(lane.StartVertex);
+                Graph.RemoveVertex(lane.EndVertex);
             }
             else
             {
@@ -422,7 +419,7 @@ public static class Build
                     if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
                         toRemove.Add(p);
             }
-            toRemove.ForEach(p => Game.RemovePath(p));
+            toRemove.ForEach(p => Graph.RemovePath(p));
 
             if (option != RoadRemovalOption.Combine)
             {

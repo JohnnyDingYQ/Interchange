@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using QuikGraph;
 using QuikGraph.Algorithms;
@@ -9,42 +10,52 @@ public static class Graph
 {
     private static AdjacencyGraph<Vertex, Path> graph = new();
 
+
+    static Graph()
+    {
+        ApplyBinding();
+    }
+
+    static void ApplyBinding()
+    {
+        graph.VertexAdded += (v) => {
+            v.Id = Game.FindNextAvailableKey(Game.Vertices.Keys);
+            Game.Vertices[v.Id] = v;
+        };
+        graph.EdgeAdded += (p) => {
+            p.Id = Game.FindNextAvailableKey(Game.Paths.Keys);
+            Game.Paths[p.Id] = p;
+        };
+        graph.VertexRemoved += (v) => Game.Vertices.Remove(v.Id);;
+        graph.EdgeRemoved += (p) => Game.Paths.Remove(p.Id);
+    }
+
     public static void Wipe()
     {
         graph = new();
+        ApplyBinding();
     }
 
-    /// <summary>
-    /// Should not be invoked outside of Game class
-    /// </summary>
-    public static void AddVertex(Vertex v)
+    public static bool AddVertex(Vertex v)
     {
-        graph.AddVertex(v);
+        return graph.AddVertex(v);
     }
 
-    /// <summary>
-    /// Should not be invoked outside of Game class
-    /// </summary>
-    public static void AddPath(Path p)
+    public static bool AddPath(Path p)
     {
-        graph.AddEdge(p);
+        return graph.AddEdge(p);
     }
 
-    /// <summary>
-    /// Should not be invoked outside of Game class
-    /// </summary>
-    public static void RemoveVertex(Vertex v)
+    public static bool RemoveVertex(Vertex v)
     {
-        graph.RemoveVertex(v);
+        return graph.RemoveVertex(v);
     }
 
-    /// <summary>
-    /// Should not be invoked outside of Game class
-    /// </summary>
-    public static void RemovePath(Path p)
+    public static bool RemovePath(Path p)
     {
-        graph.RemoveEdge(p);
+        return graph.RemoveEdge(p);
     }
+
 
     public static bool ContainsVertex(Vertex v)
     {

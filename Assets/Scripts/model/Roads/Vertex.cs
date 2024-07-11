@@ -38,4 +38,21 @@ public class Vertex
         else
             SeriesInterpolation = (bs.Length - Constants.VertexDistanceFromRoadEnds) / bs.Length;
     }
+
+    public override string ToString()
+    {
+        return "Vertex " + Id;
+    }
+
+    // public override int GetHashCode()
+    // {
+    //     return Id.GetHashCode();
+    // }
+
+    // public override bool Equals(object obj)
+    // {
+    //     if (obj == null || GetType() != obj.GetType())
+    //         return false;
+    //     return Id == ((Vertex) obj).Id;
+    // }
 }
