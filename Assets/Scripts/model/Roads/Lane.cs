@@ -28,7 +28,8 @@ public class Lane
     public uint Road_ { get; set; }
     [JsonProperty]
     public int LaneIndex { get; private set; }
-    public float Length { get; private set; }
+    [JsonIgnore]
+    public float Length { get => BezierSeries.Length; }
     [JsonIgnore]
     public Path InnerPath { get; set; }
     [JsonProperty]
@@ -48,7 +49,6 @@ public class Lane
     {
         Assert.IsNotNull(Road);
         BezierSeries = Road.BezierSeries.Offset(((float)Road.LaneCount / 2 - 0.5f - LaneIndex) * Constants.LaneWidth);
-        Length = BezierSeries.Length;
     }
 
     public void InitNodes()
@@ -59,10 +59,14 @@ public class Lane
         EndNode.AddLane(this, Direction.In);
     }
 
-    public void InitVerticesAndInnerPath()
+    public void InitVertices()
     {
         StartVertex = new(this, Side.Start);
         EndVertex = new(this, Side.End);
+    }
+
+    public void InitInnerPath()
+    {
         float startInterpolation = Constants.VertexDistanceFromRoadEnds / BezierSeries.Length;
         float endInterpolation = (BezierSeries.Length - Constants.VertexDistanceFromRoadEnds) / BezierSeries.Length;
         BezierSeries bs = new(BezierSeries, startInterpolation, endInterpolation);

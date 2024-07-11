@@ -6,6 +6,9 @@ using UnityEngine;
 
 public static class MeshUtil
 {
+    static readonly List<int> tris = new();
+    static readonly List<Vector2> uvs = new();
+    static readonly List<Vector3> normals = new();
     public static Mesh GetMesh(Road road)
     {
         int leftLength, rightLength;
@@ -15,8 +18,9 @@ public static class MeshUtil
         verts.AddRange(road.RightOutline.GetConcatenated());
         List<Vector3> v3Verts = verts.ConvertAll(new Converter<float3, Vector3>(ToVector3));
         Mesh mesh = new();
-        List<int> tris = new();
-        List<Vector2> uvs = new();
+        tris.Clear();
+        uvs.Clear();
+        normals.Clear();
         for (int i = 1; i < leftLength; i++)
         {
             tris.Add(i);
@@ -31,13 +35,19 @@ public static class MeshUtil
         }
         float numRepeat = road.Length / (Constants.LaneWidth * 3.8f);
         for (float i = 0; i < leftLength; i++)
+        {
             uvs.Add(new(0, i / (leftLength - 1) * numRepeat));
+            normals.Add(Vector3.up);
+        }
         for (float i = 0; i < rightLength; i++)
+        {
             uvs.Add(new(1, i / (rightLength - 1) * numRepeat));
-
+            normals.Add(Vector3.up);
+        }
+        
         mesh.SetVertices(v3Verts);
         mesh.SetTriangles(tris, 0);
-        mesh.SetNormals(Enumerable.Repeat(Vector3.up, v3Verts.Count).ToList());
+        mesh.SetNormals(normals);
         mesh.SetUVs(0, uvs);
         return mesh;
 

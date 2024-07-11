@@ -47,6 +47,8 @@ public class RoadOutline : IEquatable<RoadOutline>
             if (!MyNumerics.AreNumericallyEqual(End.First(), Mid.Last()))
             {
                 Debug.Log("mid misaligns with end");
+                Debug.Log("mid end: " + Mid.Last());
+                Debug.Log("end start: " + End.First());
                 return false;
             }
         return true;

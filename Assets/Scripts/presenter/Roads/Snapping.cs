@@ -55,7 +55,7 @@ public static class Snapping
             if (bt.SelectedRoad != null)
             {
                 float interpolation = Divide.GetInterpolation(bt.SelectedRoad, bt.ClickPos);
-                bt.DivideIsPossible = Divide.RoadDividable(bt.SelectedRoad, interpolation);
+                bt.DivideIsPossible = Divide.RoadIsDividable(bt.SelectedRoad, interpolation);
                 if (bt.DivideIsPossible)
                     SetupDivideInfo(laneCount, bt, interpolation);
             }

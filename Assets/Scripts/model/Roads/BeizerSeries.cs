@@ -59,7 +59,7 @@ public class BezierSeries
         float distance = 0;
         for (int i = 0; i < location.Index; i++)
             distance += CurveUtility.CalculateLength(curves[i], 10);
-        CurveUtility.Split(curves[location.Index], location.Interpolation, out BezierCurve left, out BezierCurve right);
+        CurveUtility.Split(curves[location.Index], location.Interpolation, out BezierCurve left, out _);
         distance += CurveUtility.CalculateLength(left, 10);
         return distance;
     }
@@ -213,7 +213,7 @@ public class BezierSeries
         int minIndex = 0;
         for (int i = 0; i < curves.Count; i++)
         {
-            float distance = CurveUtility.GetNearestPoint(curves[i], ray, out float3 p, out float t);
+            float distance = CurveUtility.GetNearestPoint(curves[i], ray, out _, out _);
             if (distance < minDistance)
             {
                 minDistance = distance;
@@ -242,6 +242,14 @@ public class BezierSeries
             rightSeries.Add(curves[count++]);
         left = new(leftSeries);
         right = new(rightSeries);
+    }
+
+    public void Add(BezierSeries other)
+    {
+        Assert.IsTrue(MyNumerics.AreNumericallyEqual(EvaluatePosition(1), other.EvaluatePosition(0)));
+        curves.AddRange(other.curves);
+        Length += other.Length;
+        PrepForSerialization();
     }
 
     private struct SeriesLocation

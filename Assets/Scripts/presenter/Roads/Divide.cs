@@ -4,7 +4,6 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Splines;
 
 public static class Divide
 {
@@ -13,7 +12,7 @@ public static class Divide
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
         float interpolation = GetInterpolation(road, clickPos);
-        if (RoadDividable(road, interpolation))
+        if (RoadIsDividable(road, interpolation))
             return DivideRoad(road, GetInterpolation(road, clickPos));
         return null;
     }
@@ -26,7 +25,7 @@ public static class Divide
         return interpolation;
     }
 
-    public static bool RoadDividable(Road road, float t)
+    public static bool RoadIsDividable(Road road, float t)
     {
         return road.SplitIsValid(t);
     }
@@ -52,7 +51,7 @@ public static class Divide
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
         OperateOutline();
-        Game.RemoveRoad(road, true);
+        Game.RemoveRoad(road, RoadRemovalOption.Divide);
         List<Node> leftNodes = new();
         for (int i = 0; i < leftRoad.LaneCount; i++)
             leftNodes.Add(leftRoad.Lanes[i].EndNode);
@@ -66,8 +65,8 @@ public static class Divide
             rightRoad.StartIntersection = leftRoad.EndIntersection;
             rightRoad.EndIntersection = road.EndIntersection;
 
-            leftRoad.StartIntersection.AddRoad(leftRoad, Side.Start);
-            rightRoad.EndIntersection.AddRoad(rightRoad, Side.End);
+            leftRoad.StartIntersection.AddRoad(leftRoad, Direction.Out);
+            rightRoad.EndIntersection.AddRoad(rightRoad, Direction.In);
         }
 
         void OperateNodes()

@@ -180,7 +180,7 @@ public class OutlineTest
     {
         foreach (Road r in Game.Roads.Values)
         {
-            r.LeftOutline.IsPlausible();
+            // r.LeftOutline.IsPlausible();
             // Debug.Log(r.HasNoneEmptyOutline());
             if (!r.OutlinePlausible())
             {
@@ -189,7 +189,7 @@ public class OutlineTest
             }
             if (!r.HasNoneEmptyOutline())
             {
-                Debug.Log(r.Id);   
+                Debug.Log("Road " + r.Id + ": Outline empty");
                 return false;
             }
         }

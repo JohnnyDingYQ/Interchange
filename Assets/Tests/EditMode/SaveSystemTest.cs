@@ -20,7 +20,6 @@ public class SaveSystemTest
     {
         RoadBuilder.Single(0, stride, 2 * stride, 1);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
@@ -42,7 +41,6 @@ public class SaveSystemTest
     {
         Road r = RoadBuilder.Single(0, stride, 2 * stride, 3);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(1, Game.Roads.Count);
@@ -70,7 +68,6 @@ public class SaveSystemTest
         Road road1 = RoadBuilder.Single(3 * stride, 4 * stride, 5 * stride, 1);
 
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
@@ -92,7 +89,6 @@ public class SaveSystemTest
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(2, Game.Roads.Count);
@@ -113,7 +109,6 @@ public class SaveSystemTest
         RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
         foreach (Road road in Game.Roads.Values)
@@ -131,7 +126,6 @@ public class SaveSystemTest
         RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
 
         Assert.AreEqual(3, Game.Paths.Count);
@@ -148,7 +142,6 @@ public class SaveSystemTest
         Assert.AreSame(lane, lane.StartNode.GetLanes(Direction.Out).First());
         Assert.AreSame(lane, lane.EndNode.GetLanes(Direction.In).First());
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
         road = Game.Roads.Values.First();
         lane = road.Lanes.First();
@@ -164,7 +157,6 @@ public class SaveSystemTest
         Road saved2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road saved3 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
         Road restored1 = Game.Roads[saved1.Id];
         Road restored2 = Game.Roads[saved2.Id];
@@ -186,7 +178,6 @@ public class SaveSystemTest
         Road saved2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Road saved3 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         SaveSystem.SaveGame();
-        Game.WipeState();
         SaveSystem.LoadGame();
         Road restored1 = Game.Roads[saved1.Id];
         Road restored2 = Game.Roads[saved2.Id];

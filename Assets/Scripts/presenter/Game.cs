@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using QuikGraph;
-using Unity.Mathematics;
 using System.Linq;
 using UnityEngine.Assertions;
-using QuikGraph.Algorithms;
 
 public static class Game
 {
@@ -25,7 +21,6 @@ public static class Game
     public static Dictionary<uint, Point> Targets { get => GameSave.Targets; }
     public static Dictionary<uint, SourcePoint> Sources { get => GameSave.Sources; }
     public static Road HoveredRoad { get; set; }
-
     public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
 
@@ -113,6 +108,7 @@ public static class Game
     {
         Assert.IsTrue(Graph.ContainsVertex(v));
         Assert.IsTrue(Vertices.ContainsValue(v));
+        Assert.AreEqual(0, Graph.GetOutPaths(v).Count);
         Vertices.Remove(v.Id);
         Graph.RemoveVertex(v);
     }
@@ -150,18 +146,15 @@ public static class Game
         return Nodes.Values.Contains(node);
     }
 
-    public static bool RemoveRoad(uint id)
-    {
-        if (!Roads.ContainsKey(id))
-            return false;
-        return RemoveRoad(Roads[id], false);
-    }
-
-    public static bool RemoveRoad(Road road, bool retainVertices)
+    public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
-        return Build.RemoveRoad(road, retainVertices);
+        return Build.RemoveRoad(road, option);
+    }
+    public static bool RemoveRoad(Road road)
+    {
+        return RemoveRoad(road, RoadRemovalOption.Default);
     }
 
     public static void RegisterCar(Car car)
@@ -177,11 +170,6 @@ public static class Game
         Assert.IsTrue(Cars.ContainsValue(car));
         Cars.Remove(car.Id);
         CarRemoved?.Invoke(car);
-    }
-
-    public static bool RemoveRoad(Road road)
-    {
-        return RemoveRoad(road, false);
     }
 
     public static void InvokeRoadUpdated(Road road)

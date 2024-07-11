@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using System;
+using UnityEngine.Assertions;
 
 public class Intersection
 {
@@ -11,25 +12,19 @@ public class Intersection
     [JsonIgnore]
     private List<Node> nodes = new();
     [JsonIgnore]
-    public List<Node> Nodes { get { return new List<Node>(nodes); } }
-    [JsonProperty]
-    public List<uint> Nodes_ { get; set; }
+    public List<Node> Nodes { get => new(nodes); }
     [JsonIgnore]
-    public int Count { get { return Nodes.Count; } }
+    public int Count { get => Nodes.Count; }
     [JsonProperty]
     private HashSet<Road> inRoads = new();
     [JsonIgnore]
-    public ReadOnlySet<Road> InRoads { get { return inRoads.AsReadOnly(); } }
-    [JsonProperty]
-    public List<uint> InRoads_ { get; set; }
+    public ReadOnlySet<Road> InRoads { get => inRoads.AsReadOnly(); }
     [JsonProperty]
     private HashSet<Road> outRoads = new();
     [JsonIgnore]
-    public ReadOnlySet<Road> OutRoads { get { return outRoads.AsReadOnly(); } }
-    [JsonProperty]
-    public List<uint> OutRoads_ { get; set; }
+    public ReadOnlySet<Road> OutRoads { get => outRoads.AsReadOnly(); }
     [JsonIgnore]
-    public HashSet<Road> Roads { get { return GetRoads(); } }
+    public HashSet<Road> Roads { get => GetRoads(); }
     [JsonIgnore]
     public Plane Plane { get => GetPlane(); }
     [JsonIgnore]
@@ -38,12 +33,18 @@ public class Intersection
     public float3 Tangent { get => GetAttribute(AttributeTypes.Tangent); }
     [JsonIgnore]
     public float3 PointOnInSide { get => GetAttribute(AttributeTypes.PointOnInSide); }
+    [JsonProperty]
+    public List<uint> Nodes_ { get; set; }
+    [JsonProperty]
+    public List<uint> InRoads_ { get; set; }
+    [JsonProperty]
+    public List<uint> OutRoads_ { get; set; }
 
     public Intersection() { }
 
-    public Intersection(Road road, Side side)
+    public Intersection(Road road, Direction direction)
     {
-        AddRoad(road, side);
+        AddRoad(road, direction);
     }
 
     public void SetNodes(List<Node> nodes)
@@ -66,17 +67,16 @@ public class Intersection
         return inRoads.Count == 0 && outRoads.Count == 0;
     }
 
-    public void AddRoad(Road road, Side side)
+    public void AddRoad(Road road, Direction direction)
     {
-        if (side != Side.Start && side != Side.End)
-            throw new InvalidOperationException("Invalid side");
+        Assert.IsTrue(direction == Direction.Out || direction == Direction.In);
 
-        if (side == Side.Start)
+        if (direction == Direction.Out)
             outRoads.Add(road);
-        else if (side == Side.End)
+        else if (direction == Direction.In)
             inRoads.Add(road);
 
-        foreach (Node n in road.GetNodes(side))
+        foreach (Node n in road.GetNodes(direction == Direction.Out ? Side.Start : Side.End))
         {
             n.Intersection = this;
             if (!nodes.Contains(n))
@@ -85,14 +85,13 @@ public class Intersection
         nodes.Sort();
     }
 
-    public void RemoveRoad(Road road, Side side)
+    public void RemoveRoad(Road road, Direction direction)
     {
-        if (side != Side.Start && side != Side.End)
-            throw new InvalidOperationException("Invalid side");
+        Assert.IsTrue(direction == Direction.Out || direction == Direction.In);
 
-        if (side == Side.Start)
+        if (direction == Direction.Out)
             outRoads.Remove(road);
-        else if (side == Side.End)
+        else if (direction == Direction.In)
             inRoads.Remove(road);
     }
 

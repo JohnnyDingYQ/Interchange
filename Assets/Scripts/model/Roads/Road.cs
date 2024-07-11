@@ -67,10 +67,11 @@ public class Road
         foreach (Lane l in Lanes)
         {
             l.InitNodes();
-            l.InitVerticesAndInnerPath();
+            l.InitVertices();
+            l.InitInnerPath();
         }
-        StartIntersection = new(this, Side.Start);
-        EndIntersection = new(this, Side.End);
+        StartIntersection = new(this, Direction.Out);
+        EndIntersection = new(this, Direction.In);
         LeftOutline = new();
         RightOutline = new();
         EvaluateInnerOutline();

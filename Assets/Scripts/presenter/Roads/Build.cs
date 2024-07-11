@@ -82,7 +82,8 @@ public static class Build
     {
         foreach (uint id in GhostRoads)
         {
-            Game.RemoveRoad(id);
+            Assert.IsTrue(Game.Roads.ContainsKey(id));
+            Game.RemoveRoad(Game.Roads[id]);
         }
         GhostRoads.Clear();
     }
@@ -370,7 +371,7 @@ public static class Build
             nodes[i].AddLane(road.Lanes[i], Direction.Out);
             road.Lanes[i].StartNode = nodes[i];
         }
-        road.StartIntersection.AddRoad(road, Side.Start);
+        road.StartIntersection.AddRoad(road, Direction.Out);
         IntersectionUtil.EvaluatePaths(road.StartIntersection);
         IntersectionUtil.EvaluateOutline(road.StartIntersection);
     }
@@ -384,7 +385,7 @@ public static class Build
             nodes[i].AddLane(road.Lanes[i], Direction.In);
             road.Lanes[i].EndNode = nodes[i];
         }
-        road.EndIntersection.AddRoad(road, Side.End);
+        road.EndIntersection.AddRoad(road, Direction.In);
         IntersectionUtil.EvaluatePaths(road.EndIntersection);
         IntersectionUtil.EvaluateOutline(road.EndIntersection);
     }
@@ -401,13 +402,13 @@ public static class Build
         }
     }
 
-    public static bool RemoveRoad(Road road, bool retainVertices)
+    public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
         Game.Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
             List<Path> toRemove = new();
-            if (!retainVertices)
+            if (option == RoadRemovalOption.Default)
             {
                 foreach (Path p in Game.Paths.Values)
                     if (p.Source == lane.StartVertex || p.Target == lane.EndVertex || p.Source == lane.EndVertex || p.Target == lane.StartVertex)
@@ -435,26 +436,33 @@ public static class Build
             }
             Game.RemoveLane(lane);
         }
-        road.StartIntersection.RemoveRoad(road, Side.Start);
-        road.EndIntersection.RemoveRoad(road, Side.End);
-        if (!road.StartIntersection.IsEmpty())
-        {
-            IntersectionUtil.EvaluatePaths(road.StartIntersection);
-            IntersectionUtil.EvaluateOutline(road.StartIntersection);
-        }
-        else
-            Game.RemoveIntersection(road.StartIntersection);
+        road.StartIntersection.RemoveRoad(road, Direction.Out);
+        road.EndIntersection.RemoveRoad(road, Direction.In);
 
-        if (!road.EndIntersection.IsEmpty())
-        {
-            IntersectionUtil.EvaluatePaths(road.EndIntersection);
-            IntersectionUtil.EvaluateOutline(road.EndIntersection);
-        }
-        else
-            Game.RemoveIntersection(road.EndIntersection);
+        if (option != RoadRemovalOption.Combine)
+            EvaluateIntersections(road);
 
         Game.InvokeRoadRemoved(road);
         return true;
+
+        static void EvaluateIntersections(Road road)
+        {
+            if (!road.StartIntersection.IsEmpty())
+            {
+                IntersectionUtil.EvaluatePaths(road.StartIntersection);
+                IntersectionUtil.EvaluateOutline(road.StartIntersection);
+            }
+            else
+                Game.RemoveIntersection(road.StartIntersection);
+
+            if (!road.EndIntersection.IsEmpty())
+            {
+                IntersectionUtil.EvaluatePaths(road.EndIntersection);
+                IntersectionUtil.EvaluateOutline(road.EndIntersection);
+            }
+            else
+                Game.RemoveIntersection(road.EndIntersection);
+        }
     }
 
     public static void IncreaseElevation()

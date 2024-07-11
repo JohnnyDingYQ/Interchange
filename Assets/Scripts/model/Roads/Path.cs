@@ -22,7 +22,7 @@ public class Path : IEdge<Vertex>
     public Vertex Target { get; set; }
     public uint Target_ { get; set; }
     [JsonIgnore]
-    public float Length { get { return BezierSeries.Length; } }
+    public float Length { get => BezierSeries.Length; }
     [JsonIgnore]
     public Path InterweavingPath { get; set; }
     public uint InterweavingPath_ { get; set; }
