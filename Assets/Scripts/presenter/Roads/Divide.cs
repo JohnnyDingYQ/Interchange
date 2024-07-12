@@ -48,8 +48,10 @@ public static class Divide
         OperateNodes();
         OperateIntersections();
         OperateVertices();
+        Debug.Log(Game.Vertices.Count);
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
+        Debug.Log(Game.Vertices.Count);
         OperateOutline();
         Game.RemoveRoad(road, RoadRemovalOption.Divide);
         List<Node> leftNodes = new();

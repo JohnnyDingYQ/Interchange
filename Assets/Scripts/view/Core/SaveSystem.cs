@@ -40,8 +40,10 @@ public static class SaveSystem
         static void RestoreGameState()
         {
             IdToObjectReferences();
+            Graph.CancelBinding();
             foreach (Path p in Game.Paths.Values)
                 Graph.AddVerticesAndPath(p);
+            Graph.ApplyBinding();
             foreach (Lane l in Game.Lanes.Values)
                 l.InitCurve();
             foreach (Road r in Game.Roads.Values)

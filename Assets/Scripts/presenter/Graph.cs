@@ -16,18 +16,40 @@ public static class Graph
         ApplyBinding();
     }
 
-    static void ApplyBinding()
+    public static void ApplyBinding()
     {
-        graph.VertexAdded += (v) => {
-            v.Id = Game.FindNextAvailableKey(Game.Vertices.Keys);
-            Game.Vertices[v.Id] = v;
-        };
-        graph.EdgeAdded += (p) => {
-            p.Id = Game.FindNextAvailableKey(Game.Paths.Keys);
-            Game.Paths[p.Id] = p;
-        };
-        graph.VertexRemoved += (v) => Game.Vertices.Remove(v.Id);;
-        graph.EdgeRemoved += (p) => Game.Paths.Remove(p.Id);
+        graph.VertexAdded += RegisterVertex;
+        graph.EdgeAdded += RegisterPath;
+        graph.VertexRemoved += UnregisterVertex;
+        graph.EdgeRemoved += UnregisterPath;
+    }
+
+    public static void CancelBinding()
+    {
+        graph.VertexAdded -= RegisterVertex;
+        graph.EdgeAdded -= RegisterPath;
+        graph.VertexRemoved -= UnregisterVertex;
+        graph.EdgeRemoved -= UnregisterPath;
+    }
+
+    static void RegisterVertex(Vertex v)
+    {
+        Game.Vertices[v.Id] = v;
+    }
+
+    static void RegisterPath(Path p)
+    {
+        Game.Paths[p.Id] = p;
+    }
+    
+    static void UnregisterVertex(Vertex v)
+    {
+        Game.Vertices.Remove(v.Id);
+    }
+
+    static void UnregisterPath(Path p)
+    {
+        Game.Paths.Remove(p.Id);
     }
 
     public static void Wipe()
@@ -38,11 +60,15 @@ public static class Graph
 
     public static bool AddVertex(Vertex v)
     {
+        if (!Game.Vertices.ContainsKey(v.Id))
+            v.Id = Game.FindNextAvailableKey(Game.Vertices.Keys);
         return graph.AddVertex(v);
     }
 
     public static bool AddPath(Path p)
     {
+        if (!Game.Paths.ContainsKey(p.Id))
+            p.Id = Game.FindNextAvailableKey(Game.Paths.Keys);
         return graph.AddEdge(p);
     }
 

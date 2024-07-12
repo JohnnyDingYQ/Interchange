@@ -67,15 +67,15 @@ public class Path : IEdge<Vertex>
         return false;
     }
 
-    // public override int GetHashCode()
-    // {
-    //     return Id.GetHashCode();
-    // }
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 
-    // public override bool Equals(object obj)
-    // {
-    //     if (obj == null || GetType() != obj.GetType())
-    //         return false;
-    //     return Id == ((Path) obj).Id;
-    // }
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+        return Id == ((Path) obj).Id;
+    }
 }

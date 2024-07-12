@@ -236,17 +236,23 @@ public class DivideTest
         SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
 
         foreach (Lane l in subRoads.Left.Lanes)
-            foreach (Vertex v in new Vertex[] { l.StartVertex, l.EndVertex })
-                Assert.AreSame(l, v.Lane);
+        {
+            Assert.AreSame(l, l.StartVertex.Lane);
+            Assert.AreSame(l, l.EndVertex.Lane);
+        }
     }
 
     [Test]
-    public void DivideDoesNotCreateExtraVertices()
+    public void VertexCreation()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Divide.HandleDivideCommand(road, stride);
+        SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
         
         Assert.AreEqual(4, Game.Vertices.Count);
+        Assert.True(Game.Vertices.Values.Contains(subRoads.Left.Lanes[0].StartVertex));
+        Assert.True(Game.Vertices.Values.Contains(subRoads.Left.Lanes[0].EndVertex));
+        Assert.True(Game.Vertices.Values.Contains(subRoads.Right.Lanes[0].StartVertex));
+        Assert.True(Game.Vertices.Values.Contains(subRoads.Right.Lanes[0].EndVertex));
     }
 
     [Test]

@@ -83,6 +83,24 @@ public class CombineRoadsTest
         Assert.NotNull(Graph.GetPath(combined.Lanes[0].EndVertex, connected.Lanes[0].StartVertex));
     }
 
+    [Test]
+    public void GraphSanityCheck()
+    {
+        Graph.AddVertex(new());
+        Graph.AddVertex(new());
+        Graph.AddVertex(new());
+        Graph.AddVertex(new());
+        Assert.AreEqual(4, Game.Vertices.Count());
+        
+        Graph.RemoveVertex(Game.Vertices[2]);
+        Graph.RemoveVertex(Game.Vertices[3]);
+        Assert.AreEqual(2, Game.Vertices.Count());
+        
+        Graph.AddVertex(new());
+        Graph.AddVertex(new());
+        Assert.AreEqual(4, Game.Vertices.Count());
+        }
+
     bool AllRoadsOutLineValid()
     {
         foreach (Road r in Game.Roads.Values)

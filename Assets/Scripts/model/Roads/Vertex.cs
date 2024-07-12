@@ -44,15 +44,15 @@ public class Vertex
         return "Vertex " + Id;
     }
 
-    // public override int GetHashCode()
-    // {
-    //     return Id.GetHashCode();
-    // }
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 
-    // public override bool Equals(object obj)
-    // {
-    //     if (obj == null || GetType() != obj.GetType())
-    //         return false;
-    //     return Id == ((Vertex) obj).Id;
-    // }
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+        return Id == ((Vertex) obj).Id;
+    }
 }
