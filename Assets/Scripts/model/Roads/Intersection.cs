@@ -171,4 +171,16 @@ public class Intersection
                 return nodes[i];
         return null;
     }
+
+    public bool IsForLaneChangeOnly()
+    {
+        if (InRoads.Count != 1 || OutRoads.Count != 1)
+            return false;
+        if (inRoads.Single().LaneCount != outRoads.Single().LaneCount)
+            return false;
+        foreach (Node n in nodes)
+            if (n.GetLanes(Direction.In).Count != 1 && n.GetLanes(Direction.Out).Count != 1)
+                return false;
+        return true;
+    }
 }

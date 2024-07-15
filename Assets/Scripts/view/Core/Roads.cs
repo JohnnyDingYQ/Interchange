@@ -11,7 +11,7 @@ public class Roads : MonoBehaviour
     [SerializeField]
     private GameObject arrowPrefab;
     [SerializeField]
-    Texture oneLaneTex, twoLandTex;
+    Texture oneLaneTex, twoLaneTex;
     private static Dictionary<uint, RoadHumbleObject> roadMapping;
     public static RoadHumbleObject HoveredRoad { get; set; }
     public static List<RoadHumbleObject> SelectedRoads { get; set; }
@@ -56,7 +56,7 @@ public class Roads : MonoBehaviour
             if (road.LaneCount == 1)
                 material.SetTexture("_MainTex", oneLaneTex);
             else
-                material.SetTexture("_MainTex", twoLandTex);
+                material.SetTexture("_MainTex", twoLaneTex);
         }
     }
 
@@ -66,7 +66,9 @@ public class Roads : MonoBehaviour
         foreach (float t in roadObject.Road.ArrowInterpolations)
         {
             GameObject arrow = Instantiate(arrowPrefab, roadObject.transform);
-            arrow.transform.position = roadObject.Road.EvaluatePosition(t);
+            float3 pos = roadObject.Road.EvaluatePosition(t);
+            pos.y = Constants.MaxElevation + 1;
+            arrow.transform.position = pos;
             float angle = Vector3.Angle(roadObject.Road.EvaluateTangent(t), Vector3.forward);
             if (math.cross(roadObject.Road.EvaluateTangent(t), Vector3.forward).y > 0)
                 angle = 360 - angle;

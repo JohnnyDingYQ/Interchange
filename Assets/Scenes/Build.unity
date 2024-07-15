@@ -170,7 +170,7 @@ MonoBehaviour:
   roadPrefab: {fileID: 6831116549096913646, guid: 90721b7e7686d1c4baabbb95dadffc9a, type: 3}
   arrowPrefab: {fileID: 6178782724906258381, guid: 528684144c7744a3588fa9ada8f6d9cd, type: 3}
   oneLaneTex: {fileID: 2800000, guid: e2128e34564eb4955b4a346cdb4a97ec, type: 3}
-  twoLandTex: {fileID: 2800000, guid: 4bdaebe95e7d24c77bf3dc1dad796a67, type: 3}
+  twoLaneTex: {fileID: 2800000, guid: 4bdaebe95e7d24c77bf3dc1dad796a67, type: 3}
 --- !u!1 &18878158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1774,6 +1774,10 @@ PrefabInstance:
     - target: {fileID: 4219139233327057845, guid: 7664266fdd355e1419859a6fd9801daa, type: 3}
       propertyPath: m_Name
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4219139233327057845, guid: 7664266fdd355e1419859a6fd9801daa, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

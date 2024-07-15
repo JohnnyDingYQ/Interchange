@@ -206,7 +206,7 @@ public static class IntersectionUtil
                 Graph.RemovePath(p);
         }
 
-        // i.e. nodes are internal to a a road
+        // i.e. nodes are internal to a road
         bool NodesBelongToUniqueRoad(Node n1, Node n2)
         {
             if (n1.GetLanes(Direction.In).Count == 1 && n2.GetLanes(Direction.Out).Count == 1

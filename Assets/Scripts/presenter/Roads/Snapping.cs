@@ -19,7 +19,17 @@ public static class Snapping
             Snapped = false
         };
         if (bt.Nodes == null)
-            AttemptDivide(laneCount, bt);
+        {
+            if (bt.SelectedRoad != null)
+            {
+                float interpolation = bt.SelectedRoad.GetNearestInterpolation(bt.ClickPos);
+                AttemptDivide(laneCount, bt, interpolation);
+                if (!bt.DivideIsPossible)
+                {
+                    Debug.Log(CombineThenDivideIsValid(laneCount, bt, interpolation));
+                }
+            }
+        }
         else
             SetupSnapInfo(bt);
         return bt;
@@ -50,15 +60,35 @@ public static class Snapping
             bt.Tangent = math.normalize(bt.SelectedRoad.EvaluateTangent(interpolation));
         }
 
-        static void AttemptDivide(int laneCount, BuildTargets bt)
+        static void AttemptDivide(int laneCount, BuildTargets bt, float interpolation)
+        {   
+            bt.DivideIsPossible = Divide.RoadIsDividable(bt.SelectedRoad, interpolation);
+            if (bt.DivideIsPossible)
+                SetupDivideInfo(laneCount, bt, interpolation);
+        }
+
+        static bool CombineThenDivideIsValid(int laneCount, BuildTargets bt, float interpolation)
         {
-            if (bt.SelectedRoad != null)
+            bool lookLeft = false;
+            if (interpolation <= 0.5)
+                lookLeft = true;
+            Intersection nearestIx = lookLeft ? bt.SelectedRoad.StartIntersection : bt.SelectedRoad.EndIntersection;
+            if (!Combine.CombineIsValid(nearestIx))
+                return false;
+            Road left = nearestIx.InRoads.Single();
+            Road right = nearestIx.OutRoads.Single();
+            for (int i = 0; i < left.LaneCount; i++)
             {
-                float interpolation = Divide.GetInterpolation(bt.SelectedRoad, bt.ClickPos);
-                bt.DivideIsPossible = Divide.RoadIsDividable(bt.SelectedRoad, interpolation);
-                if (bt.DivideIsPossible)
-                    SetupDivideInfo(laneCount, bt, interpolation);
+                float leftLength = left.Lanes[i].Length;
+                float rightLength = right.Lanes[i].Length;
+                float totalLength = leftLength + rightLength;
+                float newDivide = lookLeft ? leftLength + rightLength * interpolation : rightLength * interpolation;
+                if (newDivide < Constants.MinLaneLength || newDivide > Constants.MaxLaneLength)
+                    return false;
+                if (totalLength - newDivide < Constants.MinLaneLength || totalLength - newDivide > Constants.MaxLaneLength)
+                    return false;
             }
+            return true;
         }
 
         static void SetupSnapInfo(BuildTargets bt)

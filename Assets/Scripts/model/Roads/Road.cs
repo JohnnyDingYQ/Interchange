@@ -151,6 +151,14 @@ public class Road
             ArrowInterpolations.Add(i / (arrowCount + 1));
     }
 
+    public float GetNearestInterpolation(float3 clickPos)
+    {
+        clickPos.y = 0;
+        Ray ray = new(clickPos, Vector3.up);
+        BezierSeries.GetNearestPoint(ray, out _, out float interpolation);
+        return interpolation;
+    }
+
     public float3 EvaluatePosition(float t)
     {
         return BezierSeries.EvaluatePosition(t);

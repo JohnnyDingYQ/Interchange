@@ -151,6 +151,15 @@ public static class Build
     static List<Road> BuildRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
         if (buildMode == BuildMode.Actual)
+            PreprocessSnap();
+        Road road = InitRoad(startTarget, pivotPos, endTarget);
+        if (road == null)
+            return null;
+        if (buildMode == BuildMode.Ghost)
+            road.IsGhost = true;
+        return ProcessRoad(road, startTarget, endTarget);
+
+        void PreprocessSnap()
         {
             if (!startTarget.Snapped && startTarget.DivideIsPossible)
             {
@@ -163,12 +172,6 @@ public static class Build
                 endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
             }
         }
-        Road road = InitRoad(startTarget, pivotPos, endTarget);
-        if (road == null)
-            return null;
-        if (buildMode == BuildMode.Ghost)
-            road.IsGhost = true;
-        return ProcessRoad(road, startTarget, endTarget);
     }
 
     static List<Road> BuildParallelRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)

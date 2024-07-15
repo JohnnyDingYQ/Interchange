@@ -6,16 +6,7 @@ public static class Combine
 
     public static bool CombineIsValid(Intersection ix)
     {
-        if (ix.InRoads.Count != 1 || ix.OutRoads.Count != 1)
-            return false;
-        Road left = ix.InRoads.Single();
-        Road right = ix.OutRoads.Single();
-        if (left.LaneCount != right.LaneCount)
-            return false;
-        for (int i = 0; i < left.LaneCount; i++)
-            if (left.Lanes[i].Length + right.Lanes[i].Length > Constants.MaxLaneLength)
-                return false;
-        return true;
+        return ix.IsForLaneChangeOnly();
     }
 
     public static Road CombineRoads(Intersection ix)

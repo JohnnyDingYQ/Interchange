@@ -11,19 +11,12 @@ public static class Divide
     {
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
-        float interpolation = GetInterpolation(road, clickPos);
+        float interpolation = road.GetNearestInterpolation(clickPos);
         if (RoadIsDividable(road, interpolation))
-            return DivideRoad(road, GetInterpolation(road, clickPos));
+            return DivideRoad(road, road.GetNearestInterpolation(clickPos));
         return null;
     }
 
-    public static float GetInterpolation(Road road, float3 clickPos)
-    {
-        clickPos.y = 0;
-        Ray ray = new(clickPos, Vector3.up);
-        road.BezierSeries.GetNearestPoint(ray, out _, out float interpolation);
-        return interpolation;
-    }
 
     public static bool RoadIsDividable(Road road, float t)
     {
@@ -48,10 +41,8 @@ public static class Divide
         OperateNodes();
         OperateIntersections();
         OperateVertices();
-        Debug.Log(Game.Vertices.Count);
         Game.RegisterRoad(leftRoad);
         Game.RegisterRoad(rightRoad);
-        Debug.Log(Game.Vertices.Count);
         OperateOutline();
         Game.RemoveRoad(road, RoadRemovalOption.Divide);
         List<Node> leftNodes = new();
