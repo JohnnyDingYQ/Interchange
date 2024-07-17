@@ -38,12 +38,10 @@ public static class DemandsSatisfer
 
     public static Car AttemptSchedule(SourcePoint source, Point target)
     {
-        ReadOnlySet<Lane> soureOut = source.Node.GetLanes(Direction.Out);
-        ReadOnlySet<Lane> targetIn = target.Node.GetLanes(Direction.In);
-        if (soureOut.Count == 0 || targetIn.Count == 0)
+        if (source.Node.OutLane == null || target.Node.OutLane == null)
             return null;
-        Vertex startV = soureOut.First().StartVertex;
-        Vertex endV = targetIn.First().EndVertex;
+        Vertex startV = source.Node.OutLane.StartVertex;
+        Vertex endV = target.Node.OutLane.EndVertex;
         return AttemptSchedule(startV, endV);
     }
 

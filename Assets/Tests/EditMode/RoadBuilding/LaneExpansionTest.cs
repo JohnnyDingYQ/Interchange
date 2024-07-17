@@ -18,15 +18,21 @@ public class LaneExpansionTest
     public void OneLaneToTwoLane_Left()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.Single(2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1), 3 * stride, 4 * stride, 2);
+        Road road1 = RoadBuilder.Single(
+            2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1),
+            3 * stride,
+            4 * stride,
+            2
+        );
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
 
         Assert.AreSame(lane00.EndNode, lane11.StartNode);
         Assert.AreEqual(5, Game.Nodes.Count);
-        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
-        Assert.True(lane00.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane11 }));
+        Assert.Null(lane10.StartNode.InLane);
+        Assert.AreSame(lane00.EndNode.OutLane, lane11);
+        Assert.AreSame(lane00.EndNode, lane11.StartNode);
         CheckIntersection(new() { road0 }, new() { road1 });
     }
 
@@ -44,9 +50,9 @@ public class LaneExpansionTest
         Assert.AreSame(lane00.EndNode, lane10.StartNode);
         Assert.AreSame(lane01.EndNode, lane11.StartNode);
         Assert.AreEqual(8, Game.Nodes.Count);
-        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
-        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane00, lane10 }));
-        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane01, lane11 }));
+        Assert.Null(lane12.StartNode.InLane);
+        Assert.AreSame(lane10.StartNode.InLane, lane00);
+        Assert.AreSame(lane11.StartNode.InLane, lane01);
         CheckIntersection(new() { road0 }, new() { road1 });
     }
 
@@ -62,10 +68,9 @@ public class LaneExpansionTest
 
         Assert.AreSame(lane00.EndNode, lane11.StartNode);
         Assert.AreEqual(7, Game.Nodes.Count);
-        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
-        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
-        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
-
+        Assert.Null(lane10.StartNode.InLane);
+        Assert.AreSame(lane11.StartNode.InLane, lane00);
+        Assert.Null(lane12.StartNode.InLane);
         CheckIntersection(new() { road0 }, new() { road1 });
     }
 
@@ -81,10 +86,9 @@ public class LaneExpansionTest
         Lane lane12 = road1.Lanes[2];
         Assert.AreSame(lane00.EndNode, lane12.StartNode);
         Assert.AreEqual(7, Game.Nodes.Count);
-        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
-        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11 }));
-        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12, lane00 }));
-
+        Assert.Null(lane10.StartNode.InLane);
+        Assert.Null(lane11.StartNode.InLane);
+        Assert.AreSame(lane12.StartNode.InLane, lane00);
         CheckIntersection(new() { road0 }, new() { road1 });
     }
 
@@ -100,50 +104,34 @@ public class LaneExpansionTest
         Lane lane12 = road1.Lanes[2];
         Assert.AreSame(lane00.EndNode, lane10.StartNode);
         Assert.AreEqual(7, Game.Nodes.Count);
-        Assert.True(lane10.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane10, lane00 }));
-        Assert.True(lane11.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane11 }));
-        Assert.True(lane12.StartNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
-
+        Assert.AreSame(lane10.StartNode.InLane, lane00);
+        Assert.Null(lane11.StartNode.InLane);
+        Assert.Null(lane12.StartNode.InLane);
         CheckIntersection(new() { road0 }, new() { road1 });
     }
 
     [Test]
     public void ThreeLaneToOneLane_Mid()
     {
-        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road road1 = RoadBuilder.Single(0, stride , 2 * stride, 3);
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Lane lane00 = road0.Lanes[0];
         Lane lane10 = road1.Lanes[0];
         Lane lane11 = road1.Lanes[1];
         Lane lane12 = road1.Lanes[2];
         Assert.AreSame(lane00.StartNode, lane11.EndNode);
         Assert.AreEqual(7, Game.Nodes.Count);
-        Assert.True(lane10.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
-        Assert.True(lane11.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
-        Assert.True(lane12.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
+        Assert.Null(lane10.EndNode.OutLane);
+        Assert.AreSame(lane11.EndNode.OutLane, lane00);
+        Assert.Null(lane12.EndNode.OutLane);
         CheckIntersection(new() { road1 }, new() { road0 });
     }
-    [Test]
-    public void ThreeLaneToOneLane_Left()
-    {
-        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        Road road1 = RoadBuilder.Single(0, stride , 2 * stride, 3);
-        Lane lane00 = road0.Lanes[0];
-        Lane lane10 = road1.Lanes[0];
-        Lane lane11 = road1.Lanes[1];
-        Lane lane12 = road1.Lanes[2];
-        Assert.AreSame(lane00.StartNode, lane11.EndNode);
-        Assert.AreEqual(7, Game.Nodes.Count);
-        Assert.True(lane10.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane10 }));
-        Assert.True(lane11.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane11, lane00 }));
-        Assert.True(lane12.EndNode.Lanes.SetEquals(new HashSet<Lane> { lane12 }));
-        CheckIntersection(new() { road1 }, new() { road0 });
-    }
+    
     # region helper
 
     public bool IsIsolatedNode(Node node)
     {
-        return node.Lanes.Count == 1;
+        return node.InLane == null ^ node.OutLane == null;
     }
 
     void CheckIntersection(HashSet<Road> inRoads, HashSet<Road> outRoads)

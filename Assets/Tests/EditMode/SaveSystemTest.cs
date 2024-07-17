@@ -30,16 +30,16 @@ public class SaveSystemTest
         Lane lane = road.Lanes.First();
         Assert.AreEqual(new float3(0), lane.StartPos);
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndPos));
-        HashSet<Lane> expected = new() { lane };
         Assert.AreEqual(2, Game.Nodes.Count);
-        Assert.True(lane.StartNode.Lanes.SetEquals(expected));
-        Assert.True(lane.EndNode.Lanes.SetEquals(expected));
+        Assert.AreSame(lane.StartNode.OutLane, lane);
+        Assert.AreSame(lane.EndNode.InLane, lane);
+
     }
 
     [Test]
     public void RecoverSingleThreeLaneRoad()
     {
-        Road r = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(0, stride, 2 * stride, 3);
         SaveSystem.SaveGame();
         SaveSystem.LoadGame();
 
@@ -52,13 +52,18 @@ public class SaveSystemTest
         Assert.AreEqual(new float3(0), lane.StartPos);
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndPos));
         Assert.AreEqual(6, Game.Nodes.Count);
-        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
-        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[0] }));
-        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[1] }));
-        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[1] }));
-        Assert.True(road.Lanes[2].StartNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[2] }));
-        Assert.True(road.Lanes[2].EndNode.Lanes.SetEquals(new HashSet<Lane> { road.Lanes[2] }));
-
+        Assert.AreSame(road.Lanes[0].StartNode.OutLane, road.Lanes[0]);
+        Assert.AreSame(road.Lanes[0].EndNode.InLane, road.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].StartNode.OutLane, road.Lanes[1]);
+        Assert.AreSame(road.Lanes[1].EndNode.InLane, road.Lanes[1]);
+        Assert.AreSame(road.Lanes[2].StartNode.OutLane, road.Lanes[2]);
+        Assert.AreSame(road.Lanes[2].EndNode.InLane, road.Lanes[2]);
+        Assert.Null(road.Lanes[0].StartNode.InLane);
+        Assert.Null(road.Lanes[0].EndNode.OutLane);
+        Assert.Null(road.Lanes[1].StartNode.InLane);
+        Assert.Null(road.Lanes[1].EndNode.OutLane);
+        Assert.Null(road.Lanes[2].StartNode.InLane);
+        Assert.Null(road.Lanes[2].EndNode.OutLane);
     }
 
     [Test]
@@ -76,10 +81,14 @@ public class SaveSystemTest
         Assert.AreEqual(3 * stride, road1.StartPos);
         Assert.True(MyNumerics.AreNumericallyEqual(5 * stride, road1.EndPos));
         Assert.AreEqual(4, Game.Nodes.Count);
-        Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
-        Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
-        Assert.True(road1.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
-        Assert.True(road1.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+        Assert.AreSame(road0.Lanes[0].StartNode.OutLane, road0.Lanes[0]);
+        Assert.AreSame(road0.Lanes[0].EndNode.InLane, road0.Lanes[0]);
+        Assert.AreSame(road1.Lanes[0].StartNode.OutLane, road1.Lanes[0]);
+        Assert.AreSame(road1.Lanes[0].EndNode.InLane, road1.Lanes[0]);
+        Assert.Null(road0.Lanes[0].StartNode.InLane);
+        Assert.Null(road0.Lanes[0].EndNode.OutLane);
+        Assert.Null(road1.Lanes[0].StartNode.InLane);
+        Assert.Null(road1.Lanes[0].EndNode.OutLane);
     }
 
     [Test]
@@ -97,10 +106,11 @@ public class SaveSystemTest
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, road1.StartPos));
         Assert.True(MyNumerics.AreNumericallyEqual(4 * stride, road1.EndPos));
         Assert.AreEqual(3, Game.Nodes.Count);
-        Assert.True(road0.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0] }));
-        Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
-        Assert.True(road1.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane> { road0.Lanes[0], road1.Lanes[0] }));
-        Assert.True(road1.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
+        Assert.AreSame(road0.Lanes[0].EndNode, road1.Lanes[0].StartNode);
+        Assert.AreSame(road0.Lanes[0].StartNode.OutLane, road0.Lanes[0]);
+        Assert.AreSame(road0.Lanes[0].EndNode.InLane, road0.Lanes[0]);
+        Assert.AreSame(road1.Lanes[0].StartNode.OutLane, road1.Lanes[0]);
+        Assert.AreSame(road1.Lanes[0].EndNode.InLane, road1.Lanes[0]);
     }
 
     [Test]
@@ -139,14 +149,14 @@ public class SaveSystemTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Lane lane = road.Lanes.First();
-        Assert.AreSame(lane, lane.StartNode.GetLanes(Direction.Out).First());
-        Assert.AreSame(lane, lane.EndNode.GetLanes(Direction.In).First());
+        Assert.AreSame(lane, lane.StartNode.OutLane);
+        Assert.AreSame(lane, lane.EndNode.InLane);
         SaveSystem.SaveGame();
         SaveSystem.LoadGame();
         road = Game.Roads.Values.First();
         lane = road.Lanes.First();
-        Assert.AreSame(lane, lane.StartNode.GetLanes(Direction.Out).First());
-        Assert.AreSame(lane, lane.EndNode.GetLanes(Direction.In).First());
+        Assert.AreSame(lane, lane.StartNode.OutLane);
+        Assert.AreSame(lane, lane.EndNode.InLane);
 
     }
 
@@ -185,8 +195,8 @@ public class SaveSystemTest
 
         Assert.True(Graph.ContainsPath(restored1.Lanes[0], restored2.Lanes[0]));
         Assert.True(Graph.ContainsPath(restored1.Lanes[1], restored3.Lanes[0]));
-        Assert.AreEqual(2, restored1.Lanes[0].EndNode.Lanes.Count);
-        Assert.AreEqual(2, restored1.Lanes[1].EndNode.Lanes.Count);
+        Assert.AreSame(restored1.Lanes[0].EndNode.OutLane, restored2.Lanes[0]);
+        Assert.AreSame(restored1.Lanes[1].EndNode.OutLane, restored3.Lanes[0]);
     }
 
     [Test]
@@ -203,7 +213,6 @@ public class SaveSystemTest
         Assert.AreSame(restored.EndIntersection, restored.Lanes[0].EndNode.Intersection);
         Assert.AreSame(restored.StartIntersection, restored.Lanes[1].StartNode.Intersection);
         Assert.AreSame(restored.EndIntersection, restored.Lanes[1].EndNode.Intersection);
-        Intersection i = Game.Roads.Values.First().EndIntersection;
         Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.Normal, restored.EndIntersection.Normal));
         Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.Tangent, restored.EndIntersection.Tangent));
         Assert.True(MyNumerics.AreNumericallyEqual(saved.EndIntersection.PointOnInSide, restored.EndIntersection.PointOnInSide));
@@ -214,7 +223,7 @@ public class SaveSystemTest
     public void RecoverInterweavingPath()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 2);
-        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
         uint id = road0.Id;
         Assert.NotNull(Graph.GetOutPaths(road0.Lanes.First().EndVertex).Last().InterweavingPath);
         

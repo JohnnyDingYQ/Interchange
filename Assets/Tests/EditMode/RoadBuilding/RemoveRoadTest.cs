@@ -39,8 +39,8 @@ public class RemoveRoadTest
         Assert.AreEqual(6, Game.Nodes.Count);
         Assert.True(Game.RemoveRoad(road0));
         Assert.AreEqual(4, Game.Nodes.Count);
-        Assert.True(road0.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[0] }));
-        Assert.True(road0.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane> { road1.Lanes[1] }));
+        Assert.Null(road1.Lanes[0].StartNode.InLane);
+        Assert.Null(road1.Lanes[1].StartNode.InLane);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class RemoveRoadTest
     [Test]
     public void RemoveLaneContraction()
     {
-        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Game.RemoveRoad(road1);
 

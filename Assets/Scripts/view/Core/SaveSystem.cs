@@ -88,8 +88,8 @@ public static class SaveSystem
         }
         foreach (Node node in Game.Nodes.Values)
         {
-            node.InLanes_ = node.GetLanes(Direction.In).Select(l => l.Id).ToList();
-            node.OutLanes_ = node.GetLanes(Direction.Out).Select(l => l.Id).ToList();
+            node.InLane_ = node.InLane != null ? node.InLane.Id : 0;
+            node.OutLane_ = node.OutLane != null ? node.OutLane.Id : 0;
             node.Intersection_ = node.Intersection.Id;
         }
         foreach (Intersection i in Game.Intersections.Values)
@@ -140,8 +140,8 @@ public static class SaveSystem
         }
         foreach (Node node in Game.Nodes.Values)
         {
-            node.SetInLanes(node.InLanes_.Select(l => Game.Lanes[l]).ToHashSet());
-            node.SetOutLanes(node.OutLanes_.Select(l => Game.Lanes[l]).ToHashSet());
+            node.InLane = node.InLane_ != 0 ? Game.Lanes[node.InLane_] : null;
+            node.OutLane = node.OutLane_ != 0 ? Game.Lanes[node.OutLane_] : null;
             node.Intersection = Game.Intersections[node.Intersection_];
         }
         foreach (Intersection i in Game.Intersections.Values)

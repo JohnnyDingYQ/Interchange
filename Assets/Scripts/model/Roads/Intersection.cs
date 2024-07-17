@@ -13,8 +13,6 @@ public class Intersection
     private List<Node> nodes = new();
     [JsonIgnore]
     public List<Node> Nodes { get => new(nodes); }
-    [JsonIgnore]
-    public int Count { get => Nodes.Count; }
     [JsonProperty]
     private HashSet<Road> inRoads = new();
     [JsonIgnore]
@@ -159,28 +157,48 @@ public class Intersection
     public Node FirstNodeWithRoad(Direction direction)
     {
         foreach (Node n in nodes)
-            if (n.GetLanes(direction).Count != 0)
-                return n;
+        {
+            if (direction == Direction.In)
+            {
+                if (n.InLane != null)
+                    return n;
+            }
+            else if (direction == Direction.Out)
+            {
+                if (n.OutLane != null)
+                    return n;
+            }
+        }
         return null;
     }
 
-    public Node LastNodeWithRoad(Direction direction)
+public Node LastNodeWithRoad(Direction direction)
+{
+    for (int i = nodes.Count - 1; i >= 0; i--)
     {
-        for (int i = nodes.Count - 1; i >= 0; i--)
-            if (nodes[i].GetLanes(direction).Count != 0)
+        if (direction == Direction.In)
+        {
+            if (nodes[i].InLane != null)
                 return nodes[i];
-        return null;
+        }
+        else if (direction == Direction.Out)
+        {
+            if (nodes[i].OutLane != null)
+                return nodes[i];
+        }
     }
+    return null;
+}
 
-    public bool IsForLaneChangeOnly()
-    {
-        if (InRoads.Count != 1 || OutRoads.Count != 1)
+public bool IsForLaneChangeOnly()
+{
+    if (InRoads.Count != 1 || OutRoads.Count != 1)
+        return false;
+    if (inRoads.Single().LaneCount != outRoads.Single().LaneCount)
+        return false;
+    foreach (Node n in nodes)
+        if (n.InLane == null || n.OutLane == null)
             return false;
-        if (inRoads.Single().LaneCount != outRoads.Single().LaneCount)
-            return false;
-        foreach (Node n in nodes)
-            if (n.GetLanes(Direction.In).Count != 1 && n.GetLanes(Direction.Out).Count != 1)
-                return false;
-        return true;
-    }
+    return true;
+}
 }

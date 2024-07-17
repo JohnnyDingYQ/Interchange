@@ -31,8 +31,8 @@ public class CombineRoadsTest
         Assert.AreEqual(1, Game.Lanes.Count);
         Assert.True(Game.Nodes.Values.Contains(combined.Lanes[0].StartNode));
         Assert.True(Game.Nodes.Values.Contains(combined.Lanes[0].EndNode));
-        Assert.AreSame(combined.Lanes[0], combined.Lanes[0].StartNode.Lanes.Single());
-        Assert.AreSame(combined.Lanes[0], combined.Lanes[0].EndNode.Lanes.Single());
+        Assert.AreSame(combined.Lanes[0], combined.Lanes[0].StartNode.OutLane);
+        Assert.AreSame(combined.Lanes[0], combined.Lanes[0].EndNode.InLane);
         Assert.AreEqual(2, Game.Vertices.Count);
         Assert.True(Game.Vertices.Values.Contains(combined.Lanes[0].StartVertex));
         Assert.True(Game.Vertices.Values.Contains(combined.Lanes[0].EndVertex));
@@ -55,7 +55,7 @@ public class CombineRoadsTest
     public void RemoveAfterCombining()
     {
         Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Road right = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road toDelete = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
 
         Road combined = Combine.CombineRoads(left.EndIntersection);
@@ -79,7 +79,8 @@ public class CombineRoadsTest
         Road connected = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
 
         Assert.AreEqual(2, Game.Roads.Count);
-        Assert.True(combined.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { combined.Lanes[0], connected.Lanes[0] }));
+        Assert.AreSame(combined.Lanes[0].EndNode.InLane, combined.Lanes[0]);
+        Assert.AreSame(combined.Lanes[0].EndNode.OutLane, connected.Lanes[0]);
         Assert.NotNull(Graph.GetPath(combined.Lanes[0].EndVertex, connected.Lanes[0].StartVertex));
     }
 

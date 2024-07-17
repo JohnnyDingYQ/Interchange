@@ -79,7 +79,8 @@ public class DivideTest
                 Lane leftLane = leftRoad.Lanes[j];
                 Lane rightLane = rightRoad.Lanes[j];
                 Assert.AreSame(leftLane.EndNode, rightLane.StartNode);
-                Assert.True(leftLane.EndNode.Lanes.SetEquals(new HashSet<Lane>() { leftLane, rightLane }));
+                Assert.AreSame(leftLane, leftLane.EndNode.InLane);
+                Assert.AreSame(rightLane, leftLane.EndNode.OutLane);
             }
 
             ResetGame();
@@ -121,9 +122,9 @@ public class DivideTest
         {
             Node lNode = left.Lanes[i].EndNode;
             Node rNode = subLeft.Lanes[i].StartNode;
-            HashSet<Lane> expected = new() { left.Lanes[i], subLeft.Lanes[i] };
             Assert.AreSame(lNode, rNode);
-            Assert.True(lNode.Lanes.SetEquals(expected));
+            Assert.AreSame(lNode.InLane, left.Lanes[i]);
+            Assert.AreSame(lNode.OutLane, subLeft.Lanes[i]);
         }
 
         // check rightend connection
@@ -131,9 +132,9 @@ public class DivideTest
         {
             Node lNode = subRight.Lanes[i].EndNode;
             Node rNode = right.Lanes[i].StartNode;
-            HashSet<Lane> expected = new() { right.Lanes[i], subRight.Lanes[i] };
             Assert.AreSame(lNode, rNode);
-            Assert.True(lNode.Lanes.SetEquals(expected));
+            Assert.AreSame(lNode.InLane, subRight.Lanes[i]);
+            Assert.AreSame(lNode.OutLane, right.Lanes[i]);
         }
     }
 
@@ -150,7 +151,8 @@ public class DivideTest
         Road roadRight = Divide.DivideRoad(road, 0.5f).Right;
         for (int i = 0; i < 3; i++)
         {
-            Assert.True(roadRight.Lanes[i].EndNode.Lanes.SetEquals(new HashSet<Lane>() { roadRight.Lanes[i], connectedRoads[i].Lanes[0] }));
+            Assert.AreSame(roadRight.Lanes[i].EndNode.InLane, roadRight.Lanes[i]);
+            Assert.AreSame(roadRight.Lanes[i].EndNode.OutLane, connectedRoads[i].Lanes[0]);
         }
     }
 

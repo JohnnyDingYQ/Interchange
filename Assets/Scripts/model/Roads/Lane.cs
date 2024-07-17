@@ -55,8 +55,8 @@ public class Lane
     {
         StartNode = new(BezierSeries.EvaluatePosition(0), Road.StartPos.y, LaneIndex);
         EndNode = new(BezierSeries.EvaluatePosition(1), Road.EndPos.y, LaneIndex);
-        StartNode.AddLane(this, Direction.Out);
-        EndNode.AddLane(this, Direction.In);
+        StartNode.OutLane = this;
+        EndNode.InLane = this;
     }
 
     public void InitVertices()

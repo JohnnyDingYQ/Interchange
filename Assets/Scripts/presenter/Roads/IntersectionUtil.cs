@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
 public static class IntersectionUtil
@@ -148,10 +149,11 @@ public static class IntersectionUtil
 
         if (i.InRoads.Count == 0 || i.OutRoads.Count == 0)
             return;
-
+        // build straight paths
         foreach (Node n in i.Nodes)
             BuildPathNode2Node(n, n);
 
+        // build lane changing paths
         for (int j = 0; j < i.Nodes.Count; j++)
         {
             Node n = i.Nodes[j];
@@ -160,8 +162,8 @@ public static class IntersectionUtil
                 Node other = i.Nodes[j - 1];
                 if (NodesBelongToUniqueRoad(n, other))
                 {
-                    Path l = BuildPathLane2Lane(n.GetLanes(Direction.In).Single(), other.GetLanes(Direction.Out).Single());
-                    Path r = BuildPathLane2Lane(other.GetLanes(Direction.In).Single(), n.GetLanes(Direction.Out).Single());
+                    Path l = BuildPathLane2Lane(n.InLane, other.OutLane);
+                    Path r = BuildPathLane2Lane(other.InLane, n.OutLane);
                     l.InterweavingPath = r;
                     r.InterweavingPath = l;
                 }
@@ -170,7 +172,7 @@ public static class IntersectionUtil
 
         foreach (Node n in i.Nodes)
         {
-            if (n.GetLanes(Direction.Out).Count == 0)
+            if (n.OutLane == null)
             {
                 if (n.NodeIndex < i.LastNodeWithRoad(Direction.Out).NodeIndex && n.NodeIndex > i.FirstNodeWithRoad(Direction.Out).NodeIndex)
                     continue;
@@ -182,7 +184,7 @@ public static class IntersectionUtil
                     BuildPathNode2Node(n, i.LastNodeWithRoad(Direction.Out));
             }
 
-            if (n.GetLanes(Direction.In).Count == 0)
+            if (n.InLane == null)
             {
                 if (n.NodeIndex < i.LastNodeWithRoad(Direction.In).NodeIndex && n.NodeIndex > i.FirstNodeWithRoad(Direction.In).NodeIndex)
                     continue;
@@ -209,24 +211,17 @@ public static class IntersectionUtil
         // i.e. nodes are internal to a road
         bool NodesBelongToUniqueRoad(Node n1, Node n2)
         {
-            if (n1.GetLanes(Direction.In).Count == 1 && n2.GetLanes(Direction.Out).Count == 1
-                    && n1.GetLanes(Direction.Out).Count == 1 && n2.GetLanes(Direction.In).Count == 1)
-            {
-                HashSet<Road> ins = n1.GetRoads(Direction.In);
-                ins.UnionWith(n2.GetRoads(Direction.In));
-                HashSet<Road> outs = n1.GetRoads(Direction.Out);
-                outs.UnionWith(n2.GetRoads(Direction.Out));
-                if (ins.Count == 1 && outs.Count == 1)
-                    return true;
-            }
-            return false;
+            if (n1.InLane == null || n1.OutLane == null)
+                return false;
+            if (n2.InLane == null || n2.OutLane == null)
+                return false;
+            return n1.InLane.Road == n2.InLane.Road && n1.OutLane.Road == n2.OutLane.Road;
         }
 
         static void BuildPathNode2Node(Node n1, Node n2)
         {
-            foreach (Lane inLane in n1.GetLanes(Direction.In))
-                foreach (Lane outLane in n2.GetLanes(Direction.Out))
-                    BuildPathLane2Lane(inLane, outLane);
+            if (n1.InLane != null && n2.OutLane != null)
+                BuildPathLane2Lane(n1.InLane, n2.OutLane);
         }
 
         static Path BuildPathLane2Lane(Lane l1, Lane l2)

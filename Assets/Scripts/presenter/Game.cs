@@ -104,9 +104,9 @@ public static class Game
         Nodes[node.Id] = node;
     }
 
-    public static bool HasNode(Node node)
+    public static void RemoveNode(Node node)
     {
-        return Nodes.Values.Contains(node);
+        Nodes.Remove(node.Id);
     }
 
     public static bool RemoveRoad(Road road, RoadRemovalOption option)

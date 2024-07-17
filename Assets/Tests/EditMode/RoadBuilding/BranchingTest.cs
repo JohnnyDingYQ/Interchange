@@ -23,8 +23,8 @@ public class BranchingTest
         Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1);
         Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 1);
 
-        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.AreSame(road.Lanes[0].EndNode.OutLane, branch1.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].EndNode.OutLane, branch2.Lanes[0]);
         CheckIntersection(new() { road }, new() { branch1, branch2 });
     }
 
@@ -37,8 +37,8 @@ public class BranchingTest
         Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
         Road branch2 = RoadBuilder.Single(p2 - 2 * offset, p2 - offset, p2, 1);
 
-        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
+        Assert.AreSame(road.Lanes[0].StartNode.InLane, branch1.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].StartNode.InLane, branch2.Lanes[0]);
         CheckIntersection(new() { branch1, branch2 }, new() { road });
     }
 
@@ -49,8 +49,8 @@ public class BranchingTest
         float3 p1 = road.Lanes[0].EndPos;
         Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1); ;
 
-        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
+        Assert.AreSame(road.Lanes[0].EndNode.OutLane, branch1.Lanes[0]);
+        Assert.Null(road.Lanes[1].EndNode.OutLane);
         CheckIntersection(new() { road }, new() { branch1 });
     }
 
@@ -61,8 +61,8 @@ public class BranchingTest
         float3 p1 = road.Lanes[0].StartPos;
         Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
 
-        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { road.Lanes[1] }));
+        Assert.AreSame(road.Lanes[0].StartNode.InLane, branch1.Lanes[0]);
+        Assert.Null(road.Lanes[1].StartNode.InLane);
         CheckIntersection(new() { branch1 }, new() { road });
     }
 
@@ -75,9 +75,9 @@ public class BranchingTest
         Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1);
         Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 2);
 
-        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(road.Lanes[2].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[1], road.Lanes[2] }));
+        Assert.AreSame(road.Lanes[0].EndNode.OutLane, branch1.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].EndNode.OutLane, branch2.Lanes[0]);
+        Assert.AreSame(road.Lanes[2].EndNode.OutLane, branch2.Lanes[1]);
         CheckIntersection(new() { road }, new() { branch1, branch2 });
     }
 
@@ -90,9 +90,9 @@ public class BranchingTest
         Road branch1 = RoadBuilder.Single(p1 - 2 * offset, p1 - offset, p1, 1);
         Road branch2 = RoadBuilder.Single(p2 - 2 * offset, p2 - offset, p2, 2);
 
-        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(road.Lanes[2].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[1], road.Lanes[2] }));
+        Assert.AreSame(road.Lanes[0].StartNode.InLane, branch1.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].StartNode.InLane, branch2.Lanes[0]);
+        Assert.AreSame(road.Lanes[2].StartNode.InLane, branch2.Lanes[1]);
         CheckIntersection(new() { branch1, branch2 }, new() { road });
     }
 
@@ -107,9 +107,9 @@ public class BranchingTest
         Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 1);
         Road branch3 = RoadBuilder.Single(p3, p3 + offset, p3 + 2 * offset, 1);
 
-        Assert.True(road.Lanes[0].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(road.Lanes[2].EndNode.Lanes.SetEquals(new HashSet<Lane>() { branch3.Lanes[0], road.Lanes[2] }));
+        Assert.AreSame(road.Lanes[0].EndNode.OutLane, branch1.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].EndNode.OutLane, branch2.Lanes[0]);
+        Assert.AreSame(road.Lanes[2].EndNode.OutLane, branch3.Lanes[0]);
         CheckIntersection(new() { road }, new() { branch1, branch2, branch3 });
     }
 
@@ -124,9 +124,9 @@ public class BranchingTest
         Road branch2 = RoadBuilder.Single(p2 - 2 * offset, p2 - offset, p2, 1);
         Road branch3 = RoadBuilder.Single(p3 - 2 * offset, p3 - offset, p3, 1);
 
-        Assert.True(road.Lanes[0].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch1.Lanes[0], road.Lanes[0] }));
-        Assert.True(road.Lanes[1].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch2.Lanes[0], road.Lanes[1] }));
-        Assert.True(road.Lanes[2].StartNode.Lanes.SetEquals(new HashSet<Lane>() { branch3.Lanes[0], road.Lanes[2] }));
+        Assert.AreSame(road.Lanes[0].StartNode.InLane, branch1.Lanes[0]);
+        Assert.AreSame(road.Lanes[1].StartNode.InLane, branch2.Lanes[0]);
+        Assert.AreSame(road.Lanes[2].StartNode.InLane, branch3.Lanes[0]);
         CheckIntersection(new() { branch1, branch2, branch3 }, new() { road });
     }
 
@@ -134,7 +134,7 @@ public class BranchingTest
 
     public bool IsIsolatedNode(Node node)
     {
-        return node.Lanes.Count == 1;
+        return node.InLane == null ^ node.OutLane == null;
     }
 
     void CheckIntersection(HashSet<Road> inRoads, HashSet<Road> outRoads)

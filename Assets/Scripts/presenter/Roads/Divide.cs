@@ -71,10 +71,10 @@ public static class Divide
                 Lane lane = road.Lanes[i];
 
                 laneLeft.StartNode = lane.StartNode;
-                lane.StartNode.AddLane(laneLeft, Direction.Out);
+                lane.StartNode.OutLane = laneLeft;
 
                 laneRight.EndNode = lane.EndNode;
-                lane.EndNode.AddLane(laneRight, Direction.In);
+                lane.EndNode.InLane = laneRight;
 
                 Game.RegisterNode(laneLeft.EndNode);
             }

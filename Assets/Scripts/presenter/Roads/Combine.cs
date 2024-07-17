@@ -46,8 +46,7 @@ public static class Combine
         {
             Game.Nodes.Remove(left.Lanes[i].EndNode.Id);
             left.Lanes[i].EndNode = right.Lanes[i].EndNode;
-            left.Lanes[i].EndNode.RemoveLane(right.Lanes[i]);
-            left.Lanes[i].EndNode.AddLane(left.Lanes[i], Direction.In);
+            left.Lanes[i].EndNode.InLane = left.Lanes[i];
         }
         Game.InvokeRoadUpdated(left);
 
