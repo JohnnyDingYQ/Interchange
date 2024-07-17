@@ -42,6 +42,8 @@ public class CombineRoadsTest
         Assert.AreSame(right.EndIntersection, combined.EndIntersection);
         Assert.False(combined.EndIntersection.InRoads.Contains(right));
         Assert.False(combined.EndIntersection.IsEmpty());
+        Assert.AreEqual(1, left.StartIntersection.Nodes.Count);
+        Assert.AreEqual(1, left.EndIntersection.Nodes.Count);
         Assert.True(AllRoadsOutLineValid());
         for (int i = 0; i < combined.Lanes.Count; i++)
         {

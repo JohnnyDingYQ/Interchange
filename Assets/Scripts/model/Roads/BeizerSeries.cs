@@ -29,14 +29,12 @@ public class BezierSeries
     {
         curves = c;
         Length = GetLength();
-        PrepForSerialization();
     }
 
     public BezierSeries(BezierCurve c)
     {
         curves = new() { c };
         Length = GetLength();
-        PrepForSerialization();
     }
 
     public BezierSeries(BezierSeries bs, float startInterpolation, float endInterpolation)
@@ -51,7 +49,6 @@ public class BezierSeries
         left.Split(startDistance / left.Length, out _, out BezierSeries right);
         curves = right.curves;
         Length = right.Length;
-        PrepForSerialization();
     }
 
     float GetDistanceByLocation(SeriesLocation location)
@@ -259,7 +256,6 @@ public class BezierSeries
         Assert.IsTrue(MyNumerics.AreNumericallyEqual(EvaluatePosition(1), other.EvaluatePosition(0)));
         curves.AddRange(other.curves);
         Length += other.Length;
-        PrepForSerialization();
     }
 
     private struct SeriesLocation

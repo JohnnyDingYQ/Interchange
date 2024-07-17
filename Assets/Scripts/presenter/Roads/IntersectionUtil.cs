@@ -6,51 +6,39 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
+/// <summary>
+/// Evaluates and updates the outlines and paths for the given intersection.
+/// </summary>
 public static class IntersectionUtil
 {
-    public static void EvaluateOutline(Intersection i)
+
+    public static void EvaluateOutline(Intersection ix)
     {
-        foreach (Road r in i.OutRoads)
+        foreach (Road r in ix.OutRoads)
         {
-            r.LeftOutline.Start.Clear();
-            r.RightOutline.Start.Clear();
-
-            List<float3> outline = GetPath(r, Orientation.Left, Direction.Out)?.GetOutline(Orientation.Left);
-            if (outline != null)
-                r.LeftOutline.Start = SeparateOutlineWithEndofRoad(outline, Direction.Out);
-            else
-                r.LeftOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Left, Side.Start);
-
-            outline = GetPath(r, Orientation.Right, Direction.Out)?.GetOutline(Orientation.Right);
-            if (outline != null)
-                r.RightOutline.Start = SeparateOutlineWithEndofRoad(outline, Direction.Out);
-            else
-                r.RightOutline.Start = GetOutLineAtTwoEnds(r, Orientation.Right, Side.Start);
-
-
-        }
-        foreach (Road r in i.InRoads)
-        {
-            r.LeftOutline.End.Clear();
-            r.RightOutline.End.Clear();
-
-            List<float3> outline = GetPath(r, Orientation.Left, Direction.In)?.GetOutline(Orientation.Left);
-            if (outline != null)
-                r.LeftOutline.End = SeparateOutlineWithEndofRoad(outline, Direction.In);
-            else
-                r.LeftOutline.End = GetOutLineAtTwoEnds(r, Orientation.Left, Side.End);
-
-            outline = GetPath(r, Orientation.Right, Direction.In)?.GetOutline(Orientation.Right);
-            if (outline != null)
-                r.RightOutline.End = SeparateOutlineWithEndofRoad(outline, Direction.In);
-            else
-                r.RightOutline.End = GetOutLineAtTwoEnds(r, Orientation.Right, Side.End);
+            r.LeftOutline.Start = GetOutlineForRoad(r, Orientation.Left, Direction.Out, Side.Start);
+            r.RightOutline.Start = GetOutlineForRoad(r, Orientation.Right, Direction.Out, Side.Start);
         }
 
-        foreach (Road r in i.Roads)
+        foreach (Road r in ix.InRoads)
+        {
+            r.LeftOutline.End = GetOutlineForRoad(r, Orientation.Left, Direction.In, Side.End);
+            r.RightOutline.End = GetOutlineForRoad(r, Orientation.Right, Direction.In, Side.End);
+        }
+
+        foreach (Road r in ix.Roads)
             Game.InvokeRoadUpdated(r);
+        
 
-        #region extracted
+        List<float3> GetOutlineForRoad(Road road, Orientation orientation, Direction direction, Side side)
+        {
+            List<float3> outline = GetPath(road, orientation, direction)?.GetOutline(orientation);
+            if (outline != null)
+                return SeparateOutlineWithEndofRoad(outline, direction);
+            else
+                return GetOutLineAtTwoEnds(road, orientation, side);
+            
+        }
 
         Path GetPath(Road road, Orientation orientation, Direction direction)
         {
@@ -59,21 +47,23 @@ public static class IntersectionUtil
                 edges = Graph.GetOutPaths(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex);
             else if (direction == Direction.Out)
                 edges = Graph.GetInPaths(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
-            else
-                throw new ArgumentException("direction");
 
             if (edges != null && edges.Count() != 0)
             {
                 if (direction == Direction.In)
+                {
                     if (orientation == Orientation.Left)
-                        return edges.OrderBy(e => Component(-i.Normal, e.Target.Pos)).First();
+                        return edges.OrderBy(e => Component(-ix.Normal, e.Target.Pos)).First();
                     else
-                        return edges.OrderBy(e => Component(-i.Normal, e.Target.Pos)).Last();
+                        return edges.OrderBy(e => Component(-ix.Normal, e.Target.Pos)).Last();
+                }
                 if (direction == Direction.Out)
+                {
                     if (orientation == Orientation.Left)
-                        return edges.OrderBy(e => Component(-i.Normal, e.Source.Pos)).First();
+                        return edges.OrderBy(e => Component(-ix.Normal, e.Source.Pos)).First();
                     else
-                        return edges.OrderBy(e => Component(-i.Normal, e.Source.Pos)).Last();
+                        return edges.OrderBy(e => Component(-ix.Normal, e.Source.Pos)).Last();
+                }
             }
             return null;
         }
@@ -94,13 +84,13 @@ public static class IntersectionUtil
             foreach (float3 pt in interRoadOutline)
             {
                 if (!crossed)
-                    if (i.Plane.SameSide(pt, i.PointOnInSide))
+                    if (ix.Plane.SameSide(pt, ix.PointOnInSide))
                         outlineEnd.Add(pt);
                     else
                     {
                         crossed = true;
                         Ray ray = new(pt, prevPt - pt);
-                        i.Plane.Raycast(ray, out float distance);
+                        ix.Plane.Raycast(ray, out float distance);
                         float3 commonPt = ray.GetPoint(distance);
                         outlineEnd.Add(commonPt);
                         outlineStart.Add(commonPt);
@@ -139,107 +129,116 @@ public static class IntersectionUtil
             }
             return results;
         }
-        #endregion
     }
 
-    public static void EvaluatePaths(Intersection i)
+    public static void EvaluatePaths(Intersection ix)
     {
-
         ClearAllPaths();
 
-        if (i.InRoads.Count == 0 || i.OutRoads.Count == 0)
+        if (ix.InRoads.Count == 0 || ix.OutRoads.Count == 0)
             return;
-        // build straight paths
-        foreach (Node n in i.Nodes)
-            BuildPathNode2Node(n, n);
 
-        // build lane changing paths
-        for (int j = 0; j < i.Nodes.Count; j++)
+        BuildStraightPaths(ix);
+        BuildLaneChangingPaths(ix);
+        AutoMergeOrExpandLanes(ix);
+
+        void BuildStraightPaths(Intersection ix)
         {
-            Node n = i.Nodes[j];
-            if (j - 1 >= 0)
-            {
-                Node other = i.Nodes[j - 1];
-                if (NodesBelongToUniqueRoad(n, other))
+            foreach (Node node in ix.Nodes)
+                if (node.InLane != null && node.OutLane != null)
                 {
-                    Path l = BuildPathLane2Lane(n.InLane, other.OutLane);
-                    Path r = BuildPathLane2Lane(other.InLane, n.OutLane);
-                    l.InterweavingPath = r;
-                    r.InterweavingPath = l;
+                    BezierSeries left = new(node.InLane.BezierSeries, node.InLane.EndVertex.SeriesInterpolation, 1);
+                    BezierSeries right = new(node.OutLane.BezierSeries, 0, node.OutLane.StartVertex.SeriesInterpolation);
+                    left.Add(right);
+                    Path path = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
+                    Graph.AddPath(path);
+                }
+            
+        }
+
+        void BuildLaneChangingPaths(Intersection ix)
+        {
+            for (int j = 1; j < ix.Nodes.Count; j++)
+            {
+                Node currentNode = ix.Nodes[j];
+                Node previousNode = ix.Nodes[j - 1];
+                if (NodesBelongToUniqueRoad(currentNode, previousNode))
+                {
+                    Path leftPath = BuildPathLane2Lane(currentNode.InLane, previousNode.OutLane);
+                    Path rightPath = BuildPathLane2Lane(previousNode.InLane, currentNode.OutLane);
+                    leftPath.InterweavingPath = rightPath;
+                    rightPath.InterweavingPath = leftPath;
                 }
             }
         }
 
-        foreach (Node n in i.Nodes)
+        void AutoMergeOrExpandLanes(Intersection ix)
         {
-            if (n.OutLane == null)
+            foreach (Node n in ix.Nodes)
             {
-                if (n.NodeIndex < i.LastNodeWithRoad(Direction.Out).NodeIndex && n.NodeIndex > i.FirstNodeWithRoad(Direction.Out).NodeIndex)
-                    continue;
-                int indexFirst = n.NodeIndex - i.FirstNodeWithRoad(Direction.Out).NodeIndex;
-                int indexLast = n.NodeIndex - i.LastNodeWithRoad(Direction.Out).NodeIndex;
-                if (Math.Abs(indexFirst) < Math.Abs(indexLast))
-                    BuildPathNode2Node(n, i.FirstNodeWithRoad(Direction.Out));
-                else
-                    BuildPathNode2Node(n, i.LastNodeWithRoad(Direction.Out));
-            }
+                if (n.OutLane == null)
+                {
+                    if (n.NodeIndex < ix.LastNodeWithRoad(Direction.Out).NodeIndex && n.NodeIndex > ix.FirstNodeWithRoad(Direction.Out).NodeIndex)
+                        continue;
+                    Node targetNode = Math.Abs(n.NodeIndex - ix.FirstNodeWithRoad(Direction.Out).NodeIndex) < Math.Abs(n.NodeIndex - ix.LastNodeWithRoad(Direction.Out).NodeIndex) ?
+                        ix.FirstNodeWithRoad(Direction.Out) : ix.LastNodeWithRoad(Direction.Out);
+                    BuildPathNode2Node(n, targetNode);
+                }
 
-            if (n.InLane == null)
-            {
-                if (n.NodeIndex < i.LastNodeWithRoad(Direction.In).NodeIndex && n.NodeIndex > i.FirstNodeWithRoad(Direction.In).NodeIndex)
-                    continue;
-                int indexFirst = n.NodeIndex - i.FirstNodeWithRoad(Direction.In).NodeIndex;
-                int indexLast = n.NodeIndex - i.LastNodeWithRoad(Direction.In).NodeIndex;
-                if (Math.Abs(indexFirst) < Math.Abs(indexLast))
-                    BuildPathNode2Node(i.FirstNodeWithRoad(Direction.In), n);
-                else
-                    BuildPathNode2Node(i.LastNodeWithRoad(Direction.In), n);
+                if (n.InLane == null)
+                {
+                    if (n.NodeIndex < ix.LastNodeWithRoad(Direction.In).NodeIndex && n.NodeIndex > ix.FirstNodeWithRoad(Direction.In).NodeIndex)
+                        continue;
+                    Node targetNode = Math.Abs(n.NodeIndex - ix.FirstNodeWithRoad(Direction.In).NodeIndex) < Math.Abs(n.NodeIndex - ix.LastNodeWithRoad(Direction.In).NodeIndex) ?
+                        ix.FirstNodeWithRoad(Direction.In) : ix.LastNodeWithRoad(Direction.In);
+                    BuildPathNode2Node(targetNode, n);
+                }
             }
         }
 
         void ClearAllPaths()
         {
-            List<Path> toRemove = new();
-            foreach (Road r in i.InRoads)
-                foreach (Lane l in r.Lanes)
-                    toRemove.AddRange(Graph.GetOutPaths(l.EndVertex));
-
-            foreach (Path p in toRemove)
-                Graph.RemovePath(p);
+            List<Path> pathsToRemove = new();
+            foreach (Road road in ix.InRoads)
+                foreach (Lane lane in road.Lanes)
+                    pathsToRemove.AddRange(Graph.GetOutPaths(lane.EndVertex));
+                
+            foreach (Path path in pathsToRemove)
+                Graph.RemovePath(path);
+            
         }
 
-        // i.e. nodes are internal to a road
-        bool NodesBelongToUniqueRoad(Node n1, Node n2)
+        bool NodesBelongToUniqueRoad(Node node1, Node node2)
         {
-            if (n1.InLane == null || n1.OutLane == null)
+            if (node1.InLane == null || node1.OutLane == null || node2.InLane == null || node2.OutLane == null)
                 return false;
-            if (n2.InLane == null || n2.OutLane == null)
-                return false;
-            return n1.InLane.Road == n2.InLane.Road && n1.OutLane.Road == n2.OutLane.Road;
+            return node1.InLane.Road == node2.InLane.Road && node1.OutLane.Road == node2.OutLane.Road;
         }
 
-        static void BuildPathNode2Node(Node n1, Node n2)
+        void BuildPathNode2Node(Node node1, Node node2)
         {
-            if (n1.InLane != null && n2.OutLane != null)
-                BuildPathLane2Lane(n1.InLane, n2.OutLane);
+            if (node1.InLane != null && node2.OutLane != null)
+                BuildPathLane2Lane(node1.InLane, node2.OutLane);
+            
         }
 
-        static Path BuildPathLane2Lane(Lane l1, Lane l2)
+        Path BuildPathLane2Lane(Lane lane1, Lane lane2)
         {
-            return BuildPath(l1.EndVertex, l2.StartVertex);
+            return BuildPath(lane1.EndVertex, lane2.StartVertex);
         }
 
-        static Path BuildPath(Vertex start, Vertex end)
+        Path BuildPath(Vertex start, Vertex end)
         {
-            Path path = Graph.GetPath(start, end);
-            if (path != null)
+            Path existingPath = Graph.GetPath(start, end);
+            if (existingPath != null)
                 return null;
+
             float3 pos1 = start.Pos + Constants.MinLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinLaneLength / 3 * end.Tangent;
-            BezierSeries bs = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
-            Path p = new(bs, start, end);
-            Graph.AddPath(p);
-            return p;
+            BezierSeries bezierSeries = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
+            Path newPath = new(bezierSeries, start, end);
+            Graph.AddPath(newPath);
+            return newPath;
         }
     }
 }

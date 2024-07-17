@@ -73,6 +73,7 @@ public static class SaveSystem
     {
         foreach (Road road in Game.Roads.Values)
         {
+            road.BezierSeries.PrepForSerialization();
             road.StartIntersection_ = road.StartIntersection.Id;
             road.EndIntersection_ = road.EndIntersection.Id;
             road.Lanes_ = road.Lanes.Select(lane => lane.Id).ToList();
@@ -100,6 +101,7 @@ public static class SaveSystem
         }
         foreach (Path p in Game.Paths.Values)
         {
+            p.BezierSeries.PrepForSerialization();
             p.Source_ = p.Source.Id;
             p.Target_ = p.Target.Id;
             if (p.InterweavingPath != null)
