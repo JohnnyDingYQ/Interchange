@@ -11,7 +11,7 @@ public class Roads : MonoBehaviour
     [SerializeField]
     private GameObject arrowPrefab;
     [SerializeField]
-    Texture oneLaneTex, twoLaneTex;
+    Texture oneLaneTex, twoLaneTex, threeLaneTex;
     private static Dictionary<uint, RoadHumbleObject> roadMapping;
     public static RoadHumbleObject HoveredRoad { get; set; }
     public static List<RoadHumbleObject> SelectedRoads { get; set; }
@@ -55,8 +55,10 @@ public class Roads : MonoBehaviour
             Material material = roadGameObject.GetComponent<Renderer>().material;
             if (road.LaneCount == 1)
                 material.SetTexture("_MainTex", oneLaneTex);
-            else
+            else if (road.LaneCount == 2)
                 material.SetTexture("_MainTex", twoLaneTex);
+            else if (road.LaneCount == 3)
+                material.SetTexture("_MainTex", threeLaneTex);
         }
     }
 
