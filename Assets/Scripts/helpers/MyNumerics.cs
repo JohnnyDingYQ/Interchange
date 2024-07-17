@@ -41,6 +41,13 @@ public static class MyNumerics
         return true;
     }
 
+    public static float AngleInDegrees(float3 a, float3 b)
+    {
+        if (math.length(a) == 0 || math.length(b) == 0)
+            return 0;
+        return MathF.Acos(math.dot(a, b) / math.length(a) / math.length(b)) / MathF.PI * 180;
+    }
+
     public static int GetRandomIndex(int length)
     {
         int index =  (int) (UnityEngine.Random.value * length);

@@ -36,11 +36,7 @@ public class SnapPoints : MonoBehaviour
         BuildTargets endTarget = Build.EndTarget;
         if (endTarget != null)
         {
-            IEnumerable<float3> nodePos = null;
-            if (endTarget.Snapped)
-                nodePos = endTarget.Nodes.Select(n => n.Pos);
-            else if (endTarget.DivideIsPossible)
-                nodePos = endTarget.NodesPosIfDivded;
+            IEnumerable<float3> nodePos = endTarget.NodesPos;
             if (nodePos != null)
                 foreach (float3 pos in nodePos)
                 {
@@ -54,11 +50,7 @@ public class SnapPoints : MonoBehaviour
         BuildTargets startTarget = Build.StartTarget;
         if (startTarget != null)
         {
-            IEnumerable<float3> nodePos = null;
-            if (startTarget.Snapped)
-                nodePos = startTarget.Nodes.Select(n => n.Pos);
-            else if (startTarget.DivideIsPossible)
-                nodePos = startTarget.NodesPosIfDivded;
+            IEnumerable<float3> nodePos = startTarget.NodesPos;
             if (nodePos != null)
                 foreach (float3 pos in nodePos)
                 {

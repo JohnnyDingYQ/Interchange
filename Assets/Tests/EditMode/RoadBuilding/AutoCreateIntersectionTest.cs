@@ -77,10 +77,24 @@ public class AutoCreateIntersectionTest
     public void DivideTwoLaneRoadSnap()
     {
         Road road0 = RoadBuilder.Single(0, up, 2 * up, 2);
-        BuildTargets bt = Snapping.Snap(up + new float3(Constants.LaneWidth / 2, 0, 0), 1);
-        Assert.True(MyNumerics.AreNumericallyEqual(road0.Lanes[1].EvaluatePosition(0.5f), bt.Pos));
+        Game.HoveredRoad = road0;
+        BuildTargets bt = Snapping.Snap(up + new float3(0, 0, Constants.LaneWidth / 2), 2);
+        Assert.True(MyNumerics.AreNumericallyEqual(0, bt.Pos.x));
 
-        bt = Snapping.Snap(up - new float3(Constants.LaneWidth / 2, 0, 0),1);
-        Assert.True(MyNumerics.AreNumericallyEqual(road0.Lanes[0].EvaluatePosition(0.5f), bt.Pos));
+        bt = Snapping.Snap(up - new float3(0, 0, Constants.LaneWidth / 2), 2);
+        Assert.True(MyNumerics.AreNumericallyEqual(0, bt.Pos.x));
+    }
+
+    [Test]
+    public void TwoLaneStartPosCorrect()
+    {
+        Road road0 = RoadBuilder.Single(0, up, 2 * up, 2);
+        Build.LaneCount = 2;
+        Game.HoveredRoad = road0;
+        Build.HandleBuildCommand(up + new float3(Constants.LaneWidth / 2, 0, 0));
+        Game.HoveredRoad = null;
+        Build.HandleBuildCommand(up + upRight);
+        Road road1 = Build.HandleBuildCommand(up + upRight * 2).Single();
+        Assert.True(MyNumerics.AreNumericallyEqual(road1.StartPos.x, 0));
     }
 }

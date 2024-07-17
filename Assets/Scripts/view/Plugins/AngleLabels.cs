@@ -27,7 +27,7 @@ public class AngleLabels : MonoBehaviour
 
             l.gameObject.SetActive(true);
             l.ApplyWorldPos(s1.Item2);
-            l.SetText(Round(GetAngleInDegree(s2.Item1 - s2.Item2, s1.Item2 - s1.Item1), 1) + "°");
+            l.SetText(Round(MyNumerics.AngleInDegrees(s2.Item1 - s2.Item2, s1.Item2 - s1.Item1), 1) + "°");
         }
         for (int i = Build.SupportLines.Count; i < labels.Count; i++)
             labels[i].gameObject.SetActive(false);
@@ -36,12 +36,5 @@ public class AngleLabels : MonoBehaviour
     float Round(float n, int places)
     {
         return (float)(Math.Round(n * Math.Pow(10, places)) / Math.Pow(10, places));
-    }
-
-    float GetAngleInDegree(float3 a, float3 b)
-    {
-        if (math.length(a) == 0 || math.length(b) == 0)
-            return 0;
-        return MathF.Acos(math.dot(a, b) / math.length(a) / math.length(b)) / MathF.PI * 180;
     }
 }

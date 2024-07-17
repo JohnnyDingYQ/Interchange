@@ -161,15 +161,21 @@ public static class Build
 
         void PreprocessSnap()
         {
-            if (!startTarget.Snapped && startTarget.DivideIsPossible)
+            if (!startTarget.Snapped && startTarget.DivideIsValid)
             {
                 Divide.HandleDivideCommand(startTarget.SelectedRoad, startTarget.ClickPos);
                 startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
             }
-            if (!endTarget.Snapped && endTarget.DivideIsPossible)
+            if (!endTarget.Snapped && endTarget.DivideIsValid)
             {
                 Divide.HandleDivideCommand(endTarget.SelectedRoad, endTarget.ClickPos);
                 endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
+            }
+            if (!startTarget.Snapped && startTarget.CombineAndDivideIsValid)
+            {
+                Combine.CombineRoads(startTarget.Intersection);
+                Divide.HandleDivideCommand(startTarget.SelectedRoad, startTarget.ClickPos);
+                startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
             }
         }
     }

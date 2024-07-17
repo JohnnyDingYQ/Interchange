@@ -51,6 +51,15 @@ public class RoadOutline : IEquatable<RoadOutline>
                 Debug.Log("end start: " + End.First());
                 return false;
             }
+        foreach (List<float3> list in new List<List<float3>> { Start, Mid, End })
+            for (int i = 2; i < list.Count; i++)
+            {
+                if (MyNumerics.AngleInDegrees(list[i] - list[i - 1], list[i - 1] - list[i - 2]) > 90)
+                {
+                    Debug.Log("points not in a straight line");
+                    return false;
+                }
+            }
         return true;
     }
 

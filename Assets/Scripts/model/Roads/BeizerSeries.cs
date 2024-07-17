@@ -176,6 +176,7 @@ public class BezierSeries
     public List<float3> GetOutline(Orientation orientation)
     {
         List<float3> results = new();
+        bool isFirstCurve = true;
         foreach (BezierCurve curve in curves)
         {
             int numPoints = (int)(CurveUtility.CalculateLength(curve) * Constants.MeshResolution);
@@ -183,12 +184,15 @@ public class BezierSeries
                 numPoints = 1;
             for (int j = 0; j <= numPoints; j++)
             {
+                if (!isFirstCurve && j == 0)
+                    continue;
                 float t = (float)j / numPoints;
                 float3 normal = curve.Normalized2DNormal(t) * Constants.RoadOutlineSeparation;
                 if (orientation == Orientation.Right)
                     normal *= -1;
                 results.Add(CurveUtility.EvaluatePosition(curve, t) + normal);
             }
+            isFirstCurve = false;
         }
         return results;
     }
@@ -197,10 +201,16 @@ public class BezierSeries
     {
         float distance = CurveUtility.CalculateLength(curves.First(), 10);
         int startIndex = 0;
-        while (distanceFromStart - distance > 0.05f)
+        while (distanceFromStart - distance > 0.0f)
         {
             distanceFromStart -= distance;
             startIndex++;
+
+            // Scenario:
+            // Reached end but did not break loop because of numerical inaccurracy
+            if (startIndex == curves.Count)
+                return new(curves.Count - 1, 1);
+
             distance = CurveUtility.CalculateLength(curves[startIndex], 10);
         }
         float startInterpolation = CurveUtility.GetDistanceToInterpolation(curves[startIndex], distanceFromStart);

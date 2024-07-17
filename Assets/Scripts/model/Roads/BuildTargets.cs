@@ -11,6 +11,7 @@ public class BuildTargets
     public float3 Tangent { get; set; }
     public bool TangentAssigned { get; set; }
     public Road SelectedRoad { get; set; }
-    public bool DivideIsPossible { get; set; }
-    public List<float3> NodesPosIfDivded { get; set; }
+    public bool DivideIsValid { get; set; }
+    public bool CombineAndDivideIsValid { get; set; }
+    public List<float3> NodesPos { get; set; }
 }

@@ -23,10 +23,15 @@ public static class Snapping
             if (bt.SelectedRoad != null)
             {
                 float interpolation = bt.SelectedRoad.GetNearestInterpolation(bt.ClickPos);
-                AttemptDivide(laneCount, bt, interpolation);
-                if (!bt.DivideIsPossible)
+                if (DivideIsValid(laneCount, bt, interpolation))
                 {
-                    Debug.Log(CombineThenDivideIsValid(laneCount, bt, interpolation));
+                    bt.DivideIsValid = true;   
+                    SetupInterpolatedNode(laneCount, bt, interpolation);
+                }
+                else if (CombineThenDivideIsValid(laneCount, bt, interpolation))
+                {
+                    bt.CombineAndDivideIsValid = true;
+                    SetupInterpolatedNode(laneCount, bt, interpolation);
                 }
             }
         }
@@ -34,10 +39,10 @@ public static class Snapping
             SetupSnapInfo(bt);
         return bt;
 
-        static void SetupDivideInfo(int laneCount, BuildTargets bt, float interpolation)
+        static void SetupInterpolatedNode(int laneCount, BuildTargets bt, float interpolation)
         {
             bt.Pos = bt.SelectedRoad.EvaluatePosition(interpolation);
-            bt.NodesPosIfDivded = new();
+            bt.NodesPos = new();
             float3 offset = bt.SelectedRoad.Evaluate2DNormalizedNormal(interpolation);
 
             bufferList.Clear();
@@ -52,19 +57,24 @@ public static class Snapping
             for (int i = interpolateRange; i >= -interpolateRange; i--)
             {
                 float3 p = center + offset * i * Constants.LaneWidth;
-                bt.NodesPosIfDivded.Add(p);
+                if (WithinSnapRange(bt.ClickPos, p, laneCount))
+                    bt.NodesPos.Add(p);
             }
-            bt.Pos = center;
-            bt.NodesPosIfDivded = bt.NodesPosIfDivded.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
+            if (laneCount % 2 == 0)
+            {
+                float3 secondClosest = bufferList.OrderBy(p => math.length(p - bt.ClickPos)).Skip(1).First();
+                bt.Pos = Vector3.Lerp(secondClosest, center, 0.5f);
+            }
+            else
+                bt.Pos = center;
+            bt.NodesPos = bt.NodesPos.OrderBy(p => math.length(p - bt.ClickPos)).Take(laneCount).ToList();
             bt.TangentAssigned = true;
             bt.Tangent = math.normalize(bt.SelectedRoad.EvaluateTangent(interpolation));
         }
 
-        static void AttemptDivide(int laneCount, BuildTargets bt, float interpolation)
+        static bool DivideIsValid(int laneCount, BuildTargets bt, float interpolation)
         {   
-            bt.DivideIsPossible = Divide.RoadIsDividable(bt.SelectedRoad, interpolation);
-            if (bt.DivideIsPossible)
-                SetupDivideInfo(laneCount, bt, interpolation);
+            return Divide.RoadIsDividable(bt.SelectedRoad, interpolation);
         }
 
         static bool CombineThenDivideIsValid(int laneCount, BuildTargets bt, float interpolation)
@@ -73,6 +83,7 @@ public static class Snapping
             if (interpolation <= 0.5)
                 lookLeft = true;
             Intersection nearestIx = lookLeft ? bt.SelectedRoad.StartIntersection : bt.SelectedRoad.EndIntersection;
+            bt.Intersection = nearestIx;
             if (!Combine.CombineIsValid(nearestIx))
                 return false;
             Road left = nearestIx.InRoads.Single();
@@ -96,6 +107,7 @@ public static class Snapping
             bt.Snapped = true;
             bt.Pos = Vector3.Lerp(bt.Nodes.First().Pos, bt.Nodes.Last().Pos, 0.5f);
             bt.Intersection = bt.Nodes.First().Intersection;
+            bt.NodesPos = bt.Nodes.Select(n => n.Pos).ToList();
             if (!bt.Intersection.IsRoadEmpty())
             {
                 bt.TangentAssigned = true;
@@ -168,10 +180,20 @@ public static class Snapping
 
         void AddNodeIfWithinSnap(Node n)
         {
-            float distance = Vector3.Distance(clickPos, n.Pos);
-            if (distance < snapRadius)
+            
+            if (WithinSnapRange(clickPos, n.Pos, laneCount))
+            {
+                float distance = Vector3.Distance(clickPos, n.Pos);
                 candidates.Add(new(distance, n));
+            }
         }
         #endregion
+    }
+
+    static bool WithinSnapRange(float3 center, float3 pos, int laneCount)
+    {
+        float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
+        return Vector3.Distance(center, pos) < snapRadius;
+        
     }
 }
