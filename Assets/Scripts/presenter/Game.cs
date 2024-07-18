@@ -113,7 +113,7 @@ public static class Game
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
-        return Build.RemoveRoad(road, option);
+        return Remove.RemoveRoad(road, option);
     }
     public static bool RemoveRoad(Road road)
     {
