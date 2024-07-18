@@ -230,6 +230,7 @@ public class BezierSeries
         float _d = CurveUtility.GetNearestPoint(curves[minIndex], ray, out float3 _p, out float _t);
         position = _p;
         interpolation = LocationToInterpolation(new(minIndex, _t));
+        interpolation = Math.Clamp(interpolation, 0, 1);
         return _d;
     }
 

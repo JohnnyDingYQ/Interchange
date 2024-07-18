@@ -12,112 +12,63 @@ public static class Snapping
         BuildTargets bt = new()
         {
             ClickPos = pos,
-            Nodes = GetBuildNodes(pos, laneCount),
             SelectedRoad = Game.HoveredRoad,
             Pos = pos,
             Snapped = false
         };
-        if (bt.Nodes == null)
-        {
 
-        }
-        else
-            SetupSnapInfo(bt);
-        return bt;
-        
-        static void SetupSnapInfo(BuildTargets bt)
+        List<Node> nodes = Game.Nodes.Values
+            .Where(node => WithinSnapRange(pos, node.Pos, laneCount))
+            .OrderBy(node => node.NodeIndex)
+            .Take(laneCount)
+            .ToList();
+
+        if (nodes.Count == 0)
+            return bt;
+
+        if (laneCount == 1 && nodes.First().BelongsToPoint)
         {
-            bt.Offset = bt.Nodes.First().NodeIndex;
             bt.Snapped = true;
-            bt.Pos = Vector3.Lerp(bt.Nodes.First().Pos, bt.Nodes.Last().Pos, 0.5f);
-            bt.Intersection = bt.Nodes.First().Intersection;
-            bt.NodesPos = bt.Nodes.Select(n => n.Pos).ToList();
-            if (!bt.Intersection.IsRoadEmpty())
+            bt.Offset = 0;
+            bt.Intersection = nodes.First().Intersection;
+            return bt;
+        }
+
+        if (nodes.Any(node => node.BelongsToPoint))
+            return bt;
+
+        int index = nodes.First().NodeIndex;
+        float3 offset = nodes.First().Intersection.Normal * Constants.LaneWidth;
+        float3 interpolatedPos = nodes.First().Pos + offset;
+        if (nodes.Count < laneCount)
+        {
+            while (WithinSnapRange(pos, interpolatedPos, laneCount))
             {
-                bt.TangentAssigned = true;
-                bt.Tangent = bt.Intersection.Tangent;
+                index--;
+                interpolatedPos += offset;
             }
         }
-    }
-
-    static List<Node> GetBuildNodes(float3 clickPos, int laneCount)
-    {
-        float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
-        List<Tuple<float, Node>> candidates = new();
-        foreach (Node node in Game.Nodes.Values)
-            AddNodeIfWithinSnap(node);
-
-        if (candidates.Count == 0)
-            return null;
-
-        // this sorts nodes with ascending order of distance (descending proximity)
-        List<Node> nodes = candidates.OrderBy(t => t.Item1).Select(t => t.Item2).ToList();
-        while (nodes.Count > laneCount)
-            nodes.Remove(nodes.Last());
-
-        // this sorts nodes with their order in the road, left to right in the direction of the road
-        nodes.Sort();
-
-        // check all snapped nodes belong to the same intersection
-        Intersection intersection = nodes.First().Intersection;
-        foreach (Node n in nodes)
+        interpolatedPos -= offset;
+        bt.Offset = index;
+        bt.Snapped = true;
+        bt.Pos = interpolatedPos - offset * ((float)(laneCount - 1) / 2);
+        bt.Intersection = nodes.First().Intersection;
+        bt.NodesPos = new();
+        for (int i = 0; i < laneCount; i++)
         {
-            Assert.IsNotNull(n.Intersection);
-            if (n.Intersection != intersection)
-                return null;
+            bt.NodesPos.Add(interpolatedPos - offset * i);
         }
-
-        if (nodes.Count == laneCount)
-            return nodes;
-        else if (nodes.Count == 1 && nodes.First().BelongsToPoint)
-            return null;
-        else
+        if (!bt.Intersection.IsRoadEmpty())
         {
-            candidates = new();
-            GetInterpolatedCandidates(2, intersection);
-            if (candidates.Count + nodes.Count < laneCount)
-                return null;
-
-            nodes.AddRange(candidates.Select(t => t.Item2).Take(laneCount - nodes.Count));
-            nodes.Sort();
-            return nodes;
+            bt.TangentAssigned = true;
+            bt.Tangent = bt.Intersection.Tangent;
         }
-
-        # region extracted functions
-        void GetInterpolatedCandidates(int interpolationReach, Intersection intersection)
-        {
-            float3 normal = intersection.Normal * Constants.LaneWidth;
-            for (int i = 1; i <= interpolationReach; i++)
-            {
-                float3 left = nodes.First().Pos + i * normal;
-                float3 right = nodes.Last().Pos - i * normal;
-                AddNodeIfWithinSnap(new(left, nodes.First().Pos.y, nodes.First().NodeIndex - i)
-                {
-                    Intersection = intersection
-                });
-                AddNodeIfWithinSnap(new(right, nodes.Last().Pos.y, nodes.Last().NodeIndex + i)
-                {
-                    Intersection = intersection
-                });
-            }
-        }
-
-        void AddNodeIfWithinSnap(Node n)
-        {
-            
-            if (WithinSnapRange(clickPos, n.Pos, laneCount))
-            {
-                float distance = Vector3.Distance(clickPos, n.Pos);
-                candidates.Add(new(distance, n));
-            }
-        }
-        #endregion
+        return bt;
     }
 
     static bool WithinSnapRange(float3 center, float3 pos, int laneCount)
     {
         float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
         return Vector3.Distance(center, pos) < snapRadius;
-        
     }
 }

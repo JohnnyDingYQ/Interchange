@@ -91,7 +91,6 @@ public static class SaveSystem
         {
             node.InLane_ = node.InLane != null ? node.InLane.Id : 0;
             node.OutLane_ = node.OutLane != null ? node.OutLane.Id : 0;
-            node.Intersection_ = node.Intersection.Id;
         }
         foreach (Intersection i in Game.Intersections.Values)
         {
@@ -144,7 +143,6 @@ public static class SaveSystem
         {
             node.InLane = node.InLane_ != 0 ? Game.Lanes[node.InLane_] : null;
             node.OutLane = node.OutLane_ != 0 ? Game.Lanes[node.OutLane_] : null;
-            node.Intersection = Game.Intersections[node.Intersection_];
         }
         foreach (Intersection i in Game.Intersections.Values)
         {

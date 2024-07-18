@@ -29,12 +29,11 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         BuildTargets bt = Snapping.Snap(2 * stride, 1);
-        Node node = bt.Nodes[0];
-        Lane lane = road.Lanes[0];
 
         Assert.True(bt.Snapped);
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, bt.Pos));
-        Assert.AreSame(lane.EndNode, node);
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
     }
 
     [Test]
@@ -42,16 +41,12 @@ public class BuildTargetTest
     {
         RoadBuilder.Single(0, stride, 2 * stride, 2);
         BuildTargets bt = Snapping.Snap(0, 2);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
         Road road = Game.Roads.Values.First();
-        Lane lane0 = road.Lanes[0];
-        Lane lane1 = road.Lanes[1];
 
         Assert.True(bt.Snapped);
         Assert.AreEqual(new float3(0), bt.Pos);
-        Assert.AreEqual(lane0.StartNode, node0);
-        Assert.AreEqual(lane1.StartNode, node1);
+        Assert.AreSame(road.StartIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
     }
 
     [Test]
@@ -60,13 +55,11 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Lane lane = road.Lanes[0];
         BuildTargets bt = Snapping.Snap(lane.EndPos + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 1);
-        Assert.AreEqual(1, bt.Nodes.Count);
-        Node node = bt.Nodes[0];
-
 
         Assert.True(bt.Snapped);
         Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.Pos));
-        Assert.AreSame(lane.EndNode, node);
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
     }
 
     [Test]
@@ -77,14 +70,11 @@ public class BuildTargetTest
         Lane lane1 = road.Lanes[1];
         float3 midPoint = Vector3.Lerp(lane0.StartPos, lane1.StartPos, 0.5f);
         BuildTargets bt = Snapping.Snap(midPoint + 0.9f * Constants.BuildSnapTolerance * new float3(-1, 0, 0), 2);
-        Assert.AreEqual(2, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
 
         Assert.True(bt.Snapped);
         Assert.AreEqual(midPoint, bt.Pos);
-        Assert.AreEqual(lane0.StartNode, node0);
-        Assert.AreEqual(lane1.StartNode, node1);
+        Assert.AreSame(road.StartIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
     }
 
     [Test]
@@ -93,12 +83,10 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
         BuildTargets bt = Snapping.Snap(buildPoint, 2);
-        Assert.AreEqual(2, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
 
-        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
-        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, node1.Pos));
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(-1, bt.Offset);
+
     }
 
     [Test]
@@ -107,12 +95,9 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
         BuildTargets bt = Snapping.Snap(buildPoint, 2);
-        Assert.AreEqual(2, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
 
-        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node1.Pos));
-        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, node0.Pos));
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
     }
 
     [Test]
@@ -121,16 +106,9 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
         BuildTargets bt = Snapping.Snap(buildPoint, 3);
-        Assert.AreEqual(3, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
-        Node node2 = bt.Nodes[2];
-        Lane lane0 = road.Lanes[0];
-        Lane lane1 = road.Lanes[1];
 
-        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
-        Assert.AreSame(lane0.EndNode, node1);
-        Assert.AreSame(lane1.EndNode, node2);
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(-1, bt.Offset);
     }
 
     [Test]
@@ -139,17 +117,9 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
         BuildTargets bt = Snapping.Snap(buildPoint, 3);
-        Assert.AreEqual(3, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
-        Node node2 = bt.Nodes[2];
-        Lane lane0 = road.Lanes[0];
-        Lane lane1 = road.Lanes[1];
-
-        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 2), node2.Pos));
-        Assert.AreEqual(lane0.EndPos, node0.Pos);
-        Assert.AreEqual(lane1.EndPos, node1.Pos);
-        Assert.AreSame(node0, lane0.EndNode);
+        
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
     }
 
     [Test]
@@ -157,14 +127,9 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         BuildTargets bt = Snapping.Snap(2 * stride, 3);
-        Assert.AreEqual(3, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
-        Node node2 = bt.Nodes[2];
 
-        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, -1), node0.Pos));
-        Assert.AreSame(road.Lanes[0].EndNode, node1);
-        Assert.True(MyNumerics.AreNumericallyEqual(road.ExtrapolateNodePos(Side.End, 1), node2.Pos));
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(-1, bt.Offset);
     }
 
     [Test]
@@ -173,14 +138,9 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + road.BezierSeries.Evaluate2DNormalizedNormal(1) * Constants.LaneWidth;
         BuildTargets bt = Snapping.Snap(buildPoint, 3);
-        Assert.AreEqual(3, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
-        Node node2 = bt.Nodes[2];
 
-        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, -2), node0.Pos);
-        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, -1), node1.Pos);
-        Assert.AreSame(road.Lanes[0].EndNode, node2);
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(-2, bt.Offset);
     }
 
     [Test]
@@ -189,14 +149,9 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + -1 * Constants.LaneWidth * road.BezierSeries.Evaluate2DNormalizedNormal(1);
         BuildTargets bt = Snapping.Snap(buildPoint, 3);
-        Assert.AreEqual(3, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
-        Node node2 = bt.Nodes[2];
 
-        Assert.AreSame(road.Lanes[0].EndNode, node0);
-        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, 1), node1.Pos);
-        Assert.AreEqual(road.ExtrapolateNodePos(Side.End, 2), node2.Pos);
+        Assert.AreSame(road.EndIntersection, bt.Intersection);
+        Assert.AreEqual(0, bt.Offset);
         
     }
 
@@ -205,14 +160,9 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         BuildTargets bt = Snapping.Snap(0, 3);
-        Assert.AreEqual(3, bt.Nodes.Count);
-        Node node0 = bt.Nodes[0];
-        Node node1 = bt.Nodes[1];
-        Node node2 = bt.Nodes[2];
 
-        Assert.AreEqual(road.ExtrapolateNodePos(Side.Start, -1), node0.Pos);
-        Assert.AreEqual(road.Lanes[0].StartPos, node1.Pos);
-        Assert.AreEqual(road.ExtrapolateNodePos(Side.Start, 1), node2.Pos);
+        Assert.AreSame(road.StartIntersection, bt.Intersection);
+        Assert.AreEqual(-1, bt.Offset);
     }
 
     [Test]

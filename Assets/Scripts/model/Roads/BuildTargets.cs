@@ -3,7 +3,6 @@ using Unity.Mathematics;
 
 public class BuildTargets
 {
-    public List<Node> Nodes { get; set; }
     public float3 ClickPos { get; set; }
     public bool Snapped { get; set; }
     public float3 Pos { get; set; }

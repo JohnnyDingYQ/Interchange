@@ -48,6 +48,8 @@ public class Intersection
     public void SetNodes(List<Node> nodes)
     {
         this.nodes = nodes;
+        foreach (Node node in nodes)
+            node.Intersection = this;
     }
 
     public void AddNode(int nodeIndex)
@@ -57,11 +59,13 @@ public class Intersection
             if (n.NodeIndex == nodeIndex)
                 return;
         int firstIndex = nodes.First().NodeIndex;
-        nodes.Add(new(
+        Node newNode = new(
             nodes.First().Pos + Normal * Constants.LaneWidth * (firstIndex - nodeIndex),
             nodes.First().Pos.y,
             nodeIndex
-        ));
+        )
+        { Intersection = this };
+        nodes.Add(newNode);
         nodes.Sort();
     }
 
@@ -195,33 +199,33 @@ public class Intersection
         return null;
     }
 
-public Node LastNodeWithRoad(Direction direction)
-{
-    for (int i = nodes.Count - 1; i >= 0; i--)
+    public Node LastNodeWithRoad(Direction direction)
     {
-        if (direction == Direction.In)
+        for (int i = nodes.Count - 1; i >= 0; i--)
         {
-            if (nodes[i].InLane != null)
-                return nodes[i];
+            if (direction == Direction.In)
+            {
+                if (nodes[i].InLane != null)
+                    return nodes[i];
+            }
+            else if (direction == Direction.Out)
+            {
+                if (nodes[i].OutLane != null)
+                    return nodes[i];
+            }
         }
-        else if (direction == Direction.Out)
-        {
-            if (nodes[i].OutLane != null)
-                return nodes[i];
-        }
+        return null;
     }
-    return null;
-}
 
-public bool IsForLaneChangeOnly()
-{
-    if (InRoads.Count != 1 || OutRoads.Count != 1)
-        return false;
-    if (inRoads.Single().LaneCount != outRoads.Single().LaneCount)
-        return false;
-    foreach (Node n in nodes)
-        if (n.InLane == null || n.OutLane == null)
+    public bool IsForLaneChangeOnly()
+    {
+        if (InRoads.Count != 1 || OutRoads.Count != 1)
             return false;
-    return true;
-}
+        if (inRoads.Single().LaneCount != outRoads.Single().LaneCount)
+            return false;
+        foreach (Node n in nodes)
+            if (n.InLane == null || n.OutLane == null)
+                return false;
+        return true;
+    }
 }
