@@ -50,6 +50,29 @@ public class Intersection
         this.nodes = nodes;
     }
 
+    public void AddNode(int nodeIndex)
+    {
+        Assert.AreNotEqual(0, nodes.Count);
+        foreach (Node n in nodes)
+            if (n.NodeIndex == nodeIndex)
+                return;
+        int firstIndex = nodes.First().NodeIndex;
+        nodes.Add(new(
+            nodes.First().Pos + Normal * Constants.LaneWidth * (firstIndex - nodeIndex),
+            nodes.First().Pos.y,
+            nodeIndex
+        ));
+        nodes.Sort();
+    }
+
+    public Node GetNodeByIndex(int nodeIndex)
+    {
+        foreach (Node n in nodes)
+            if (n.NodeIndex == nodeIndex)
+                return n;
+        return null;
+    }
+
     public void SetInRoads(HashSet<Road> roads)
     {
         inRoads = roads;

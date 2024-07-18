@@ -8,10 +8,9 @@ public class BuildTargets
     public bool Snapped { get; set; }
     public float3 Pos { get; set; }
     public Intersection Intersection { get; set; }
+    public int Offset { get; set; }
     public float3 Tangent { get; set; }
     public bool TangentAssigned { get; set; }
     public Road SelectedRoad { get; set; }
-    public bool DivideIsValid { get; set; }
-    public bool CombineAndDivideIsValid { get; set; }
     public List<float3> NodesPos { get; set; }
 }

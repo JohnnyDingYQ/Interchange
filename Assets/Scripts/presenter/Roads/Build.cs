@@ -4,7 +4,6 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Pool;
 using UnityEngine.Splines;
 
 public static class Build
@@ -12,8 +11,8 @@ public static class Build
     private static float3 pivotPos;
     private static bool startAssigned, pivotAssigned, pivotAligned;
     public static int LaneCount { get; set; }
-    public static BuildTargets StartTarget;
-    public static BuildTargets EndTarget;
+    public static BuildTargets StartTarget { get; set; }
+    public static BuildTargets EndTarget { get; set; }
     public static List<Tuple<float3, float3>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
     public static bool EnforcesTangent { get; set; }
@@ -81,10 +80,7 @@ public static class Build
     static void RemoveAllGhostRoads()
     {
         foreach (uint id in GhostRoads)
-        {
-            Assert.IsTrue(Game.Roads.ContainsKey(id));
             Game.RemoveRoad(Game.Roads[id]);
-        }
         GhostRoads.Clear();
     }
 
@@ -101,7 +97,19 @@ public static class Build
     public static void HandleHover(float3 hoverPos)
     {
         if (!startAssigned)
-            StartTarget = Snapping.Snap(hoverPos, LaneCount);
+        {
+            if (Game.HoveredRoad == null)
+                StartTarget = Snapping.Snap(hoverPos, LaneCount);
+            else
+            {
+                float interpolation = Game.HoveredRoad.GetNearestInterpolation(hoverPos);
+                List<float3> lanePos = new();
+                foreach (Lane lane in Game.HoveredRoad.Lanes)
+                {
+                    lanePos.Add(lane.EvaluatePosition(interpolation));
+                }
+            }
+        }
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
         if (EnforcesTangent && !pivotAssigned && startAssigned)
@@ -150,34 +158,12 @@ public static class Build
 
     static List<Road> BuildRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
-        if (buildMode == BuildMode.Actual)
-            PreprocessSnap();
         Road road = InitRoad(startTarget, pivotPos, endTarget);
         if (road == null)
             return null;
         if (buildMode == BuildMode.Ghost)
             road.IsGhost = true;
         return ProcessRoad(road, startTarget, endTarget);
-
-        void PreprocessSnap()
-        {
-            if (!startTarget.Snapped && startTarget.DivideIsValid)
-            {
-                Divide.HandleDivideCommand(startTarget.SelectedRoad, startTarget.ClickPos);
-                startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
-            }
-            if (!endTarget.Snapped && endTarget.DivideIsValid)
-            {
-                Divide.HandleDivideCommand(endTarget.SelectedRoad, endTarget.ClickPos);
-                endTarget = Snapping.Snap(endTarget.ClickPos, LaneCount);
-            }
-            if (!startTarget.Snapped && startTarget.CombineAndDivideIsValid)
-            {
-                Combine.CombineRoads(startTarget.Intersection);
-                Divide.HandleDivideCommand(startTarget.SelectedRoad, startTarget.ClickPos);
-                startTarget = Snapping.Snap(startTarget.ClickPos, LaneCount);
-            }
-        }
     }
 
     static List<Road> BuildParallelRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
@@ -236,8 +222,6 @@ public static class Build
 
     static List<Road> ProcessRoad(Road road, BuildTargets startTarget, BuildTargets endTarget)
     {
-        List<Node> startNodes = startTarget.Nodes;
-        List<Node> endNodes = endTarget.Nodes;
         if (road.HasLaneShorterThanMinLaneLength())
             return null;
         if (startTarget.Snapped)
@@ -246,16 +230,13 @@ public static class Build
             road.EndIntersection = endTarget.Intersection;
         Game.RegisterRoad(road);
 
-        if (!road.IsGhost)
-            ReplaceExistingRoad();
-
         if (startTarget.Snapped)
-            ConnectRoadStartToNodes(startNodes, road);
+            ConnectRoadStartToNodes(startTarget, road);
         else
             IntersectionUtil.EvaluateOutline(road.StartIntersection);
 
         if (endTarget.Snapped)
-            ConnectRoadEndToNodes(endNodes, road);
+            ConnectRoadEndToNodes(endTarget, road);
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
@@ -302,43 +283,6 @@ public static class Build
             resultingRoads.Add(subRoads.Right);
             RecursiveRoadDivision(subRoads.Right, divisions - 1);
         }
-
-        void ReplaceExistingRoad()
-        {
-            if (!(startTarget.Snapped && endTarget.Snapped))
-                return;
-            List<Vertex> startV = new();
-            foreach (Node n in startNodes)
-                if (n.OutLane != null)
-                    startV.Add(n.OutLane.StartVertex);
-            List<Vertex> endV = new();
-            foreach (Node n in endNodes)
-                if (n.InLane != null)
-                    endV.Add(n.InLane.EndVertex);
-
-            HashSet<Road> roads = new();
-            foreach (Vertex start in startV)
-                foreach (Vertex end in endV)
-                {
-                    List<Path> paths = Graph.ShortestPathAStar(start, end)?.ToList();
-                    if (paths != null)
-                        foreach (Path p in paths)
-                        {
-                            roads.Add(p.Source.Road);
-                            roads.Add(p.Target.Road);
-                        }
-                }
-            foreach (Road r in roads)
-                if (r != road)
-                    Game.RemoveRoad(r);
-            foreach (Node n in startNodes)
-                if (!Game.Nodes.ContainsKey(n.Id))
-                    n.Id = 0;
-            foreach (Node n in endNodes)
-                if (!Game.Nodes.ContainsKey(n.Id))
-                    n.Id = 0;
-        }
-
         #endregion
     }
 
@@ -380,28 +324,32 @@ public static class Build
         return p;
     }
 
-    public static void ConnectRoadStartToNodes(List<Node> nodes, Road road)
-    {
-        Assert.IsTrue(nodes.First().Intersection == road.StartIntersection);
+    public static void ConnectRoadStartToNodes(BuildTargets bt, Road road)
+    {   
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
-        for (int i = 0; i < road.LaneCount; i++)
+        int count = 0;
+        for (int i = bt.Offset; i < bt.Offset + road.LaneCount; i++)
         {
-            nodes[i].OutLane = road.Lanes[i];
-            road.Lanes[i].StartNode = nodes[i];
+            bt.Intersection.AddNode(i);
+            Node node = bt.Intersection.GetNodeByIndex(i);
+            node.OutLane = road.Lanes[count];
+            road.Lanes[count++].StartNode = node;
         }
         road.StartIntersection.AddRoad(road, Direction.Out);
         IntersectionUtil.EvaluatePaths(road.StartIntersection);
         IntersectionUtil.EvaluateOutline(road.StartIntersection);
     }
 
-    public static void ConnectRoadEndToNodes(List<Node> nodes, Road road)
+    public static void ConnectRoadEndToNodes(BuildTargets bt, Road road)
     {
-        Assert.IsTrue(nodes.First().Intersection == road.EndIntersection);
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
-        for (int i = 0; i < road.LaneCount; i++)
+        int count = 0;
+        for (int i = bt.Offset; i < bt.Offset + road.LaneCount; i++)
         {
-            nodes[i].InLane = road.Lanes[i];
-            road.Lanes[i].EndNode = nodes[i];
+            bt.Intersection.AddNode(i);
+            Node node = bt.Intersection.GetNodeByIndex(i);
+            node.InLane = road.Lanes[count];
+            road.Lanes[count++].EndNode = node;
         }
         road.EndIntersection.AddRoad(road, Direction.In);
         IntersectionUtil.EvaluatePaths(road.EndIntersection);
@@ -419,6 +367,8 @@ public static class Build
 
     public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
+        if (!Game.Roads.ContainsKey(road.Id))
+            return false;
         Game.Roads.Remove(road.Id);
         foreach (Lane lane in road.Lanes)
         {
