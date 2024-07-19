@@ -25,12 +25,12 @@ public class Intersection
     public HashSet<Road> Roads { get => GetRoads(); }
     [JsonIgnore]
     public Plane Plane { get => GetPlane(); }
-    [JsonIgnore]
-    public float3 Normal { get => GetAttribute(AttributeTypes.Normal); }
-    [JsonIgnore]
-    public float3 Tangent { get => GetAttribute(AttributeTypes.Tangent); }
-    [JsonIgnore]
-    public float3 PointOnInSide { get => GetAttribute(AttributeTypes.PointOnInSide); }
+    [JsonProperty]
+    public float3 Normal { get; private set; }
+    [JsonProperty]
+    public float3 Tangent { get; private set; }
+    [JsonProperty]
+    public float3 PointOnInSide { get; private set; }
     [JsonProperty]
     public List<uint> Nodes_ { get; set; }
     [JsonProperty]
@@ -43,6 +43,9 @@ public class Intersection
     public Intersection(Road road, Direction direction)
     {
         AddRoad(road, direction);
+        Normal = GetAttribute(AttributeTypes.Normal);
+        Tangent = GetAttribute(AttributeTypes.Tangent);
+        PointOnInSide = GetAttribute(AttributeTypes.PointOnInSide);
     }
 
     public void SetNodes(List<Node> nodes)

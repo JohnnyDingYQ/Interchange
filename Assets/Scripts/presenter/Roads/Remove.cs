@@ -26,21 +26,24 @@ public static class Remove
             }
             toRemove.ForEach(p => Graph.RemovePath(p));
 
-            if (option == RoadRemovalOption.Default)
+            if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
                 lane.StartNode.OutLane = null;
                 lane.EndNode.InLane = null;
-                if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null
-                    && !lane.StartNode.BelongsToPoint)
+                if (option == RoadRemovalOption.Default)
                 {
-                    Game.RemoveNode(lane.StartNode);
-                    road.StartIntersection.RemoveNode(lane.StartNode);
-                }
-                if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null
-                    && !lane.EndNode.BelongsToPoint)
-                {
-                    Game.RemoveNode(lane.EndNode);
-                    road.EndIntersection.RemoveNode(lane.EndNode);
+                    if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null
+                        && !lane.StartNode.BelongsToPoint)
+                    {
+                        Game.RemoveNode(lane.StartNode);
+                        road.StartIntersection.RemoveNode(lane.StartNode);
+                    }
+                    if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null
+                        && !lane.EndNode.BelongsToPoint)
+                    {
+                        Game.RemoveNode(lane.EndNode);
+                        road.EndIntersection.RemoveNode(lane.EndNode);
+                    }
                 }
             }
             Game.RemoveLane(lane);
@@ -48,7 +51,7 @@ public static class Remove
         road.StartIntersection.RemoveRoad(road, Direction.Out);
         road.EndIntersection.RemoveRoad(road, Direction.In);
 
-        if (option != RoadRemovalOption.Combine)
+        if (option != RoadRemovalOption.Combine && option != RoadRemovalOption.Replace)
             EvaluateIntersections(road);
 
         Game.InvokeRoadRemoved(road);

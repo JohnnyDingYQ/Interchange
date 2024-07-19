@@ -98,16 +98,18 @@ public static class Build
 
     public static void HandleHover(float3 hoverPos)
     {
-        if (Game.HoveredRoad == null)
-            ReplaceSuggestionOn = false;
         if (!startAssigned)
         {
-            if (Game.HoveredRoad == null)
+            Road road = Game.HoveredRoad;
+            float interpolation = road != null ? road.GetNearestInterpolation(hoverPos) : 0;
+            if (Game.HoveredRoad == null || !road.InterpolationBetweenVertices(interpolation))
+            {
                 StartTarget = Snapping.Snap(hoverPos, LaneCount);
+                EndTarget = null;
+                ReplaceSuggestionOn = false;
+            }
             else
             {
-                Road road = Game.HoveredRoad;
-                float interpolation = road.GetNearestInterpolation(hoverPos);
                 float distance = math.distance(road.EvaluatePosition(interpolation), hoverPos);
                 bool isOnLeftSide = math.cross(
                     road.EvaluateTangent(interpolation),
@@ -169,13 +171,16 @@ public static class Build
         List<Road> BuildSuggested()
         {
             Road road = new(StartTarget.SelectedRoad.BezierSeries, LaneCount);
-            roads = ProcessRoad(road, StartTarget, EndTarget);
             Game.RemoveRoad(StartTarget.SelectedRoad, RoadRemovalOption.Replace);
+            roads = ProcessRoad(road, StartTarget, EndTarget);
+            Assert.IsTrue(road == roads.Single());
+            
             foreach (Node node in StartTarget.Intersection.Nodes)
-                if (StartTarget.SelectedRoad.Lanes.Contains(node.OutLane))
+                if (!road.Lanes.Contains(node.OutLane) && node.InLane == null)
                     Game.RemoveNode(node);
-            foreach (Node node in EndTarget.Intersection.Nodes)
-                if (EndTarget.SelectedRoad.Lanes.Contains(node.InLane))
+                
+            foreach (Node node in EndTarget.Intersection.Nodes)            
+                if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)
                     Game.RemoveNode(node);
             return roads;
         }

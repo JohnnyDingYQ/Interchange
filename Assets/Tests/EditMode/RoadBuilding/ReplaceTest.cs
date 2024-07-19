@@ -20,6 +20,7 @@ public class ReplaceTest
         Game.HoveredRoad = road;
         Build.HandleHover(stride);
 
+        Assert.True(Build.ReplaceSuggestionOn);
         Assert.NotNull(Build.StartTarget);
         Assert.NotNull(Build.EndTarget);
     }
@@ -38,6 +39,7 @@ public class ReplaceTest
         Assert.AreEqual(6, Game.Vertices.Count);
         Assert.AreEqual(3, Game.Paths.Count);
         Assert.AreEqual(3, Game.Lanes.Count);
+        Assert.AreEqual(2, Game.Intersections.Count);
     }
 
     [Test]
@@ -54,5 +56,67 @@ public class ReplaceTest
         Assert.AreEqual(2, Game.Vertices.Count);
         Assert.AreEqual(1, Game.Paths.Count);
         Assert.AreEqual(1, Game.Lanes.Count);
+        Assert.AreEqual(2, Game.Intersections.Count);
+    }
+
+    [Test]
+    public void ReplaceConnectedThreeLaneWithOneLane()
+    {
+        Road connected = RoadBuilder.Single(-2 * stride, -stride, 0, 3);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Build.LaneCount = 1;
+        Game.HoveredRoad = road;
+        Build.HandleHover(stride);
+        Build.HandleBuildCommand(stride);
+
+        Assert.AreEqual(2, Game.Roads.Count);
+        Assert.AreEqual(7, Game.Nodes.Count);
+        Assert.AreEqual(8, Game.Vertices.Count);
+        Assert.AreEqual(7, Game.Paths.Count);
+        Assert.AreEqual(4, Game.Lanes.Count);
+        Assert.AreEqual(3, Game.Intersections.Count);
+    }
+
+    [Test]
+    public void HoverNotBetweenVerticesDoesNotTriggerReplaceSuggestion()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Build.LaneCount = 1;
+        Game.HoveredRoad = road;
+
+        Build.HandleHover(0);
+        Assert.False(Build.ReplaceSuggestionOn);
+
+        Build.HandleHover(1);
+        Assert.False(Build.ReplaceSuggestionOn);
+    }
+
+    [Test]
+    public void SuggestionTargetsCancelsProperly()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Build.LaneCount = 1;
+        Game.HoveredRoad = road;
+
+        Build.HandleHover(stride);
+        Build.HandleHover(0);
+        Assert.False(Build.ReplaceSuggestionOn);
+        Assert.NotNull(Build.StartTarget);
+        Assert.Null(Build.EndTarget);
+    }
+
+    [Test]
+    public void SuggestionCanceledWhenRoadHoverCancel()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Build.LaneCount = 1;
+        Game.HoveredRoad = road;
+
+        Build.HandleHover(stride);
+        Game.HoveredRoad = null;
+        Build.HandleHover(-1);
+        Assert.False(Build.ReplaceSuggestionOn);
+        Assert.NotNull(Build.StartTarget);
+        Assert.Null(Build.EndTarget);
     }
 }

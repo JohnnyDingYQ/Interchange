@@ -130,14 +130,22 @@ public class Road
         return true;
     }
 
+    public bool InterpolationBetweenVertices(float interpolation)
+    {
+        Assert.IsTrue(interpolation <= 1 && interpolation >= 0);
+        if (interpolation > 0.5f)
+            interpolation = 1 - interpolation;
+        foreach (Lane l in Lanes)
+            if (l.Length * interpolation < Constants.VertexDistanceFromRoadEnds)
+                return false;
+        return true;
+    }
+
     public void SetArrowPositions()
     {
         Assert.IsNotNull(BezierSeries);
         ArrowInterpolations = new();
         int arrowCount = 1;
-        // int arrowCount = (int) (BezierSeries.Length / Constants.RoadArrowSeparation);
-        // if (arrowCount == 0)
-        //     arrowCount++;
         for (float i = 1; i < arrowCount + 1; i++)
             ArrowInterpolations.Add(i / (arrowCount + 1));
     }
