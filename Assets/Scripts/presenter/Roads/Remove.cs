@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 public static class Remove
 {
@@ -11,7 +13,7 @@ public static class Remove
         foreach (Lane lane in road.Lanes)
         {
             List<Path> toRemove = new();
-            if (option == RoadRemovalOption.Default)
+            if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
                 Graph.RemoveVertex(lane.StartVertex);
                 Graph.RemoveVertex(lane.EndVertex);
@@ -26,18 +28,19 @@ public static class Remove
 
             if (option == RoadRemovalOption.Default)
             {
-                foreach (Node node in new List<Node>() { lane.StartNode, lane.EndNode })
+                lane.StartNode.OutLane = null;
+                lane.EndNode.InLane = null;
+                if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null
+                    && !lane.StartNode.BelongsToPoint)
                 {
-                    if (node == lane.StartNode)
-                        node.OutLane = null;
-                    else
-                        node.InLane = null;
-                    if (node.InLane == null && node.OutLane == null && !node.BelongsToPoint)
-                    {
-                        Game.RemoveNode(node);
-                        road.StartIntersection.RemoveNode(node);
-                        road.EndIntersection.RemoveNode(node);
-                    }
+                    Game.RemoveNode(lane.StartNode);
+                    road.StartIntersection.RemoveNode(lane.StartNode);
+                }
+                if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null
+                    && !lane.EndNode.BelongsToPoint)
+                {
+                    Game.RemoveNode(lane.EndNode);
+                    road.EndIntersection.RemoveNode(lane.EndNode);
                 }
             }
             Game.RemoveLane(lane);

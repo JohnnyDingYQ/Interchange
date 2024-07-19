@@ -22,11 +22,11 @@ public class Node : IComparable<Node>
     public Intersection Intersection { get; set; }
     public bool BelongsToPoint { get; set; }
     public Node() { }
-    public Node(float3 pos, float elevation, int order)
+    public Node(float3 pos, float elevation, int nodeIndex)
     {
         pos.y = elevation;
         Pos = pos;
-        NodeIndex = order;
+        NodeIndex = nodeIndex;
         Id = 0;
     }
 

@@ -29,6 +29,7 @@ public class RemoveRoadTest
         Assert.True(Game.RemoveRoad(road));
         Assert.AreEqual(0, Game.Roads.Count);
         Assert.AreEqual(0, Game.Nodes.Count);
+        Assert.AreEqual(0, Game.Intersections.Count);
     }
 
     [Test]
@@ -65,11 +66,11 @@ public class RemoveRoadTest
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         float3 originalLeftEnd = road1.LeftOutline.End.Last();
         float3 originalRightEnd = road1.RightOutline.End.Last();
-        Road road2 = RoadBuilder.Single(2* stride, 3 * stride, 4 * stride, 1);
+        Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Assert.True(Game.RemoveRoad(road2));
         float3 updatedLeftEnd = road1.LeftOutline.End.Last();
         float3 updatedRightEnd = road1.RightOutline.End.Last();
-        
+
         Assert.True(MyNumerics.AreNumericallyEqual(originalLeftEnd, updatedLeftEnd));
         Assert.True(MyNumerics.AreNumericallyEqual(originalRightEnd, updatedRightEnd));
     }

@@ -10,9 +10,9 @@ public class Intersection
 {
     public uint Id { get; set; }
     [JsonIgnore]
-    private List<Node> nodes = new();
+    private readonly SortedList<int, Node> nodes = new();
     [JsonIgnore]
-    public List<Node> Nodes { get => new(nodes); }
+    public List<Node> Nodes { get => new(nodes.Values); }
     [JsonProperty]
     private HashSet<Road> inRoads = new();
     [JsonIgnore]
@@ -47,7 +47,8 @@ public class Intersection
 
     public void SetNodes(List<Node> nodes)
     {
-        this.nodes = nodes;
+        foreach (Node node in nodes)
+            this.nodes[node.NodeIndex] = node;
         foreach (Node node in nodes)
             node.Intersection = this;
     }
@@ -55,25 +56,23 @@ public class Intersection
     public void AddNode(int nodeIndex)
     {
         Assert.AreNotEqual(0, nodes.Count);
-        foreach (Node n in nodes)
-            if (n.NodeIndex == nodeIndex)
-                return;
-        int firstIndex = nodes.First().NodeIndex;
+        if (nodes.ContainsKey(nodeIndex))
+            return;
+        Node firstNode = nodes.Values.First();
+        int firstIndex = firstNode.NodeIndex;
         Node newNode = new(
-            nodes.First().Pos + Normal * Constants.LaneWidth * (firstIndex - nodeIndex),
-            nodes.First().Pos.y,
+            firstNode.Pos + Normal * Constants.LaneWidth * (firstIndex - nodeIndex),
+            firstNode.Pos.y,
             nodeIndex
         )
         { Intersection = this };
-        nodes.Add(newNode);
-        nodes.Sort();
+        nodes[newNode.NodeIndex] = newNode;
     }
 
     public Node GetNodeByIndex(int nodeIndex)
     {
-        foreach (Node n in nodes)
-            if (n.NodeIndex == nodeIndex)
-                return n;
+        if (nodes.ContainsKey(nodeIndex))
+            return nodes[nodeIndex];
         return null;
     }
 
@@ -104,10 +103,8 @@ public class Intersection
         foreach (Node n in road.GetNodes(direction == Direction.Out ? Side.Start : Side.End))
         {
             n.Intersection = this;
-            if (!nodes.Contains(n))
-                nodes.Add(n);
+            nodes[n.NodeIndex] = n;
         }
-        nodes.Sort();
     }
 
     public void RemoveRoad(Road road, Direction direction)
@@ -127,7 +124,7 @@ public class Intersection
 
     public void RemoveNode(Node node)
     {
-        nodes.Remove(node);
+        nodes.Remove(node.NodeIndex);
     }
 
     float3 GetAttribute(AttributeTypes attributeType)
@@ -183,17 +180,17 @@ public class Intersection
 
     public Node FirstNodeWithRoad(Direction direction)
     {
-        foreach (Node n in nodes)
+        for (int i = 0; i < nodes.Count; i++)
         {
             if (direction == Direction.In)
             {
-                if (n.InLane != null)
-                    return n;
+                if (nodes.Values[i].InLane != null)
+                    return nodes.Values[i];
             }
             else if (direction == Direction.Out)
             {
-                if (n.OutLane != null)
-                    return n;
+                if (nodes.Values[i].OutLane != null)
+                    return nodes.Values[i];
             }
         }
         return null;
@@ -205,13 +202,13 @@ public class Intersection
         {
             if (direction == Direction.In)
             {
-                if (nodes[i].InLane != null)
-                    return nodes[i];
+                if (nodes.Values[i].InLane != null)
+                    return nodes.Values[i];
             }
             else if (direction == Direction.Out)
             {
-                if (nodes[i].OutLane != null)
-                    return nodes[i];
+                if (nodes.Values[i].OutLane != null)
+                    return nodes.Values[i];
             }
         }
         return null;
@@ -223,7 +220,7 @@ public class Intersection
             return false;
         if (inRoads.Single().LaneCount != outRoads.Single().LaneCount)
             return false;
-        foreach (Node n in nodes)
+        foreach (Node n in nodes.Values)
             if (n.InLane == null || n.OutLane == null)
                 return false;
         return true;

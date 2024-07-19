@@ -45,12 +45,7 @@ public static class Divide
         Game.RegisterRoad(rightRoad);
         OperateOutline();
         Game.RemoveRoad(road, RoadRemovalOption.Divide);
-        BuildTargets temp = new()
-        {
-            Intersection = leftRoad.EndIntersection,
-            Offset = 0
-        };
-        Build.ConnectRoadStartToNodes(temp, rightRoad);
+        Build.ConnectRoadStartToNodes(leftRoad.EndIntersection, 0, rightRoad);
 
         return new SubRoads(leftRoad, rightRoad);
 

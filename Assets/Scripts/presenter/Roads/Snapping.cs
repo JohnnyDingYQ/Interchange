@@ -41,6 +41,12 @@ public static class Snapping
         float3 offset = nodes.First().Intersection.Normal * Constants.LaneWidth;
         float3 interpolatedPos = nodes.First().Pos + offset;
         if (nodes.Count < laneCount)
+            ExtrapolateToTheLeft();
+        interpolatedPos -= offset;
+        SetupSnapInfo();
+        return bt;
+
+        void ExtrapolateToTheLeft()
         {
             while (WithinSnapRange(pos, interpolatedPos, laneCount))
             {
@@ -48,22 +54,24 @@ public static class Snapping
                 interpolatedPos += offset;
             }
         }
-        interpolatedPos -= offset;
-        bt.Offset = index;
-        bt.Snapped = true;
-        bt.Pos = interpolatedPos - offset * ((float)(laneCount - 1) / 2);
-        bt.Intersection = nodes.First().Intersection;
-        bt.NodesPos = new();
-        for (int i = 0; i < laneCount; i++)
+
+        void SetupSnapInfo()
         {
-            bt.NodesPos.Add(interpolatedPos - offset * i);
+            bt.Offset = index;
+            bt.Snapped = true;
+            bt.Pos = interpolatedPos - offset * ((float)(laneCount - 1) / 2);
+            bt.Intersection = nodes.First().Intersection;
+            bt.NodesPos = new();
+            for (int i = 0; i < laneCount; i++)
+            {
+                bt.NodesPos.Add(interpolatedPos - offset * i);
+            }
+            if (!bt.Intersection.IsRoadEmpty())
+            {
+                bt.TangentAssigned = true;
+                bt.Tangent = bt.Intersection.Tangent;
+            }
         }
-        if (!bt.Intersection.IsRoadEmpty())
-        {
-            bt.TangentAssigned = true;
-            bt.Tangent = bt.Intersection.Tangent;
-        }
-        return bt;
     }
 
     static bool WithinSnapRange(float3 center, float3 pos, int laneCount)
