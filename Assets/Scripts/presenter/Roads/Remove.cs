@@ -34,16 +34,12 @@ public static class Remove
                 {
                     if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null
                         && !lane.StartNode.BelongsToPoint)
-                    {
                         Game.RemoveNode(lane.StartNode);
-                        road.StartIntersection.RemoveNode(lane.StartNode);
-                    }
+                    
                     if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null
                         && !lane.EndNode.BelongsToPoint)
-                    {
                         Game.RemoveNode(lane.EndNode);
-                        road.EndIntersection.RemoveNode(lane.EndNode);
-                    }
+                    
                 }
             }
             Game.RemoveLane(lane);

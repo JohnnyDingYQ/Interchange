@@ -170,7 +170,11 @@ public static class Build
 
         List<Road> BuildSuggested()
         {
-            Road road = new(StartTarget.SelectedRoad.BezierSeries, LaneCount);
+            float roadMidIndex = StartTarget.Offset + (float) LaneCount / 2;
+            float currMidIndex = StartTarget.SelectedRoad.Lanes.First().StartNode.NodeIndex
+                + (float) StartTarget.SelectedRoad.LaneCount / 2;
+            float offsetDist = (currMidIndex - roadMidIndex) * Constants.LaneWidth;
+            Road road = new(StartTarget.SelectedRoad.BezierSeries.Offset(offsetDist), LaneCount);
             Game.RemoveRoad(StartTarget.SelectedRoad, RoadRemovalOption.Replace);
             roads = ProcessRoad(road, StartTarget, EndTarget);
             Assert.IsTrue(road == roads.Single());

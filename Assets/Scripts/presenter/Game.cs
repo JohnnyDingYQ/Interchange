@@ -107,6 +107,7 @@ public static class Game
     public static void RemoveNode(Node node)
     {
         Nodes.Remove(node.Id);
+        node.Intersection.RemoveNode(node);
     }
 
     public static bool RemoveRoad(Road road, RoadRemovalOption option)
