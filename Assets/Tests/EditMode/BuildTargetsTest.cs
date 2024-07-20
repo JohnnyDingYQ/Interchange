@@ -183,22 +183,6 @@ public class BuildTargetTest
     }
 
     [Test]
-    public void NodeBelongsToPointOnlyAcceptsOneLaneSnap()
-    {
-        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        road.Lanes[0].StartNode.BelongsToPoint = true;
-
-        BuildTargets bt = Snapping.Snap(0, 1, Side.End);
-        Assert.True(bt.Snapped);
-
-        bt = Snapping.Snap(0, 2, Side.End);
-        Assert.False(bt.Snapped);
-
-        bt = Snapping.Snap(0, 3, Side.End);
-        Assert.False(bt.Snapped);
-    }
-
-    [Test]
     public void SnapEndButInLaneAlreadyExists()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);

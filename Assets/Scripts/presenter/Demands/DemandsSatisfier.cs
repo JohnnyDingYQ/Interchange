@@ -8,7 +8,7 @@ public static class DemandsSatisfer
     static readonly HashSet<uint> toDecrement = new();
     public static void SatisfyDemands(float deltaTime)
     {
-        foreach (SourcePoint source in Game.Sources.Values)
+        foreach (Zone source in Game.SourceZones.Values)
         {
             if (source.CarSpawnInterval > 0)
             {
@@ -18,7 +18,7 @@ public static class DemandsSatisfer
             foreach (uint targetID in source.Destinations.Keys)
             {
                 int demand = source.Destinations[targetID];
-                Point target = Game.Targets[targetID];
+                Zone target = Game.TargetZones[targetID];
                 if (demand > 0)
                 {
                     Car car = AttemptSchedule(source, target);
@@ -36,12 +36,12 @@ public static class DemandsSatisfer
         }
     }
 
-    public static Car AttemptSchedule(SourcePoint source, Point target)
+    public static Car AttemptSchedule(Zone source, Zone target)
     {
-        if (source.Node.OutLane == null || target.Node.OutLane == null)
+        if (source.Vertices.Count == 0 || target.Vertices.Count == 0)
             return null;
-        Vertex startV = source.Node.OutLane.StartVertex;
-        Vertex endV = target.Node.OutLane.EndVertex;
+        Vertex startV = source.Vertices.ElementAt(MyNumerics.GetRandomIndex(source.Vertices.Count));
+        Vertex endV = target.Vertices.ElementAt(MyNumerics.GetRandomIndex(target.Vertices.Count));
         return AttemptSchedule(startV, endV);
     }
 

@@ -30,19 +30,7 @@ public static class Snapping
         if (side == Side.Start && nodes.Any(node => node.OutLane != null))
             return bt;
         
-        
         if (side == Side.End && nodes.Any(node => node.InLane != null))
-            return bt;
-
-        if (laneCount == 1 && nodes.First().BelongsToPoint)
-        {
-            bt.Snapped = true;
-            bt.Offset = 0;
-            bt.Intersection = nodes.First().Intersection;
-            return bt;
-        }
-
-        if (nodes.Any(node => node.BelongsToPoint))
             return bt;
 
         int index = nodes.First().NodeIndex;

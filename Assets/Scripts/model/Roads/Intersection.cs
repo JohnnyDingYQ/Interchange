@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using System;
 using UnityEngine.Assertions;
+using System.Collections.ObjectModel;
 
 public class Intersection
 {
@@ -12,7 +13,7 @@ public class Intersection
     [JsonIgnore]
     private readonly SortedList<int, Node> nodes = new();
     [JsonIgnore]
-    public List<Node> Nodes { get => new(nodes.Values); }
+    public ReadOnlyCollection<Node> Nodes { get => nodes.Values.ToList().AsReadOnly(); }
     [JsonProperty]
     private HashSet<Road> inRoads = new();
     [JsonIgnore]

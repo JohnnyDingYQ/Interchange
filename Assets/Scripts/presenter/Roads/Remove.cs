@@ -32,12 +32,10 @@ public static class Remove
                 lane.EndNode.InLane = null;
                 if (option == RoadRemovalOption.Default)
                 {
-                    if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null
-                        && !lane.StartNode.BelongsToPoint)
+                    if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null)
                         Game.RemoveNode(lane.StartNode);
                     
-                    if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null
-                        && !lane.EndNode.BelongsToPoint)
+                    if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null)
                         Game.RemoveNode(lane.EndNode);
                     
                 }

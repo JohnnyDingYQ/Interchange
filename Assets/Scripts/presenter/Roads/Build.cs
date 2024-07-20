@@ -10,6 +10,7 @@ public static class Build
 {
     private static float3 pivotPos;
     private static bool startAssigned, pivotAssigned, pivotAligned;
+    private static Zone startZone;
     public static int LaneCount { get; set; }
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
@@ -148,6 +149,7 @@ public static class Build
         if (!startAssigned)
         {
             startAssigned = true;
+            startZone = Game.HoveredZone;
             StartTarget = Snapping.Snap(clickPos, LaneCount, Side.Start);
             return null;
         }
@@ -164,7 +166,13 @@ public static class Build
         if (ParallelBuildOn)
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
+        {
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
+            if (roads != null && startZone != null && LaneCount == 1)
+                startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
+            if (roads != null && Game.HoveredZone != null && LaneCount == 1)
+                Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
+        }
         ResetSelection();
         return roads;
 

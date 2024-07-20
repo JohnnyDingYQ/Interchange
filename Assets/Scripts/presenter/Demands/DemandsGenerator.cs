@@ -11,9 +11,9 @@ public static class DemandsGenerator
             coolDown -= deltaTime;
             return;
         }
-        foreach (SourcePoint source in Game.Sources.Values)
+        foreach (Zone source in Game.SourceZones.Values)
         {
-            Point target = Game.Targets.ElementAt((int) (UnityEngine.Random.value * Game.Targets.Count())).Value;
+            Zone target = Game.TargetZones.ElementAt((int) (UnityEngine.Random.value * Game.TargetZones.Count())).Value;
             if (source.Destinations.ContainsKey(target.Id))
                 source.Destinations[target.Id] = Math.Min(Constants.DestinationCap, source.Destinations[target.Id] + 1);
             else

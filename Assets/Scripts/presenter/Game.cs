@@ -14,9 +14,10 @@ public static class Game
     public static Dictionary<uint, Vertex> Vertices { get => GameSave.Vertices; }
     public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
-    public static Dictionary<uint, Point> Targets { get => GameSave.Targets; }
-    public static Dictionary<uint, SourcePoint> Sources { get => GameSave.Sources; }
+    public static Dictionary<uint, Zone> SourceZones { get; set; }
+    public static Dictionary<uint, Zone> TargetZones { get; set; }
     public static Road HoveredRoad { get; set; }
+    public static Zone HoveredZone { get; set; }
     public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;

@@ -9,7 +9,6 @@ public static class SaveSystem
 {
     public static void LoadGame()
     {
-        GameSave backup = Game.GameSave;
         Game.WipeState();
         string saveFile = Application.persistentDataPath + "/save0.json";
 
@@ -22,15 +21,7 @@ public static class SaveSystem
                 TypeNameHandling = TypeNameHandling.Auto,
                 PreserveReferencesHandling = PreserveReferencesHandling.All,
             });
-            if (!Points.NodePositionsAreCorrect())
-            {
-                Debug.Log("Point position have changed, aborting load");
-                Game.GameSave = backup;
-            }
-            else
-            {
-                RestoreGameState();
-            }
+            RestoreGameState();
         }
         else
         {
@@ -108,14 +99,6 @@ public static class SaveSystem
             else
                 p.InterweavingPath_ = 0;
         }
-        foreach (SourcePoint p in Game.Sources.Values)
-        {
-            p.Node_ = p.Node.Id;
-        }
-        foreach (Point p in Game.Targets.Values)
-        {
-            p.Node_ = p.Node.Id;
-        }
         foreach (Vertex v in Game.Vertices.Values)
         {
             v.Lane_ = v.Lane.Id;
@@ -156,14 +139,6 @@ public static class SaveSystem
             p.Target = Game.Vertices[p.Target_];
             if (p.InterweavingPath_ != 0)
                 p.InterweavingPath = Game.Paths[p.InterweavingPath_];
-        }
-        foreach (SourcePoint p in Game.Sources.Values)
-        {
-            p.Node = Game.Nodes[p.Node_];
-        }
-        foreach (Point p in Game.Targets.Values)
-        {
-            p.Node = Game.Nodes[p.Node_];
         }
         foreach (Vertex v in Game.Vertices.Values)
         {
