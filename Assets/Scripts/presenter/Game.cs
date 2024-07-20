@@ -6,11 +6,6 @@ using UnityEngine.Assertions;
 
 public static class Game
 {
-    public static event Action<Road> RoadAdded;
-    public static event Action<Road> RoadUpdated;
-    public static event Action<Road> RoadRemoved;
-    public static event Action<Car> CarAdded;
-    public static event Action<Car> CarRemoved;
     public static GameSave GameSave { get; set; }
     public static Dictionary<uint, Road> Roads { get => GameSave.Roads; }
     public static Dictionary<uint, Node> Nodes { get => GameSave.Nodes; }
@@ -24,6 +19,9 @@ public static class Game
     public static Road HoveredRoad { get; set; }
     public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
+    public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;
+    public static event Action<Intersection> IntersectionAdded, IntersectionRemoved;
+    public static event Action<Car> CarAdded, CarRemoved;
 
     static Game()
     {
@@ -67,17 +65,18 @@ public static class Game
 
     public static void RegisterIntersection(Intersection i)
     {
-        if (!Intersections.Values.Contains(i))
-        {
-            i.Id = FindNextAvailableKey(Intersections.Keys);
-            Intersections[i.Id] = i;
-        }
+        if (Intersections.Values.Contains(i))
+            return;
+        i.Id = FindNextAvailableKey(Intersections.Keys);
+        Intersections[i.Id] = i;
+        IntersectionAdded?.Invoke(i);
     }
 
     public static void RemoveIntersection(Intersection i)
     {
         Assert.IsTrue(Intersections.Keys.Contains(i.Id));
         Intersections.Remove(i.Id);
+        IntersectionRemoved?.Invoke(i);
     }
 
     public static void RegisterLane(Lane lane)
@@ -140,6 +139,7 @@ public static class Game
     {
         RoadUpdated?.Invoke(road);
     }
+
     public static void InvokeRoadAdded(Road road)
     {
         RoadAdded?.Invoke(road);

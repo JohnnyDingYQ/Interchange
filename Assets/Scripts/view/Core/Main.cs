@@ -38,4 +38,9 @@ public class Main : MonoBehaviour
         Assert.IsTrue(Constants.MinLaneLength * 2 < Constants.MaxLaneLength);
         Assert.IsTrue(Constants.MinElevation < Constants.MaxElevation);
     }
+
+    public static float GetHUDObjectHeight(HUDLayer layer)
+    {
+        return Constants.MaxElevation + ((int) layer + 1) * (float) (Constants.MaxElevation - Constants.MinElevation) * 0.01f;
+    }
 }

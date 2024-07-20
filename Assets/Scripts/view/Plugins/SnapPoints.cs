@@ -42,8 +42,8 @@ public class SnapPoints : MonoBehaviour
                 {
                     SnapPoint snapPoint = snapPointPool.Get();
                     float3 posCopy = pos;
-                    posCopy.y = Constants.MaxElevation + 1;
-                    snapPoint.transform.position = pos;
+                    posCopy.y = Main.GetHUDObjectHeight(HUDLayer.SnapPoints);
+                    snapPoint.transform.position = posCopy;
                     activeSnapPoints.Add(snapPoint);
                 }
         }
@@ -56,8 +56,8 @@ public class SnapPoints : MonoBehaviour
                 {
                     SnapPoint snapPoint = snapPointPool.Get();
                     float3 posCopy = pos;
-                    posCopy.y = Constants.MaxElevation + 1;
-                    snapPoint.transform.position = pos;
+                    posCopy.y = Main.GetHUDObjectHeight(HUDLayer.SnapPoints);
+                    snapPoint.transform.position = posCopy;
                     activeSnapPoints.Add(snapPoint);
                 }
         }

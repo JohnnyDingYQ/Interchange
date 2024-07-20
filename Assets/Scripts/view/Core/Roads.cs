@@ -69,7 +69,7 @@ public class Roads : MonoBehaviour
         {
             GameObject arrow = Instantiate(arrowPrefab, roadObject.transform);
             float3 pos = roadObject.Road.EvaluatePosition(t);
-            pos.y = Constants.MaxElevation + 1;
+            pos.y = Main.GetHUDObjectHeight(HUDLayer.DirectionArrows);
             arrow.transform.position = pos;
             float angle = Vector3.Angle(roadObject.Road.EvaluateTangent(t), Vector3.forward);
             if (math.cross(roadObject.Road.EvaluateTangent(t), Vector3.forward).y > 0)
