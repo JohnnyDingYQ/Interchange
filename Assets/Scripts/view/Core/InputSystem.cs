@@ -171,7 +171,7 @@ public class InputSystem : MonoBehaviour
     }
     void DivideRoad(InputAction.CallbackContext context)
     {
-        Intersection ix = Snapping.Snap(MouseWorldPos, Build.LaneCount).Intersection;
+        Intersection ix = Snapping.Snap(MouseWorldPos, Build.LaneCount, Side.Both).Intersection;
         if (ix != null)
         {
             Combine.CombineRoads(ix);

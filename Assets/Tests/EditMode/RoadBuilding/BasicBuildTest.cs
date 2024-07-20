@@ -253,6 +253,18 @@ public class BasicBuildTest
         Assert.AreEqual(0, Game.Roads.Count);
     }
 
+    [Test]
+    public void SnapDoesNotOverrideInLane()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        float3 offset = new(2 * Constants.MinLaneLength, 0, 0);
+        float3 step = new(0, 0, Constants.MinLaneLength);
+        Road road1 = RoadBuilder.Single(offset, offset + step, offset + 2 * step, 1);
+
+        Assert.AreSame(road0.EndIntersection.Nodes.Single().InLane, road0.Lanes.Single());
+    }
+
+
     #region Helpers
     public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)
     {

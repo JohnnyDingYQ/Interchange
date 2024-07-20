@@ -56,11 +56,11 @@ public class Intersection
             node.Intersection = this;
     }
 
-    public void AddNode(int nodeIndex)
+    public Node AddNode(int nodeIndex)
     {
         Assert.AreNotEqual(0, nodes.Count);
         if (nodes.ContainsKey(nodeIndex))
-            return;
+            return null;
         Node firstNode = nodes.Values.First();
         int firstIndex = firstNode.NodeIndex;
         Node newNode = new(
@@ -70,6 +70,20 @@ public class Intersection
         )
         { Intersection = this };
         nodes[newNode.NodeIndex] = newNode;
+        return newNode;
+    }
+
+    // invokes AddNode if walked node index does not exist
+    public List<Node> WalkNodes(int startNodeIndex, int count)
+    {
+        List<Node> results = new();
+        for (int i = startNodeIndex; i < startNodeIndex + count; i++)
+        {
+            Node node = GetNodeByIndex(i);
+            node ??= AddNode(i);
+            results.Add(node);
+        }
+        return results;
     }
 
     public Node GetNodeByIndex(int nodeIndex)
@@ -227,5 +241,9 @@ public class Intersection
             if (n.InLane == null || n.OutLane == null)
                 return false;
         return true;
+    }
+    public override string ToString()
+    {
+        return "Intersection " + Id;
     }
 }

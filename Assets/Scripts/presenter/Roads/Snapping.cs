@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 
 public static class Snapping
 {
-    public static BuildTargets Snap(float3 pos, int laneCount)
+    public static BuildTargets Snap(float3 pos, int laneCount, Side side)
     {
         BuildTargets bt = new()
         {
@@ -19,11 +19,19 @@ public static class Snapping
 
         List<Node> nodes = Game.Nodes.Values
             .Where(node => WithinSnapRange(pos, node.Pos, laneCount))
-            .OrderBy(node => node.NodeIndex)
+            .OrderBy(node => math.length(pos - node.Pos))
             .Take(laneCount)
+            .OrderBy(node => node.NodeIndex)
             .ToList();
 
         if (nodes.Count == 0)
+            return bt;
+        
+        if (side == Side.Start && nodes.Any(node => node.OutLane != null))
+            return bt;
+        
+        
+        if (side == Side.End && nodes.Any(node => node.InLane != null))
             return bt;
 
         if (laneCount == 1 && nodes.First().BelongsToPoint)

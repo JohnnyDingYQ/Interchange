@@ -16,8 +16,8 @@ public class BuildTargetTest
     [Test]
     public void NoSnap()
     {
-        BuildTargets bt1 = Snapping.Snap(0, 1);
-        BuildTargets bt2 = Snapping.Snap(0, 2);
+        BuildTargets bt1 = Snapping.Snap(0, 1, Side.End);
+        BuildTargets bt2 = Snapping.Snap(0, 2, Side.Start);
         Assert.False(bt1.Snapped);
         Assert.False(bt2.Snapped);
         Assert.AreEqual(new float3(0), bt1.ClickPos);
@@ -28,7 +28,7 @@ public class BuildTargetTest
     public void RepeatingOneLaneRoad_OnEnd()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        BuildTargets bt = Snapping.Snap(2 * stride, 1);
+        BuildTargets bt = Snapping.Snap(2 * stride, 1, Side.Start);
 
         Assert.True(bt.Snapped);
         Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, bt.Pos));
@@ -40,7 +40,7 @@ public class BuildTargetTest
     public void RepeatingTwoLaneRoad_OnStart()
     {
         RoadBuilder.Single(0, stride, 2 * stride, 2);
-        BuildTargets bt = Snapping.Snap(0, 2);
+        BuildTargets bt = Snapping.Snap(0, 2, Side.End);
         Road road = Game.Roads.Values.First();
 
         Assert.True(bt.Snapped);
@@ -54,7 +54,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Lane lane = road.Lanes[0];
-        BuildTargets bt = Snapping.Snap(lane.EndPos + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 1);
+        BuildTargets bt = Snapping.Snap(lane.EndPos + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 1, Side.Start);
 
         Assert.True(bt.Snapped);
         Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.Pos));
@@ -69,7 +69,7 @@ public class BuildTargetTest
         Lane lane0 = road.Lanes[0];
         Lane lane1 = road.Lanes[1];
         float3 midPoint = Vector3.Lerp(lane0.StartPos, lane1.StartPos, 0.5f);
-        BuildTargets bt = Snapping.Snap(midPoint + 0.9f * Constants.BuildSnapTolerance * new float3(-1, 0, 0), 2);
+        BuildTargets bt = Snapping.Snap(midPoint + 0.9f * Constants.BuildSnapTolerance * new float3(-1, 0, 0), 2, Side.End);
 
         Assert.True(bt.Snapped);
         Assert.AreEqual(midPoint, bt.Pos);
@@ -82,7 +82,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
-        BuildTargets bt = Snapping.Snap(buildPoint, 2);
+        BuildTargets bt = Snapping.Snap(buildPoint, 2, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(-1, bt.Offset);
@@ -94,7 +94,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
-        BuildTargets bt = Snapping.Snap(buildPoint, 2);
+        BuildTargets bt = Snapping.Snap(buildPoint, 2, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(0, bt.Offset);
@@ -105,7 +105,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, 1);
-        BuildTargets bt = Snapping.Snap(buildPoint, 3);
+        BuildTargets bt = Snapping.Snap(buildPoint, 3, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(-1, bt.Offset);
@@ -116,7 +116,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Vector3 buildPoint = 2 * stride + 0.9f * Constants.BuildSnapTolerance * new float3(0, 0, -1);
-        BuildTargets bt = Snapping.Snap(buildPoint, 3);
+        BuildTargets bt = Snapping.Snap(buildPoint, 3, Side.Start);
         
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(0, bt.Offset);
@@ -126,7 +126,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Mid()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        BuildTargets bt = Snapping.Snap(2 * stride, 3);
+        BuildTargets bt = Snapping.Snap(2 * stride, 3, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(-1, bt.Offset);
@@ -137,7 +137,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + road.BezierSeries.Evaluate2DNormalizedNormal(1) * Constants.LaneWidth;
-        BuildTargets bt = Snapping.Snap(buildPoint, 3);
+        BuildTargets bt = Snapping.Snap(buildPoint, 3, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(-2, bt.Offset);
@@ -148,7 +148,7 @@ public class BuildTargetTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vector3 buildPoint = 2 * stride + -1 * Constants.LaneWidth * road.BezierSeries.Evaluate2DNormalizedNormal(1);
-        BuildTargets bt = Snapping.Snap(buildPoint, 3);
+        BuildTargets bt = Snapping.Snap(buildPoint, 3, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(0, bt.Offset);
@@ -159,7 +159,7 @@ public class BuildTargetTest
     public void LaneContractionThreeLanetoOneLane()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        BuildTargets bt = Snapping.Snap(0, 3);
+        BuildTargets bt = Snapping.Snap(0, 3, Side.End);
 
         Assert.AreSame(road.StartIntersection, bt.Intersection);
         Assert.AreEqual(-1, bt.Offset);
@@ -169,7 +169,7 @@ public class BuildTargetTest
     public void InitialRoadCanBeSnappedAtStart()
     {
         RoadBuilder.Single(0, stride, 2 * stride, 1);
-        BuildTargets bt = Snapping.Snap(0, 3);
+        BuildTargets bt = Snapping.Snap(0, 3, Side.End);
         Assert.True(bt.Snapped);
     }
 
@@ -177,7 +177,7 @@ public class BuildTargetTest
     public void NodeUnsnappableAtMinimumElevation()
     {
         RoadBuilder.Single(new float3(0, -2, 0), stride, 2 * stride, 1);
-        BuildTargets bt = Snapping.Snap(0, 1);
+        BuildTargets bt = Snapping.Snap(0, 1, Side.End);
         
         Assert.False(bt.Snapped);
     }
@@ -188,13 +188,22 @@ public class BuildTargetTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         road.Lanes[0].StartNode.BelongsToPoint = true;
 
-        BuildTargets bt = Snapping.Snap(0, 1);
+        BuildTargets bt = Snapping.Snap(0, 1, Side.End);
         Assert.True(bt.Snapped);
 
-        bt = Snapping.Snap(0, 2);
+        bt = Snapping.Snap(0, 2, Side.End);
         Assert.False(bt.Snapped);
 
-        bt = Snapping.Snap(0, 3);
+        bt = Snapping.Snap(0, 3, Side.End);
+        Assert.False(bt.Snapped);
+    }
+
+    [Test]
+    public void SnapEndButInLaneAlreadyExists()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        BuildTargets bt = Snapping.Snap(2 * stride, 1, Side.End);
+
         Assert.False(bt.Snapped);
     }
 }

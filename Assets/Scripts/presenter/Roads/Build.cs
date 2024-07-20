@@ -89,7 +89,7 @@ public static class Build
     public static void BuildGhostRoad(float3 endTargetClickPos)
     {
         RemoveAllGhostRoads();
-        EndTarget = Snapping.Snap(endTargetClickPos, LaneCount);
+        EndTarget = Snapping.Snap(endTargetClickPos, LaneCount, Side.End);
         if (ParallelBuildOn)
             BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
         else
@@ -104,7 +104,7 @@ public static class Build
             float interpolation = road != null ? road.GetNearestInterpolation(hoverPos) : 0;
             if (Game.HoveredRoad == null || !road.InterpolationBetweenVertices(interpolation))
             {
-                StartTarget = Snapping.Snap(hoverPos, LaneCount);
+                StartTarget = Snapping.Snap(hoverPos, LaneCount, Side.Start);
                 EndTarget = null;
                 ReplaceSuggestionOn = false;
             }
@@ -115,8 +115,8 @@ public static class Build
                     road.EvaluateTangent(interpolation),
                     road.EvaluatePosition(interpolation) - hoverPos).y > 0;
                 float offset = isOnLeftSide ? distance : -distance;
-                StartTarget = Snapping.Snap(road.EvaluatePosition(0) + offset * road.Evaluate2DNormalizedNormal(0), LaneCount);
-                EndTarget = Snapping.Snap(road.EvaluatePosition(1) + offset * road.Evaluate2DNormalizedNormal(1), LaneCount);
+                StartTarget = Snapping.Snap(road.EvaluatePosition(0) + offset * road.Evaluate2DNormalizedNormal(0), LaneCount, Side.Both);
+                EndTarget = Snapping.Snap(road.EvaluatePosition(1) + offset * road.Evaluate2DNormalizedNormal(1), LaneCount, Side.Both);
                 ReplaceSuggestionOn = true;
             }
         }
@@ -148,7 +148,7 @@ public static class Build
         if (!startAssigned)
         {
             startAssigned = true;
-            StartTarget = Snapping.Snap(clickPos, LaneCount);
+            StartTarget = Snapping.Snap(clickPos, LaneCount, Side.Start);
             return null;
         }
         if (!pivotAssigned)
@@ -160,7 +160,7 @@ public static class Build
             return null;
         }
         RemoveAllGhostRoads();
-        EndTarget = Snapping.Snap(clickPos, LaneCount);
+        EndTarget = Snapping.Snap(clickPos, LaneCount, Side.End);
         if (ParallelBuildOn)
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
@@ -206,8 +206,8 @@ public static class Build
         if (road == null)
             return null;
         BezierSeries offsetted = road.BezierSeries.Offset(ParallelSpacing);
-        BuildTargets startTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(0), LaneCount);
-        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(1), LaneCount);
+        BuildTargets startTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(0), LaneCount, Side.End);
+        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(1), LaneCount, Side.Start);
         offsetted.Reverse();
         Road parallel = new(offsetted, LaneCount);
         if (buildMode == BuildMode.Ghost)
@@ -361,14 +361,14 @@ public static class Build
     public static void ConnectRoadStartToNodes(Intersection ix, int index, Road road)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
-        int count = 0;
-        for (int i = index; i < index + road.LaneCount; i++)
+        List<Node> nodes = ix.WalkNodes(index, road.LaneCount);
+        for (int i = 0; i < nodes.Count; i++)
         {
-            ix.AddNode(i);
-            Node node = ix.GetNodeByIndex(i);
-            node.OutLane = road.Lanes[count];
-            road.Lanes[count++].StartNode = node;
+            Node node = nodes[i];
+            node.OutLane = road.Lanes[i];
+            road.Lanes[i].StartNode = node;
         }
+
         road.StartIntersection.AddRoad(road, Direction.Out);
         IntersectionUtil.EvaluatePaths(road.StartIntersection);
         IntersectionUtil.EvaluateOutline(road.StartIntersection);
@@ -377,13 +377,12 @@ public static class Build
     public static void ConnectRoadEndToNodes(Intersection ix, int index, Road road)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
-        int count = 0;
-        for (int i = index; i < index + road.LaneCount; i++)
+        List<Node> nodes = ix.WalkNodes(index, road.LaneCount);
+        for (int i = 0; i < nodes.Count; i++)
         {
-            ix.AddNode(i);
-            Node node = ix.GetNodeByIndex(i);
-            node.InLane = road.Lanes[count];
-            road.Lanes[count++].EndNode = node;
+            Node node = nodes[i];
+            node.InLane = road.Lanes[i];
+            road.Lanes[i].EndNode = node;
         }
         road.EndIntersection.AddRoad(road, Direction.In);
         IntersectionUtil.EvaluatePaths(road.EndIntersection);
