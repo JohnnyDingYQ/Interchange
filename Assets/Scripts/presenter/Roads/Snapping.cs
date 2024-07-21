@@ -53,15 +53,12 @@ public static class Snapping
 
         void SetupSnapInfo()
         {
+            bt.Intersection = nodes.First().Intersection;
+            nodes = bt.Intersection.WalkNodes(index, laneCount);
             bt.Offset = index;
             bt.Snapped = true;
-            bt.Pos = interpolatedPos - offset * ((float)(laneCount - 1) / 2);
-            bt.Intersection = nodes.First().Intersection;
-            bt.NodesPos = new();
-            for (int i = 0; i < laneCount; i++)
-            {
-                bt.NodesPos.Add(interpolatedPos - offset * i);
-            }
+            bt.Pos = (nodes.First().Pos + nodes.Last().Pos) / 2;
+            bt.NodesPos = nodes.Select(node => node.Pos).ToList();
             if (!bt.Intersection.IsRoadEmpty())
             {
                 bt.TangentAssigned = true;

@@ -4,11 +4,10 @@ using UnityEngine.Assertions;
 
 public class Main : MonoBehaviour
 {
-
-    bool flip = false;
     readonly bool debugMode = true;
     [SerializeField]
     DevPanel devPanel;
+    uint frameElapsed = 0;
 
     void Start()
     {
@@ -25,12 +24,15 @@ public class Main : MonoBehaviour
 
     void Update()
     {
-        flip = !flip;
-        if (flip)
+        DemandsGenerator.GenerateDemands(Time.deltaTime);
+        DemandsSatisfer.SatisfyDemands(Time.deltaTime);
+        if (frameElapsed % 6 == 0)
         {
-            Build.HandleHover(InputSystem.MouseWorldPos);
             Roads.UpdateHoveredRoad();
+            Zones.UpdateHoveredZone();
+            Build.HandleHover(InputSystem.MouseWorldPos);
         }
+        frameElapsed++;
     }
 
     void SanityCheck()

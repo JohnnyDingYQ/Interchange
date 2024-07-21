@@ -152,6 +152,8 @@ public class BezierSeries
     {
         Assert.IsTrue(t <= 1);
         Assert.IsTrue(t >= 0);
+        if (t == 1)
+            return curves.Last().Normalized2DNormal(1);
         SeriesLocation location = InterpolationToLocation(t);
         return curves[location.Index].Normalized2DNormal(location.Interpolation);
     }
@@ -254,7 +256,13 @@ public class BezierSeries
 
     public void Add(BezierSeries other)
     {
-        Assert.IsTrue(MyNumerics.AreNumericallyEqual(EvaluatePosition(1), other.EvaluatePosition(0)));
+        if (!MyNumerics.AreNumericallyEqual(EvaluatePosition(1), other.EvaluatePosition(0)))
+        {
+            Debug.Log("This end: " + EvaluatePosition(1));
+            Debug.Log("Other start: " + other.EvaluatePosition(0));
+            Debug.Log("Diff: " + math.length(EvaluatePosition(1) - other.EvaluatePosition(0)));
+            Assert.IsFalse(true);
+        }
         curves.AddRange(other.curves);
         Length += other.Length;
     }

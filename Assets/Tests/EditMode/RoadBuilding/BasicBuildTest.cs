@@ -264,6 +264,16 @@ public class BasicBuildTest
         Assert.AreSame(road0.EndIntersection.Nodes.Single().InLane, road0.Lanes.Single());
     }
 
+    // [Test]
+    // public void ConnectBentRoadToRaodStart()
+    // {
+    //     float3 right = new(Constants.MinLaneLength, 0, 0);
+    //     float3 up = new(0, 0, 2 * Constants.MinLaneLength);
+    //     float3 start = 2 * up + 2 * right;
+    //     Road road1 = RoadBuilder.Single(start, start + right, start + right, 2);
+    //     Road road0 = RoadBuilder.Single(0, 2 * up, start, 2);
+    // }
+
 
     #region Helpers
     public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)

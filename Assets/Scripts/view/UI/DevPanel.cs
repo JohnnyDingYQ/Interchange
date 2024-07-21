@@ -52,8 +52,6 @@ public class DevPanel : MonoBehaviour
         supportLines.value = true;
         ghostRoad.RegisterCallback<ChangeEvent<bool>>(ToggleGhost);
         ghostRoad.value = true;
-        enforceTangent.RegisterCallback<ChangeEvent<bool>>(EnforceTangent);
-        enforceTangent.value = true;
     }
 
     void Update()
@@ -81,7 +79,6 @@ public class DevPanel : MonoBehaviour
         drawVertices.UnregisterCallback<ChangeEvent<bool>>(ToggleVertices);
         supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
         ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
-        enforceTangent.UnregisterCallback<ChangeEvent<bool>>(EnforceTangent);
     }
 
     void MouseReturnGameWorld(MouseEnterEvent e)
@@ -123,9 +120,5 @@ public class DevPanel : MonoBehaviour
     void ToggleSupportLines(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawSupportLines = e.newValue;
-    }
-    void EnforceTangent(ChangeEvent<bool> e)
-    {
-        Build.EnforcesTangent = e.newValue;
     }
 }

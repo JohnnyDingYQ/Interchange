@@ -53,6 +53,19 @@ public class ParallelBuildTest
         Assert.IsTrue(AreConnected(roads1.Last(), roads0.Last()));
     }
 
+    [Test]
+    public void BuildingBentParallelWorks()
+    {
+        Build.ToggletParallelBuild();
+        List<Road> roads0 = RoadBuilder.Many(-2 * stride, -stride, 0, 2);
+        List<Road> roads1 = RoadBuilder.Many(
+            0,
+            new(2 * Constants.MinLaneLength, 0, 0),
+            new(2 * Constants.MinLaneLength, 0, 2 * Constants.MinLaneLength),
+            2
+        );
+    }
+
     bool AreConnected(Road left, Road right)
     {
         return left.Lanes.Select(l => l.EndNode).ToHashSet().SetEquals(right.Lanes.Select(l => l.StartNode));

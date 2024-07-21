@@ -14,7 +14,7 @@ public class Car
     private readonly Path[] paths;
     public float DistanceOnPath { get; set; }
     private int pathIndex;
-    public Path CurrentPath {get {return paths[pathIndex]; }}
+    public Path CurrentPath {get => paths[pathIndex];}
     private float speed;
     private bool isBraking;
 
@@ -26,6 +26,7 @@ public class Car
         DistanceOnPath = 0;
         pathIndex = 0;
         speed = 0;
+        Pos = new(0, -100, 0);
     }
     public void Start()
     {

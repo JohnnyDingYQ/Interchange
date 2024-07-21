@@ -65,7 +65,7 @@ public class Intersection
         Node firstNode = nodes.Values.First();
         int firstIndex = firstNode.NodeIndex;
         Node newNode = new(
-            firstNode.Pos + Normal * Constants.LaneWidth * (firstIndex - nodeIndex),
+            firstNode.Pos + (firstIndex - nodeIndex) * Constants.LaneWidth * Normal,
             firstNode.Pos.y,
             nodeIndex
         )

@@ -28,19 +28,8 @@ public class Zones : MonoBehaviour
             Game.TargetZones.Add(id, new(id));
         }
     }
-
-    void Update()
-    {
-        UpdateHoveredZone();
-
-        DemandsGenerator.GenerateDemands(Time.deltaTime);
-        DemandsSatisfer.SatisfyDemands(Time.deltaTime);
     
-        // foreach (Zone zone in Game.SourceZones.Values)
-        //     Debug.Log(zone.Vertices.Count);
-    }
-
-    void UpdateHoveredZone()
+    public static void UpdateHoveredZone()
     {
         float3 mousePos = InputSystem.MouseWorldPos;
         mousePos.y = Constants.MinElevation + 1;

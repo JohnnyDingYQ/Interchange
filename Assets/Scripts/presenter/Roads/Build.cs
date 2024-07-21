@@ -16,7 +16,6 @@ public static class Build
     public static BuildTargets EndTarget { get; set; }
     public static List<Tuple<float3, float3>> SupportLines { get; }
     public static bool BuildsGhostRoad { get; set; }
-    public static bool EnforcesTangent { get; set; }
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
     public static float ParallelSpacing { get; set; }
@@ -30,7 +29,6 @@ public static class Build
         pivotAligned = false;
         SupportLines = new();
         BuildsGhostRoad = true;
-        EnforcesTangent = true;
         GhostRoads = new();
         ParallelSpacing = Constants.DefaultParallelSpacing;
     }
@@ -39,7 +37,6 @@ public static class Build
     {
         ResetSelection();
         RemoveAllGhostRoads();
-        EnforcesTangent = true;
         BuildsGhostRoad = true;
         GhostRoads = new();
         ParallelBuildOn = false;
@@ -123,7 +120,7 @@ public static class Build
         }
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
-        if (EnforcesTangent && !pivotAssigned && startAssigned)
+        if (!pivotAssigned && startAssigned)
             AlignPivotByStart(StartTarget, pivotPos);
         if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
@@ -157,8 +154,7 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
-            if (EnforcesTangent)
-                AlignPivotByStart(StartTarget, pivotPos);
+            AlignPivotByStart(StartTarget, pivotPos);
             return null;
         }
         RemoveAllGhostRoads();
@@ -168,30 +164,33 @@ public static class Build
         else
         {
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
-            if (roads != null && startZone != null && LaneCount == 1)
-                startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
-            if (roads != null && Game.HoveredZone != null && LaneCount == 1)
-                Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
+            if (roads != null && LaneCount == 1)
+            {
+                if (startZone != null && Game.SourceZones.Values.Contains(startZone))
+                    startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
+                if (Game.HoveredZone != null && Game.TargetZones.Values.Contains(Game.HoveredZone))
+                    Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
+            }
         }
         ResetSelection();
         return roads;
 
         List<Road> BuildSuggested()
         {
-            float roadMidIndex = StartTarget.Offset + (float) LaneCount / 2;
+            float roadMidIndex = StartTarget.Offset + (float)LaneCount / 2;
             float currMidIndex = StartTarget.SelectedRoad.Lanes.First().StartNode.NodeIndex
-                + (float) StartTarget.SelectedRoad.LaneCount / 2;
+                + (float)StartTarget.SelectedRoad.LaneCount / 2;
             float offsetDist = (currMidIndex - roadMidIndex) * Constants.LaneWidth;
             Road road = new(StartTarget.SelectedRoad.BezierSeries.Offset(offsetDist), LaneCount);
             Game.RemoveRoad(StartTarget.SelectedRoad, RoadRemovalOption.Replace);
             roads = ProcessRoad(road, StartTarget, EndTarget);
             Assert.IsTrue(road == roads.Single());
-            
+
             foreach (Node node in StartTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.OutLane) && node.InLane == null)
                     Game.RemoveNode(node);
-                
-            foreach (Node node in EndTarget.Intersection.Nodes)            
+
+            foreach (Node node in EndTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)
                     Game.RemoveNode(node);
             return roads;
@@ -214,17 +213,19 @@ public static class Build
         if (road == null)
             return null;
         BezierSeries offsetted = road.BezierSeries.Offset(ParallelSpacing);
-        BuildTargets startTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(0), LaneCount, Side.End);
-        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(1), LaneCount, Side.Start);
         offsetted.Reverse();
+        Debug.Log(offsetted.Evaluate2DNormalizedNormal(1));
+        BuildTargets startTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(0), LaneCount, Side.Start);
+        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(1), LaneCount, Side.End);
         Road parallel = new(offsetted, LaneCount);
+        Debug.Log(parallel.Lanes[0].EvaluatePosition(1));
         if (buildMode == BuildMode.Ghost)
         {
             road.IsGhost = true;
             parallel.IsGhost = true;
         }
         List<Road> roads = ProcessRoad(road, startTarget, endTarget);
-        roads.AddRange(ProcessRoad(parallel, endTargetParallel, startTargetParallel));
+        roads.AddRange(ProcessRoad(parallel, startTargetParallel, endTargetParallel));
         return roads;
     }
 
@@ -232,7 +233,7 @@ public static class Build
     {
         float3 startPos = startTarget.Pos;
         float3 endPos = endTarget.Pos;
-        if (EnforcesTangent && !pivotAligned)
+        if (!pivotAligned)
             pivotPos = AlignPivotEnd(endTarget, pivotPos);
         if (RoadIsTooBent() || BadSegmentRatio())
             return null;
