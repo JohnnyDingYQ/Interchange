@@ -202,8 +202,8 @@ public class BasicBuildTest
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride + new float3(Constants.MinLaneLength, 0 , 0), 4 * stride, 1);
-        float3 inTangent = road0.BezierSeries.Evaluate2DNormalizedNormal(1);
-        float3 outTangent = road1.BezierSeries.Evaluate2DNormalizedNormal(0);
+        float3 inTangent = road0.Curve.EndNormal;
+        float3 outTangent = road1.Curve.StartNormal;
 
         Assert.True(MyNumerics.AreNumericallyEqual(inTangent, outTangent));
     }
@@ -212,8 +212,8 @@ public class BasicBuildTest
     {
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road road0 = RoadBuilder.Single(0, stride + new float3(Constants.MinLaneLength, 0 , 0), 2 * stride, 1);
-        float3 inTangent = road0.BezierSeries.Evaluate2DNormalizedNormal(1);
-        float3 outTangent = road1.BezierSeries.Evaluate2DNormalizedNormal(0);
+        float3 inTangent = road0.Curve.EndNormal;
+        float3 outTangent = road1.Curve.StartNormal;
 
         Assert.True(MyNumerics.AreNumericallyEqual(inTangent, outTangent));
     }

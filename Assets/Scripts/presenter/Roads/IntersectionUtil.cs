@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Evaluates and updates the outlines and paths for the given intersection.
@@ -111,12 +112,12 @@ public static class IntersectionUtil
             if (orientation == Orientation.Right)
                 normalMultiplier *= -1;
             int numPoints = (int)(Constants.VertexDistanceFromRoadEnds * Constants.MeshResolution) + 1;
-            BezierSeries bs = lane.BezierSeries;
+            Curve bs = lane.Curve;
             float interpolationOfLocation;
             if (side == Side.Start)
-                interpolationOfLocation = lane.StartVertex.SeriesInterpolation;
+                interpolationOfLocation = lane.Curve.GetDistanceToInterpolation(Constants.VertexDistanceFromRoadEnds);
             else
-                interpolationOfLocation = lane.EndVertex.SeriesInterpolation;
+                interpolationOfLocation = lane.Curve.GetDistanceToInterpolation(lane.Curve.Length - Constants.VertexDistanceFromRoadEnds);
             for (int i = 0; i <= numPoints; i++)
             {
                 float t;
@@ -147,8 +148,10 @@ public static class IntersectionUtil
             foreach (Node node in ix.Nodes)
                 if (node.InLane != null && node.OutLane != null)
                 {
-                    BezierSeries left = new(node.InLane.BezierSeries, node.InLane.EndVertex.SeriesInterpolation, 1);
-                    BezierSeries right = new(node.OutLane.BezierSeries, 0, node.OutLane.StartVertex.SeriesInterpolation);
+                    Curve left = node.InLane.Curve.Duplicate();
+                    left.AddStartDistance(node.InLane.Curve.Length - Constants.VertexDistanceFromRoadEnds);
+                    Curve right = node.OutLane.Curve.Duplicate();
+                    right.AddEndDistance(node.InLane.Curve.Length - Constants.VertexDistanceFromRoadEnds);
                     left.Add(right);
                     Path path = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
                     Graph.AddPath(path);
@@ -235,8 +238,8 @@ public static class IntersectionUtil
 
             float3 pos1 = start.Pos + Constants.MinLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinLaneLength / 3 * end.Tangent;
-            BezierSeries bezierSeries = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
-            Path newPath = new(bezierSeries, start, end);
+            Curve Curve = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
+            Path newPath = new(Curve, start, end);
             Graph.AddPath(newPath);
             return newPath;
         }

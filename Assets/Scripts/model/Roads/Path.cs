@@ -14,7 +14,7 @@ public class Path : IEdge<Vertex>
     [JsonProperty]
     public uint Id { get; set; }
     [JsonProperty]
-    public BezierSeries BezierSeries { get; private set; }
+    public Curve Curve { get; private set; }
     [JsonIgnore]
     public Vertex Source { get; set; }
     public uint Source_ { get; set; }
@@ -22,7 +22,7 @@ public class Path : IEdge<Vertex>
     public Vertex Target { get; set; }
     public uint Target_ { get; set; }
     [JsonIgnore]
-    public float Length { get => BezierSeries.Length; }
+    public float Length { get => Curve.Length; }
     [JsonIgnore]
     public Path InterweavingPath { get; set; }
     public uint InterweavingPath_ { get; set; }
@@ -33,9 +33,9 @@ public class Path : IEdge<Vertex>
 
     public Path() { Cars = new(); }
 
-    public Path(BezierSeries bezierSeries, Vertex source, Vertex target)
+    public Path(Curve curve, Vertex source, Vertex target)
     {
-        BezierSeries = bezierSeries;
+        Curve = curve;
         Source = source;
         Target = target;
         Cars = new();
@@ -43,7 +43,14 @@ public class Path : IEdge<Vertex>
 
     public List<float3> GetOutline(Orientation orientation)
     {
-        return BezierSeries.GetOutline(orientation);
+        Curve border = Curve.Duplicate();
+        if (orientation == Orientation.Left)
+            border.Offset(Constants.RoadOutlineSeparation);
+        else if (orientation == Orientation.Right)
+            border.Offset(-Constants.RoadOutlineSeparation);
+        else
+            throw new ArgumentException("orientation");
+        return border.GetOutline((int) Math.Ceiling(border.Length * Constants.MeshResolution)).ToList();
     }
 
     public void AddCar(Car car)

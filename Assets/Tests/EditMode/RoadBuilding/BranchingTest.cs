@@ -23,8 +23,8 @@ public class BranchingTest
         Road branch1 = RoadBuilder.Single(p1, p1 + offset, p1 + 2 * offset, 1);
         Road branch2 = RoadBuilder.Single(p2, p2 + offset, p2 + 2 * offset, 1);
 
-        Assert.AreSame(road.Lanes[0].EndNode.OutLane, branch1.Lanes[0]);
-        Assert.AreSame(road.Lanes[1].EndNode.OutLane, branch2.Lanes[0]);
+        Assert.AreSame(branch1.Lanes[0], road.Lanes[0].EndNode.OutLane);
+        Assert.AreSame(branch2.Lanes[0], road.Lanes[1].EndNode.OutLane);
         CheckIntersection(new() { road }, new() { branch1, branch2 });
     }
 

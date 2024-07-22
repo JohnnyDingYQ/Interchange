@@ -181,7 +181,7 @@ public static class Build
             float currMidIndex = StartTarget.SelectedRoad.Lanes.First().StartNode.NodeIndex
                 + (float)StartTarget.SelectedRoad.LaneCount / 2;
             float offsetDist = (currMidIndex - roadMidIndex) * Constants.LaneWidth;
-            Road road = new(StartTarget.SelectedRoad.BezierSeries.Offset(offsetDist), LaneCount);
+            Road road = new(StartTarget.SelectedRoad.Curve.Offset(offsetDist), LaneCount);
             Game.RemoveRoad(StartTarget.SelectedRoad, RoadRemovalOption.Replace);
             roads = ProcessRoad(road, StartTarget, EndTarget);
             Assert.IsTrue(road == roads.Single());
@@ -212,13 +212,11 @@ public static class Build
         Road road = InitRoad(startTarget, pivotPos, endTarget);
         if (road == null)
             return null;
-        BezierSeries offsetted = road.BezierSeries.Offset(ParallelSpacing);
-        offsetted.Reverse();
-        Debug.Log(offsetted.Evaluate2DNormalizedNormal(1));
-        BuildTargets startTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(0), LaneCount, Side.Start);
-        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EvaluatePosition(1), LaneCount, Side.End);
+        Curve offsetted = road.Curve.Offset(ParallelSpacing);
+        offsetted.ReverseChain();
+        BuildTargets startTargetParallel = Snapping.Snap(offsetted.StartPos, LaneCount, Side.Start);
+        BuildTargets endTargetParallel = Snapping.Snap(offsetted.EndPos, LaneCount, Side.End);
         Road parallel = new(offsetted, LaneCount);
-        Debug.Log(parallel.Lanes[0].EvaluatePosition(1));
         if (buildMode == BuildMode.Ghost)
         {
             road.IsGhost = true;
@@ -329,7 +327,7 @@ public static class Build
         #endregion
     }
 
-    static BezierSeries ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
+    static Curve ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
     {
         // reference: https://pomax.github.io/bezierinfo/#circles_cubic
         float k = 0.551785f;

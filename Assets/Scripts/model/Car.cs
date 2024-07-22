@@ -60,7 +60,7 @@ public class Car
             {
                 nextPath.IncomingCar = null;
                 nextPath.AddCar(this);
-                Pos = nextPath.BezierSeries.EvaluatePosition(0);
+                Pos = nextPath.Curve.StartPos;
             }
             else
             {
@@ -68,7 +68,7 @@ public class Car
             }
             return;
         }
-        Pos = path.BezierSeries.EvaluatePosition(DistanceOnPath / path.Length);
+        Pos = path.Curve.EvaluateDistancePos(DistanceOnPath);
 
         # region EXTRACTED FUNCTIONS
         int GetCarIndex()

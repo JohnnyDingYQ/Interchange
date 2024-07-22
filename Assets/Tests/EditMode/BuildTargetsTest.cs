@@ -136,7 +136,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Left()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Vector3 buildPoint = 2 * stride + road.BezierSeries.Evaluate2DNormalizedNormal(1) * Constants.LaneWidth;
+        Vector3 buildPoint = 2 * stride + road.Curve.EndNormal * Constants.LaneWidth;
         BuildTargets bt = Snapping.Snap(buildPoint, 3, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);
@@ -147,7 +147,7 @@ public class BuildTargetTest
     public void LaneExpansionOneLaneToThreeLane_Right()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Vector3 buildPoint = 2 * stride + -1 * Constants.LaneWidth * road.BezierSeries.Evaluate2DNormalizedNormal(1);
+        Vector3 buildPoint = 2 * stride + -1 * Constants.LaneWidth * road.Curve.EndNormal;
         BuildTargets bt = Snapping.Snap(buildPoint, 3, Side.Start);
 
         Assert.AreSame(road.EndIntersection, bt.Intersection);

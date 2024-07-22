@@ -11,23 +11,15 @@ public static class Divide
     {
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
-        float interpolation = road.GetNearestInterpolation(clickPos);
-        if (RoadIsDividable(road, interpolation))
-            return DivideRoad(road, road.GetNearestInterpolation(clickPos));
-        return null;
+        road.Curve.GetNearestPoint(new(clickPos, Vector3.down), out _, out float t);
+        return DivideRoad(road, t);
     }
 
-
-    public static bool RoadIsDividable(Road road, float t)
-    {
-        return road.SplitIsValid(t);
-    }
-
-    public static SubRoads DivideRoad(Road road, float t)
+    public static SubRoads DivideRoad(Road road, float distanceOnCurve)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         int laneCount = road.LaneCount;
-        road.BezierSeries.Split(t, out BezierSeries left, out BezierSeries right);
+        road.Curve.Split(distanceOnCurve, out Curve left, out Curve right);
         Road leftRoad = new(left, laneCount)
         {
             IsGhost = road.IsGhost
@@ -88,8 +80,8 @@ public static class Divide
                 laneRight.EndVertex = lane.EndVertex;
                 laneLeft.StartVertex.SetOwnerLane(laneLeft, Side.Start);
                 laneRight.EndVertex.SetOwnerLane(laneRight, Side.End);
-                laneLeft.InnerPath = new(laneLeft.InnerPath.BezierSeries, laneLeft.StartVertex, laneLeft.EndVertex);
-                laneRight.InnerPath = new(laneRight.InnerPath.BezierSeries, laneRight.StartVertex, laneRight.EndVertex);
+                laneLeft.InnerPath = new(laneLeft.InnerPath.Curve, laneLeft.StartVertex, laneLeft.EndVertex);
+                laneRight.InnerPath = new(laneRight.InnerPath.Curve, laneRight.StartVertex, laneRight.EndVertex);
             }
         }
 

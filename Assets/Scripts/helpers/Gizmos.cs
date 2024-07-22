@@ -28,13 +28,13 @@ public static class Gizmos
     {
         foreach (Road road in Game.Roads.Values)
             foreach (Lane lane in road.Lanes)
-                DrawBeizerSeries(lane.BezierSeries, Color.white, duration);
+                DrawCurve(lane.Curve, Color.white, duration);
     }
 
     public static void DrawRoadCenter(float duration)
     {
         foreach (Road road in Game.Roads.Values)
-            DrawBeizerSeries(road.BezierSeries, Color.magenta, duration);
+            DrawCurve(road.Curve, Color.magenta, duration);
     }
 
     public static void DrawVertices(float duration)
@@ -62,7 +62,7 @@ public static class Gizmos
     {
         foreach (Path path in Game.Paths.Values)
         {
-            DrawBeizerSeries(path.BezierSeries, Color.yellow, duration);
+            DrawCurve(path.Curve, Color.yellow, duration);
         }
     }
 
@@ -83,15 +83,21 @@ public static class Gizmos
         }
     }
 
-    public static void DrawBeizerSeries(BezierSeries bs, Color color, float duration)
+    public static void DrawCurve(Curve curve, Color color, float duration)
     {
         int resolution = 30;
-        float3 prev = bs.EvaluatePosition(0);
-        for (int i = 1; i <= resolution; i++)
+        bool flag = true;
+        float3 prev = 0;
+        foreach (float3 curr in curve.GetOutline(resolution))
         {
-            float3 cur = bs.EvaluatePosition((float) i / resolution);
-            Debug.DrawLine(prev, cur, color, duration);
-            prev = cur;
+            if (flag)
+            {
+                flag = false;
+                prev = curr;
+                continue;
+            }
+            Debug.DrawLine(prev, curr, color, duration);
+            prev = curr;
         }
 
     }

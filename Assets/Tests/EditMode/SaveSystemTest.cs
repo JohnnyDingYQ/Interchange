@@ -123,9 +123,9 @@ public class SaveSystemTest
 
         foreach (Road road in Game.Roads.Values)
         {
-            Assert.NotNull(road.BezierSeries);
+            Assert.NotNull(road.Curve);
             foreach (Lane lane in road.Lanes)
-                Assert.NotNull(lane.BezierSeries);
+                Assert.NotNull(lane.Curve);
         }
 
     }
@@ -141,7 +141,7 @@ public class SaveSystemTest
         Assert.AreEqual(3, Game.Paths.Count);
         Assert.AreEqual(4, Game.Vertices.Count);
         foreach (Path path in Game.Paths.Values)
-            Assert.NotNull(path.BezierSeries);
+            Assert.NotNull(path.Curve);
     }
 
     [Test]

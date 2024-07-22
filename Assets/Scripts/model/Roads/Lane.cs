@@ -18,7 +18,7 @@ public class Lane
     public Node EndNode { get; set; }
     public uint StartNode_ { get; set; }
     public uint EndNode_ { get; set; }
-    public BezierSeries BezierSeries { get; private set; }
+    public Curve Curve { get; private set; }
     [JsonIgnore]
     public float3 StartPos { get { return StartNode.Pos; } }
     [JsonIgnore]
@@ -29,7 +29,7 @@ public class Lane
     [JsonProperty]
     public int LaneIndex { get; private set; }
     [JsonIgnore]
-    public float Length { get => BezierSeries.Length; }
+    public float Length { get => Curve.Length; }
     [JsonIgnore]
     public Path InnerPath { get; set; }
     [JsonProperty]
@@ -48,13 +48,14 @@ public class Lane
     public void InitCurve()
     {
         Assert.IsNotNull(Road);
-        BezierSeries = Road.BezierSeries.Offset(((float)Road.LaneCount / 2 - 0.5f - LaneIndex) * Constants.LaneWidth);
+        Curve = Road.Curve.Duplicate();
+        Curve.Offset(((float)Road.LaneCount / 2 - 0.5f - LaneIndex) * Constants.LaneWidth);
     }
 
     public void InitNodes()
     {
-        StartNode = new(BezierSeries.EvaluatePosition(0), Road.StartPos.y, LaneIndex);
-        EndNode = new(BezierSeries.EvaluatePosition(1), Road.EndPos.y, LaneIndex);
+        StartNode = new(Curve.StartPos, Road.StartPos.y, LaneIndex);
+        EndNode = new(Curve.EndPos, Road.EndPos.y, LaneIndex);
         StartNode.OutLane = this;
         EndNode.InLane = this;
     }
@@ -67,26 +68,11 @@ public class Lane
 
     public void InitInnerPath()
     {
-        float startInterpolation = Constants.VertexDistanceFromRoadEnds / BezierSeries.Length;
-        float endInterpolation = (BezierSeries.Length - Constants.VertexDistanceFromRoadEnds) / BezierSeries.Length;
-        BezierSeries bs = new(BezierSeries, startInterpolation, endInterpolation);
-        Path path = new(bs, StartVertex, EndVertex);
+        Curve curve = Curve.Duplicate();
+        curve.AddStartDistance(Constants.VertexDistanceFromRoadEnds);
+        curve.AddEndDistance(Constants.VertexDistanceFromRoadEnds);
+        Path path = new(curve, StartVertex, EndVertex);
         InnerPath = path;
-    }
-
-    public float3 EvaluatePosition(float t)
-    {
-        return BezierSeries.EvaluatePosition(t);
-    }
-
-    public float3 EvaluateTangent(float t)
-    {
-        return BezierSeries.EvaluateTangent(t);
-    }
-
-    public float3 Evaluate2DNormalizedNormal(float t)
-    {
-        return BezierSeries.Evaluate2DNormalizedNormal(t);
     }
 
     public override string ToString()

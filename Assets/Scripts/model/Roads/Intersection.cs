@@ -150,24 +150,24 @@ public class Intersection
         if (inRoads.Count != 0)
         {
             Road randomInRoad = inRoads.First();
-            BezierSeries bs = randomInRoad.BezierSeries;
+            Curve bs = randomInRoad.Curve;
             if (attributeType == AttributeTypes.Normal)
-                return bs.Evaluate2DNormalizedNormal(1);
+                return bs.EndNormal;
             if (attributeType == AttributeTypes.Tangent)
-                return math.normalize(bs.EvaluateTangent(1));
+                return math.normalize(bs.EndTangent);
             if (attributeType == AttributeTypes.PointOnInSide)
-                return bs.EvaluatePosition(1) - math.normalize(bs.EvaluateTangent(1));
+                return bs.EndPos - math.normalize(bs.EndTangent);
         }
         if (outRoads.Count != 0)
         {
             Road randomOutRoad = outRoads.First();
-            BezierSeries bs = randomOutRoad.BezierSeries;
+            Curve bs = randomOutRoad.Curve;
             if (attributeType == AttributeTypes.Normal)
-                return bs.Evaluate2DNormalizedNormal(0);
+                return bs.StartNormal;
             if (attributeType == AttributeTypes.Tangent)
-                return math.normalize(bs.EvaluateTangent(0));
+                return math.normalize(bs.StartTangent);
             if (attributeType == AttributeTypes.PointOnInSide)
-                return bs.EvaluatePosition(0) - math.normalize(bs.EvaluateTangent(0));
+                return bs.StartPos - math.normalize(bs.StartTangent);
         }
         throw new InvalidOperationException("intersection is empty");
     }

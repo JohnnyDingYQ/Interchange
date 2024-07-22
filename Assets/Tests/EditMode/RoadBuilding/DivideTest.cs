@@ -111,6 +111,7 @@ public class DivideTest
         Road left = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Road mid = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
         Road right = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 2);
+        Debug.Log(mid.Lanes[0].EndPos);
         SubRoads subRoads = Divide.DivideRoad(mid, 0.5f);
         Road subLeft = subRoads.Left;
         Road subRight = subRoads.Right;
@@ -169,11 +170,11 @@ public class DivideTest
     {
         Road road = RoadBuilder.Single(
             0,
-            Constants.MinLaneLength * new float3(1, 0, 0),
+            2 * Constants.MinLaneLength * new float3(1, 0, 0),
             2 * Constants.MinLaneLength * new float3(1, 0, 1),
             3
         );
-        SubRoads subRoads = Divide.DivideRoad(road, 0.5f);
+        SubRoads subRoads = Divide.HandleDivideCommand(road, 2 * Constants.MinLaneLength * new float3(1, 0, 0));
         Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
     }
 

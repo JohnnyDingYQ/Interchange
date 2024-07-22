@@ -16,7 +16,7 @@ public static class Combine
         Road left = ix.InRoads.Single();
         Road right = ix.OutRoads.Single();
 
-        left.BezierSeries.Add(right.BezierSeries);
+        left.Curve.Add(right.Curve);
         left.EndIntersection = right.EndIntersection;
         left.EndIntersection.RemoveRoad(right, Direction.In);
 
@@ -33,7 +33,7 @@ public static class Combine
         for (int i = 0; i < left.LaneCount; i++)
         {
             left.EndIntersection.RemoveNode(right.Lanes[i].EndNode);
-            left.Lanes[i].BezierSeries.Add(right.Lanes[i].BezierSeries);
+            left.Lanes[i].Curve.Add(right.Lanes[i].Curve);
             Graph.RemoveVertex(left.Lanes[i].EndVertex);
             Graph.RemoveVertex(right.Lanes[i].StartVertex);
             left.Lanes[i].EndVertex = right.Lanes[i].EndVertex;

@@ -17,7 +17,7 @@ namespace CurveExtensions
         {
             pt.y = 0;
             Ray ray = new(pt, Vector3.up);
-            float distance = CurveUtility.GetNearestPoint(curve, ray, out float3 position, out float interpolation);
+            CurveUtility.GetNearestPoint(curve, ray, out _, out float interpolation);
             return interpolation;
         }
     }

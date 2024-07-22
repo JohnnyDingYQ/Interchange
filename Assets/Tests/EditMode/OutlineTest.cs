@@ -24,8 +24,10 @@ public class OutlineTest
     [Test]
     public void OneLaneRepeated_OnEnd()
     {
-        RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        // foreach (float3 pos in road.Lanes[0].InnerPath.Curve.GetOutline(10))
+        //     Debug.Log(pos);
         Assert.True(AllRoadsOutLineValid());
     }
 

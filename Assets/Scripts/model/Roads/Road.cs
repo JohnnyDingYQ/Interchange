@@ -9,18 +9,18 @@ using UnityEngine.Splines;
 public class Road
 {
     public uint Id { get; set; }
-    public BezierSeries BezierSeries { get; set; }
+    public Curve Curve { get; set; }
     [JsonIgnore]
     public List<Lane> Lanes { get; set; }
     public List<uint> Lanes_ { get; set; }
     [JsonProperty]
     public int LaneCount { get; private set; }
     [JsonIgnore]
-    public float3 StartPos { get => BezierSeries.EvaluatePosition(0); }
+    public float3 StartPos { get => Curve.StartPos; }
     [JsonIgnore]
-    public float3 EndPos { get => BezierSeries.EvaluatePosition(1); }
+    public float3 EndPos { get => Curve.EndPos; }
     [JsonIgnore]
-    public float Length { get => BezierSeries.Length; }
+    public float Length { get => Curve.Length; }
     [JsonIgnore]
     public RoadOutline LeftOutline { get; set; }
     [JsonIgnore]
@@ -46,14 +46,14 @@ public class Road
     public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount)
     {
         LaneCount = laneCount;
-        BezierSeries = new(new BezierCurve(startPos, pivotPos, endPos));
+        Curve = new(new BezierCurve(startPos, pivotPos, endPos));
 
         InitRoad();
     }
 
-    public Road(BezierSeries bs, int laneCount)
+    public Road(Curve bs, int laneCount)
     {
-        BezierSeries = bs;
+        Curve = bs;
         LaneCount = laneCount;
 
         InitRoad();
@@ -119,17 +119,6 @@ public class Road
             Lanes.Add(new(this, i));
     }
 
-    public bool SplitIsValid(float interpolation)
-    {
-        Assert.IsTrue(interpolation <= 1 && interpolation >= 0);
-        if (interpolation > 0.5f)
-            interpolation = 1 - interpolation;
-        foreach (Lane l in Lanes)
-            if (l.Length * interpolation < Constants.MinLaneLength)
-                return false;
-        return true;
-    }
-
     public bool InterpolationBetweenVertices(float interpolation)
     {
         Assert.IsTrue(interpolation <= 1 && interpolation >= 0);
@@ -143,7 +132,7 @@ public class Road
 
     public void SetArrowPositions()
     {
-        Assert.IsNotNull(BezierSeries);
+        Assert.IsNotNull(Curve);
         ArrowInterpolations = new();
         int arrowCount = 1;
         for (float i = 1; i < arrowCount + 1; i++)
@@ -154,23 +143,23 @@ public class Road
     {
         clickPos.y = 0;
         Ray ray = new(clickPos, Vector3.up);
-        BezierSeries.GetNearestPoint(ray, out _, out float interpolation);
-        return interpolation;
+        Curve.GetNearestPoint(ray, out _, out float t);
+        return t;
     }
 
     public float3 EvaluatePosition(float t)
     {
-        return BezierSeries.EvaluatePosition(t);
+        return Curve.EvaluatePosition(t);
     }
 
     public float3 EvaluateTangent(float t)
     {
-        return BezierSeries.EvaluateTangent(t);
+        return Curve.EvaluateTangent(t);
     }
 
     public float3 Evaluate2DNormalizedNormal(float t)
     {
-        return BezierSeries.Evaluate2DNormalizedNormal(t);
+        return Curve.Evaluate2DNormalizedNormal(t);
     }
 
     public override string ToString()
