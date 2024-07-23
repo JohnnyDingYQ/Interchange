@@ -42,6 +42,7 @@ public class Curve
 
     float GetLength()
     {
+        Assert.IsFalse(this == nextCurve);
         if (nextCurve != null)
             return SegmentLength + nextCurve.Length;
         return SegmentLength;
@@ -51,9 +52,8 @@ public class Curve
     {
         Curve newCurve = DuplicateHelper();
         if (newCurve.nextCurve != null)
-        {
             newCurve.nextCurve = newCurve.nextCurve.Duplicate();
-        }
+        
         return newCurve;
     }
 
@@ -71,22 +71,6 @@ public class Curve
             nextCurve = nextCurve,
             lut = lut
         };
-        return newCurve;
-    }
-
-    // Use new crve but keep other attributes
-    public Curve Duplicate(BezierCurve curve)
-    {
-        Curve newCurve = new(curve)
-        {
-            offsetDistance = offsetDistance,
-            startDistance = startDistance,
-            endDistance = endDistance,
-            startT = startT,
-            endT = endT,
-            nextCurve = nextCurve
-        };
-        newCurve.CreateDistanceCache();
         return newCurve;
     }
 
@@ -279,14 +263,41 @@ public class Curve
         }
     }
 
+
     // NOT nextCurve compatible
-    public void Split(float t, out Curve left, out Curve right)
+    public void Split(float distance, out Curve left, out Curve right)
     {
-        CurveUtility.Split(bCurve, t, out BezierCurve l, out BezierCurve r);
+        Assert.IsTrue(distance < Length);
+        int index = 0;
+        Curve toSplit = this;
+        float currDistance = distance;
+        while (currDistance > toSplit.SegmentLength)
+        {
+            currDistance -= toSplit.SegmentLength;
+            toSplit = toSplit.nextCurve;
+            index++;
+        }
+
+        CurveUtility.Split(toSplit.bCurve, toSplit.GetDistanceToInterpolation(currDistance), out BezierCurve l, out BezierCurve r);
         left = new(l) { offsetDistance = offsetDistance };
         left.AddStartDistance(startDistance);
         right = new(r) { offsetDistance = offsetDistance };
         right.AddEndDistance(endDistance);
+
+        if (index == 0)
+            return;
+        Curve newHead = Duplicate();
+        Curve prev = newHead;
+        while (index != 1)
+        {
+            prev = prev.nextCurve;
+            index--;
+        }
+        toSplit = prev.nextCurve;
+        prev.nextCurve = left;
+        left = newHead;
+        right.nextCurve = toSplit.nextCurve;
+
     }
 
     public OutlineEnum GetOutline(int numPoints)

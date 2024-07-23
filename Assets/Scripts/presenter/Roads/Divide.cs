@@ -18,9 +18,8 @@ public static class Divide
     public static SubRoads DivideRoad(Road road, float distanceOnCurve)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
-        float t = road.Curve.GetDistanceToInterpolation(distanceOnCurve);
         int laneCount = road.LaneCount;
-        road.Curve.Split(t, out Curve left, out Curve right);
+        road.Curve.Split(distanceOnCurve, out Curve left, out Curve right);
         Road leftRoad = new(left, laneCount)
         {
             IsGhost = road.IsGhost
