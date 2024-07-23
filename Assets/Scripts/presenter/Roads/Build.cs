@@ -212,8 +212,8 @@ public static class Build
         Road road = InitRoad(startTarget, pivotPos, endTarget);
         if (road == null)
             return null;
-        Curve offsetted = road.Curve.Offset(ParallelSpacing);
-        offsetted.ReverseChain();
+        Curve offsetted = road.Curve.Duplicate().Offset(ParallelSpacing);
+        offsetted = offsetted.ReverseChain();
         BuildTargets startTargetParallel = Snapping.Snap(offsetted.StartPos, LaneCount, Side.Start);
         BuildTargets endTargetParallel = Snapping.Snap(offsetted.EndPos, LaneCount, Side.End);
         Road parallel = new(offsetted, LaneCount);
@@ -318,7 +318,7 @@ public static class Build
         {
             if (divisions == 1)
                 return;
-            SubRoads subRoads = Divide.DivideRoad(road, 1 / (float)divisions);
+            SubRoads subRoads = Divide.DivideRoad(road, road.Curve.GetDistanceToInterpolation(road.Curve.Length / divisions));
             resultingRoads.Remove(road);
             resultingRoads.Add(subRoads.Left);
             resultingRoads.Add(subRoads.Right);

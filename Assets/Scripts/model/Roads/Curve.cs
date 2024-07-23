@@ -93,7 +93,6 @@ public class Curve
     public Curve AddStartDistance(float startDistance)
     {
         this.startDistance += startDistance;
-        Assert.IsTrue(this.startDistance + endDistance <= bCurveLength);
         startT = CurveUtility.GetDistanceToInterpolation(lut, startDistance);
         return this;
     }
@@ -101,7 +100,6 @@ public class Curve
     public Curve AddEndDistance(float endDistance)
     {
         this.endDistance += endDistance;
-        Assert.IsTrue(startDistance + this.endDistance <= bCurveLength);
         endT = CurveUtility.GetDistanceToInterpolation(lut, bCurveLength - endDistance);
         return this;
     }
@@ -173,36 +171,45 @@ public class Curve
     {
         Curve newHead = ReverseLinkedList(this);
 
-        ReverseHelper(newHead);
+        newHead = ReverseHelper(newHead);
         return newHead;
 
         static Curve ReverseLinkedList(Curve head)
         {
-            if (head.nextCurve == null)
+            if (head == null || head.nextCurve == null)
                 return head;
-            Curve prev = head;
-            Curve curr = head.nextCurve;
-            Curve next = head.nextCurve.nextCurve;
-            while (next != null)
+            Curve prev = null;
+            Curve curr = head;
+            while (curr != null)
             {
+                Curve next = curr.nextCurve;
                 curr.nextCurve = prev;
                 prev = curr;
                 curr = next;
-                next = next.nextCurve;
             }
-            curr.nextCurve = prev;
-            return curr;
+
+            return prev;
         }
     }
 
-    void ReverseHelper(Curve reversed)
+    Curve ReverseHelper(Curve curve)
     {
-        if (reversed == null)
-            return;
-        reversed = Duplicate(reversed.bCurve.GetInvertedCurve());
-        (reversed.startT, reversed.endT) = (reversed.endT, reversed.startT);
-        (reversed.startDistance, reversed.endDistance) = (reversed.endDistance, reversed.startDistance);
-        ReverseHelper(reversed.nextCurve);
+        if (curve == null)
+            return null;
+        Curve reversed = new()
+        {
+            bCurve = curve.bCurve.GetInvertedCurve(),
+            startDistance = curve.endDistance,
+            endDistance = curve.startDistance,
+            bCurveLength = curve.bCurveLength,
+            offsetDistance = -curve.offsetDistance,
+            nextCurve = curve.nextCurve
+        };
+        reversed.nextCurve = ReverseHelper(reversed.nextCurve);
+        reversed.CreateDistanceCache();
+        reversed.startT = reversed.GetDistanceToInterpolation(curve.startDistance);
+        reversed.endT = reversed.GetDistanceToInterpolation(curve.bCurveLength - curve.endDistance);
+        return reversed;
     }
 
     public void Add(Curve other)
