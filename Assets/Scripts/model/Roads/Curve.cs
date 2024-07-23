@@ -283,9 +283,9 @@ public class Curve
     public void Split(float t, out Curve left, out Curve right)
     {
         CurveUtility.Split(bCurve, t, out BezierCurve l, out BezierCurve r);
-        left = new(l);
+        left = new(l) {offsetDistance = offsetDistance};
         left.AddStartDistance(startDistance);
-        right = new(r);
+        right = new(r) {offsetDistance = offsetDistance};
         right.AddEndDistance(endDistance);
     }
 

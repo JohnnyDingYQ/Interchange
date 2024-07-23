@@ -7,6 +7,8 @@ public static class Remove
     // only called in Game.cs
     public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
+        Debug.Log(road.StartIntersection.DebugHelper());
+        Debug.Log(road.EndIntersection.DebugHelper());
         if (!Game.Roads.ContainsKey(road.Id))
             return false;
         Game.Roads.Remove(road.Id);
@@ -33,10 +35,16 @@ public static class Remove
                 if (option == RoadRemovalOption.Default)
                 {
                     if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null)
+                    {
+                        Debug.Log("hi start");
                         Game.RemoveNode(lane.StartNode);
+                    }
                     
                     if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null)
+                    {
+                        Debug.Log("hi end");
                         Game.RemoveNode(lane.EndNode);
+                    }
                     
                 }
             }
@@ -44,6 +52,7 @@ public static class Remove
         }
         road.StartIntersection.RemoveRoad(road, Direction.Out);
         road.EndIntersection.RemoveRoad(road, Direction.In);
+        // Debug.Log(road.StartIntersection.Nodes.Count);
 
         if (option != RoadRemovalOption.Combine && option != RoadRemovalOption.Replace)
             EvaluateIntersections(road);

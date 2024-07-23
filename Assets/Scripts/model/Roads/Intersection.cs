@@ -247,4 +247,9 @@ public class Intersection
     {
         return "Intersection " + Id;
     }
+
+    public int DebugHelper()
+    {
+        return nodes.Count;
+    }
 }

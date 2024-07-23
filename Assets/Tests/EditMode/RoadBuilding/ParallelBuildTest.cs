@@ -34,6 +34,20 @@ public class ParallelBuildTest
     }
 
     [Test]
+    public void AutoDivideParallelRoad()
+    {
+        float3 longStride = new float3(1.1f, 0, 0) * Constants.MaxLaneLength;
+        Build.ToggletParallelBuild();
+        List<Road> roads = RoadBuilder.Many(0, longStride / 2, longStride, 1);
+        
+        Assert.AreEqual(4, roads.Count);
+        Assert.AreEqual(Constants.DefaultParallelSpacing, roads[2].StartPos.z);
+        Assert.AreEqual(Constants.DefaultParallelSpacing, roads[2].EndPos.z);
+        Assert.AreEqual(Constants.DefaultParallelSpacing, roads[3].StartPos.z);
+        Assert.AreEqual(Constants.DefaultParallelSpacing, roads[3].EndPos.z);
+    }
+
+    [Test]
     public void ConnectedParallelOneLane()
     {
         Build.ToggletParallelBuild();
