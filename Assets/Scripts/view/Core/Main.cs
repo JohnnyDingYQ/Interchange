@@ -26,7 +26,7 @@ public class Main : MonoBehaviour
     {
         DemandsGenerator.GenerateDemands(Time.deltaTime);
         DemandsSatisfer.SatisfyDemands(Time.deltaTime);
-        if (frameElapsed % 6 == 0)
+        if (frameElapsed % 2 == 0)
         {
             Roads.UpdateHoveredRoad();
             Zones.UpdateHoveredZone();

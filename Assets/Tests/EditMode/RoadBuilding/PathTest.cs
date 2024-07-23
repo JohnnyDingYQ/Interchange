@@ -66,6 +66,9 @@ public class PathTest
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
         
+        foreach (Path p in Game.Paths.Values)
+            Assert.True(p.Curve.Length <= road1.Curve.Length);
+
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsPath(road1.Lanes[0], road2.Lanes[i]));
@@ -76,6 +79,9 @@ public class PathTest
     {
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+
+        foreach (Path p in Game.Paths.Values)
+            Assert.True(p.Curve.Length <= road1.Curve.Length);
 
         Assert.AreEqual(7, Game.Paths.Count);
         for (int i = 0; i < 3; i++)

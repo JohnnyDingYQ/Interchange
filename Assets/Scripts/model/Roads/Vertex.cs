@@ -44,8 +44,8 @@ public class Vertex
     {
         Curve curve = Lane.Curve;
         return side == Side.Start
-            ? curve.EvaluateDistanceTangent(Constants.VertexDistanceFromRoadEnds)
-            : curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds);
+            ? math.normalize(curve.EvaluateDistanceTangent(Constants.VertexDistanceFromRoadEnds))
+            : math.normalize(curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds));
     }
 
     public override string ToString()

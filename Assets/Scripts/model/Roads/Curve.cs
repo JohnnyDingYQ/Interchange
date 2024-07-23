@@ -348,9 +348,9 @@ public class Curve
         return bCurve.Normalized2DNormal(t);
     }
 
-    public float GetEndT()
+    public Curve GetEndT()
     {
-        return nextCurve.endT;
+        return nextCurve;
     }
 
 }

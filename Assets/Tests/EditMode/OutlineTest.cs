@@ -24,10 +24,8 @@ public class OutlineTest
     [Test]
     public void OneLaneRepeated_OnEnd()
     {
-        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        // foreach (float3 pos in road.Lanes[0].InnerPath.Curve.GetOutline(10))
-        //     Debug.Log(pos);
         Assert.True(AllRoadsOutLineValid());
     }
 
@@ -61,6 +59,7 @@ public class OutlineTest
         Road road1 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 2);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        
         Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
@@ -71,7 +70,11 @@ public class OutlineTest
     {
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        Road branch0 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
+        Path error = Graph.GetOutPaths(road1.Lanes[1].EndVertex).First();
+        Debug.Log(error.Curve.GetEndT());
+        foreach (float3 pos in error.Curve.GetOutline(10))
+            Debug.Log(pos);
         Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
