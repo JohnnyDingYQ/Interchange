@@ -11,15 +11,16 @@ public static class Divide
     {
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
-        road.Curve.GetNearestPoint(new(clickPos, Vector3.down), out _, out float t);
-        return DivideRoad(road, t);
+        road.Curve.GetNearestPoint(new(clickPos, Vector3.down), out float distanceOnCurve);
+        return DivideRoad(road, distanceOnCurve);
     }
 
     public static SubRoads DivideRoad(Road road, float distanceOnCurve)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
+        float t = road.Curve.GetDistanceToInterpolation(distanceOnCurve);
         int laneCount = road.LaneCount;
-        road.Curve.Split(distanceOnCurve, out Curve left, out Curve right);
+        road.Curve.Split(t, out Curve left, out Curve right);
         Road leftRoad = new(left, laneCount)
         {
             IsGhost = road.IsGhost

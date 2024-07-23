@@ -99,8 +99,8 @@ public static class Build
         if (!startAssigned)
         {
             Road road = Game.HoveredRoad;
-            float interpolation = road != null ? road.GetNearestInterpolation(hoverPos) : 0;
-            if (Game.HoveredRoad == null || !road.InterpolationBetweenVertices(interpolation))
+            float distOnRoad = road != null ? road.GetNearestDistance(hoverPos) : 0;
+            if (Game.HoveredRoad == null || !road.DistanceBetweenVertices(distOnRoad))
             {
                 StartTarget = Snapping.Snap(hoverPos, LaneCount, Side.Start);
                 EndTarget = null;
@@ -108,13 +108,13 @@ public static class Build
             }
             else
             {
-                float distance = math.distance(road.EvaluatePosition(interpolation), hoverPos);
+                float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), hoverPos);
                 bool isOnLeftSide = math.cross(
-                    road.EvaluateTangent(interpolation),
-                    road.EvaluatePosition(interpolation) - hoverPos).y > 0;
+                    road.Curve.EvaluateDistanceTangent(distOnRoad),
+                    road.Curve.EvaluateDistancePos(distOnRoad) - hoverPos).y > 0;
                 float offset = isOnLeftSide ? distance : -distance;
-                StartTarget = Snapping.Snap(road.EvaluatePosition(0) + offset * road.Evaluate2DNormalizedNormal(0), LaneCount, Side.Both);
-                EndTarget = Snapping.Snap(road.EvaluatePosition(1) + offset * road.Evaluate2DNormalizedNormal(1), LaneCount, Side.Both);
+                StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
+                EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
                 ReplaceSuggestionOn = true;
             }
         }
@@ -318,7 +318,7 @@ public static class Build
         {
             if (divisions == 1)
                 return;
-            SubRoads subRoads = Divide.DivideRoad(road, road.Curve.GetDistanceToInterpolation(road.Curve.Length / divisions));
+            SubRoads subRoads = Divide.DivideRoad(road, road.Curve.Length / divisions);
             resultingRoads.Remove(road);
             resultingRoads.Add(subRoads.Left);
             resultingRoads.Add(subRoads.Right);

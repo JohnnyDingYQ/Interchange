@@ -31,7 +31,7 @@ public class DivideTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
 
         Assert.AreEqual(1, Roads.Count);
-        Divide.DivideRoad(road, 0.5f);
+        Divide.DivideRoad(road, road.Length / 2);
         Assert.AreEqual(2, Roads.Count);
     }
 
@@ -39,7 +39,7 @@ public class DivideTest
     public void SubRoadsRetainsStartAndEndPos()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        SubRoads subRoads = Divide.DivideRoad(road, 0.5f);
+        SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
 
         Assert.AreEqual(road.StartPos, subRoads.Left.StartPos);
         Assert.AreEqual(road.EndPos, subRoads.Right.EndPos);
@@ -51,7 +51,7 @@ public class DivideTest
         for (int i = 1; i <= 3; i++)
         {
             Road road = RoadBuilder.Single(0, stride, 2 * stride, i);
-            SubRoads subRoads = Divide.DivideRoad(road, 0.5f);
+            SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
             Road leftRoad = subRoads.Left;
             Road rightRoad = subRoads.Right;
 
@@ -69,7 +69,7 @@ public class DivideTest
         for (int i = 1; i <= 3; i++)
         {
             Road road = RoadBuilder.Single(0, stride, 2 * stride, i); ;
-            SubRoads subRoads = Divide.DivideRoad(road, 0.5f);
+            SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
             Road leftRoad = subRoads.Left;
             Road rightRoad = subRoads.Right;
 
@@ -93,7 +93,7 @@ public class DivideTest
         for (int i = 1; i <= 3; i++)
         {
             Road road = RoadBuilder.Single(0, stride, 2 * stride, i);
-            Divide.DivideRoad(road, 0.5f);
+            Divide.DivideRoad(road, road.Length / 2);
 
             Assert.AreEqual(3 * i, Nodes.Count);
             foreach (Node node in Nodes.Values)
@@ -111,7 +111,7 @@ public class DivideTest
         Road left = RoadBuilder.Single(0, stride, 2 * stride, 2);
         Road mid = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
         Road right = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 2);
-        SubRoads subRoads = Divide.DivideRoad(mid, 0.5f);
+        SubRoads subRoads = Divide.DivideRoad(mid, mid.Length / 2);
         Road subLeft = subRoads.Left;
         Road subRight = subRoads.Right;
         Assert.NotNull(subLeft);
@@ -148,7 +148,7 @@ public class DivideTest
             float3 pos = road.Lanes[i].EndPos;
             connectedRoads.Add(RoadBuilder.Single(pos, pos + stride, pos + 2 * stride, 1));
         }
-        Road roadRight = Divide.DivideRoad(road, 0.5f).Right;
+        Road roadRight = Divide.DivideRoad(road, road.Length / 2).Right;
         for (int i = 0; i < 3; i++)
         {
             Assert.AreSame(roadRight.Lanes[i].EndNode.InLane, roadRight.Lanes[i]);
@@ -283,7 +283,7 @@ public class DivideTest
             2.01f * Constants.MinLaneLength * Vector3.up,
             3
         );
-        SubRoads subRoads = Divide.DivideRoad(road, 0.5f);
+        SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
         Assert.NotNull(subRoads);
         Assert.AreEqual(2, Game.Roads.Count);
     }

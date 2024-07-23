@@ -119,15 +119,9 @@ public class Road
             Lanes.Add(new(this, i));
     }
 
-    public bool InterpolationBetweenVertices(float interpolation)
+    public bool DistanceBetweenVertices(float distance)
     {
-        Assert.IsTrue(interpolation <= 1 && interpolation >= 0);
-        if (interpolation > 0.5f)
-            interpolation = 1 - interpolation;
-        foreach (Lane l in Lanes)
-            if (l.Length * interpolation < Constants.VertexDistanceFromRoadEnds)
-                return false;
-        return true;
+        return distance >= Constants.VertexDistanceFromRoadEnds && (Length - distance) >= Constants.VertexDistanceFromRoadEnds;
     }
 
     public void SetArrowPositions()
@@ -139,12 +133,12 @@ public class Road
             ArrowInterpolations.Add(i / (arrowCount + 1));
     }
 
-    public float GetNearestInterpolation(float3 clickPos)
+    public float GetNearestDistance(float3 clickPos)
     {
         clickPos.y = 0;
         Ray ray = new(clickPos, Vector3.up);
-        Curve.GetNearestPoint(ray, out _, out float t);
-        return t;
+        Curve.GetNearestPoint(ray, out float distanceOnCurve);
+        return distanceOnCurve;
     }
 
     public float3 EvaluatePosition(float t)

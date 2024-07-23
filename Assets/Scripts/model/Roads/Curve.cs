@@ -242,13 +242,13 @@ public class Curve
         return CurveUtility.EvaluateTangent(bCurve, t);
     }
 
-    public float GetNearestPoint(Ray ray, out float3 distanceOnCurve, out float t, int resolution = 15)
+    public float GetNearestPoint(Ray ray, out float distanceOnCurve, int resolution = 15)
     {
         float minDistance = float.MaxValue;
         float currDist = 0;
-        float distanceStep = SegmentLength / resolution;
+        float distanceStep = Length / resolution;
         float localMin = 0;
-        while (currDist <= SegmentLength)
+        while (currDist <= Length)
         {
             float3 pos = EvaluateDistancePos(currDist);
             float distance = GetDistanceToCurve(pos);
@@ -260,7 +260,7 @@ public class Curve
             currDist += distanceStep;
         }
         float low = localMin - distanceStep >= 0 ? localMin - distanceStep : localMin;
-        float high = localMin + distanceStep <= SegmentLength ? localMin + distanceStep : localMin;
+        float high = localMin + distanceStep <= Length ? localMin + distanceStep : localMin;
         do
         {
             float mid = (low + high) / 2;
@@ -270,7 +270,6 @@ public class Curve
                 low = mid;
         } while (high - low > 0.01f);
 
-        t = GetDistanceToInterpolation(low);
         distanceOnCurve = low;
         return GetDistanceToCurve(EvaluateDistancePos(low));
 
@@ -280,12 +279,13 @@ public class Curve
         }
     }
 
+    // NOT nextCurve compatible
     public void Split(float t, out Curve left, out Curve right)
     {
         CurveUtility.Split(bCurve, t, out BezierCurve l, out BezierCurve r);
-        left = new(l) {offsetDistance = offsetDistance};
+        left = new(l) { offsetDistance = offsetDistance };
         left.AddStartDistance(startDistance);
-        right = new(r) {offsetDistance = offsetDistance};
+        right = new(r) { offsetDistance = offsetDistance };
         right.AddEndDistance(endDistance);
     }
 
