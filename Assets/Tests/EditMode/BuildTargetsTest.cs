@@ -190,4 +190,13 @@ public class BuildTargetTest
 
         Assert.False(bt.Snapped);
     }
+
+    [Test]
+    public void ProcessSnapDoesNotAddExtraNodesToIntersections()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 2);
+        BuildTargets bt = Snapping.Snap(2 * stride, 3, Side.Start);
+
+        Assert.AreEqual(2, road0.EndIntersection.Nodes.Count);
+    }
 }

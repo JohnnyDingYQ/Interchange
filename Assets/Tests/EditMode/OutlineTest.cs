@@ -70,11 +70,7 @@ public class OutlineTest
     {
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
-        Road branch0 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Path error = Graph.GetOutPaths(road1.Lanes[1].EndVertex).First();
-        Debug.Log(error.Curve.GetEndT());
-        foreach (float3 pos in error.Curve.GetOutline(10))
-            Debug.Log(pos);
+        RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         Assert.True(AllRoadsOutLineValid());
         RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         Assert.True(AllRoadsOutLineValid());
