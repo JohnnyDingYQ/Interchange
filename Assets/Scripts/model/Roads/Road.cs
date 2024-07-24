@@ -74,14 +74,16 @@ public class Road
         EndIntersection = new(this, Direction.In);
         LeftOutline = new();
         RightOutline = new();
-        EvaluateInnerOutline();
+        SetInnerOutline();
         SetArrowPositions();
     }
 
-    public void EvaluateInnerOutline()
+    public void SetInnerOutline()
     {
-        LeftOutline.Mid = Lanes.First().InnerPath.GetOutline(Orientation.Left);
-        RightOutline.Mid = Lanes.Last().InnerPath.GetOutline(Orientation.Right);
+        LeftOutline.MidCurve = Lanes.First().InnerPath.Curve.Duplicate().Offset(Constants.RoadOutlineSeparation);
+        RightOutline.MidCurve = Lanes.Last().InnerPath.Curve.Duplicate().Offset(-Constants.RoadOutlineSeparation);
+        // Debug.Log(LeftOutline.MidCurve.EndPos);
+        // Debug.Log(RightOutline.MidCurve.EndPos);
     }
 
     public List<Node> GetNodes(Side side)
@@ -94,7 +96,7 @@ public class Road
 
     public bool HasNoneEmptyOutline()
     {
-        return LeftOutline.Mid.Count != 0 && RightOutline.Mid.Count != 0
+        return LeftOutline.MidCurve != null && RightOutline.MidCurve != null
             && LeftOutline.Start.Count != 0 && RightOutline.Start.Count != 0
             && LeftOutline.End.Count != 0 && RightOutline.End.Count != 0;
     }

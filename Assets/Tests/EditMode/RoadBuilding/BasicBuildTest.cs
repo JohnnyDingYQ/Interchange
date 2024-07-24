@@ -29,8 +29,8 @@ public class BasicBuildTest
 
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(1, road.Lanes.Count);
-        Assert.True(MyNumerics.AreNumericallyEqual(0, lane.StartNode.Pos));
-        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, lane.EndNode.Pos));
+        Assert.True(MyNumerics.IsApproxEqual(0, lane.StartNode.Pos));
+        Assert.True(MyNumerics.IsApproxEqual(2 * stride, lane.EndNode.Pos));
         Assert.True(Game.Nodes.ContainsKey(lane.StartNode.Id));
         Assert.True(Game.Nodes.ContainsKey(lane.EndNode.Id));
         Assert.AreSame(lane.StartNode.OutLane, lane);
@@ -205,7 +205,7 @@ public class BasicBuildTest
         float3 inTangent = road0.Curve.EndNormal;
         float3 outTangent = road1.Curve.StartNormal;
 
-        Assert.True(MyNumerics.AreNumericallyEqual(inTangent, outTangent));
+        Assert.True(MyNumerics.IsApproxEqual(inTangent, outTangent));
     }
     [Test]
     public void EnforcesTangentAtStart()
@@ -215,7 +215,7 @@ public class BasicBuildTest
         float3 inTangent = road0.Curve.EndNormal;
         float3 outTangent = road1.Curve.StartNormal;
 
-        Assert.True(MyNumerics.AreNumericallyEqual(inTangent, outTangent));
+        Assert.True(MyNumerics.IsApproxEqual(inTangent, outTangent));
     }
 
     [Test]

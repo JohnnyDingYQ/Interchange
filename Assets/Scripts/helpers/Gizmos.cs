@@ -73,11 +73,11 @@ public static class Gizmos
             Color start = new(99.0f / 255, 224.0f / 255, 103.0f / 255, 1);
             Color mid = new(43.0f / 255, 153.0f / 255, 47.0f / 255, 1);
             Color end = new(16.0f / 255, 99.0f / 255, 19.0f / 255, 1);
-            DrawListofPoints(road.LeftOutline.Mid, mid, duration);
+            DrawListofPoints(road.LeftOutline.Mid.ToList(), mid, duration);
             DrawListofPoints(road.LeftOutline.Start, start, duration);
             DrawListofPoints(road.LeftOutline.End, end, duration);
 
-            DrawListofPoints(road.RightOutline.Mid, mid, duration);
+            DrawListofPoints(road.RightOutline.Mid.ToList(), mid, duration);
             DrawListofPoints(road.RightOutline.Start, start, duration);
             DrawListofPoints(road.RightOutline.End, end, duration);
         }

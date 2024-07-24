@@ -53,11 +53,11 @@ public class Curve
         Curve newCurve = DuplicateHelper();
         if (newCurve.nextCurve != null)
             newCurve.nextCurve = newCurve.nextCurve.Duplicate();
-        
+
         return newCurve;
     }
 
-    public Curve DuplicateHelper()
+    Curve DuplicateHelper()
     {
         Curve newCurve = new()
         {
@@ -74,18 +74,68 @@ public class Curve
         return newCurve;
     }
 
-    public Curve AddStartDistance(float startDistance)
+    public Curve AddStartDistance(float delta)
     {
-        this.startDistance += startDistance;
-        startT = CurveUtility.GetDistanceToInterpolation(lut, startDistance);
+        Assert.IsTrue(delta >= 0);
+        int index = 0;
+        Curve curr = GetCurveByIndex(index);
+        while (curr.SegmentLength == 0)
+            curr = GetCurveByIndex(++index);
+        while (curr.SegmentLength < delta)
+        {
+            delta -= curr.SegmentLength;
+            curr.startDistance = curr.bCurveLength;
+            curr.startT = 1;
+            curr.endDistance = 0;
+            curr.endT = 1;
+            Assert.AreEqual(0, curr.SegmentLength);
+            curr = curr.nextCurve;
+        }
+        curr.startDistance += delta;
+        curr.startT = CurveUtility.GetDistanceToInterpolation(curr.lut, curr.startDistance);
         return this;
     }
 
-    public Curve AddEndDistance(float endDistance)
+    public Curve AddEndDistance(float delta)
     {
-        this.endDistance += endDistance;
-        endT = CurveUtility.GetDistanceToInterpolation(lut, bCurveLength - endDistance);
+        Assert.IsTrue(delta >= 0);
+        int index = GetChainLength() - 1;
+        Curve curr = GetCurveByIndex(index);
+        while (curr.SegmentLength == 0)
+            curr = GetCurveByIndex(--index);
+        while (curr.SegmentLength < delta)
+        {
+            delta -= curr.SegmentLength;
+            curr.startDistance = curr.bCurveLength;
+            curr.startT = 1;
+            curr.endDistance = 0;
+            curr.endT = 1;
+            Assert.AreEqual(0, curr.SegmentLength);
+            curr = GetCurveByIndex(--index);
+        }
+        curr.endDistance += delta;
+        curr.endT = CurveUtility.GetDistanceToInterpolation(curr.lut, curr.bCurveLength - curr.endDistance);
         return this;
+    }
+
+    public Curve GetCurveByIndex(int index)
+    {
+        Curve curve = this;
+        for (int i = 0; i < index; i++)
+            curve = curve.nextCurve;
+        return curve;
+    }
+
+    public int GetChainLength()
+    {
+        int count = 0;
+        Curve curve = this;
+        while (curve != null)
+        {
+            count++;
+            curve = curve.nextCurve;
+        }
+        return count;
     }
 
     public float GetDistanceToInterpolation(float distance)
@@ -107,13 +157,15 @@ public class Curve
     Curve GetLastCurve()
     {
         Curve c = this;
-        while (c.nextCurve != null)
+        while (c.nextCurve != null && c.nextCurve.SegmentLength != 0)
             c = c.nextCurve;
         return c;
     }
 
     float3 GetStartPos()
     {
+        if (SegmentLength == 0)
+            return nextCurve.GetStartPos();
         if (offsetDistance == 0)
             return CurveUtility.EvaluatePosition(bCurve, startT);
         return CurveUtility.EvaluatePosition(bCurve, startT) + StartNormal * offsetDistance;
@@ -199,7 +251,7 @@ public class Curve
     public void Add(Curve other)
     {
         Curve last = GetLastCurve();
-        if (!MyNumerics.AreNumericallyEqual(last.EndPos, other.StartPos))
+        if (!MyNumerics.IsApproxEqual(last.EndPos, other.StartPos))
         {
             Debug.Log("end: " + last.EndPos);
             Debug.Log("start: " + other.StartPos);

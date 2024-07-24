@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CombineRoadsTest
 {
-    float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
+    float3 stride = Constants.MinLaneLength * new float3(0, 0, 1);
 
     [SetUp]
     public void SetUp()

@@ -161,7 +161,7 @@ public class DivideTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
+        Assert.True(MyNumerics.IsApproxEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
     }
 
     [Test]
@@ -174,7 +174,7 @@ public class DivideTest
             3
         );
         SubRoads subRoads = Divide.HandleDivideCommand(road, 2 * Constants.MinLaneLength * new float3(1, 0, 0));
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
+        Assert.True(MyNumerics.IsApproxEqual(subRoads.Left.Length, subRoads.Right.Length, LengthDiffTolerance));
     }
 
     [Test]
@@ -185,10 +185,10 @@ public class DivideTest
         SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
         Assert.True(subRoads.Left.OutlinePlausible());
         Assert.True(subRoads.Right.OutlinePlausible());
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Right.LeftOutline.End.Last(), road1.LeftOutline.Start.First()));
-        Assert.True(MyNumerics.AreNumericallyEqual(subRoads.Right.RightOutline.End.Last(), road1.RightOutline.Start.First()));
+        Assert.True(MyNumerics.IsApproxEqual(subRoads.Left.LeftOutline.End.Last(), subRoads.Right.LeftOutline.Start.First()));
+        Assert.True(MyNumerics.IsApproxEqual(subRoads.Left.RightOutline.End.Last(), subRoads.Right.RightOutline.Start.First()));
+        Assert.True(MyNumerics.IsApproxEqual(subRoads.Right.LeftOutline.End.Last(), road1.LeftOutline.Start.First()));
+        Assert.True(MyNumerics.IsApproxEqual(subRoads.Right.RightOutline.End.Last(), road1.RightOutline.Start.First()));
     }
 
     [Test]

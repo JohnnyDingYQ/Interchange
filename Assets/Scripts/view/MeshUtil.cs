@@ -14,8 +14,11 @@ public static class MeshUtil
         int leftLength, rightLength;
         leftLength = road.LeftOutline.GetSize();
         rightLength = road.RightOutline.GetSize();
-        List<float3> verts = road.LeftOutline.GetConcatenated();
-        verts.AddRange(road.RightOutline.GetConcatenated());
+        List<float3> verts = new();
+        foreach (float3 pos in road.LeftOutline)
+            verts.Add(pos);
+        foreach (float3 pos in road.RightOutline)
+            verts.Add(pos);
         List<Vector3> v3Verts = verts.ConvertAll(new Converter<float3, Vector3>(ToVector3));
         Mesh mesh = new();
         tris.Clear();

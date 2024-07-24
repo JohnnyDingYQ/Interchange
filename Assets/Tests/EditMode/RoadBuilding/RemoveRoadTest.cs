@@ -71,8 +71,8 @@ public class RemoveRoadTest
         float3 updatedLeftEnd = road1.LeftOutline.End.Last();
         float3 updatedRightEnd = road1.RightOutline.End.Last();
 
-        Assert.True(MyNumerics.AreNumericallyEqual(originalLeftEnd, updatedLeftEnd));
-        Assert.True(MyNumerics.AreNumericallyEqual(originalRightEnd, updatedRightEnd));
+        Assert.True(MyNumerics.IsApproxEqual(originalLeftEnd, updatedLeftEnd));
+        Assert.True(MyNumerics.IsApproxEqual(originalRightEnd, updatedRightEnd));
     }
 
     [Test]

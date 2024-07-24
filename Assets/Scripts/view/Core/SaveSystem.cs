@@ -40,7 +40,7 @@ public static class SaveSystem
             foreach (Road r in Game.Roads.Values)
             {
                 r.SetArrowPositions();
-                r.EvaluateInnerOutline();
+                r.SetInnerOutline();
                 Game.InvokeRoadAdded(r);
             }
             foreach (Intersection i in Game.Intersections.Values)

@@ -31,7 +31,7 @@ public class BuildTargetTest
         BuildTargets bt = Snapping.Snap(2 * stride, 1, Side.Start);
 
         Assert.True(bt.Snapped);
-        Assert.True(MyNumerics.AreNumericallyEqual(2 * stride, bt.Pos));
+        Assert.True(MyNumerics.IsApproxEqual(2 * stride, bt.Pos));
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(0, bt.Offset);
     }
@@ -57,7 +57,7 @@ public class BuildTargetTest
         BuildTargets bt = Snapping.Snap(lane.EndPos + 0.9f * Constants.BuildSnapTolerance * new float3(1, 0, 0), 1, Side.Start);
 
         Assert.True(bt.Snapped);
-        Assert.True(MyNumerics.AreNumericallyEqual(lane.EndPos, bt.Pos));
+        Assert.True(MyNumerics.IsApproxEqual(lane.EndPos, bt.Pos));
         Assert.AreSame(road.EndIntersection, bt.Intersection);
         Assert.AreEqual(0, bt.Offset);
     }

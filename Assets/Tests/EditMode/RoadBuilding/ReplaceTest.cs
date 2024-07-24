@@ -142,7 +142,7 @@ public class ReplaceTest
         Assert.AreEqual(2, Game.Lanes.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
         float3 expectedPos = (road.Lanes[0].StartNode.Pos + road.Lanes[1].StartNode.Pos) / 2;
-        Assert.True(MyNumerics.AreNumericallyEqual(built.Single().StartPos, expectedPos));
+        Assert.True(MyNumerics.IsApproxEqual(built.Single().StartPos, expectedPos));
     }
 
     [Test]

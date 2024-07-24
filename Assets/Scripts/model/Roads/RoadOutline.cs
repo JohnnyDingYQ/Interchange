@@ -4,23 +4,26 @@ using System.Linq;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
 using System;
+using System.Collections;
 
-public class RoadOutline : IEquatable<RoadOutline>
+public class RoadOutline : IEnumerable<float3>
 {
     public List<float3> Start { get; set; }
-    public List<float3> Mid { get; set; }
+    public IEnumerable<float3> Mid { get => MidCurve.GetOutline((int) (MidCurve.Length * Constants.MeshResolution)); }
     public List<float3> End { get; set; }
+    public Curve StartCurve { get; set; }
+    public Curve MidCurve { get; set; }
+    public Curve EndCurve { get; set; }
 
     public RoadOutline()
     {
         Start = new();
         End = new();
-        Mid = new();
     }
 
     public int GetSize()
     {
-        int size = Start.Count + End.Count + Mid.Count;
+        int size = Start.Count + End.Count + Mid.Count();
         return size;
     }
 
@@ -36,7 +39,7 @@ public class RoadOutline : IEquatable<RoadOutline>
     public bool IsPlausible()
     {
         if (Start.Count != 0)
-            if (!MyNumerics.AreNumericallyEqual(Start.Last(), Mid.First()))
+            if (!MyNumerics.IsApproxEqual(Start.Last(), Mid.First()))
             {
                 Debug.Log("start misaligns with mid");
                 Debug.Log("start end: " + Start.Last());
@@ -44,7 +47,7 @@ public class RoadOutline : IEquatable<RoadOutline>
                 return false;
             }
         if (End.Count != 0)
-            if (!MyNumerics.AreNumericallyEqual(End.First(), Mid.Last()))
+            if (!MyNumerics.IsApproxEqual(End.First(), Mid.Last()))
             {
                 Debug.Log("mid misaligns with end");
                 Debug.Log("mid end: " + Mid.Last());
@@ -54,10 +57,14 @@ public class RoadOutline : IEquatable<RoadOutline>
         return true;
     }
 
-    public bool Equals(RoadOutline other)
+    public IEnumerator<float3> GetEnumerator()
     {
-        return MyNumerics.AreNumericallyEqual(Start, other.Start)
-        && MyNumerics.AreNumericallyEqual(Mid, other.Mid)
-        && MyNumerics.AreNumericallyEqual(End, other.End);
+        foreach (float3 pos in GetConcatenated())
+            yield return pos;
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
