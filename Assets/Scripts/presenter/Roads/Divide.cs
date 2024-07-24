@@ -89,15 +89,11 @@ public static class Divide
         {
             leftRoad.SetInnerOutline();
             rightRoad.SetInnerOutline();
-            leftRoad.LeftOutline.Start = road.LeftOutline.Start;
-            leftRoad.RightOutline.Start = road.RightOutline.Start;
-            rightRoad.LeftOutline.End = road.LeftOutline.End;
-            rightRoad.RightOutline.End = road.RightOutline.End;
+            // leftRoad.LeftOutline.Start = road.LeftOutline.Start;
+            // leftRoad.RightOutline.Start = road.RightOutline.Start;
+            // rightRoad.LeftOutline.End = road.LeftOutline.End;
+            // rightRoad.RightOutline.End = road.RightOutline.End;
 
-            leftRoad.LeftOutline.Start.Add(leftRoad.LeftOutline.Mid.First());
-            leftRoad.RightOutline.Start.Add(leftRoad.RightOutline.Mid.First());
-            rightRoad.LeftOutline.End.Insert(0, rightRoad.LeftOutline.Mid.Last());
-            rightRoad.RightOutline.End.Insert(0, rightRoad.RightOutline.Mid.Last());
         }
     }
 }

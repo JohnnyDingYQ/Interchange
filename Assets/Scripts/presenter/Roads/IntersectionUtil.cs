@@ -17,21 +17,21 @@ public static class IntersectionUtil
     {
         foreach (Road r in ix.OutRoads)
         {
-            r.LeftOutline.Start = GetOutlineForRoad(r, Orientation.Left, Direction.Out, Side.Start);
-            r.RightOutline.Start = GetOutlineForRoad(r, Orientation.Right, Direction.Out, Side.Start);
+            r.LeftOutline.StartCurve = GetOutlineCurve(r, Orientation.Left, Direction.Out, Side.Start);
+            r.RightOutline.StartCurve = GetOutlineCurve(r, Orientation.Right, Direction.Out, Side.Start);
         }
 
         foreach (Road r in ix.InRoads)
         {
-            r.LeftOutline.End = GetOutlineForRoad(r, Orientation.Left, Direction.In, Side.End);
-            r.RightOutline.End = GetOutlineForRoad(r, Orientation.Right, Direction.In, Side.End);
+            r.LeftOutline.EndCurve = GetOutlineCurve(r, Orientation.Left, Direction.In, Side.End);
+            r.RightOutline.EndCurve = GetOutlineCurve(r, Orientation.Right, Direction.In, Side.End);
         }
 
         foreach (Road r in ix.Roads)
             Game.InvokeRoadUpdated(r);
 
 
-        List<float3> GetOutlineForRoad(Road road, Orientation orientation, Direction direction, Side side)
+        Curve GetOutlineCurve(Road road, Orientation orientation, Direction direction, Side side)
         {
             Path p = GetPath(road, orientation, direction);
             if (p != null)
@@ -43,9 +43,9 @@ public static class IntersectionUtil
                 else
                     curve.Offset(-Constants.RoadOutlineSeparation);
                 if (direction == Direction.Out)
-                    return curve.AddStartDistance(distanceOnCurve).GetOutline(10).ToList();
+                    return curve.AddStartDistance(distanceOnCurve);
                 else
-                    return curve.AddEndDistance(p.Curve.Length - distanceOnCurve).GetOutline(10).ToList();
+                    return curve.AddEndDistance(p.Curve.Length - distanceOnCurve);
             }
             else
             {
@@ -58,9 +58,9 @@ public static class IntersectionUtil
 
                 
                 if (side == Side.Start)
-                    return curve.AddEndDistance(curve.Length - Constants.VertexDistanceFromRoadEnds).GetOutline(10).ToList();
+                    return curve.AddEndDistance(curve.Length - Constants.VertexDistanceFromRoadEnds);
                 else
-                    return curve.AddStartDistance(curve.Length - Constants.VertexDistanceFromRoadEnds).GetOutline(10).ToList();
+                    return curve.AddStartDistance(curve.Length - Constants.VertexDistanceFromRoadEnds);
             }
 
         }

@@ -386,25 +386,6 @@ public class Curve
         }
     }
 
-    private float DenormalizeInterpolation(float t)
-    {
-        return (endT - startT) * t;
-    }
-
-    public float3 EvaluatePosition(float t)
-    {
-        t = DenormalizeInterpolation(t);
-        if (offsetDistance == 0)
-            return CurveUtility.EvaluatePosition(bCurve, t);
-        return CurveUtility.EvaluatePosition(bCurve, t) + offsetDistance * bCurve.Normalized2DNormal(t);
-    }
-
-    public float3 Evaluate2DNormalizedNormal(float t)
-    {
-        t = DenormalizeInterpolation(t);
-        return bCurve.Normalized2DNormal(t);
-    }
-
     public Curve GetEndT()
     {
         return nextCurve;

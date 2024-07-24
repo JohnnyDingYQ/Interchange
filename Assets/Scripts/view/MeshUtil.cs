@@ -9,17 +9,25 @@ public static class MeshUtil
     static readonly List<int> tris = new();
     static readonly List<Vector2> uvs = new();
     static readonly List<Vector3> normals = new();
+    static readonly List<float3> verts = new();
+    static readonly List<Vector3> v3Verts = new();
     public static Mesh GetMesh(Road road)
     {
         int leftLength, rightLength;
         leftLength = road.LeftOutline.GetSize();
         rightLength = road.RightOutline.GetSize();
-        List<float3> verts = new();
+        verts.Clear();
+        v3Verts.Clear();
         foreach (float3 pos in road.LeftOutline)
+        {
             verts.Add(pos);
+            v3Verts.Add(ToVector3(pos));
+        }
         foreach (float3 pos in road.RightOutline)
+        {
             verts.Add(pos);
-        List<Vector3> v3Verts = verts.ConvertAll(new Converter<float3, Vector3>(ToVector3));
+            v3Verts.Add(ToVector3(pos));
+        }
         Mesh mesh = new();
         tris.Clear();
         uvs.Clear();

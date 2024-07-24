@@ -8,22 +8,28 @@ using System.Collections;
 
 public class RoadOutline : IEnumerable<float3>
 {
-    public List<float3> Start { get; set; }
-    public IEnumerable<float3> Mid { get => MidCurve.GetOutline((int) (MidCurve.Length * Constants.MeshResolution)); }
-    public List<float3> End { get; set; }
+    public IEnumerable<float3> Start { get => GetCurveOutline(StartCurve); }
+    public IEnumerable<float3> Mid { get => GetCurveOutline(MidCurve); }
+    public IEnumerable<float3> End { get => GetCurveOutline(EndCurve); }
     public Curve StartCurve { get; set; }
     public Curve MidCurve { get; set; }
     public Curve EndCurve { get; set; }
 
-    public RoadOutline()
+    IEnumerable<float3> GetCurveOutline(Curve curve)
     {
-        Start = new();
-        End = new();
+        if (curve == null)
+            return GetEmptyFloat3Enumerator();
+        return curve.GetOutline((int) Math.Ceiling(curve.Length * Constants.MeshResolution));
+    }
+
+    public IEnumerable<float3> GetEmptyFloat3Enumerator()
+    {
+        yield break;
     }
 
     public int GetSize()
     {
-        int size = Start.Count + End.Count + Mid.Count();
+        int size = Start.Count() + End.Count() + Mid.Count();
         return size;
     }
 
@@ -38,7 +44,7 @@ public class RoadOutline : IEnumerable<float3>
 
     public bool IsPlausible()
     {
-        if (Start.Count != 0)
+        if (Start.Count() != 0)
             if (!MyNumerics.IsApproxEqual(Start.Last(), Mid.First()))
             {
                 Debug.Log("start misaligns with mid");
@@ -46,7 +52,7 @@ public class RoadOutline : IEnumerable<float3>
                 Debug.Log("mid start: " + Mid.First());
                 return false;
             }
-        if (End.Count != 0)
+        if (End.Count() != 0)
             if (!MyNumerics.IsApproxEqual(End.First(), Mid.Last()))
             {
                 Debug.Log("mid misaligns with end");
@@ -59,7 +65,11 @@ public class RoadOutline : IEnumerable<float3>
 
     public IEnumerator<float3> GetEnumerator()
     {
-        foreach (float3 pos in GetConcatenated())
+        foreach (float3 pos in Start)
+            yield return pos;
+        foreach (float3 pos in Mid)
+            yield return pos;
+        foreach (float3 pos in End)
             yield return pos;
     }
 

@@ -92,8 +92,8 @@ public class Road
     public bool HasNoneEmptyOutline()
     {
         return LeftOutline.MidCurve != null && RightOutline.MidCurve != null
-            && LeftOutline.Start.Count != 0 && RightOutline.Start.Count != 0
-            && LeftOutline.End.Count != 0 && RightOutline.End.Count != 0;
+            && LeftOutline.Start.Count() != 0 && RightOutline.Start.Count() != 0
+            && LeftOutline.End.Count() != 0 && RightOutline.End.Count() != 0;
     }
 
     public bool OutlinePlausible()
