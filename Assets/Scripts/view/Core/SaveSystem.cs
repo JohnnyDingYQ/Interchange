@@ -39,7 +39,6 @@ public static class SaveSystem
                 l.InitCurve();
             foreach (Road r in Game.Roads.Values)
             {
-                r.SetArrowPositions();
                 r.SetInnerOutline();
                 Game.InvokeRoadAdded(r);
             }

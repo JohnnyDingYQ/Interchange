@@ -22,7 +22,7 @@ public class Roads : MonoBehaviour
     void Start()
     {
         Game.RoadAdded += InstantiateRoad;
-        Game.RoadUpdated += UpdateRoadMesh;
+        Game.RoadUpdated += UpdateRoad;
         Game.RoadRemoved += DestroyRoad;
         roadMapping = new();
         SelectedRoads = new();
@@ -31,7 +31,7 @@ public class Roads : MonoBehaviour
     void OnDestroy()
     {
         Game.RoadAdded -= InstantiateRoad;
-        Game.RoadUpdated -= UpdateRoadMesh;
+        Game.RoadUpdated -= UpdateRoad;
         Game.RoadRemoved -= DestroyRoad;
     }
 
@@ -45,8 +45,8 @@ public class Roads : MonoBehaviour
         roadGameObject.Road = road;
         roadGameObject.gameObject.isStatic = true;
         roadMapping[road.Id] = roadGameObject;
-        UpdateRoadMesh(road);
-        CreateRoadArrows(roadGameObject);
+        UpdateRoad(road);
+        SetRoadArrow(roadGameObject);
 
         SetupTexture(roadGameObject);
 
@@ -62,32 +62,36 @@ public class Roads : MonoBehaviour
         }
     }
 
-    void CreateRoadArrows(RoadHumbleObject roadObject)
+    void SetRoadArrow(RoadHumbleObject roadObject)
     {
         Assert.IsNotNull(roadObject.Road);
-        foreach (float t in roadObject.Road.ArrowInterpolations)
-        {
-            GameObject arrow = Instantiate(arrowPrefab, roadObject.transform);
-            float3 pos = roadObject.Road.EvaluatePosition(t);
-            pos.y = Main.GetHUDObjectHeight(HUDLayer.DirectionArrows);
-            arrow.transform.position = pos;
-            float angle = Vector3.Angle(roadObject.Road.EvaluateTangent(t), Vector3.forward);
-            if (math.cross(roadObject.Road.EvaluateTangent(t), Vector3.forward).y > 0)
-                angle = 360 - angle;
-            arrow.transform.eulerAngles = new(
-                0,
-                180 + angle,
-                0
-            );
-            arrow.transform.localScale = new(0.8f, 0.8f, 0.8f);
-        }
+        GameObject arrow;
+        if (roadObject.transform.childCount == 0)
+            arrow = Instantiate(arrowPrefab, roadObject.transform);
+        else
+            arrow = roadObject.transform.GetChild(0).gameObject;
+        float3 pos = roadObject.Road.Curve.EvaluateDistancePos(roadObject.Road.Curve.Length / 2);
+        pos.y = Main.GetHUDObjectHeight(HUDLayer.DirectionArrows);
+        arrow.transform.position = pos;
+        float3 tangent = roadObject.Road.Curve.EvaluateDistanceTangent(roadObject.Road.Curve.Length / 2);
+        float angle = Vector3.Angle(tangent, Vector3.forward);
+        if (math.cross(tangent, Vector3.forward).y > 0)
+            angle = 360 - angle;
+        arrow.transform.eulerAngles = new(
+            0,
+            180 + angle,
+            0
+        );
+        arrow.transform.localScale = new(0.8f, 0.8f, 0.8f);
     }
 
-    public void UpdateRoadMesh(Road road)
+    public void UpdateRoad(Road road)
     {
         Mesh m = MeshUtil.GetMesh(road);
-        roadMapping[road.Id].GetComponent<MeshFilter>().mesh = m;
-        roadMapping[road.Id].GetComponent<MeshCollider>().sharedMesh = m;
+        RoadHumbleObject roadObject = roadMapping[road.Id];
+        roadObject.GetComponent<MeshFilter>().mesh = m;
+        roadObject.GetComponent<MeshCollider>().sharedMesh = m;
+        SetRoadArrow(roadObject);
     }
 
     void DestroyRoad(Road road)
@@ -149,7 +153,7 @@ public class Roads : MonoBehaviour
     {
         foreach (RoadHumbleObject g in SelectedRoads)
             if (g != null)
-            UnHighLight(g.gameObject);
+                UnHighLight(g.gameObject);
         SelectedRoads.Clear();
     }
 

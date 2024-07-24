@@ -219,19 +219,6 @@ public class BasicBuildTest
     }
 
     [Test]
-    public void ShortestRoadArrowPositions()
-    {
-        Road road1 = RoadBuilder.Single(
-            0,
-            new(0, 0, Constants.MinLaneLength / 2),
-            new(0, 0, Constants.MinLaneLength + 0.1f),
-            1
-        );
-        Assert.NotNull(road1.ArrowInterpolations);
-        Assert.AreNotEqual(0, road1.ArrowInterpolations.Count);
-    }
-
-    [Test]
     public void BadSegmentRatio()
     {
         Road road1 = RoadBuilder.Single(

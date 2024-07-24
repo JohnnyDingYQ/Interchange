@@ -33,8 +33,6 @@ public class Road
     public uint EndIntersection_ { get; set; }
     [JsonIgnore]
     public bool IsGhost { get; set; }
-    [JsonIgnore]
-    public List<float> ArrowInterpolations { get; private set; }
 
     // Empty constructor for JSON.Net deserialization
     public Road()
@@ -75,15 +73,12 @@ public class Road
         LeftOutline = new();
         RightOutline = new();
         SetInnerOutline();
-        SetArrowPositions();
     }
 
     public void SetInnerOutline()
     {
         LeftOutline.MidCurve = Lanes.First().InnerPath.Curve.Duplicate().Offset(Constants.RoadOutlineSeparation);
         RightOutline.MidCurve = Lanes.Last().InnerPath.Curve.Duplicate().Offset(-Constants.RoadOutlineSeparation);
-        // Debug.Log(LeftOutline.MidCurve.EndPos);
-        // Debug.Log(RightOutline.MidCurve.EndPos);
     }
 
     public List<Node> GetNodes(Side side)
@@ -126,36 +121,12 @@ public class Road
         return distance >= Constants.VertexDistanceFromRoadEnds && (Length - distance) >= Constants.VertexDistanceFromRoadEnds;
     }
 
-    public void SetArrowPositions()
-    {
-        Assert.IsNotNull(Curve);
-        ArrowInterpolations = new();
-        int arrowCount = 1;
-        for (float i = 1; i < arrowCount + 1; i++)
-            ArrowInterpolations.Add(i / (arrowCount + 1));
-    }
-
     public float GetNearestDistance(float3 clickPos)
     {
         clickPos.y = 0;
         Ray ray = new(clickPos, Vector3.up);
         Curve.GetNearestPoint(ray, out float distanceOnCurve);
         return distanceOnCurve;
-    }
-
-    public float3 EvaluatePosition(float t)
-    {
-        return Curve.EvaluatePosition(t);
-    }
-
-    public float3 EvaluateTangent(float t)
-    {
-        return Curve.EvaluateTangent(t);
-    }
-
-    public float3 Evaluate2DNormalizedNormal(float t)
-    {
-        return Curve.Evaluate2DNormalizedNormal(t);
     }
 
     public override string ToString()

@@ -399,12 +399,6 @@ public class Curve
         return CurveUtility.EvaluatePosition(bCurve, t) + offsetDistance * bCurve.Normalized2DNormal(t);
     }
 
-    public float3 EvaluateTangent(float t)
-    {
-        t = DenormalizeInterpolation(t);
-        return CurveUtility.EvaluateTangent(bCurve, t);
-    }
-
     public float3 Evaluate2DNormalizedNormal(float t)
     {
         t = DenormalizeInterpolation(t);

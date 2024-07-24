@@ -20,14 +20,7 @@ public static class Combine
         left.EndIntersection = right.EndIntersection;
         left.EndIntersection.RemoveRoad(right, Direction.In);
 
-        // left.LeftOutline.Mid.AddRange(left.LeftOutline.End);
-        // left.LeftOutline.Mid.AddRange(right.LeftOutline.Start);
-        // left.LeftOutline.Mid.AddRange(right.LeftOutline.Mid);
         left.LeftOutline.End = right.LeftOutline.End;
-
-        // left.RightOutline.Mid.AddRange(left.RightOutline.End);
-        // left.RightOutline.Mid.AddRange(right.RightOutline.Start);
-        // left.RightOutline.Mid.AddRange(right.RightOutline.Mid);
         left.RightOutline.End = right.RightOutline.End;
 
         for (int i = 0; i < left.LaneCount; i++)
