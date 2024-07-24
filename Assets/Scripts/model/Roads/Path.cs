@@ -41,18 +41,6 @@ public class Path : IEdge<Vertex>
         Cars = new();
     }
 
-    public List<float3> GetOutline(Orientation orientation)
-    {
-        Curve border = Curve.Duplicate();
-        if (orientation == Orientation.Left)
-            border.Offset(Constants.RoadOutlineSeparation);
-        else if (orientation == Orientation.Right)
-            border.Offset(-Constants.RoadOutlineSeparation);
-        else
-            throw new ArgumentException("orientation");
-        return border.GetOutline((int) Math.Ceiling(border.Length * Constants.MeshResolution)).ToList();
-    }
-
     public void AddCar(Car car)
     {
         car.DistanceOnPath = 0;

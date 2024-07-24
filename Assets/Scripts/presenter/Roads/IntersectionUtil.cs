@@ -29,16 +29,40 @@ public static class IntersectionUtil
 
         foreach (Road r in ix.Roads)
             Game.InvokeRoadUpdated(r);
-        
+
 
         List<float3> GetOutlineForRoad(Road road, Orientation orientation, Direction direction, Side side)
         {
-            List<float3> outline = GetPath(road, orientation, direction)?.GetOutline(orientation);
-            if (outline != null)
-                return SeparateOutlineWithEndofRoad(outline, direction);
+            Path p = GetPath(road, orientation, direction);
+            if (p != null)
+            {
+                p.Curve.GetNearestPoint(new(ix.Nodes.Last().Pos, ix.Normal), out float distanceOnCurve);
+                Curve curve = p.Curve.Duplicate();
+                if (orientation == Orientation.Left)
+                    curve.Offset(Constants.RoadOutlineSeparation);
+                else
+                    curve.Offset(-Constants.RoadOutlineSeparation);
+                if (direction == Direction.Out)
+                    return curve.AddStartDistance(distanceOnCurve).GetOutline(10).ToList();
+                else
+                    return curve.AddEndDistance(p.Curve.Length - distanceOnCurve).GetOutline(10).ToList();
+            }
             else
-                return GetOutLineAtTwoEnds(road, orientation, side);
-            
+            {
+                Curve curve;
+
+                if (orientation == Orientation.Left)
+                    curve = road.Lanes.First().Curve.Duplicate().Offset(Constants.RoadOutlineSeparation);
+                else
+                    curve = road.Lanes.Last().Curve.Duplicate().Offset(-Constants.RoadOutlineSeparation);
+
+                
+                if (side == Side.Start)
+                    return curve.AddEndDistance(curve.Length - Constants.VertexDistanceFromRoadEnds).GetOutline(10).ToList();
+                else
+                    return curve.AddStartDistance(curve.Length - Constants.VertexDistanceFromRoadEnds).GetOutline(10).ToList();
+            }
+
         }
 
         Path GetPath(Road road, Orientation orientation, Direction direction)
@@ -73,63 +97,6 @@ public static class IntersectionUtil
         {
             return math.dot(u, v) / math.length(v);
         }
-
-        List<float3> SeparateOutlineWithEndofRoad(List<float3> interRoadOutline, Direction direction)
-        {
-            if (direction != Direction.In && direction != Direction.Out)
-                throw new ArgumentException("direction");
-            List<float3> outlineEnd = new();
-            List<float3> outlineStart = new();
-            bool crossed = false;
-            float3 prevPt = 0;
-            foreach (float3 pt in interRoadOutline)
-            {
-                if (!crossed)
-                    if (ix.Plane.SameSide(pt, ix.PointOnInSide))
-                        outlineEnd.Add(pt);
-                    else
-                    {
-                        crossed = true;
-                        Ray ray = new(pt, prevPt - pt);
-                        ix.Plane.Raycast(ray, out float distance);
-                        float3 commonPt = ray.GetPoint(distance);
-                        outlineEnd.Add(commonPt);
-                        outlineStart.Add(commonPt);
-                        outlineStart.Add(pt);
-                    }
-                else
-                    outlineStart.Add(pt);
-                prevPt = pt;
-            }
-            return direction == Direction.In ? outlineEnd : outlineStart;
-        }
-
-        static List<float3> GetOutLineAtTwoEnds(Road road, Orientation orientation, Side side)
-        {
-            List<float3> results = new();
-            Lane lane = orientation == Orientation.Left ? road.Lanes.First() : road.Lanes.Last();
-            float normalMultiplier = Constants.RoadOutlineSeparation;
-            if (orientation == Orientation.Right)
-                normalMultiplier *= -1;
-            int numPoints = (int)(Constants.VertexDistanceFromRoadEnds * Constants.MeshResolution) + 1;
-            Curve bs = lane.Curve;
-            float interpolationOfLocation;
-            if (side == Side.Start)
-                interpolationOfLocation = lane.Curve.GetDistanceToInterpolation(Constants.VertexDistanceFromRoadEnds);
-            else
-                interpolationOfLocation = lane.Curve.GetDistanceToInterpolation(lane.Curve.Length - Constants.VertexDistanceFromRoadEnds);
-            for (int i = 0; i <= numPoints; i++)
-            {
-                float t;
-                if (side == Side.Start)
-                    t = (float)i / numPoints * interpolationOfLocation;
-                else
-                    t = interpolationOfLocation + (float)i / numPoints * (1 - interpolationOfLocation);
-                float3 normal = bs.Evaluate2DNormalizedNormal(t);
-                results.Add(bs.EvaluatePosition(t) + normal * normalMultiplier);
-            }
-            return results;
-        }
     }
 
     public static void EvaluatePaths(Intersection ix)
@@ -156,7 +123,7 @@ public static class IntersectionUtil
                     Path path = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
                     Graph.AddPath(path);
                 }
-            
+
         }
 
         void BuildLaneChangingPaths(Intersection ix)
@@ -205,10 +172,10 @@ public static class IntersectionUtil
             foreach (Road road in ix.InRoads)
                 foreach (Lane lane in road.Lanes)
                     pathsToRemove.AddRange(Graph.GetOutPaths(lane.EndVertex));
-                
+
             foreach (Path path in pathsToRemove)
                 Graph.RemovePath(path);
-            
+
         }
 
         bool NodesBelongToUniqueRoad(Node node1, Node node2)
@@ -222,7 +189,7 @@ public static class IntersectionUtil
         {
             if (node1.InLane != null && node2.OutLane != null)
                 BuildPathLane2Lane(node1.InLane, node2.OutLane);
-            
+
         }
 
         Path BuildPathLane2Lane(Lane lane1, Lane lane2)
