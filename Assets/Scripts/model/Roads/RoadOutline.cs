@@ -8,18 +8,20 @@ using System.Collections;
 
 public class RoadOutline : IEnumerable<float3>
 {
-    public IEnumerable<float3> Start { get => GetCurveOutline(StartCurve); }
-    public IEnumerable<float3> Mid { get => GetCurveOutline(MidCurve); }
-    public IEnumerable<float3> End { get => GetCurveOutline(EndCurve); }
+    public IEnumerable<float3> Start { get => GetCurveOutline(StartCurve, EndsNumPoint); }
+    public IEnumerable<float3> Mid { get => GetCurveOutline(MidCurve, MidNumPoint); }
+    public IEnumerable<float3> End { get => GetCurveOutline(EndCurve, EndsNumPoint); }
     public Curve StartCurve { get; set; }
     public Curve MidCurve { get; set; }
     public Curve EndCurve { get; set; }
+    public const int EndsNumPoint = 10;
+    public const int MidNumPoint = 20;
 
-    IEnumerable<float3> GetCurveOutline(Curve curve)
+    IEnumerable<float3> GetCurveOutline(Curve curve, int numPoints)
     {
         if (curve == null)
             return GetEmptyFloat3Enumerator();
-        return curve.GetOutline((int) Math.Ceiling(curve.Length * Constants.MeshResolution));
+        return curve.GetOutline(numPoints);
     }
 
     public IEnumerable<float3> GetEmptyFloat3Enumerator()

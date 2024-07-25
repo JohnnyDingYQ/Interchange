@@ -370,10 +370,10 @@ public class Curve
 
         public IEnumerator<float3> GetEnumerator()
         {
-            float pointSeparation = curve.Length / numPoints;
+            float pointSeparation = curve.Length / (numPoints - 1);
             int count = 0;
             float currDistance = 0;
-            while (count++ <= numPoints)
+            while (count++ < numPoints)
             {
                 yield return curve.EvaluateDistancePos(currDistance);
                 currDistance += pointSeparation;

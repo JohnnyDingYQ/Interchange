@@ -6,7 +6,6 @@ public static class Constants
     public const float MaxLaneLength = LaneWidth * 35;
     public const int MaxLaneCount = 3;
     public const float MinSegmentRatio = 0.2f;
-    public const float MeshResolution = 10 / LaneWidth;
     public const float RoadOutlineSeparation = LaneWidth / 2;
     public const float VertexDistanceFromRoadEnds = MinLaneLength / 2.1f; 
     public const float RoadArrowSeparation = LaneWidth * 10f;

@@ -27,10 +27,6 @@ public static class IntersectionUtil
             r.RightOutline.EndCurve = GetOutlineCurve(r, Orientation.Right, Direction.In, Side.End);
         }
 
-        foreach (Road r in ix.Roads)
-            Game.InvokeRoadUpdated(r);
-
-
         Curve GetOutlineCurve(Road road, Orientation orientation, Direction direction, Side side)
         {
             Path p = GetPath(road, orientation, direction);

@@ -292,6 +292,8 @@ public static class Build
 
         if (road.IsGhost)
             GhostRoads.AddRange(resultingRoads.Select(r => r.Id));
+        Game.UpdateIntersection(road.StartIntersection);
+        Game.UpdateIntersection(resultingRoads.Last().EndIntersection);
         return resultingRoads;
 
         # region extracted funcitons

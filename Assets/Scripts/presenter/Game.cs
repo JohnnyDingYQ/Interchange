@@ -80,6 +80,12 @@ public static class Game
         IntersectionRemoved?.Invoke(i);
     }
 
+    public static void UpdateIntersection(Intersection ix)
+    {
+        foreach (Road r in ix.Roads)
+            RoadUpdated?.Invoke(r);
+    }
+
     public static void RegisterLane(Lane lane)
     {
         if (!Lanes.Values.Contains(lane))
@@ -134,11 +140,6 @@ public static class Game
         Assert.IsTrue(Cars.ContainsValue(car));
         Cars.Remove(car.Id);
         CarRemoved?.Invoke(car);
-    }
-
-    public static void InvokeRoadUpdated(Road road)
-    {
-        RoadUpdated?.Invoke(road);
     }
 
     public static void InvokeRoadAdded(Road road)
