@@ -73,13 +73,13 @@ public static class Gizmos
             Color start = new(99.0f / 255, 224.0f / 255, 103.0f / 255, 1);
             Color mid = new(43.0f / 255, 153.0f / 255, 47.0f / 255, 1);
             Color end = new(16.0f / 255, 99.0f / 255, 19.0f / 255, 1);
-            // DrawListofPoints(road.LeftOutline.Mid.ToList(), mid, duration);
-            // DrawListofPoints(road.LeftOutline.Start, start, duration);
-            // DrawListofPoints(road.LeftOutline.End, end, duration);
+            DrawListofPoints(road.LeftOutline.Mid, mid, duration);
+            DrawListofPoints(road.LeftOutline.Start, start, duration);
+            DrawListofPoints(road.LeftOutline.End, end, duration);
 
-            // DrawListofPoints(road.RightOutline.Mid.ToList(), mid, duration);
-            // DrawListofPoints(road.RightOutline.Start, start, duration);
-            // DrawListofPoints(road.RightOutline.End, end, duration);
+            DrawListofPoints(road.RightOutline.Mid, mid, duration);
+            DrawListofPoints(road.RightOutline.Start, start, duration);
+            DrawListofPoints(road.RightOutline.End, end, duration);
         }
     }
 
@@ -102,14 +102,19 @@ public static class Gizmos
 
     }
 
-    public static void DrawListofPoints(List<float3> l, Color color, float duration)
+    public static void DrawListofPoints(IEnumerable<float3> l, Color color, float duration)
     {
         if (l == null)
             return;
-        if (l.Count == 1)
+        if (l.Count() == 1)
             return;
-        for (int i = 1; i < l.Count; i++)
-            Debug.DrawLine(l[i - 1], l[i], color, duration);
+        float3 prev = l.First();
+        l = l.Skip(1);
+        foreach (float3 pos in l)
+        {
+            Debug.DrawLine(prev, pos, color, duration);
+            prev = pos;
+        }
     }
 
     public static void DrawSupportLine(float duration)

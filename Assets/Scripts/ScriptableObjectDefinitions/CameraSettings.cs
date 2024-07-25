@@ -6,7 +6,6 @@ public class CameraSettings : ScriptableObject
 {
     public AnimationCurve ZoomSpeed;
     public AnimationCurve PanSpeed;
-    public float MinHeight;
     public float MaxHeight;
     public float ZoomMultiplier;
     public float PanMultiplier;

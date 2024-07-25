@@ -90,11 +90,6 @@ public static class Divide
         {
             leftRoad.SetInnerOutline();
             rightRoad.SetInnerOutline();
-            // leftRoad.LeftOutline.Start = road.LeftOutline.Start;
-            // leftRoad.RightOutline.Start = road.RightOutline.Start;
-            // rightRoad.LeftOutline.End = road.LeftOutline.End;
-            // rightRoad.RightOutline.End = road.RightOutline.End;
-
         }
     }
 }

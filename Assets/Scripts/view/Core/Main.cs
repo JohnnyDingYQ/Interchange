@@ -43,6 +43,6 @@ public class Main : MonoBehaviour
 
     public static float GetHUDObjectHeight(HUDLayer layer)
     {
-        return Constants.MaxElevation + ((int) layer + 1) * (float) (Constants.MaxElevation - Constants.MinElevation) * 0.01f;
+        return Constants.MaxElevation + ((int) layer + 1) + 0.01f;
     }
 }

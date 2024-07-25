@@ -17,17 +17,17 @@ public static class IntersectionUtil
     {
         foreach (Road r in ix.OutRoads)
         {
-            r.LeftOutline.StartCurve = GetOutlineCurve(r, Orientation.Left, Direction.Out, Side.Start);
-            r.RightOutline.StartCurve = GetOutlineCurve(r, Orientation.Right, Direction.Out, Side.Start);
+            r.LeftOutline.StartCurve = GetOutlineCurve(r, Orientation.Left, Direction.Out);
+            r.RightOutline.StartCurve = GetOutlineCurve(r, Orientation.Right, Direction.Out);
         }
 
         foreach (Road r in ix.InRoads)
         {
-            r.LeftOutline.EndCurve = GetOutlineCurve(r, Orientation.Left, Direction.In, Side.End);
-            r.RightOutline.EndCurve = GetOutlineCurve(r, Orientation.Right, Direction.In, Side.End);
+            r.LeftOutline.EndCurve = GetOutlineCurve(r, Orientation.Left, Direction.In);
+            r.RightOutline.EndCurve = GetOutlineCurve(r, Orientation.Right, Direction.In);
         }
 
-        Curve GetOutlineCurve(Road road, Orientation orientation, Direction direction, Side side)
+        Curve GetOutlineCurve(Road road, Orientation orientation, Direction direction)
         {
             Path p = GetPath(road, orientation, direction);
             if (p != null)
@@ -38,6 +38,7 @@ public static class IntersectionUtil
                     curve.Offset(Constants.RoadOutlineSeparation);
                 else
                     curve.Offset(-Constants.RoadOutlineSeparation);
+
                 if (direction == Direction.Out)
                     return curve.AddStartDistance(distanceOnCurve);
                 else
@@ -52,8 +53,7 @@ public static class IntersectionUtil
                 else
                     curve = road.Lanes.Last().Curve.Duplicate().Offset(-Constants.RoadOutlineSeparation);
 
-                
-                if (side == Side.Start)
+                if (direction == Direction.Out)
                     return curve.AddEndDistance(curve.Length - Constants.VertexDistanceFromRoadEnds);
                 else
                     return curve.AddStartDistance(curve.Length - Constants.VertexDistanceFromRoadEnds);
