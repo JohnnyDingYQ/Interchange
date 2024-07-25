@@ -39,10 +39,11 @@ public class Main : MonoBehaviour
     {
         Assert.IsTrue(Constants.MinLaneLength * 2 < Constants.MaxLaneLength);
         Assert.IsTrue(Constants.MinElevation < Constants.MaxElevation);
+        Assert.AreEqual(0, (Constants.MaxElevation - Constants.MinElevation) % Constants.ElevationStep);
     }
 
     public static float GetHUDObjectHeight(HUDLayer layer)
     {
-        return Constants.MaxElevation + ((int) layer + 1) + 0.01f;
+        return Constants.MaxElevation + ((int) layer + 1) * 0.01f;
     }
 }

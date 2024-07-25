@@ -9,19 +9,24 @@ public class CameraControl : MonoBehaviour
     CameraSettings cameraSettings;
     public static Vector3 CameraOffset;
     float minHeight;
+    Vector3 cameraVelocity;
 
     void Start()
     {
-        HUDLayer[] enums = (HUDLayer[]) Enum.GetValues(typeof(HUDLayer));
+        HUDLayer[] enums = (HUDLayer[])Enum.GetValues(typeof(HUDLayer));
         minHeight = Main.GetHUDObjectHeight(enums[^1]) + Camera.main.nearClipPlane + 1f;
     }
 
     void Update()
     {
-        AdjustCamera(CameraOffset);
+        SetCameraVelocity(CameraOffset);
+        Camera.main.transform.position += cameraVelocity * Time.deltaTime;
+        cameraVelocity *= math.pow(math.E, -Time.deltaTime * cameraSettings.driftDecayExponentMultiplier);
+        ClampToBounds();
+        Camera.main.orthographicSize = Camera.main.transform.position.y;
     }
 
-    public void AdjustCamera(Vector3 cameraOffset)
+    public void SetCameraVelocity(Vector3 cameraOffset)
     {
         float cameraHeight = Camera.main.transform.position.y;
         float heightRatio = cameraHeight / (cameraSettings.MaxHeight - minHeight);
@@ -31,32 +36,28 @@ public class CameraControl : MonoBehaviour
 
         ApplyZoom();
         ApplyPan();
-        ClampToBounds();
-
-        Camera.main.orthographicSize = Camera.main.transform.position.y;
 
         void ApplyZoom()
         {
-            if (cameraOffset.y < 0 && Camera.main.transform.position.y == minHeight)
+            if (cameraOffset.y == 0)
                 return;
             Vector3 v = Camera.main.transform.position - (Vector3)InputSystem.MouseWorldPos;
             float t = (cameraHeight + cameraOffset.y - Camera.main.transform.position.y) / v.y;
-            Camera.main.transform.position +=  t * Time.deltaTime * v;
+            cameraVelocity.y = (t * v).y;
         }
 
         void ApplyPan()
         {
-            float3 newCameraPos = Camera.main.transform.position;
-            newCameraPos.x += Time.deltaTime * cameraOffset.x;
-            newCameraPos.z += Time.deltaTime * cameraOffset.z;
-            Camera.main.transform.position = newCameraPos;
+            if (cameraOffset.x != 0)
+                cameraVelocity.x = cameraOffset.x;
+            if (cameraOffset.z != 0)
+            cameraVelocity.z = cameraOffset.z;
         }
-
-        void ClampToBounds()
-        {
-            float3 cameraPos = Camera.main.transform.position;
-            cameraPos.y = Math.Clamp(cameraPos.y, minHeight, cameraSettings.MaxHeight);
-            Camera.main.transform.position = cameraPos;
-        }
+    }
+    void ClampToBounds()
+    {
+        float3 cameraPos = Camera.main.transform.position;
+        cameraPos.y = Math.Clamp(cameraPos.y, minHeight, cameraSettings.MaxHeight);
+        Camera.main.transform.position = cameraPos;
     }
 }

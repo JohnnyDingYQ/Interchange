@@ -9,4 +9,5 @@ public class CameraSettings : ScriptableObject
     public float MaxHeight;
     public float ZoomMultiplier;
     public float PanMultiplier;
+    public float driftDecayExponentMultiplier;
 }

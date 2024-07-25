@@ -34,24 +34,23 @@ public static class Remove
                 {
                     if (lane.StartNode.OutLane == null && lane.StartNode.InLane == null)
                         Game.RemoveNode(lane.StartNode);
-                    
+
                     if (lane.EndNode.OutLane == null && lane.EndNode.InLane == null)
-                        Game.RemoveNode(lane.EndNode);                    
+                        Game.RemoveNode(lane.EndNode);
                 }
             }
             Game.RemoveLane(lane);
         }
         road.StartIntersection.RemoveRoad(road, Direction.Out);
         road.EndIntersection.RemoveRoad(road, Direction.In);
-        // Debug.Log(road.StartIntersection.Nodes.Count);
 
         if (option != RoadRemovalOption.Combine && option != RoadRemovalOption.Replace)
-            EvaluateIntersections(road);
+            EvaluateIntersections(road, option);
 
         Game.InvokeRoadRemoved(road);
         return true;
 
-        static void EvaluateIntersections(Road road)
+        static void EvaluateIntersections(Road road, RoadRemovalOption option)
         {
             if (!road.StartIntersection.IsEmpty())
             {
@@ -68,6 +67,15 @@ public static class Remove
             }
             else
                 Game.RemoveIntersection(road.EndIntersection);
+
+            if (option != RoadRemovalOption.Divide)
+            {
+                if (!road.StartIntersection.IsEmpty())
+                    Game.UpdateIntersection(road.StartIntersection);
+                if (!road.EndIntersection.IsEmpty())
+                    Game.UpdateIntersection(road.EndIntersection);
+            }
+
         }
     }
 }
