@@ -174,15 +174,6 @@ public class BuildTargetTest
     }
 
     [Test]
-    public void NodeUnsnappableAtMinimumElevation()
-    {
-        RoadBuilder.Single(new float3(0, -2, 0), stride, 2 * stride, 1);
-        BuildTargets bt = Snapping.Snap(0, 1, Side.End);
-        
-        Assert.False(bt.Snapped);
-    }
-
-    [Test]
     public void SnapEndButInLaneAlreadyExists()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
@@ -198,5 +189,19 @@ public class BuildTargetTest
         BuildTargets bt = Snapping.Snap(2 * stride, 3, Side.Start);
 
         Assert.AreEqual(2, road0.EndIntersection.Nodes.Count);
+    }
+
+    [Test]
+    public void ElevationToleranceIsOneLevel()
+    {
+        float3 step = new(0, Constants.ElevationStep, 0);
+        Road road0 = RoadBuilder.Single(step, step + stride, step + 2 * stride, 1);
+        BuildTargets bt0 = Snapping.Snap(2 * stride + 2 * step, 2, Side.Start);
+        BuildTargets bt1 = Snapping.Snap(2 * stride, 2, Side.Start);
+        BuildTargets bt2 = Snapping.Snap(2 * stride + 3 * step, 2, Side.Start);
+
+        Assert.True(bt0.Snapped);
+        Assert.True(bt1.Snapped);
+        Assert.False(bt2.Snapped);
     }
 }

@@ -73,6 +73,6 @@ public static class Snapping
     static bool WithinSnapRange(float3 center, float3 pos, int laneCount)
     {
         float snapRadius = (laneCount * Constants.LaneWidth + Constants.BuildSnapTolerance) / 2;
-        return Vector3.Distance(center, pos) < snapRadius;
+        return Vector2.Distance(center.xz, pos.xz) < snapRadius && Math.Abs(center.y - pos.y) <= Constants.ElevationStep;
     }
 }
