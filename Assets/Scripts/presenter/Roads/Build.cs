@@ -121,7 +121,7 @@ public static class Build
         if (startAssigned && !pivotAssigned)
             pivotPos = hoverPos;
         if (!pivotAssigned && startAssigned)
-            AlignPivotByStart(StartTarget, pivotPos);
+            pivotPos = AlignPivotByStart(StartTarget, pivotPos);
         if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
         SetSupportLines();
@@ -154,7 +154,7 @@ public static class Build
         {
             pivotAssigned = true;
             pivotPos = clickPos;
-            AlignPivotByStart(StartTarget, pivotPos);
+            pivotPos = AlignPivotByStart(StartTarget, pivotPos);
             return null;
         }
         RemoveAllGhostRoads();
@@ -235,7 +235,11 @@ public static class Build
             pivotPos = AlignPivotEnd(endTarget, pivotPos);
         if (RoadIsTooBent() || BadSegmentRatio())
             return null;
-        Road road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
+        Road road;
+        if (startTarget.Snapped && endTarget.Snapped)
+            road = new(new(new(startPos, AlignPivotByStart(startTarget, pivotPos), AlignPivotEnd(endTarget, pivotPos), endPos)), LaneCount);
+        else
+            road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
         return road;
 
         bool RoadIsTooBent()
@@ -348,7 +352,6 @@ public static class Build
         else
             return p;
         p.y = oldY;
-        pivotPos = p;
         pivotAligned = true;
         return p;
     }
@@ -362,7 +365,6 @@ public static class Build
         else
             return p;
         p.y = oldY;
-        pivotPos = p;
         pivotAligned = true;
         return p;
     }

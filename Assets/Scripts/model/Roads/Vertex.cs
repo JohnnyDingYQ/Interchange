@@ -13,8 +13,6 @@ public class Vertex
     public Lane Lane { get; set; }
     public uint Lane_ { get; set; }
     [JsonIgnore]
-    public Road Road { get { return Lane.Road; } }
-    [JsonIgnore]
     public int ScheduledCars { get; set; }
     [JsonProperty]
     Side side;
@@ -44,8 +42,8 @@ public class Vertex
     {
         Curve curve = Lane.Curve;
         return side == Side.Start
-            ? math.normalize(curve.EvaluateDistanceTangent(Constants.VertexDistanceFromRoadEnds))
-            : math.normalize(curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds));
+            ? curve.EvaluateDistanceTangent(Constants.VertexDistanceFromRoadEnds)
+            : curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds);
     }
 
     public override string ToString()

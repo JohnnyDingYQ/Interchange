@@ -12,7 +12,6 @@ public static class Divide
         if (road == null)
             throw new InvalidOperationException("Road to divide cannot be null");
         road.Curve.GetNearestPoint(new(clickPos, Vector3.down), out float distanceOnCurve);
-        Debug.Log(distanceOnCurve);
         return DivideRoad(road, distanceOnCurve);
     }
 

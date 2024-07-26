@@ -50,7 +50,7 @@ public static class Combine
         left.EndIntersection.AddRoad(left, Direction.In);
         Game.UpdateIntersection(left.StartIntersection);
 
-        Debug.Log(left.Curve.GetChainLength());
+        // Debug.Log(left.Curve.GetChainLength());
         return left;
 
     }

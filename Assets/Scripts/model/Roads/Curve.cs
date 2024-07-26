@@ -179,13 +179,13 @@ public class Curve
 
     float3 GetStartTangent()
     {
-        return CurveUtility.EvaluateTangent(bCurve, startT);
+        return math.normalize(CurveUtility.EvaluateTangent(bCurve, startT));
     }
 
     float3 GetEndTangent()
     {
         Curve last = GetLastCurve();
-        return CurveUtility.EvaluateTangent(last.bCurve, last.endT);
+        return math.normalize(CurveUtility.EvaluateTangent(last.bCurve, last.endT));
     }
 
     float3 GetStartNormal()
@@ -272,7 +272,7 @@ public class Curve
         if (distance > SegmentLength && nextCurve != null)
             return nextCurve.EvaluateDistanceTangent(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
-        return CurveUtility.EvaluateTangent(bCurve, t);
+        return math.normalize(CurveUtility.EvaluateTangent(bCurve, t));
     }
 
     public float GetNearestPoint(Ray ray, out float distanceOnCurve, int resolution = 15)
@@ -335,9 +335,7 @@ public class Curve
                 index++;
             }
             else
-            {
                 break;
-            }
         }
 
         CurveUtility.Split(toSplit.bCurve, toSplit.GetDistanceToInterpolation(currDistance), out BezierCurve l, out BezierCurve r);
