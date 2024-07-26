@@ -106,7 +106,7 @@ public static class Gizmos
     {
         if (l == null)
             return;
-        if (l.Count() == 1)
+        if (l.Count() == 1 || l.Count() == 0)
             return;
         float3 prev = l.First();
         l = l.Skip(1);

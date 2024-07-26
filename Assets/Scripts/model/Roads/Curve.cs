@@ -24,6 +24,8 @@ public class Curve
     public float3 EndTangent { get => GetEndTangent(); }
     public float3 StartNormal { get => GetStartNormal(); }
     public float3 EndNormal { get => GetEndNormal(); }
+    const float GetNearestPointTolerance = 0.0001f;
+    const float minimumCurveLength = 0.005f;
 
     public Curve() { }
 
@@ -166,19 +168,13 @@ public class Curve
     {
         if (SegmentLength == 0)
             return nextCurve.GetStartPos();
-        if (offsetDistance == 0)
-            return CurveUtility.EvaluatePosition(bCurve, startT);
         return CurveUtility.EvaluatePosition(bCurve, startT) + StartNormal * offsetDistance;
     }
 
     float3 GetEndPos()
     {
         Curve last = GetLastCurve();
-        if (offsetDistance == 0)
-        {
-            return CurveUtility.EvaluatePosition(last.bCurve, last.endT);
-        }
-        return CurveUtility.EvaluatePosition(last.bCurve, last.endT) + last.EndNormal * offsetDistance;
+        return CurveUtility.EvaluatePosition(last.bCurve, last.endT) + last.EndNormal * last.offsetDistance;
     }
 
     float3 GetStartTangent()
@@ -200,7 +196,7 @@ public class Curve
     float3 GetEndNormal()
     {
         Curve last = GetLastCurve();
-        return last.bCurve.Normalized2DNormal(endT);
+        return last.bCurve.Normalized2DNormal(last.endT);
     }
 
     public Curve ReverseChain()
@@ -253,6 +249,7 @@ public class Curve
         Curve last = GetLastCurve();
         if (!MyNumerics.IsApproxEqual(last.EndPos, other.StartPos))
         {
+            Debug.Log("starttingaefdasd");
             Debug.Log("end: " + last.EndPos);
             Debug.Log("start: " + other.StartPos);
             Assert.IsTrue(false);
@@ -262,7 +259,7 @@ public class Curve
 
     public float3 EvaluateDistancePos(float distance)
     {
-        if (distance > SegmentLength + 0.01f && nextCurve != null)
+        if (distance > SegmentLength && nextCurve != null)
             return nextCurve.EvaluateDistancePos(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         if (offsetDistance == 0)
@@ -300,11 +297,11 @@ public class Curve
         do
         {
             float mid = (low + high) / 2;
-            if (GetDistanceToCurve(EvaluateDistancePos(mid - 0.01f)) < GetDistanceToCurve(EvaluateDistancePos(mid + 0.01f)))
+            if (GetDistanceToCurve(EvaluateDistancePos(mid - GetNearestPointTolerance)) < GetDistanceToCurve(EvaluateDistancePos(mid + GetNearestPointTolerance)))
                 high = mid;
             else
                 low = mid;
-        } while (high - low > 0.01f);
+        } while (high - low > GetNearestPointTolerance);
 
         distanceOnCurve = low;
         return GetDistanceToCurve(EvaluateDistancePos(low));
@@ -315,19 +312,32 @@ public class Curve
         }
     }
 
-
-    // NOT nextCurve compatible
     public void Split(float distance, out Curve left, out Curve right)
     {
         Assert.IsTrue(distance < Length);
         int index = 0;
         Curve toSplit = this;
         float currDistance = distance;
-        while (currDistance > toSplit.SegmentLength)
+
+        while (true)
         {
-            currDistance -= toSplit.SegmentLength;
-            toSplit = toSplit.nextCurve;
-            index++;
+            if (Math.Abs(currDistance - toSplit.SegmentLength) < minimumCurveLength)
+            {
+                left = this;
+                right = toSplit.nextCurve;
+                toSplit.nextCurve = null;
+                return;
+            }
+            if (currDistance >= toSplit.SegmentLength)
+            {
+                currDistance -= toSplit.SegmentLength;
+                toSplit = toSplit.nextCurve;
+                index++;
+            }
+            else
+            {
+                break;
+            }
         }
 
         CurveUtility.Split(toSplit.bCurve, toSplit.GetDistanceToInterpolation(currDistance), out BezierCurve l, out BezierCurve r);
@@ -337,7 +347,10 @@ public class Curve
         right.AddEndDistance(endDistance);
 
         if (index == 0)
+        {
+            right.nextCurve = nextCurve;
             return;
+        }
         Curve newHead = Duplicate();
         Curve prev = newHead;
         while (index != 1)

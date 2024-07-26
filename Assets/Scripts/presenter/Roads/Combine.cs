@@ -12,7 +12,10 @@ public static class Combine
     public static Road CombineRoads(Intersection ix)
     {
         if (!CombineIsValid(ix))
+        {
+            Debug.Log("invalid");
             return null;
+        }
         Road left = ix.InRoads.Single();
         Road right = ix.OutRoads.Single();
 
@@ -47,6 +50,7 @@ public static class Combine
         left.EndIntersection.AddRoad(left, Direction.In);
         Game.UpdateIntersection(left.StartIntersection);
 
+        Debug.Log(left.Curve.GetChainLength());
         return left;
 
     }

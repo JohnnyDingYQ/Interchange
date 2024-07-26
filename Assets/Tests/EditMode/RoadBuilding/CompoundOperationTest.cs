@@ -29,4 +29,29 @@ public class CompoundOperationTest
 
         Build.HandleBuildCommand(3 * stride);
     }
+    [Test]
+    public void CombineAndDivideMultipleTimes()
+    {
+        Road left = RoadBuilder.Single(0, 2 * stride, 4 * stride, 2);
+        RoadBuilder.Single(4 * stride, 6 * stride, 8 * stride, 2);
+        Road combined = Combine.CombineRoads(left.EndIntersection);
+
+        SubRoads subRoads = Divide.HandleDivideCommand(combined, 4.5f * stride);
+
+        for (int i = 0; i < 10; i++)
+        {
+            combined = Combine.CombineRoads(subRoads.Left.EndIntersection);
+            Assert.True(MyNumerics.IsApproxEqual(4 * math.length(2 * stride), combined.Length));
+            subRoads = Divide.HandleDivideCommand(combined, 4.5f * stride + new float3(0, 2, 2));
+            Assert.NotNull(subRoads);
+        }
+
+        // static float GetRandomFloat(System.Random random, float minValue, float maxValue)
+        // {
+        //     double range = maxValue - minValue;
+        //     double sample = random.NextDouble(); // Generates a random double between 0.0 and 1.0
+        //     double scaled = (sample * range) + minValue; // Scales the random value to the desired range
+        //     return (float)scaled;
+        // }
+    }
 }

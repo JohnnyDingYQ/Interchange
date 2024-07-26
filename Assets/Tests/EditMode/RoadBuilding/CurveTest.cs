@@ -79,4 +79,19 @@ public class CurveTest
         Assert.True(MyNumerics.IsApproxEqual(decrement * 1.5f, left.Length));
         Assert.True(MyNumerics.IsApproxEqual(decrement * 0.5f, right.Length));
     }
+
+    [Test]
+    public void AddAndSplitMultipleTimes()
+    {
+        Curve curve = new(new(0, stride, 2 * stride));
+        float singleSegmentLength = curve.Length;
+        curve.Add(new(new(2 * stride, 3 * stride, 4 * stride)));
+        curve.Split(singleSegmentLength, out Curve left, out Curve right);
+        for (int i = 0; i < 3; i++)
+        {
+            left.Add(right);
+            left.Split(singleSegmentLength, out left, out right);
+        }
+        Assert.True(MyNumerics.IsApproxEqual(left.Length, right.Length));
+    }
 }
