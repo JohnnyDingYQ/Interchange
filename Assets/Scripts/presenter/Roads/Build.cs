@@ -85,27 +85,15 @@ public static class Build
         GhostRoads.Clear();
     }
 
-    public static void BuildGhostRoad(float3 endTargetClickPos)
-    {
-        RemoveAllGhostRoads();
-        EndTarget = Snapping.Snap(endTargetClickPos, LaneCount, Side.End);
-        if (EndTarget.Snapped)
-            pivotPos = AlignPivot(EndTarget, pivotPos);
-        if (ParallelBuildOn)
-            BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
-        else
-            BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
-    }
-
-    public static void HandleHover(float3 hoverPos)
+    static void UpdateBuildTargets(float3 pos)
     {
         if (!startAssigned)
         {
             Road road = Game.HoveredRoad;
-            float distOnRoad = road != null ? road.GetNearestDistance(hoverPos) : 0;
+            float distOnRoad = road != null ? road.GetNearestDistance(pos) : 0;
             if (Game.HoveredRoad == null || !road.DistanceBetweenVertices(distOnRoad))
             {
-                StartTarget = Snapping.Snap(hoverPos, LaneCount, Side.Start);
+                StartTarget = Snapping.Snap(pos, LaneCount, Side.Start);
                 EndTarget = null;
                 ReplaceSuggestionOn = false;
             }
@@ -116,21 +104,41 @@ public static class Build
             }
         }
         if (startAssigned && !pivotAssigned)
-            pivotPos = AlignPivot(StartTarget, hoverPos);;
-        if (startAssigned && pivotAssigned && BuildsGhostRoad)
-            BuildGhostRoad(hoverPos);
-        SetSupportLines();
+            pivotPos = AlignPivot(StartTarget, pos);
+        if (startAssigned && pivotAssigned)
+        {
+            EndTarget = Snapping.Snap(pos, LaneCount, Side.End);
+            if (EndTarget.Snapped)
+                pivotPos = AlignPivot(EndTarget, pivotPos);
+        }
 
         void SetupReplaceSuggestion(Road road, float distOnRoad)
         {
-            float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), hoverPos);
+            float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), pos);
             bool isOnLeftSide = math.cross(
                 road.Curve.EvaluateDistanceTangent(distOnRoad),
-                road.Curve.EvaluateDistancePos(distOnRoad) - hoverPos).y > 0;
+                road.Curve.EvaluateDistancePos(distOnRoad) - pos).y > 0;
             float offset = isOnLeftSide ? distance : -distance;
             StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
             EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
+
         }
+    }
+
+    public static void HandleHover(float3 hoverPos)
+    {
+        UpdateBuildTargets(hoverPos);
+        SetSupportLines();
+        BuildGhostRoad();
+    }
+    public static void BuildGhostRoad()
+    {
+        RemoveAllGhostRoads();
+        if (startAssigned && pivotAssigned)
+            if (ParallelBuildOn)
+                BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
+            else
+                BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
     }
 
     public static void ToggletParallelBuild()
@@ -143,6 +151,7 @@ public static class Build
         if (!Game.BuildModeOn)
             return null;
         List<Road> roads;
+        UpdateBuildTargets(clickPos);
         if (ReplaceSuggestionOn)
         {
             roads = BuildSuggested();
@@ -151,26 +160,21 @@ public static class Build
         }
         if (!startAssigned)
         {
-            startAssigned = true;
             startZone = Game.HoveredZone;
-            StartTarget = Snapping.Snap(clickPos, LaneCount, Side.Start);
+            startAssigned = true;
             return null;
         }
         if (!pivotAssigned)
         {
             pivotAssigned = true;
-            pivotPos = AlignPivot(StartTarget, clickPos);
             return null;
         }
         RemoveAllGhostRoads();
-        EndTarget = Snapping.Snap(clickPos, LaneCount, Side.End);
-        if (EndTarget.Snapped)
-            pivotPos = AlignPivot(EndTarget, pivotPos);
         if (ParallelBuildOn)
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
-        
+
         ResetSelection();
         return roads;
 
@@ -192,6 +196,7 @@ public static class Build
             foreach (Node node in EndTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)
                     Game.RemoveNode(node);
+            ReplaceSuggestionOn = false;
             return roads;
         }
     }
