@@ -164,13 +164,6 @@ public static class Build
         else
         {
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
-            if (roads != null && LaneCount == 1)
-            {
-                if (startZone != null && Game.SourceZones.Values.Contains(startZone))
-                    startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
-                if (Game.HoveredZone != null && Game.TargetZones.Values.Contains(Game.HoveredZone))
-                    Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
-            }
         }
         ResetSelection();
         return roads;
@@ -285,20 +278,21 @@ public static class Build
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
-        List<Road> resultingRoads = new() { road };
+        List<Road> roads = new() { road };
 
         RegisterNodes(road);
-        if (!road.IsGhost)
-        {
-            // move statement below out of this block to divide ghost road
-            AutoDivideRoad(road);
-        }
 
         if (road.IsGhost)
-            GhostRoads.AddRange(resultingRoads.Select(r => r.Id));
+            GhostRoads.AddRange(roads.Select(r => r.Id));
+        else
+        {
+            AutoDivideRoad();
+            HandleZoneConnection();
+        }
+
         Game.UpdateIntersection(road.StartIntersection);
-        Game.UpdateIntersection(resultingRoads.Last().EndIntersection);
-        return resultingRoads;
+        Game.UpdateIntersection(roads.Last().EndIntersection);
+        return roads;
 
         # region extracted funcitons
         static float GetLongestLaneLength(Road road)
@@ -309,7 +303,7 @@ public static class Build
             return length;
         }
 
-        void AutoDivideRoad(Road road)
+        void AutoDivideRoad()
         {
             float longestLength = GetLongestLaneLength(road);
             if (longestLength <= Constants.MaxLaneLength)
@@ -317,18 +311,41 @@ public static class Build
             int divisions = 2;
             while (longestLength / divisions > Constants.MaxLaneLength)
                 divisions++;
-            RecursiveRoadDivision(road, divisions);
+            RecursiveRoadDivision(road, divisions, roads);
         }
 
-        void RecursiveRoadDivision(Road road, int divisions)
+        static void RecursiveRoadDivision(Road road, int divisions, List<Road> roads)
         {
             if (divisions == 1)
                 return;
             SubRoads subRoads = Divide.DivideRoad(road, road.Curve.Length / divisions);
-            resultingRoads.Remove(road);
-            resultingRoads.Add(subRoads.Left);
-            resultingRoads.Add(subRoads.Right);
-            RecursiveRoadDivision(subRoads.Right, divisions - 1);
+            roads.Remove(road);
+            roads.Add(subRoads.Left);
+            roads.Add(subRoads.Right);
+            RecursiveRoadDivision(subRoads.Right, divisions - 1, roads);
+        }
+
+        void HandleZoneConnection()
+        {
+            if (roads != null && LaneCount == 1)
+            {
+                if (startZone?.Type == ZoneType.Source && roads.First().StartPos.y == Constants.MinElevation)
+                {
+                    startZone?.AddVertex(roads.First().Lanes.Single().StartVertex);
+                    roads.Last().EndIntersection.OutRoads
+                        .Where(r => r.LaneCount == 1)
+                        .Select(r => r.Lanes.Single()).ToList()
+                        .ForEach(l => startZone.RemoveVertex(l.StartVertex));
+                }
+                if (Game.HoveredZone?.Type == ZoneType.Target && roads.Last().EndPos.y == Constants.MinElevation)
+                {
+                    Game.HoveredZone?.AddVertex(roads.Last().Lanes.Single().EndVertex);
+                    roads.First().StartIntersection.InRoads
+                        .Where(r => r.LaneCount == 1)
+                        .Select(r => r.Lanes.Single()).ToList()
+                        .ForEach(l => Game.HoveredZone.RemoveVertex(l.EndVertex));
+                }
+            }
         }
         #endregion
     }

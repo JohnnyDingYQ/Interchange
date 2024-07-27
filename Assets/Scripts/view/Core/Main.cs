@@ -11,7 +11,6 @@ public class Main : MonoBehaviour
 
     void Start()
     {
-        SanityCheck();
         Application.targetFrameRate = 165;
         Physics.queriesHitTriggers = false;
         int now = (int)DateTime.Now.Ticks;
@@ -33,13 +32,6 @@ public class Main : MonoBehaviour
             Build.HandleHover(InputSystem.MouseWorldPos);
         }
         frameElapsed++;
-    }
-
-    void SanityCheck()
-    {
-        Assert.IsTrue(Constants.MinLaneLength * 2 < Constants.MaxLaneLength);
-        Assert.IsTrue(Constants.MinElevation < Constants.MaxElevation);
-        Assert.AreEqual(0, (Constants.MaxElevation - Constants.MinElevation) % Constants.ElevationStep);
     }
 
     public static float GetHUDObjectHeight(HUDLayer layer)

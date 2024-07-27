@@ -19,13 +19,13 @@ public class Zones : MonoBehaviour
         foreach (Transform child in sourceZones.transform)
         {
             uint id = uint.Parse(child.gameObject.name);
-            Game.SourceZones.Add(id, new(id));
+            Game.SourceZones.Add(id, new(id, ZoneType.Source));
         }
 
         foreach (Transform child in targetZones.transform)
         {
             uint id = uint.Parse(child.gameObject.name);
-            Game.TargetZones.Add(id, new(id));
+            Game.TargetZones.Add(id, new(id, ZoneType.Target));
         }
     }
     

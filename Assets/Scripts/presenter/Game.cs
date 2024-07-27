@@ -26,6 +26,7 @@ public static class Game
 
     static Game()
     {
+        SanityCheck();
         GameSave = new();
         BuildModeOn = true;
     }
@@ -150,5 +151,13 @@ public static class Game
     public static void InvokeRoadRemoved(Road road)
     {
         RoadRemoved?.Invoke(road);
+    }
+
+    static void SanityCheck()
+    {
+        Assert.IsTrue(Constants.MinLaneLength * 2 < Constants.MaxLaneLength);
+        Assert.IsTrue(Constants.MinElevation < Constants.MaxElevation);
+        Assert.AreEqual(0, (Constants.MaxElevation - Constants.MinElevation) % Constants.ElevationStep);
+        Assert.AreEqual(0, Constants.MinElevation);
     }
 }

@@ -3,6 +3,7 @@ public enum Direction { In, Out, Both }
 public enum Orientation { Left, Right }
 public enum BuildMode { Ghost, Actual }
 public enum RoadRemovalOption { Default, Divide, Combine, Replace }
+public enum ZoneType { Source, Target };
 public enum HUDLayer
 {
     Intersections,

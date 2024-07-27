@@ -1,6 +1,6 @@
 public class TargetZone : Zone
 {
-    public TargetZone(uint id) : base(id)
+    public TargetZone(uint id) : base(id, ZoneType.Target)
     {
     }
 }
