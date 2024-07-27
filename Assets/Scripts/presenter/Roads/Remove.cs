@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -15,6 +16,16 @@ public static class Remove
             List<Path> toRemove = new();
             if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
+                Game.SourceZones?.Values.ToList().ForEach(zone =>
+                {
+                    zone.RemoveVertex(lane.StartVertex);
+                    zone.RemoveVertex(lane.EndVertex);
+                });
+                Game.TargetZones?.Values.ToList().ForEach(zone =>
+                {
+                    zone.RemoveVertex(lane.StartVertex);
+                    zone.RemoveVertex(lane.EndVertex);
+                });
                 Graph.RemoveVertex(lane.StartVertex);
                 Graph.RemoveVertex(lane.EndVertex);
             }

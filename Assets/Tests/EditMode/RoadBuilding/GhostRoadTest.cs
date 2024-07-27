@@ -88,6 +88,27 @@ public class GhostRoadTest
         Assert.True(Build.EndTarget.Snapped);
     }
 
+    [Test]
+    public void SnapAtTwoEndsAndGhostRoad()
+    {
+        float3 up = new(0, 0, Constants.MinLaneLength);
+        float3 offset = new(Constants.MinLaneLength, 0, 0);
+        Road start = RoadBuilder.Single(0, up, 2 * up, 2);
+        Road end = RoadBuilder.Single(offset + 3 * up, offset + 4 * up, offset + 5 * up, 2);
+
+        Build.LaneCount = 2;
+        Build.HandleBuildCommand(2 * up);
+
+        Build.HandleHover(Vector3.Lerp(2 * up, offset + 3 * up, 0.5f));
+        Build.HandleBuildCommand(Vector3.Lerp(2 * up, offset + 3 * up, 0.5f));
+        Build.HandleHover(Vector3.Lerp(2 * up, offset + 3 * up, 0.5f));
+        
+        Build.HandleHover(offset + 3 * up);
+        Build.HandleBuildCommand(offset + 3 * up);
+        // Build.HandleHover(offset + 3 * up);
+    }
+
+
     // Uncomment if I decide to divide ghost roads again
     // [Test]
     // public void BasicDividedGhostRoad()

@@ -93,7 +93,7 @@ public static class Build
             pivotPos = AlignPivot(StartTarget, pos);
         else if (startAssigned && pivotAssigned)
             HandlePosAsEnd(pos);
-        
+
         void SetupReplaceSuggestion(Road road, float distOnRoad)
         {
             float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), pos);
@@ -104,6 +104,23 @@ public static class Build
             StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
             EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
 
+        }
+
+        void HandlePosAsStart(float3 pos)
+        {
+            Road road = Game.HoveredRoad;
+            float distOnRoad = road != null ? road.GetNearestDistance(pos) : 0;
+            if (Game.HoveredRoad == null || !road.DistanceBetweenVertices(distOnRoad))
+            {
+                StartTarget = Snapping.Snap(pos, LaneCount, Side.Start);
+                EndTarget = null;
+                ReplaceSuggestionOn = false;
+            }
+            else
+            {
+                ReplaceSuggestionOn = true;
+                SetupReplaceSuggestion(road, distOnRoad);
+            }
         }
 
         static void HandlePosAsEnd(float3 pos)
@@ -122,29 +139,14 @@ public static class Build
                         float3 startPos = EndTarget.Pos - math.length(StartTarget.Pos - EndTarget.Pos) * EndTarget.Tangent;
                         StartTarget = Snapping.Snap(startPos, LaneCount, Side.Start);
                     }
+                    else if (StartTarget.Snapped)
+                        pivotPos = Vector3.Lerp(StartTarget.Pos, EndTarget.Pos, 0.5f);
                     else
                         pivotPos = AlignPivot(EndTarget, pivotPos);
                 }
             }
             if (StraightMode)
                 pivotPos = Vector3.Lerp(StartTarget.Pos, EndTarget.Pos, 0.5f);
-        }
-
-        void HandlePosAsStart(float3 pos)
-        {
-            Road road = Game.HoveredRoad;
-            float distOnRoad = road != null ? road.GetNearestDistance(pos) : 0;
-            if (Game.HoveredRoad == null || !road.DistanceBetweenVertices(distOnRoad))
-            {
-                StartTarget = Snapping.Snap(pos, LaneCount, Side.Start);
-                EndTarget = null;
-                ReplaceSuggestionOn = false;
-            }
-            else
-            {
-                ReplaceSuggestionOn = true;
-                SetupReplaceSuggestion(road, distOnRoad);
-            }
         }
     }
 
@@ -174,6 +176,7 @@ public static class Build
         if (!Game.BuildModeOn)
             return null;
         List<Road> roads;
+        RemoveAllGhostRoads();
         UpdateBuildTargetsAndPivot(clickPos);
         if (ReplaceSuggestionOn)
         {
@@ -192,12 +195,10 @@ public static class Build
             pivotAssigned = true;
             return null;
         }
-        RemoveAllGhostRoads();
         if (ParallelBuildOn)
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
-
         ResetSelection();
         return roads;
 
@@ -260,12 +261,7 @@ public static class Build
         float3 endPos = endTarget.Pos;
         if (RoadIsTooBent() || BadSegmentRatio())
             return null;
-        Road road;
-        if (startTarget.Snapped && endTarget.Snapped)
-            road = new(new(new(startPos, AlignPivot(startTarget, pivotPos), AlignPivot(endTarget, pivotPos), endPos)), LaneCount);
-        else
-            road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
-        return road;
+        return new(GetCurve(), LaneCount);
 
         bool RoadIsTooBent()
         {
@@ -382,15 +378,31 @@ public static class Build
         #endregion
     }
 
-    static Curve ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
+    static Curve GetCurve()
     {
         // reference: https://pomax.github.io/bezierinfo/#circles_cubic
         float k = 0.551785f;
-        float3 c1 = Vector3.Lerp(q0, q1, k);
-        float3 c2 = Vector3.Lerp(q2, q1, k);
+        Assert.IsTrue(startAssigned && pivotAssigned);
+        if (StartTarget.Snapped && EndTarget.Snapped)
+        {
+            float length = math.length(math.project(pivotPos - StartTarget.Pos, StartTarget.Tangent));
+            float3 q0 = StartTarget.Pos;
+            float3 q3 = EndTarget.Pos;
+            float3 q1 = Vector3.Lerp(q0, q0 + StartTarget.Tangent * length, k);
+            float3 q2 = Vector3.Lerp(EndTarget.Pos - EndTarget.Tangent * length, EndTarget.Pos, k);
+            return new(new(q0, q1, q2, q3));
+        }
+        return ApproximateCircularArc(StartTarget.Pos, pivotPos, EndTarget.Pos);
 
-        return new(new BezierCurve(q0, c1, c2, q2));
+        Curve ApproximateCircularArc(float3 q0, float3 q1, float3 q2)
+        {
+            float3 c1 = Vector3.Lerp(q0, q1, k);
+            float3 c2 = Vector3.Lerp(q2, q1, k);
+
+            return new(new BezierCurve(q0, c1, c2, q2));
+        }
     }
+
 
     static float3 AlignPivot(BuildTargets startTarget, float3 p)
     {

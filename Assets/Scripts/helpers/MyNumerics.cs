@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public static class MyNumerics
 {
@@ -36,5 +37,12 @@ public static class MyNumerics
     {
         int index =  (int) (UnityEngine.Random.value * length);
         return index != length ? index : GetRandomIndex(length);
+    }
+
+    public static float2 Get2DVectorsIntersection(Vector2 p1, Vector2 v1, Vector2 p2, Vector2 v2)
+    {
+        Assert.IsFalse(Vector2.Distance(math.normalize(v1), math.normalize(v2)) < 0.01f);
+        float t2 = (p1.y * v1.x + p2.x * v1.y - p1.x*v1.y - p2.y * v1.x) / (v2.y * v1.x - v2.x * v1.y);
+        return p2 + t2 * v2;
     }
 }

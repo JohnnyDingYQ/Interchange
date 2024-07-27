@@ -83,4 +83,17 @@ public class ZoneTest
         Assert.AreEqual(1, Game.TargetZones[1].Vertices.Count);
         Assert.AreEqual(road.Lanes.Single().EndVertex, Game.TargetZones[1].Vertices.Single());
     }
+
+    [Test]
+    public void RemovingRoadRemovesVertexFromZone()
+    {
+        Game.HoveredZone = Game.SourceZones[1];
+        Build.HandleBuildCommand(2 * stride);
+        Game.HoveredZone = null;
+        Build.HandleBuildCommand(3 * stride);
+        Road road = Build.HandleBuildCommand(4 * stride).Single();
+        Game.RemoveRoad(road);
+        
+        Assert.AreEqual(0, Game.SourceZones[1].Vertices.Count);
+    }
 }
