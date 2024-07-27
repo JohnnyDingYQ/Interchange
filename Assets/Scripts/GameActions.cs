@@ -179,6 +179,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""StraightMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""cab08211-240a-4067-8f8b-5e9aedaf161f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -456,6 +465,17 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""DecreaseElevation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""52466241-c35d-4513-ba50-be304d5f0974"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""StraightMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -481,6 +501,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_BulkSelect = m_InGame.FindAction("BulkSelect", throwIfNotFound: true);
         m_InGame_DecreaseElevation = m_InGame.FindAction("DecreaseElevation", throwIfNotFound: true);
         m_InGame_IncreaseElevation = m_InGame.FindAction("IncreaseElevation", throwIfNotFound: true);
+        m_InGame_StraightMode = m_InGame.FindAction("StraightMode", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -559,6 +580,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_BulkSelect;
     private readonly InputAction m_InGame_DecreaseElevation;
     private readonly InputAction m_InGame_IncreaseElevation;
+    private readonly InputAction m_InGame_StraightMode;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -580,6 +602,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @BulkSelect => m_Wrapper.m_InGame_BulkSelect;
         public InputAction @DecreaseElevation => m_Wrapper.m_InGame_DecreaseElevation;
         public InputAction @IncreaseElevation => m_Wrapper.m_InGame_IncreaseElevation;
+        public InputAction @StraightMode => m_Wrapper.m_InGame_StraightMode;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -640,6 +663,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @IncreaseElevation.started += instance.OnIncreaseElevation;
             @IncreaseElevation.performed += instance.OnIncreaseElevation;
             @IncreaseElevation.canceled += instance.OnIncreaseElevation;
+            @StraightMode.started += instance.OnStraightMode;
+            @StraightMode.performed += instance.OnStraightMode;
+            @StraightMode.canceled += instance.OnStraightMode;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -695,6 +721,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @IncreaseElevation.started -= instance.OnIncreaseElevation;
             @IncreaseElevation.performed -= instance.OnIncreaseElevation;
             @IncreaseElevation.canceled -= instance.OnIncreaseElevation;
+            @StraightMode.started -= instance.OnStraightMode;
+            @StraightMode.performed -= instance.OnStraightMode;
+            @StraightMode.canceled -= instance.OnStraightMode;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -731,5 +760,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnBulkSelect(InputAction.CallbackContext context);
         void OnDecreaseElevation(InputAction.CallbackContext context);
         void OnIncreaseElevation(InputAction.CallbackContext context);
+        void OnStraightMode(InputAction.CallbackContext context);
     }
 }

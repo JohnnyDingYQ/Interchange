@@ -9,7 +9,7 @@ using UnityEngine.Splines;
 public static class Build
 {
     private static float3 pivotPos;
-    private static bool startAssigned, pivotAssigned, pivotAligned;
+    private static bool startAssigned, pivotAssigned;
     private static Zone startZone;
     public static int LaneCount { get; set; }
     public static BuildTargets StartTarget { get; set; }
@@ -21,15 +21,16 @@ public static class Build
     public static float ParallelSpacing { get; set; }
     public static int Elevation { get; set; }
     public static bool ReplaceSuggestionOn { get; set; }
+    public static bool StraightMode { get; set; }
     static Build()
     {
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
-        pivotAligned = false;
         SupportLines = new();
         BuildsGhostRoad = true;
         GhostRoads = new();
+        StraightMode = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
     }
 
@@ -48,10 +49,10 @@ public static class Build
     {
         startAssigned = false;
         pivotAssigned = false;
-        pivotAligned = false;
         StartTarget = null;
         EndTarget = null;
         ReplaceSuggestionOn = false;
+        StraightMode = false;
         RemoveAllGhostRoads();
     }
 
@@ -88,6 +89,8 @@ public static class Build
     {
         RemoveAllGhostRoads();
         EndTarget = Snapping.Snap(endTargetClickPos, LaneCount, Side.End);
+        if (EndTarget.Snapped)
+            pivotPos = AlignPivot(EndTarget, pivotPos);
         if (ParallelBuildOn)
             BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
         else
@@ -108,23 +111,26 @@ public static class Build
             }
             else
             {
-                float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), hoverPos);
-                bool isOnLeftSide = math.cross(
-                    road.Curve.EvaluateDistanceTangent(distOnRoad),
-                    road.Curve.EvaluateDistancePos(distOnRoad) - hoverPos).y > 0;
-                float offset = isOnLeftSide ? distance : -distance;
-                StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
-                EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
                 ReplaceSuggestionOn = true;
+                SetupReplaceSuggestion(road, distOnRoad);
             }
         }
         if (startAssigned && !pivotAssigned)
-            pivotPos = hoverPos;
-        if (!pivotAssigned && startAssigned)
-            pivotPos = AlignPivotByStart(StartTarget, pivotPos);
+            pivotPos = AlignPivot(StartTarget, hoverPos);;
         if (startAssigned && pivotAssigned && BuildsGhostRoad)
             BuildGhostRoad(hoverPos);
         SetSupportLines();
+
+        void SetupReplaceSuggestion(Road road, float distOnRoad)
+        {
+            float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), hoverPos);
+            bool isOnLeftSide = math.cross(
+                road.Curve.EvaluateDistanceTangent(distOnRoad),
+                road.Curve.EvaluateDistancePos(distOnRoad) - hoverPos).y > 0;
+            float offset = isOnLeftSide ? distance : -distance;
+            StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
+            EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
+        }
     }
 
     public static void ToggletParallelBuild()
@@ -153,18 +159,18 @@ public static class Build
         if (!pivotAssigned)
         {
             pivotAssigned = true;
-            pivotPos = clickPos;
-            pivotPos = AlignPivotByStart(StartTarget, pivotPos);
+            pivotPos = AlignPivot(StartTarget, clickPos);
             return null;
         }
         RemoveAllGhostRoads();
         EndTarget = Snapping.Snap(clickPos, LaneCount, Side.End);
+        if (EndTarget.Snapped)
+            pivotPos = AlignPivot(EndTarget, pivotPos);
         if (ParallelBuildOn)
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
-        {
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
-        }
+        
         ResetSelection();
         return roads;
 
@@ -224,13 +230,13 @@ public static class Build
     {
         float3 startPos = startTarget.Pos;
         float3 endPos = endTarget.Pos;
-        if (!pivotAligned)
-            pivotPos = AlignPivotEnd(endTarget, pivotPos);
+        if (StraightMode)
+            pivotPos = Vector3.Lerp(startPos, endPos, 0.5f);
         if (RoadIsTooBent() || BadSegmentRatio())
             return null;
         Road road;
         if (startTarget.Snapped && endTarget.Snapped)
-            road = new(new(new(startPos, AlignPivotByStart(startTarget, pivotPos), AlignPivotEnd(endTarget, pivotPos), endPos)), LaneCount);
+            road = new(new(new(startPos, AlignPivot(startTarget, pivotPos), AlignPivot(endTarget, pivotPos), endPos)), LaneCount);
         else
             road = new(ApproximateCircularArc(startPos, pivotPos, endPos), LaneCount);
         return road;
@@ -360,7 +366,7 @@ public static class Build
         return new(new BezierCurve(q0, c1, c2, q2));
     }
 
-    static float3 AlignPivotByStart(BuildTargets startTarget, float3 p)
+    static float3 AlignPivot(BuildTargets startTarget, float3 p)
     {
         Assert.IsNotNull(startTarget);
         float oldY = p.y;
@@ -369,20 +375,6 @@ public static class Build
         else
             return p;
         p.y = oldY;
-        pivotAligned = true;
-        return p;
-    }
-
-    static float3 AlignPivotEnd(BuildTargets endTarget, float3 p)
-    {
-        Assert.IsNotNull(endTarget);
-        float oldY = p.y;
-        if (endTarget.TangentAssigned)
-            p = math.project(p - endTarget.Pos, endTarget.Tangent) + endTarget.Pos;
-        else
-            return p;
-        p.y = oldY;
-        pivotAligned = true;
         return p;
     }
 

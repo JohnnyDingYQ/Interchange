@@ -55,6 +55,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.BulkSelect.started += BulkSelectStarted;
         gameActions.InGame.BulkSelect.performed += BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled += BulkSelectEnd;
+        gameActions.InGame.StraightMode.performed += EnableStraightMode;
 
         gameActions.InGame.Enable();
     }
@@ -81,6 +82,8 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.BulkSelect.started -= BulkSelectStarted;
         gameActions.InGame.BulkSelect.performed -= BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled -= BulkSelectEnd;
+        gameActions.InGame.StraightMode.performed -= EnableStraightMode;
+
 
         gameActions.InGame.Disable();
     }
@@ -241,5 +244,9 @@ public class InputSystem : MonoBehaviour
         if (bulkSelectPerformed)
             Roads.BulkSelect(bulkSelectStartPos, MouseWorldPos);
         bulkSelectPerformed = false;
+    }
+    void EnableStraightMode(InputAction.CallbackContext context)
+    {
+        Build.StraightMode = true;
     }
 }
