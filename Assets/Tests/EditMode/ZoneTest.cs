@@ -41,9 +41,6 @@ public class ZoneTest
         Build.HandleBuildCommand(stride);
         List<Road> roads = Build.HandleBuildCommand(2 * stride);
 
-        Debug.Log(roads.First().Lanes.Single().StartVertex);
-        Debug.Log(Game.SourceZones[1].Vertices.Count);
-
         Assert.AreEqual(roads.First().Lanes.Single().StartVertex, Game.SourceZones[1].Vertices.Single());
     }
 

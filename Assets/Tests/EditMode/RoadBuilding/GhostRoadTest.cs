@@ -76,6 +76,18 @@ public class GhostRoadTest
         Assert.NotNull(Build.StartTarget);
     }
 
+    [Test]
+    public void GhostRoadDoesNotInterfereSnap()
+    {
+        Road road0 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Build.HandleBuildCommand(0);
+        Build.HandleBuildCommand(stride);
+        Build.HandleHover(2 * stride);
+        Assert.True(Build.EndTarget.Snapped);
+        Build.HandleHover(2 * stride);
+        Assert.True(Build.EndTarget.Snapped);
+    }
+
     // Uncomment if I decide to divide ghost roads again
     // [Test]
     // public void BasicDividedGhostRoad()

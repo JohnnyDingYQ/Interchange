@@ -85,9 +85,52 @@ public static class Build
         GhostRoads.Clear();
     }
 
-    static void UpdateBuildTargets(float3 pos)
+    static void UpdateBuildTargetsAndPivot(float3 pos)
     {
         if (!startAssigned)
+            HandlePosAsStart(pos);
+        else if (startAssigned && !pivotAssigned)
+            pivotPos = AlignPivot(StartTarget, pos);
+        else if (startAssigned && pivotAssigned)
+            HandlePosAsEnd(pos);
+        
+        void SetupReplaceSuggestion(Road road, float distOnRoad)
+        {
+            float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), pos);
+            bool isOnLeftSide = math.cross(
+                road.Curve.EvaluateDistanceTangent(distOnRoad),
+                road.Curve.EvaluateDistancePos(distOnRoad) - pos).y > 0;
+            float offset = isOnLeftSide ? distance : -distance;
+            StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
+            EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
+
+        }
+
+        static void HandlePosAsEnd(float3 pos)
+        {
+            if (StraightMode && StartTarget.Snapped)
+            {
+                EndTarget = Snapping.Snap(AlignPivot(StartTarget, pos), LaneCount, Side.End);
+            }
+            else
+            {
+                EndTarget = Snapping.Snap(pos, LaneCount, Side.End);
+                if (EndTarget.Snapped)
+                {
+                    if (StraightMode)
+                    {
+                        float3 startPos = EndTarget.Pos - math.length(StartTarget.Pos - EndTarget.Pos) * EndTarget.Tangent;
+                        StartTarget = Snapping.Snap(startPos, LaneCount, Side.Start);
+                    }
+                    else
+                        pivotPos = AlignPivot(EndTarget, pivotPos);
+                }
+            }
+            if (StraightMode)
+                pivotPos = Vector3.Lerp(StartTarget.Pos, EndTarget.Pos, 0.5f);
+        }
+
+        void HandlePosAsStart(float3 pos)
         {
             Road road = Game.HoveredRoad;
             float distOnRoad = road != null ? road.GetNearestDistance(pos) : 0;
@@ -103,37 +146,17 @@ public static class Build
                 SetupReplaceSuggestion(road, distOnRoad);
             }
         }
-        if (startAssigned && !pivotAssigned)
-            pivotPos = AlignPivot(StartTarget, pos);
-        if (startAssigned && pivotAssigned)
-        {
-            EndTarget = Snapping.Snap(pos, LaneCount, Side.End);
-            if (EndTarget.Snapped)
-                pivotPos = AlignPivot(EndTarget, pivotPos);
-        }
-
-        void SetupReplaceSuggestion(Road road, float distOnRoad)
-        {
-            float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), pos);
-            bool isOnLeftSide = math.cross(
-                road.Curve.EvaluateDistanceTangent(distOnRoad),
-                road.Curve.EvaluateDistancePos(distOnRoad) - pos).y > 0;
-            float offset = isOnLeftSide ? distance : -distance;
-            StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
-            EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
-
-        }
     }
 
     public static void HandleHover(float3 hoverPos)
     {
-        UpdateBuildTargets(hoverPos);
+        RemoveAllGhostRoads();
+        UpdateBuildTargetsAndPivot(hoverPos);
         SetSupportLines();
         BuildGhostRoad();
     }
     public static void BuildGhostRoad()
     {
-        RemoveAllGhostRoads();
         if (startAssigned && pivotAssigned)
             if (ParallelBuildOn)
                 BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
@@ -151,7 +174,7 @@ public static class Build
         if (!Game.BuildModeOn)
             return null;
         List<Road> roads;
-        UpdateBuildTargets(clickPos);
+        UpdateBuildTargetsAndPivot(clickPos);
         if (ReplaceSuggestionOn)
         {
             roads = BuildSuggested();
@@ -235,8 +258,6 @@ public static class Build
     {
         float3 startPos = startTarget.Pos;
         float3 endPos = endTarget.Pos;
-        if (StraightMode)
-            pivotPos = Vector3.Lerp(startPos, endPos, 0.5f);
         if (RoadIsTooBent() || BadSegmentRatio())
             return null;
         Road road;
