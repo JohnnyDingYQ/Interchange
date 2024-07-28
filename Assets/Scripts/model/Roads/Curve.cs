@@ -426,7 +426,7 @@ public class Curve : IPersistable
             return Id == other.Id && bCurve.P0.Equals(other.bCurve.P0) && bCurve.P1.Equals(other.bCurve.P1)
                 && bCurve.P2.Equals(other.bCurve.P2) && bCurve.P3.Equals(other.bCurve.P3) && bCurveLength == other.bCurveLength
                 && offsetDistance == other.offsetDistance && startDistance == other.startDistance && endDistance == other.endDistance
-                && startT == other.startT && endT == other.endT && nextCurve == other.nextCurve;
+                && startT == other.startT && endT == other.endT && Equals(nextCurve, other.nextCurve);
 
         else
             return false;

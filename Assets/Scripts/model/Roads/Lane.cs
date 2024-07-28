@@ -66,13 +66,12 @@ public class Lane
     public override bool Equals(object obj)
     {
         if (obj is Lane other)
-        {
-            return Id == other.Id;
-        }
+            return Id == other.Id && Equals(StartVertex, other.StartVertex) && Equals(EndVertex, other.EndVertex)
+                && Equals(StartNode, other.StartNode) && Equals(EndNode, other.EndNode) && Equals(Curve, other.Curve)
+                && Equals(Road, other.Road) && Equals(LaneIndex, other.LaneIndex) && Equals(InnerPath, other.InnerPath);
         else
-        {
             return false;
-        }
+        
     }
 
     public override int GetHashCode()
