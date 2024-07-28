@@ -81,21 +81,14 @@ public class Curve
         Assert.IsTrue(delta >= 0);
         int index = 0;
         Curve curr = GetCurveByIndex(index);
-        while (curr.SegmentLength == 0)
-            curr = GetCurveByIndex(++index);
         while (curr.SegmentLength < delta)
         {
             delta -= curr.SegmentLength;
-            curr.startDistance = curr.bCurveLength;
-            curr.startT = 1;
-            curr.endDistance = 0;
-            curr.endT = 1;
-            Assert.AreEqual(0, curr.SegmentLength);
             curr = curr.nextCurve;
         }
         curr.startDistance += delta;
         curr.startT = CurveUtility.GetDistanceToInterpolation(curr.lut, curr.startDistance);
-        return this;
+        return curr;
     }
 
     public Curve AddEndDistance(float delta)
@@ -103,17 +96,11 @@ public class Curve
         Assert.IsTrue(delta >= 0);
         int index = GetChainLength() - 1;
         Curve curr = GetCurveByIndex(index);
-        while (curr.SegmentLength == 0)
-            curr = GetCurveByIndex(--index);
         while (curr.SegmentLength < delta)
         {
             delta -= curr.SegmentLength;
-            curr.startDistance = curr.bCurveLength;
-            curr.startT = 1;
-            curr.endDistance = 0;
-            curr.endT = 1;
-            Assert.AreEqual(0, curr.SegmentLength);
             curr = GetCurveByIndex(--index);
+            curr.nextCurve = null;
         }
         curr.endDistance += delta;
         curr.endT = CurveUtility.GetDistanceToInterpolation(curr.lut, curr.bCurveLength - curr.endDistance);
@@ -247,11 +234,11 @@ public class Curve
     public void Add(Curve other)
     {
         Curve last = GetLastCurve();
-        if (!MyNumerics.IsApproxEqual(last.EndPos, other.StartPos))
+        if (!MyNumerics.IsApproxEqual(EndPos, other.StartPos))
         {
-            Debug.Log("starttingaefdasd");
-            Debug.Log("end: " + last.EndPos);
-            Debug.Log("start: " + other.StartPos);
+            Debug.Log("Left curve misaligns with right curve");
+            Debug.Log("left end: " + EndPos);
+            Debug.Log("right start: " + other.StartPos);
             Assert.IsTrue(false);
         }
         last.nextCurve = other.Duplicate();
@@ -340,9 +327,9 @@ public class Curve
 
         CurveUtility.Split(toSplit.bCurve, toSplit.GetDistanceToInterpolation(currDistance), out BezierCurve l, out BezierCurve r);
         left = new(l) { offsetDistance = offsetDistance };
-        left.AddStartDistance(startDistance);
+        left = left.AddStartDistance(startDistance);
         right = new(r) { offsetDistance = offsetDistance };
-        right.AddEndDistance(endDistance);
+        right = right.AddEndDistance(endDistance);
 
         if (index == 0)
         {
@@ -356,11 +343,10 @@ public class Curve
             prev = prev.nextCurve;
             index--;
         }
-        toSplit = prev.nextCurve;
+        Curve next = prev.nextCurve.nextCurve;
         prev.nextCurve = left;
         left = newHead;
-        right.nextCurve = toSplit.nextCurve;
-
+        right.nextCurve = next;
     }
 
     public OutlineEnum GetOutline(int numPoints)

@@ -20,9 +20,9 @@ public class CurveTest
         Curve curve = new(new(0, stride, 2 * stride));
         float decrement = curve.Length / 5;
 
-        curve.AddStartDistance(decrement);
+        curve = curve.AddStartDistance(decrement);
         float3 prevStart = curve.StartPos; 
-        curve.AddStartDistance(decrement);
+        curve = curve.AddStartDistance(decrement);
         Assert.AreNotEqual(prevStart, curve.StartPos);
         Assert.True(MyNumerics.IsApproxEqual(math.length(prevStart - curve.StartPos), decrement));
 
@@ -40,7 +40,7 @@ public class CurveTest
         float singleSegmentLength = curve.Length;
         curve.Add(new(new(2 * stride, 3 * stride, 4 * stride)));
         
-        curve.AddStartDistance(1.5f * singleSegmentLength);
+        curve = curve.AddStartDistance(1.5f * singleSegmentLength);
         Assert.True(MyNumerics.IsApproxEqual(curve.Length, 0.5f * singleSegmentLength));
         Assert.True(MyNumerics.IsApproxEqual(3 * stride, curve.StartPos));
     }
@@ -52,7 +52,7 @@ public class CurveTest
         float singleSegmentLength = curve.Length;
         curve.Add(new(new(2 * stride, 3 * stride, 4 * stride)));
         
-        curve.AddEndDistance(1.5f * singleSegmentLength);
+        curve = curve.AddEndDistance(1.5f * singleSegmentLength);
         Assert.True(MyNumerics.IsApproxEqual(curve.Length, 0.5f * singleSegmentLength));
         Assert.True(MyNumerics.IsApproxEqual(stride, curve.EndPos));
     }

@@ -261,7 +261,10 @@ public static class Build
         float3 endPos = endTarget.Pos;
         if (RoadIsTooBent() || BadSegmentRatio())
             return null;
-        return new(GetCurve(), LaneCount);
+        Road road = new(GetCurve(), LaneCount);
+        if (road.HasLaneShorterThanMinLaneLength())
+            return null;
+        return road;
 
         bool RoadIsTooBent()
         {
@@ -288,8 +291,6 @@ public static class Build
 
     static List<Road> ProcessRoad(Road road, BuildTargets startTarget, BuildTargets endTarget)
     {
-        if (road.HasLaneShorterThanMinLaneLength())
-            return null;
         if (startTarget.Snapped)
             road.StartIntersection = startTarget.Intersection;
         if (endTarget.Snapped)

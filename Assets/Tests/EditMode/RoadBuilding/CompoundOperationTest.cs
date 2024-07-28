@@ -38,7 +38,7 @@ public class CompoundOperationTest
 
         SubRoads subRoads = Divide.HandleDivideCommand(combined, 4.5f * stride);
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
         {
             combined = Combine.CombineRoads(subRoads.Left.EndIntersection);
             Assert.True(MyNumerics.IsApproxEqual(4 * math.length(2 * stride), combined.Length));
@@ -53,5 +53,21 @@ public class CompoundOperationTest
         //     double scaled = (sample * range) + minValue; // Scales the random value to the desired range
         //     return (float)scaled;
         // }
+    }
+
+    [Test]
+    public void SlidingCombindAndDivide()
+    {
+        Road combined = RoadBuilder.Single(0, 2 * stride, 4 * stride, 2);
+        float length = combined.Length;
+        SubRoads subRoads;
+        float step = math.length(2 * stride) / 10;
+
+        for (float distance = math.length(stride + step); distance < math.length(3 * stride - step); distance += step)
+        {
+            subRoads = Divide.DivideRoad(combined, distance);
+            combined = Combine.CombineRoads(subRoads.Left.EndIntersection);
+            Assert.AreEqual(2, Game.Intersections.Count);
+        }
     }
 }

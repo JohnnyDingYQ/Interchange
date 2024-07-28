@@ -17,7 +17,7 @@ public class Roads : MonoBehaviour
     public static List<RoadHumbleObject> SelectedRoads { get; set; }
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
-    private const int MaxColliderHits = 50;
+    private const int MaxColliderHits = 100;
     private static readonly Collider[] hitColliders = new Collider[MaxColliderHits];
     void Start()
     {
@@ -40,14 +40,15 @@ public class Roads : MonoBehaviour
         if (roadMapping.ContainsKey(road.Id))
             DestroyRoad(roadMapping[road.Id].Road);
 
-        RoadHumbleObject roadGameObject = Instantiate(roadPrefab, transform, true);
-        roadGameObject.name = $"Road-{road.Id}";
-        roadGameObject.Road = road;
-        roadGameObject.gameObject.isStatic = true;
-        roadMapping[road.Id] = roadGameObject;
+        RoadHumbleObject roadComp = Instantiate(roadPrefab, transform, true);
+        roadComp.name = $"Road-{road.Id}";
+        roadComp.Road = road;
+        roadComp.gameObject.isStatic = true;
+        roadComp.gameObject.layer = LayerMask.NameToLayer("Roads");
+        roadMapping[road.Id] = roadComp;
         
-        SetRoadArrow(roadGameObject);
-        SetupTexture(roadGameObject);
+        SetRoadArrow(roadComp);
+        SetupTexture(roadComp);
 
         void SetupTexture(RoadHumbleObject roadGameObject)
         {
@@ -136,7 +137,8 @@ public class Roads : MonoBehaviour
         float3 halfExtent = math.abs(new float3(diff.x, (Constants.MaxElevation + 0.5f) / 2, diff.z));
         float3 center = new(sum.x, Constants.MaxElevation / 2, sum.z);
 
-        int colliderCount = Physics.OverlapBoxNonAlloc(center, halfExtent, hitColliders, Quaternion.identity);
+        int layerMask = 1 << LayerMask.NameToLayer("Roads") | 1 << LayerMask.NameToLayer("Outline");
+        int colliderCount = Physics.OverlapBoxNonAlloc(center, halfExtent, hitColliders, Quaternion.identity, layerMask);
         for (int i = 0; i < colliderCount; i++)
         {
             Collider hitCollider = hitColliders[i];
@@ -163,6 +165,6 @@ public class Roads : MonoBehaviour
 
     static void UnHighLight(GameObject g)
     {
-        g.layer = LayerMask.NameToLayer("Default");
+        g.layer = LayerMask.NameToLayer("Roads");
     }
 }

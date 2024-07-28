@@ -69,8 +69,8 @@ public class Lane
     public void InitInnerPath()
     {
         Curve curve = Curve.Duplicate();
-        curve.AddStartDistance(Constants.VertexDistanceFromRoadEnds);
-        curve.AddEndDistance(Constants.VertexDistanceFromRoadEnds);
+        curve = curve.AddStartDistance(Constants.VertexDistanceFromRoadEnds);
+        curve = curve.AddEndDistance(Constants.VertexDistanceFromRoadEnds);
         Path path = new(curve, StartVertex, EndVertex);
         InnerPath = path;
     }

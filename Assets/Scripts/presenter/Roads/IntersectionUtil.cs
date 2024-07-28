@@ -112,9 +112,9 @@ public static class IntersectionUtil
                 if (node.InLane != null && node.OutLane != null)
                 {
                     Curve left = node.InLane.Curve.Duplicate();
-                    left.AddStartDistance(left.Length - Constants.VertexDistanceFromRoadEnds);
+                    left = left.AddStartDistance(left.Length - Constants.VertexDistanceFromRoadEnds);
                     Curve right = node.OutLane.Curve.Duplicate();
-                    right.AddEndDistance(right.Length - Constants.VertexDistanceFromRoadEnds);
+                    right = right.AddEndDistance(right.Length - Constants.VertexDistanceFromRoadEnds);
                     left.Add(right);
                     Path path = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
                     Graph.AddPath(path);
