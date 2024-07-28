@@ -41,7 +41,7 @@ public static class Graph
     {
         Game.Paths[p.Id] = p;
     }
-    
+
     static void UnregisterVertex(Vertex v)
     {
         Game.Vertices.Remove(v.Id);
@@ -120,10 +120,10 @@ public static class Graph
         Assert.IsNotNull(start);
         Assert.IsNotNull(end);
         TryFunc<Vertex, IEnumerable<Path>> tryFunc = graph.ShortestPathsAStar(
-        (Path p) => p.Length,
-        (Vertex to) => math.distance(start.Pos, to.Pos),
-        start
-    );
+            (Path p) => p.Length,
+            (Vertex to) => math.distance(start.Pos, to.Pos),
+            start
+        );
         tryFunc(end, out IEnumerable<Path> paths);
         return paths;
     }

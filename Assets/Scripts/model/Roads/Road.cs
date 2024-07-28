@@ -6,34 +6,24 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
-public class Road
+public class Road : IPersistable
 {
     public uint Id { get; set; }
     public Curve Curve { get; set; }
-    [JsonIgnore]
     public List<Lane> Lanes { get; set; }
-    public List<uint> Lanes_ { get; set; }
-    [JsonProperty]
     public int LaneCount { get; private set; }
-    [JsonIgnore]
-    public float3 StartPos { get => Curve.StartPos; }
-    [JsonIgnore]
-    public float3 EndPos { get => Curve.EndPos; }
-    [JsonIgnore]
-    public float Length { get => Curve.Length; }
-    [JsonIgnore]
     public RoadOutline LeftOutline { get; set; }
-    [JsonIgnore]
     public RoadOutline RightOutline { get; set; }
-    [JsonIgnore]
     public Intersection StartIntersection { get; set; }
-    [JsonIgnore]
+    public bool IsGhost { get; set; }
+    public float3 StartPos { get => Curve.StartPos; }
+    public float3 EndPos { get => Curve.EndPos; }
+    public float Length { get => Curve.Length; }
     public Intersection EndIntersection { get; set; }
     public uint StartIntersection_ { get; set; }
     public uint EndIntersection_ { get; set; }
-    [JsonIgnore]
-    public bool IsGhost { get; set; }
 
+    public List<uint> Lanes_ { get; set; }
     // Empty constructor for JSON.Net deserialization
     public Road()
     {
@@ -127,6 +117,16 @@ public class Road
         Ray ray = new(clickPos, Vector3.up);
         Curve.GetNearestPoint(ray, out float distanceOnCurve);
         return distanceOnCurve;
+    }
+
+    public void Save(Writer write)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void Load(Reader reader)
+    {
+        throw new System.NotImplementedException();
     }
 
     public override string ToString()

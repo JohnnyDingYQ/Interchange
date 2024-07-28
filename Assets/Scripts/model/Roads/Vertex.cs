@@ -1,20 +1,13 @@
 using System;
 using Unity.Mathematics;
-using Unity.Plastic.Newtonsoft.Json;
 
-public class Vertex
+public class Vertex : IPersistable
 {
     public uint Id { get; set; }
-    [JsonIgnore]
     public float3 Pos { get => GetPos(); }
-    [JsonIgnore]
     public float3 Tangent { get => GetTangent(); }
-    [JsonIgnore]
     public Lane Lane { get; set; }
-    public uint Lane_ { get; set; }
-    [JsonIgnore]
     public int ScheduledCars { get; set; }
-    [JsonProperty]
     Side side;
 
     public Vertex() { }
@@ -46,9 +39,34 @@ public class Vertex
             : curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds);
     }
 
+    public void Save(Writer writer)
+    {
+        writer.Write(Id);
+        writer.Write(ScheduledCars);
+        writer.Write((int)side);
+        writer.Write(Lane.Id);
+    }
+
+    public void Load(Reader reader)
+    {
+        Id = reader.ReadUint();
+        ScheduledCars = reader.ReadInt();
+        side = (Side)reader.ReadInt();
+        uint laneID = reader.ReadUint();
+        Lane = laneID == 0 ? null : Lane = new() { Id = laneID };
+            
+    }
     public override string ToString()
     {
         return "Vertex " + Id;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Vertex other)
+            return Id == other.Id && ScheduledCars == other.ScheduledCars && side == other.side && Lane == other.Lane;
+        else
+            return false;
     }
 
     public override int GetHashCode()
@@ -56,10 +74,4 @@ public class Vertex
         return Id.GetHashCode();
     }
 
-    public override bool Equals(object obj)
-    {
-        if (obj == null || GetType() != obj.GetType())
-            return false;
-        return Id == ((Vertex)obj).Id;
-    }
 }

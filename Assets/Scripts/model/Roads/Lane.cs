@@ -6,34 +6,17 @@ using UnityEngine.Assertions;
 public class Lane
 {
     public uint Id { get; set; }
-    [JsonIgnore]
     public Vertex StartVertex { get; set; }
-    [JsonIgnore]
     public Vertex EndVertex { get; set; }
-    public uint StartVertex_ { get; set; }
-    public uint EndVertex_ { get; set; }
-    [JsonIgnore]
     public Node StartNode { get; set; }
-    [JsonIgnore]
     public Node EndNode { get; set; }
-    public uint StartNode_ { get; set; }
-    public uint EndNode_ { get; set; }
     public Curve Curve { get; private set; }
-    [JsonIgnore]
-    public float3 StartPos { get { return StartNode.Pos; } }
-    [JsonIgnore]
-    public float3 EndPos { get { return EndNode.Pos; } }
-    [JsonIgnore]
     public Road Road { get; set; }
-    public uint Road_ { get; set; }
-    [JsonProperty]
     public int LaneIndex { get; private set; }
-    [JsonIgnore]
-    public float Length { get => Curve.Length; }
-    [JsonIgnore]
     public Path InnerPath { get; set; }
-    [JsonProperty]
-    public uint InnerPath_ { get; set; }
+    public float3 StartPos { get => StartNode.Pos; }
+    public float3 EndPos { get => EndNode.Pos; }
+    public float Length { get => Curve.Length; }
 
     // Empty constructor for JSON.Net deserialization
     public Lane() { }
@@ -78,6 +61,23 @@ public class Lane
     public override string ToString()
     {
         return "Lane " + LaneIndex + " of Road " + Road.Id;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Lane other)
+        {
+            return Id == other.Id;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 
 }

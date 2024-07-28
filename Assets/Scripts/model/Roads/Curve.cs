@@ -7,8 +7,9 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
-public class Curve
+public class Curve : IPersistable
 {
+    public uint Id { get; set; }
     BezierCurve bCurve;
     float bCurveLength;
     float offsetDistance;
@@ -284,7 +285,8 @@ public class Curve
         do
         {
             float mid = (low + high) / 2;
-            if (GetDistanceToCurve(EvaluateDistancePos(mid - GetNearestPointTolerance)) < GetDistanceToCurve(EvaluateDistancePos(mid + GetNearestPointTolerance)))
+            if (GetDistanceToCurve(EvaluateDistancePos(mid - GetNearestPointTolerance))
+                < GetDistanceToCurve(EvaluateDistancePos(mid + GetNearestPointTolerance)))
                 high = mid;
             else
                 low = mid;
@@ -388,4 +390,50 @@ public class Curve
         return nextCurve;
     }
 
+    public void Save(Writer writer)
+    {
+        writer.Write(Id);
+        writer.Write(bCurve.P0);
+        writer.Write(bCurve.P1);
+        writer.Write(bCurve.P2);
+        writer.Write(bCurve.P3);
+        writer.Write(bCurveLength);
+        writer.Write(offsetDistance);
+        writer.Write(startDistance);
+        writer.Write(endDistance);
+        writer.Write(nextCurve == null ? 0 : nextCurve.Id);
+    }
+
+    public void Load(Reader reader)
+    {
+        Id = reader.ReadUint();
+        bCurve = new(reader.ReadFloat3(), reader.ReadFloat3(), reader.ReadFloat3(), reader.ReadFloat3());
+        bCurveLength = reader.ReadFloat();
+        offsetDistance = reader.ReadFloat();
+        startDistance = reader.ReadFloat();
+        endDistance = reader.ReadFloat();
+        uint nextCurveId = reader.ReadUint();
+        nextCurve = nextCurveId == 0 ? null : new() { Id = nextCurveId };
+
+        CreateDistanceCache();
+        startT = CurveUtility.GetDistanceToInterpolation(lut, startDistance);
+        endT = CurveUtility.GetDistanceToInterpolation(lut, bCurveLength - endDistance);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Curve other)
+            return Id == other.Id && bCurve.P0.Equals(other.bCurve.P0) && bCurve.P1.Equals(other.bCurve.P1)
+                && bCurve.P2.Equals(other.bCurve.P2) && bCurve.P3.Equals(other.bCurve.P3) && bCurveLength == other.bCurveLength
+                && offsetDistance == other.offsetDistance && startDistance == other.startDistance && endDistance == other.endDistance
+                && startT == other.startT && endT == other.endT && nextCurve == other.nextCurve;
+
+        else
+            return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }

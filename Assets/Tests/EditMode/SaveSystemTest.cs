@@ -1,19 +1,35 @@
-// using System.Collections.Generic;
-// using System.Linq;
-// using NUnit.Framework;
-// using QuikGraph;
-// using QuikGraph.Collections;
-// using Unity.Mathematics;
-// using UnityEngine;
-// public class SaveSystemTest
-// {
-//     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using QuikGraph;
+using QuikGraph.Collections;
+using Unity.Mathematics;
+using UnityEngine;
+public class SaveSystemTest
+{
+    float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
 
-//     [SetUp]
-//     public void SetUp()
-//     {
-//         Game.WipeState();
-//     }
+    [SetUp]
+    public void SetUp()
+    {
+        Game.WipeState();
+    }
+
+    [Test]
+    public void RestoreCurve()
+    {
+        Curve original = new(new(0, stride, 2 * stride));
+        original = original.AddStartDistance(Constants.MinLaneLength / 5);
+        original = original.AddEndDistance(Constants.MinLaneLength / 5);
+        original.Offset(3);
+        original.Id = 5;
+        Storage storage = new();
+        storage.Save(original);
+        Curve loaded = new();
+        storage.Load(loaded);
+
+        Assert.AreEqual(original, loaded);
+    }
 
 //     [Test]
 //     public void RecoverSingleOneLaneRoad()
@@ -268,4 +284,4 @@
 
 //     // TODO: Complete further testing
 
-// }
+}

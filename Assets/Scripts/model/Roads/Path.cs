@@ -1,34 +1,20 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using QuikGraph;
 using Unity.Mathematics;
 using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Serialization;
 using UnityEngine.Assertions;
 using UnityEngine;
 
 [JsonObject]
-public class Path : IEdge<Vertex>
+public class Path : IEdge<Vertex>, IPersistable
 {
-    [JsonProperty]
     public uint Id { get; set; }
-    [JsonProperty]
     public Curve Curve { get; private set; }
-    [JsonIgnore]
     public Vertex Source { get; set; }
-    public uint Source_ { get; set; }
-    [JsonIgnore]
     public Vertex Target { get; set; }
-    public uint Target_ { get; set; }
-    [JsonIgnore]
     public float Length { get => Curve.Length; }
-    [JsonIgnore]
     public Path InterweavingPath { get; set; }
-    public uint InterweavingPath_ { get; set; }
-    [JsonIgnore]
     public List<Car> Cars { get; set; }
-    [JsonIgnore]
     public Car IncomingCar { get; set; }
 
     public Path() { Cars = new(); }
@@ -62,10 +48,17 @@ public class Path : IEdge<Vertex>
         return false;
     }
 
-    public override int GetHashCode()
+    public void Save(Writer writer)
     {
-        return Id.GetHashCode();
+        throw new System.NotImplementedException();
     }
+
+    public void Load(Reader reader)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    
 
     public override bool Equals(object obj)
     {
@@ -73,4 +66,10 @@ public class Path : IEdge<Vertex>
             return false;
         return Id == ((Path) obj).Id;
     }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+    
 }

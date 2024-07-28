@@ -19,6 +19,7 @@ public class Roads : MonoBehaviour
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
     private const int MaxColliderHits = 100;
     private static readonly Collider[] hitColliders = new Collider[MaxColliderHits];
+    private const string roadLayerName = "Roads";
     void Start()
     {
         Game.RoadAdded += InstantiateRoad;
@@ -44,7 +45,7 @@ public class Roads : MonoBehaviour
         roadComp.name = $"Road-{road.Id}";
         roadComp.Road = road;
         roadComp.gameObject.isStatic = true;
-        roadComp.gameObject.layer = LayerMask.NameToLayer("Roads");
+        roadComp.gameObject.layer = LayerMask.NameToLayer(roadLayerName);
         roadMapping[road.Id] = roadComp;
         
         SetRoadArrow(roadComp);
@@ -137,7 +138,7 @@ public class Roads : MonoBehaviour
         float3 halfExtent = math.abs(new float3(diff.x, (Constants.MaxElevation + 0.5f) / 2, diff.z));
         float3 center = new(sum.x, Constants.MaxElevation / 2, sum.z);
 
-        int layerMask = 1 << LayerMask.NameToLayer("Roads") | 1 << LayerMask.NameToLayer("Outline");
+        int layerMask = 1 << LayerMask.NameToLayer(roadLayerName) | 1 << LayerMask.NameToLayer("Outline");
         int colliderCount = Physics.OverlapBoxNonAlloc(center, halfExtent, hitColliders, Quaternion.identity, layerMask);
         for (int i = 0; i < colliderCount; i++)
         {
@@ -165,6 +166,6 @@ public class Roads : MonoBehaviour
 
     static void UnHighLight(GameObject g)
     {
-        g.layer = LayerMask.NameToLayer("Roads");
+        g.layer = LayerMask.NameToLayer(roadLayerName);
     }
 }
