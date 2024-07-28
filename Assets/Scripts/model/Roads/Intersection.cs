@@ -2,42 +2,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Unity.Mathematics;
-using Unity.Plastic.Newtonsoft.Json;
 using System;
 using UnityEngine.Assertions;
 using System.Collections.ObjectModel;
 
-public class Intersection
+public class Intersection : IPersistable
 {
     public uint Id { get; set; }
-    [JsonIgnore]
     private readonly SortedList<int, Node> nodes = new();
-    [JsonIgnore]
-    public ReadOnlyCollection<Node> Nodes { get => nodes.Values.ToList().AsReadOnly(); }
-    [JsonProperty]
     private HashSet<Road> inRoads = new();
-    [JsonIgnore]
-    public ReadOnlySet<Road> InRoads { get => inRoads.AsReadOnly(); }
-    [JsonProperty]
     private HashSet<Road> outRoads = new();
-    [JsonIgnore]
-    public ReadOnlySet<Road> OutRoads { get => outRoads.AsReadOnly(); }
-    [JsonIgnore]
-    public HashSet<Road> Roads { get => GetRoads(); }
-    [JsonIgnore]
-    public Plane Plane { get => GetPlane(); }
-    [JsonProperty]
     public float3 Normal { get; private set; }
-    [JsonProperty]
     public float3 Tangent { get; private set; }
-    [JsonProperty]
     public float3 PointOnInSide { get; private set; }
-    [JsonProperty]
-    public List<uint> Nodes_ { get; set; }
-    [JsonProperty]
-    public List<uint> InRoads_ { get; set; }
-    [JsonProperty]
-    public List<uint> OutRoads_ { get; set; }
+    public ReadOnlyCollection<Node> Nodes { get => nodes.Values.ToList().AsReadOnly(); }
+    public ReadOnlySet<Road> InRoads { get => inRoads.AsReadOnly(); }
+    public ReadOnlySet<Road> OutRoads { get => outRoads.AsReadOnly(); }
+    public HashSet<Road> Roads { get => GetRoads(); }
+    public Plane Plane { get => GetPlane(); }
 
     public Intersection() { }
 
@@ -251,5 +233,20 @@ public class Intersection
     public int DebugHelper()
     {
         return nodes.Count;
+    }
+
+    public void Save(Writer writer)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Load(Reader reader)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

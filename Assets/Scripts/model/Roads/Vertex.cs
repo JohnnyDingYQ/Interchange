@@ -64,7 +64,7 @@ public class Vertex : IPersistable
     public override bool Equals(object obj)
     {
         if (obj is Vertex other)
-            return Id == other.Id && ScheduledCars == other.ScheduledCars && side == other.side && Equals(Lane, other.Lane);
+            return Id == other.Id && ScheduledCars == other.ScheduledCars && side == other.side && Lane.Id == other.Lane.Id;
         else
             return false;
     }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
@@ -10,21 +9,17 @@ public class Road : IPersistable
 {
     public uint Id { get; set; }
     public Curve Curve { get; set; }
-    public List<Lane> Lanes { get; set; }
     public int LaneCount { get; private set; }
+    public List<Lane> Lanes { get; set; }
+    public Intersection StartIntersection { get; set; }
+    public Intersection EndIntersection { get; set; }
+    public bool IsGhost { get; set; }
     public RoadOutline LeftOutline { get; set; }
     public RoadOutline RightOutline { get; set; }
-    public Intersection StartIntersection { get; set; }
-    public bool IsGhost { get; set; }
     public float3 StartPos { get => Curve.StartPos; }
     public float3 EndPos { get => Curve.EndPos; }
     public float Length { get => Curve.Length; }
-    public Intersection EndIntersection { get; set; }
-    public uint StartIntersection_ { get; set; }
-    public uint EndIntersection_ { get; set; }
 
-    public List<uint> Lanes_ { get; set; }
-    // Empty constructor for JSON.Net deserialization
     public Road()
     {
         LeftOutline = new();
@@ -119,14 +114,45 @@ public class Road : IPersistable
         return distanceOnCurve;
     }
 
-    public void Save(Writer write)
+    public void Save(Writer writer)
     {
-        throw new System.NotImplementedException();
+        writer.Write(Id);
+        writer.Write(Curve.Id);
+        writer.Write(LaneCount);
+        foreach (Lane l in Lanes)
+            writer.Write(l.Id);
+        writer.Write(StartIntersection.Id);
+        writer.Write(EndIntersection.Id);
     }
 
     public void Load(Reader reader)
     {
-        throw new System.NotImplementedException();
+        Id = reader.ReadUint();
+        Curve = new() { Id = reader.ReadUint() };
+        LaneCount = reader.ReadInt();
+        Lanes = new();
+        for (int i = 0; i < LaneCount; i++)
+            Lanes.Add(new() { Id = reader.ReadUint() });
+        StartIntersection = new() { Id = reader.ReadUint() };
+        EndIntersection = new() { Id = reader.ReadUint() };
+    }
+    
+    public override bool Equals(object obj)
+    {
+        if (obj is Road other)
+        {
+            return Id == other.Id && IPersistable.Equals(Curve, other.Curve) && LaneCount == other.LaneCount
+                && Lanes.Select(l => l.Id).SequenceEqual(other.Lanes.Select(l => l.Id))
+                && IPersistable.Equals(StartIntersection, other.StartIntersection)
+                && IPersistable.Equals(EndIntersection, other.EndIntersection);
+        }
+        else
+            return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 
     public override string ToString()
