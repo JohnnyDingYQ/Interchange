@@ -10,7 +10,7 @@ public class Lane : IPersistable
     public Vertex EndVertex { get; set; }
     public Node StartNode { get; set; }
     public Node EndNode { get; set; }
-    public Curve Curve { get; private set; }
+    public Curve Curve { get; set; }
     public Road Road { get; set; }
     public Path InnerPath { get; set; }
     public float3 StartPos { get => StartNode.Pos; }

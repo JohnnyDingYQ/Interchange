@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 public class Intersection : IPersistable
 {
     public uint Id { get; set; }
-    private readonly SortedList<int, Node> nodes = new();
+    private SortedList<int, Node> nodes = new();
     private HashSet<Road> inRoads = new();
     private HashSet<Road> outRoads = new();
     public float3 Normal { get; private set; }
@@ -230,19 +230,60 @@ public class Intersection : IPersistable
         return "Intersection " + Id;
     }
 
-    public int DebugHelper()
-    {
-        return nodes.Count;
-    }
-
     public void Save(Writer writer)
     {
-        throw new NotImplementedException();
+        writer.Write(Id);
+        writer.Write(nodes.Count);
+        foreach (var n in nodes)
+        {
+            writer.Write(n.Key);
+            writer.Write(n.Value.Id);
+        }
+        
+        writer.Write(inRoads.Count);
+        foreach (Road r in inRoads)
+            writer.Write(r.Id);
+        writer.Write(outRoads.Count);
+        foreach (Road r in outRoads)
+            writer.Write(r.Id);
+        writer.Write(Normal);
+        writer.Write(Tangent);
+        writer.Write(PointOnInSide);
     }
 
     public void Load(Reader reader)
     {
-        throw new NotImplementedException();
+        Id = reader.ReadUint();
+        nodes = new();
+        int nodeCount = reader.ReadInt();
+        for (int i = 0; i < nodeCount; i++)
+        {
+            int index = reader.ReadInt();
+            nodes[index] = new() { Id = reader.ReadUint() };
+        }
+        
+        inRoads = new();
+        outRoads = new();
+        int inRoadsCount = reader.ReadInt();
+        for (int i = 0; i < inRoadsCount; i++)
+            inRoads.Add(new() { Id = reader.ReadUint() });
+        int outRoadsCount = reader.ReadInt();
+        for (int i = 0; i < outRoadsCount; i++)
+            outRoads.Add(new() { Id = reader.ReadUint() });
+        Normal = reader.ReadFloat3();
+        Tangent = reader.ReadFloat3();
+        PointOnInSide = reader.ReadFloat3();
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Intersection other)
+            return Id == other.Id && nodes.Keys.SequenceEqual(other.nodes.Keys)
+                && nodes.Values.Select(n => n.Id).SequenceEqual(other.nodes.Values.Select(n => n.Id))
+                && inRoads.Select(r => r.Id).ToHashSet().SetEquals(other.inRoads.Select(r => r.Id))
+                && outRoads.Select(r => r.Id).ToHashSet().SetEquals(other.outRoads.Select(r => r.Id));
+        else
+            return false;
     }
 
     public override int GetHashCode()

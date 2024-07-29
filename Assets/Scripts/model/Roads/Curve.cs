@@ -15,7 +15,7 @@ public class Curve : IPersistable
     float offsetDistance;
     float startDistance, endDistance;
     float startT = 0, endT = 1;
-    Curve nextCurve;
+    public Curve nextCurve;
     DistanceToInterpolation[] lut;
     public float SegmentLength { get => bCurveLength - startDistance - endDistance; }
     public float Length { get => GetLength(); }

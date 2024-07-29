@@ -29,6 +29,7 @@ public class BasicBuildTest
 
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(1, road.Lanes.Count);
+        Assert.AreEqual(3, Game.Curves.Count);
         Assert.True(MyNumerics.IsApproxEqual(0, lane.StartNode.Pos));
         Assert.True(MyNumerics.IsApproxEqual(2 * stride, lane.EndNode.Pos));
         Assert.True(Game.Nodes.ContainsKey(lane.StartNode.Id));
@@ -54,6 +55,7 @@ public class BasicBuildTest
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(new float3(0), road.StartPos);
         Assert.AreEqual(2 * stride, road.EndPos);
+        Assert.AreEqual(5, Game.Curves.Count);
         Assert.True(Game.Nodes.ContainsKey(lane0.StartNode.Id));
         Assert.True(Game.Nodes.ContainsKey(lane0.EndNode.Id));
         Assert.True(Game.Nodes.ContainsKey(lane1.StartNode.Id));

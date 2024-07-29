@@ -12,8 +12,9 @@ public static class Game
     public static Dictionary<uint, Intersection> Intersections { get => GameSave.Intersections; }
     public static Dictionary<uint, Lane> Lanes { get => GameSave.Lanes; }
     public static Dictionary<uint, Vertex> Vertices { get => GameSave.Vertices; }
-    public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
+    public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
+    public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
     public static Dictionary<uint, Zone> SourceZones { get; set; }
     public static Dictionary<uint, Zone> TargetZones { get; set; }
     public static Road HoveredRoad { get; set; }
@@ -59,10 +60,25 @@ public static class Game
             if (!road.IsGhost)
                 Graph.AddPath(lane.InnerPath);
             RegisterLane(lane);
+            RegisterCurve(lane.Curve);
         }
         RegisterIntersection(road.StartIntersection);
         RegisterIntersection(road.EndIntersection);
+        RegisterCurve(road.Curve);
         RoadAdded?.Invoke(road);
+    }
+
+    public static void RegisterCurve(Curve curve)
+    {
+        if (curve.Id != 0)
+            return;
+        curve.Id = FindNextAvailableKey(Curves.Keys);
+        Curves[curve.Id] = curve;
+    }
+
+    public static void RemoveCurve(Curve curve)
+    {
+        Curves.Remove(curve.Id);
     }
 
     public static void RegisterIntersection(Intersection i)
@@ -100,6 +116,7 @@ public static class Game
     {
         Assert.IsTrue(Lanes.Keys.Contains(lane.Id));
         Lanes.Remove(lane.Id);
+        RemoveCurve(lane.Curve);
     }
 
     public static void RegisterNode(Node node)

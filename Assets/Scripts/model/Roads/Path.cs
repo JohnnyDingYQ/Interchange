@@ -6,7 +6,7 @@ using UnityEngine;
 public class Path : IEdge<Vertex>, IPersistable
 {
     public uint Id { get; set; }
-    public Curve Curve { get; private set; }
+    public Curve Curve { get; set; }
     public Vertex Source { get; set; }
     public Vertex Target { get; set; }
     public Path InterweavingPath { get; set; }

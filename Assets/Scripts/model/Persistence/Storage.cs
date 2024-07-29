@@ -9,15 +9,19 @@ public class Storage
     {
         savePath = System.IO.Path.Combine(Application.persistentDataPath, "saveFile");
     }
-    public void Save(IPersistable o)
+    public int Save(IPersistable o)
     {
         using var writer = new BinaryWriter(File.Open(savePath, FileMode.Create));
-        o.Save(new Writer(writer));
+        Writer myWriter = new(writer);
+        o.Save(myWriter);
+        return myWriter.Offset;
     }
 
-    public void Load(IPersistable o)
+    public int Load(IPersistable o)
     {
         using var reader = new BinaryReader(File.Open(savePath, FileMode.Open));
-        o.Load(new Reader(reader));
+        Reader myReader = new(reader);
+        o.Load(myReader);
+        return myReader.Offset;
     }
 }

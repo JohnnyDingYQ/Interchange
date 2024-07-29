@@ -30,6 +30,7 @@ public class RemoveRoadTest
         Assert.AreEqual(0, Game.Roads.Count);
         Assert.AreEqual(0, Game.Nodes.Count);
         Assert.AreEqual(0, Game.Intersections.Count);
+        Assert.AreEqual(0, Game.Curves.Count);
     }
 
     [Test]

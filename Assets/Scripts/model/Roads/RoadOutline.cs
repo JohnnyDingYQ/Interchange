@@ -79,4 +79,18 @@ public class RoadOutline : IEnumerable<float3>
     {
         return GetEnumerator();
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is RoadOutline other)
+            return IPersistable.Equals(StartCurve, other.StartCurve) && IPersistable.Equals(MidCurve, other.MidCurve)
+                && IPersistable.Equals(EndCurve, other.EndCurve);
+        else
+            return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }

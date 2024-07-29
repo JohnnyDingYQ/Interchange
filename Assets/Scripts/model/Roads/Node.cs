@@ -43,7 +43,7 @@ public class Node : IComparable<Node>, IPersistable
         writer.Write(NodeIndex);
         writer.Write(InLane == null ? 0 : InLane.Id);
         writer.Write(OutLane == null ? 0 : OutLane.Id);
-        writer.Write(Intersection == null ? 0 : Intersection.Id);
+        writer.Write(Intersection.Id);
     }
 
     public void Load(Reader reader)

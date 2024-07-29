@@ -40,6 +40,7 @@ public static class Graph
     static void RegisterPath(Path p)
     {
         Game.Paths[p.Id] = p;
+        Game.RegisterCurve(p.Curve);
     }
 
     static void UnregisterVertex(Vertex v)
@@ -50,6 +51,7 @@ public static class Graph
     static void UnregisterPath(Path p)
     {
         Game.Paths.Remove(p.Id);
+        Game.RemoveCurve(p.Curve);
     }
 
     public static void Wipe()
@@ -102,9 +104,9 @@ public static class Graph
         return graph.ContainsEdge(from, to);
     }
 
-    public static void AddVerticesAndPath(Path p)
+    public static void AddVerticesAndPathRange(IEnumerable<Path> paths)
     {
-        graph.AddVerticesAndEdge(p);
+        graph.AddVerticesAndEdgeRange(paths);
     }
 
     public static List<Path> GetOutPaths(Vertex v)

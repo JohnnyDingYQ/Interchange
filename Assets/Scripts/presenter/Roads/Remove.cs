@@ -11,6 +11,7 @@ public static class Remove
         if (!Game.Roads.ContainsKey(road.Id))
             return false;
         Game.Roads.Remove(road.Id);
+        Game.RemoveCurve(road.Curve);
         foreach (Lane lane in road.Lanes)
         {
             List<Path> toRemove = new();
