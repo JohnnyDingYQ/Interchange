@@ -13,8 +13,8 @@ public class Intersection : IPersistable
     private HashSet<Road> inRoads = new();
     [SaveIDCollection]
     private HashSet<Road> outRoads = new();
-    [SortedListSpecific]
-    private SortedList<int, Node> nodes = new();
+    [IPersistableImplemented]
+    private readonly PersistableSortedList nodes = new();
     public float3 Normal { get; private set; }
     public float3 Tangent { get; private set; }
     public float3 PointOnInSide { get; private set; }
@@ -237,51 +237,6 @@ public class Intersection : IPersistable
     {
         return "Intersection " + Id;
     }
-
-    // public void Save(Writer writer)
-    // {
-    //     writer.Write(Id);
-    //     writer.Write(nodes.Count);
-    //     foreach (var n in nodes)
-    //     {
-    //         writer.Write(n.Key);
-    //         writer.Write(n.Value.Id);
-    //     }
-        
-    //     writer.Write(inRoads.Count);
-    //     foreach (Road r in inRoads)
-    //         writer.Write(r.Id);
-    //     writer.Write(outRoads.Count);
-    //     foreach (Road r in outRoads)
-    //         writer.Write(r.Id);
-    //     writer.Write(Normal);
-    //     writer.Write(Tangent);
-    //     writer.Write(PointOnInSide);
-    // }
-
-    // public void Load(Reader reader)
-    // {
-    //     Id = reader.ReadUint();
-    //     nodes = new();
-    //     int nodeCount = reader.ReadInt();
-    //     for (int i = 0; i < nodeCount; i++)
-    //     {
-    //         int index = reader.ReadInt();
-    //         nodes[index] = new() { Id = reader.ReadUint() };
-    //     }
-        
-    //     inRoads = new();
-    //     outRoads = new();
-    //     int inRoadsCount = reader.ReadInt();
-    //     for (int i = 0; i < inRoadsCount; i++)
-    //         inRoads.Add(new() { Id = reader.ReadUint() });
-    //     int outRoadsCount = reader.ReadInt();
-    //     for (int i = 0; i < outRoadsCount; i++)
-    //         outRoads.Add(new() { Id = reader.ReadUint() });
-    //     Normal = reader.ReadFloat3();
-    //     Tangent = reader.ReadFloat3();
-    //     PointOnInSide = reader.ReadFloat3();
-    // }
 
     public override bool Equals(object obj)
     {

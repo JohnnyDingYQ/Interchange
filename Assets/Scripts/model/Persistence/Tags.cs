@@ -10,4 +10,4 @@ public sealed class SaveIDCollectionAttribute : Attribute
     //     CollectionType = collectionType;
     // }
 }
-public sealed class SortedListSpecificAttribute : Attribute { }
+public sealed class IPersistableImplementedAttribute : Attribute { }

@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Unity.Mathematics;
-using Unity.Properties;
 using UnityEngine;
+
 public interface IPersistable
 {
     public uint Id { get; set; }
@@ -13,196 +12,106 @@ public interface IPersistable
         Type type = GetType();
         PropertyInfo[] properties = type.GetProperties();
         FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-
+        List<FieldProperty> fieldProperties = new();
         foreach (FieldInfo field in fields)
-        {
-
-            if (field.GetCustomAttribute<NotSavedAttribute>() != null || field.Name.Contains("k__BackingField"))
-                continue;
-            if (field.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
-            {
-                IEnumerable<IPersistable> referenced = (IEnumerable<IPersistable>)field.GetValue(this);
-                if (referenced == null)
-                    throw new InvalidOperationException($"Property collection {field.Name} is null");
-                writer.Write(referenced.Count());
-                foreach (IPersistable item in referenced)
-                    writer.Write(item.Id);
-                continue;
-            }
-            if (field.GetCustomAttribute<SortedListSpecificAttribute>() != null)
-            {
-                SortedList<int, Node> referenced = (SortedList<int, Node>) field.GetValue(this);
-                if (referenced == null)
-                    throw new InvalidOperationException($"Property collection {field.Name} is null");
-                writer.Write(referenced.Count());
-                foreach (KeyValuePair<int, Node> item in referenced)
-                {
-                    writer.Write(item.Key);
-                    writer.Write(item.Value.Id);
-                }
-                continue;
-            }
-            dynamic value = field.GetValue(this);
-            writer.Write(value);
-        }
-
+            fieldProperties.Add(new(field, this));
         foreach (PropertyInfo prop in properties)
+            fieldProperties.Add(new(prop, this));
+
+        foreach (FieldProperty fieldProperty in fieldProperties)
         {
-            if (prop.GetCustomAttribute<NotSavedAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<NotSavedAttribute>() != null || fieldProperty.Name.Contains("k__BackingField"))
                 continue;
-            if (prop.GetCustomAttribute<SaveIDAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<SaveIDAttribute>() != null)
             {
-                object referenced = prop.GetValue(this);
-                if (referenced == null)
-                    writer.Write(0);
-                else
-                    writer.Write(((IPersistable)prop.GetValue(this)).Id);
+                SaveId(writer, fieldProperty);
                 continue;
             }
-            if (prop.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
             {
-                IEnumerable<IPersistable> referenced = (IEnumerable<IPersistable>)prop.GetValue(this);
-                if (referenced == null)
-                    throw new InvalidOperationException($"Property collection {prop.Name} is null");
-                writer.Write(referenced.Count());
-                foreach (IPersistable item in referenced)
-                    writer.Write(item.Id);
+                SaveIdCollection(writer, fieldProperty);
                 continue;
             }
-            if (prop.GetCustomAttribute<SortedListSpecificAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<IPersistableImplementedAttribute>() != null)
             {
-                IEnumerable<KeyValuePair<int, IPersistable>> referenced = (IEnumerable<KeyValuePair<int, IPersistable>>) prop.GetValue(this);
-                if (referenced == null)
-                    throw new InvalidOperationException($"Property collection {prop.Name} is null");
-                writer.Write(referenced.Count());
-                foreach (KeyValuePair<int, IPersistable> item in referenced)
-                {
-                    writer.Write(item.Key);
-                    writer.Write(item.Value.Id);
-                }
+                SaveIPersistable(writer, fieldProperty);
                 continue;
             }
-            dynamic value = prop.GetValue(this);
+            dynamic value = fieldProperty.GetValue();
             writer.Write(value);
         }
+
+        static void SaveId(Writer writer, FieldProperty fieldProperty)
+        {
+            object referenced = fieldProperty.GetValue();
+            if (referenced == null)
+                writer.Write(0);
+            else
+                writer.Write(((IPersistable)fieldProperty.GetValue()).Id);
+        }
+
+        static void SaveIPersistable(Writer writer, FieldProperty fieldProperty)
+        {
+            object val = fieldProperty.GetValue();
+            MethodInfo saveMethod = fieldProperty.Type().GetMethod("Save")
+                ?? throw new InvalidOperationException("Type does not support Save method");
+            saveMethod.Invoke(val, new object[] { writer });
+        }
+
+        static void SaveIdCollection(Writer writer, FieldProperty fieldProperty)
+        {
+            IEnumerable<IPersistable> referenced = (IEnumerable<IPersistable>)fieldProperty.GetValue();
+            if (referenced == null)
+                throw new InvalidOperationException($"Property collection {fieldProperty.Name} is null");
+            writer.Write(referenced.Count());
+            foreach (IPersistable item in referenced)
+                writer.Write(item.Id);
+        }
+
     }
     public virtual void Load(Reader reader)
     {
         Type type = GetType();
         PropertyInfo[] properties = type.GetProperties();
         FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-
+        List<FieldProperty> fieldProperties = new();
         foreach (FieldInfo field in fields)
-        {
-
-            if (field.GetCustomAttribute<NotSavedAttribute>() != null || field.Name.Contains("k__BackingField"))
-                continue;
-            if (field.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
-            {
-                int count = reader.ReadInt();
-                if (!field.FieldType.IsGenericType)
-                    throw new InvalidOperationException("Property is not generic type");
-                MethodInfo addMethod = field.FieldType.GetMethod("Add") ?? throw new InvalidOperationException("Property does not support Add operation");
-                Type itemType = GetGenericCollectionItemType(field.FieldType);
-                object collection = Activator.CreateInstance(field.FieldType);
-                
-                for (int i = 0; i < count; i++)
-                {
-                    IPersistable item = (IPersistable) Activator.CreateInstance(itemType);
-                    item.Id = reader.ReadUint();
-                    addMethod.Invoke(collection, new object[] { item });
-                }
-
-                field.SetValue(this, collection);
-                continue;
-            }
-            if (field.GetCustomAttribute<SortedListSpecificAttribute>() != null)
-            {
-                int count = reader.ReadInt();
-                if (!field.FieldType.IsGenericType)
-                    throw new InvalidOperationException("Property is not generic type");
-                MethodInfo addMethod = field.FieldType.GetMethod("Add") ?? throw new InvalidOperationException("Property does not support Add operation");
-                Type itemType = GetGenericCollectionItemType(field.FieldType, 1);
-                object collection = Activator.CreateInstance(field.FieldType);
-                
-                for (int i = 0; i < count; i++)
-                {
-                    int key = reader.ReadInt();
-                    IPersistable item = (IPersistable) Activator.CreateInstance(itemType);
-                    item.Id = reader.ReadUint();
-                    addMethod.Invoke(collection, new object[] { key, item });
-                }
-
-                field.SetValue(this, collection);
-                continue;
-            }
-
-            var readMethod = typeof(Reader).GetMethod("Read");
-            var genericReadMethod = readMethod.MakeGenericMethod(field.FieldType);
-            var readValue = genericReadMethod.Invoke(reader, null);
-            field.SetValue(this, readValue);
-        }
-
+            fieldProperties.Add(new(field, this));
         foreach (PropertyInfo prop in properties)
+            fieldProperties.Add(new(prop, this));
+
+        foreach (FieldProperty fieldProperty in fieldProperties)
         {
-            if (prop.GetCustomAttribute<NotSavedAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<NotSavedAttribute>() != null || fieldProperty.Name.Contains("k__BackingField"))
                 continue;
-            if (prop.GetCustomAttribute<SaveIDAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<SaveIDAttribute>() != null)
             {
                 uint id = reader.ReadUint();
                 if (id == 0)
-                    prop.SetValue(this, null);
+                    fieldProperty.SetValue(null);
                 else
                 {
-                    IPersistable obj = (IPersistable)Activator.CreateInstance(prop.PropertyType);
+                    IPersistable obj = (IPersistable)Activator.CreateInstance(fieldProperty.Type());
                     obj.Id = id;
-                    prop.SetValue(this, obj);
+                    fieldProperty.SetValue(obj);
                 }
                 continue;
             }
-            if (prop.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
             {
-                int count = reader.ReadInt();
-                if (!prop.PropertyType.IsGenericType)
-                    throw new InvalidOperationException("Property is not generic type");
-                MethodInfo addMethod = prop.PropertyType.GetMethod("Add") ?? throw new InvalidOperationException("Property does not support Add operation");
-                Type itemType = GetGenericCollectionItemType(prop.PropertyType);
-                object collection = Activator.CreateInstance(prop.PropertyType);
-                
-                for (int i = 0; i < count; i++)
-                {
-                    IPersistable item = (IPersistable) Activator.CreateInstance(itemType);
-                    item.Id = reader.ReadUint();
-                    addMethod.Invoke(collection, new object[] { item });
-                }
-
-                prop.SetValue(this, collection);
+                SaveIDCollection(reader, fieldProperty);
                 continue;
             }
-            if (prop.GetCustomAttribute<SortedListSpecificAttribute>() != null)
+            if (fieldProperty.GetCustomAttribute<IPersistableImplementedAttribute>() != null)
             {
-                int count = reader.ReadInt();
-                if (!prop.PropertyType.IsGenericType)
-                    throw new InvalidOperationException("Property is not generic type");
-                MethodInfo addMethod = prop.PropertyType.GetMethod("Add") ?? throw new InvalidOperationException("Property does not support Add operation");
-                Type itemType = GetGenericCollectionItemType(prop.PropertyType);
-                object collection = Activator.CreateInstance(prop.PropertyType);
-                
-                for (int i = 0; i < count; i++)
-                {
-                    int key = reader.ReadInt();
-                    IPersistable item = (IPersistable) Activator.CreateInstance(itemType);
-                    item.Id = reader.ReadUint();
-                    addMethod.Invoke(collection, new object[] { key, item });
-                }
-
-                prop.SetValue(this, collection);
+                LoadIPersistable(reader, fieldProperty);
                 continue;
             }
+
             var readMethod = typeof(Reader).GetMethod("Read");
-            var genericReadMethod = readMethod.MakeGenericMethod(prop.PropertyType);
+            var genericReadMethod = readMethod.MakeGenericMethod(fieldProperty.Type());
             var readValue = genericReadMethod.Invoke(reader, null);
-            prop.SetValue(this, readValue);
+            fieldProperty.SetValue(readValue);
         }
 
         static Type GetGenericCollectionItemType(Type collectionType, int offset = 0)
@@ -212,7 +121,36 @@ public interface IPersistable
                 Type[] typeArguments = collectionType.GetGenericArguments();
                 return typeArguments[offset];
             }
-            throw new ArgumentException("The provided type is not a generic collection with a single type argument.");
+            throw new ArgumentException("The provided type is not a generic collection");
+        }
+
+        static void SaveIDCollection(Reader reader, FieldProperty fieldProperty)
+        {
+            int count = reader.ReadInt();
+            Type type = fieldProperty.Type();
+            if (!type.IsGenericType)
+                throw new InvalidOperationException("Property is not generic type");
+            MethodInfo addMethod = type.GetMethod("Add") ?? throw new InvalidOperationException("Property does not support Add operation");
+            Type itemType = GetGenericCollectionItemType(type);
+            object collection = Activator.CreateInstance(type);
+
+            for (int i = 0; i < count; i++)
+            {
+                IPersistable item = (IPersistable)Activator.CreateInstance(itemType);
+                item.Id = reader.ReadUint();
+                addMethod.Invoke(collection, new object[] { item });
+            }
+
+            fieldProperty.SetValue(collection);
+        }
+
+        static void LoadIPersistable(Reader reader, FieldProperty fieldProperty)
+        {
+            object restored = Activator.CreateInstance(fieldProperty.Type());
+            MethodInfo loadMethod = fieldProperty.Type().GetMethod("Load")
+                ?? throw new InvalidOperationException("Type does not support Load method");
+            loadMethod.Invoke(restored, new object[] { reader });
+            fieldProperty.SetValue(restored);
         }
     }
 
@@ -223,5 +161,56 @@ public interface IPersistable
         if (a == null || b == null)
             return false;
         return a.Id == b.Id;
+    }
+
+    private class FieldProperty
+    {
+        readonly FieldInfo fieldInfo;
+        readonly PropertyInfo propertyInfo;
+        readonly object obj;
+        readonly bool isField;
+        public string Name { get => isField ? fieldInfo.Name : propertyInfo.Name; }
+        public FieldProperty(PropertyInfo p, object s)
+        {
+            propertyInfo = p;
+            obj = s;
+            isField = false;
+        }
+
+        public FieldProperty(FieldInfo f, object s)
+        {
+            fieldInfo = f;
+            obj = s;
+            isField = true;
+        }
+
+        public void SetValue(object value)
+        {
+            if (isField)
+                fieldInfo.SetValue(obj, value);
+            else
+                propertyInfo.SetValue(obj, value);
+        }
+
+        public object GetValue()
+        {
+            if (isField)
+                return fieldInfo.GetValue(obj);
+            return propertyInfo.GetValue(obj);
+        }
+
+        public Type Type()
+        {
+            if (isField)
+                return fieldInfo.FieldType;
+            return propertyInfo.PropertyType;
+        }
+
+        public T GetCustomAttribute<T>() where T : Attribute
+        {
+            if (isField)
+                return fieldInfo.GetCustomAttribute<T>();
+            return propertyInfo.GetCustomAttribute<T>();
+        }
     }
 }
