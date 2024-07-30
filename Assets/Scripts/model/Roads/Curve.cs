@@ -15,15 +15,25 @@ public class Curve : IPersistable
     float offsetDistance;
     float startDistance, endDistance;
     float startT = 0, endT = 1;
+    [SaveID]
     public Curve nextCurve;
+    [NotSaved]
     DistanceToInterpolation[] lut;
+    [NotSaved]
     public float SegmentLength { get => bCurveLength - startDistance - endDistance; }
+    [NotSaved]
     public float Length { get => GetLength(); }
+    [NotSaved]
     public float3 StartPos { get => GetStartPos(); }
+    [NotSaved]
     public float3 EndPos { get => GetEndPos(); }
+    [NotSaved]
     public float3 StartTangent { get => GetStartTangent(); }
+    [NotSaved]
     public float3 EndTangent { get => GetEndTangent(); }
+    [NotSaved]
     public float3 StartNormal { get => GetStartNormal(); }
+    [NotSaved]
     public float3 EndNormal { get => GetEndNormal(); }
     const float GetNearestPointTolerance = 0.0001f;
     const float minimumCurveLength = 0.005f;
@@ -389,37 +399,7 @@ public class Curve : IPersistable
     {
         return nextCurve;
     }
-
-    public void Save(Writer writer)
-    {
-        writer.Write(Id);
-        writer.Write(bCurve.P0);
-        writer.Write(bCurve.P1);
-        writer.Write(bCurve.P2);
-        writer.Write(bCurve.P3);
-        writer.Write(bCurveLength);
-        writer.Write(offsetDistance);
-        writer.Write(startDistance);
-        writer.Write(endDistance);
-        writer.Write(nextCurve == null ? 0 : nextCurve.Id);
-    }
-
-    public void Load(Reader reader)
-    {
-        Id = reader.ReadUint();
-        bCurve = new(reader.ReadFloat3(), reader.ReadFloat3(), reader.ReadFloat3(), reader.ReadFloat3());
-        bCurveLength = reader.ReadFloat();
-        offsetDistance = reader.ReadFloat();
-        startDistance = reader.ReadFloat();
-        endDistance = reader.ReadFloat();
-        uint nextCurveId = reader.ReadUint();
-        nextCurve = nextCurveId == 0 ? null : new() { Id = nextCurveId };
-
-        CreateDistanceCache();
-        startT = CurveUtility.GetDistanceToInterpolation(lut, startDistance);
-        endT = CurveUtility.GetDistanceToInterpolation(lut, bCurveLength - endDistance);
-    }
-
+    
     public override bool Equals(object obj)
     {
         if (obj is Curve other)

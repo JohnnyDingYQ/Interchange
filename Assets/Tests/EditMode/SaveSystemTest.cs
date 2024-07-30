@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using QuikGraph;
 using QuikGraph.Collections;
@@ -13,6 +14,21 @@ public class SaveSystemTest
     public void SetUp()
     {
         Game.WipeState();
+    }
+
+    [Test]
+    public void VertexUnitTest()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Vertex original = road.Lanes[0].StartVertex;
+
+        Storage storage = new();
+        int writtenBytes = storage.Save(original);
+        Vertex loaded = new();
+        int readBytes = storage.Load(loaded);
+
+        Assert.AreEqual(writtenBytes, readBytes);
+        Assert.AreEqual(original, loaded);
     }
 
     [Test]
@@ -235,7 +251,7 @@ public class SaveSystemTest
         Road restored1 = Game.Roads[saved1.Id];
         Road restored2 = Game.Roads[saved2.Id];
         Road restored3 = Game.Roads[saved3.Id];
-
+        
         Assert.AreEqual(savedBytes, loadedBytes);
         Assert.AreEqual(oldSave.Paths.Count, Game.GameSave.Paths.Count);
         Assert.True(Graph.ContainsPath(restored1.Lanes[0], restored2.Lanes[0]));
@@ -271,7 +287,7 @@ public class SaveSystemTest
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 2);
         uint id = road0.Id;
         Assert.NotNull(Graph.GetOutPaths(road0.Lanes.First().EndVertex).Last().InterweavingPath);
-        
+
         SaveSystem.SaveGame();
         SaveSystem.LoadGame();
         Road recovered = Game.Roads[id];

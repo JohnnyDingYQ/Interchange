@@ -78,7 +78,7 @@ public static class Build
         return SupportLines;
     }
 
-    static void RemoveAllGhostRoads()
+    public static void RemoveAllGhostRoads()
     {
         foreach (uint id in GhostRoads)
             Game.RemoveRoad(Game.Roads[id]);

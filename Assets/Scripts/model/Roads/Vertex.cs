@@ -4,10 +4,13 @@ using Unity.Mathematics;
 public class Vertex : IPersistable
 {
     public uint Id { get; set; }
-    public float3 Pos { get => GetPos(); }
-    public float3 Tangent { get => GetTangent(); }
+    [SaveID]
     public Lane Lane { get; set; }
     public int ScheduledCars { get; set; }
+    [NotSaved]
+    public float3 Pos { get => GetPos(); }
+    [NotSaved]
+    public float3 Tangent { get => GetTangent(); }
     Side side;
 
     public Vertex() { }
@@ -39,23 +42,6 @@ public class Vertex : IPersistable
             : curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds);
     }
 
-    public void Save(Writer writer)
-    {
-        writer.Write(Id);
-        writer.Write(ScheduledCars);
-        writer.Write((int)side);
-        writer.Write(Lane.Id);
-    }
-
-    public void Load(Reader reader)
-    {
-        Id = reader.ReadUint();
-        ScheduledCars = reader.ReadInt();
-        side = (Side)reader.ReadInt();
-        uint laneID = reader.ReadUint();
-        Lane = laneID == 0 ? null : Lane = new() { Id = laneID };
-            
-    }
     public override string ToString()
     {
         return "Vertex " + Id;

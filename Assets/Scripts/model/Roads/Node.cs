@@ -9,9 +9,13 @@ public class Node : IComparable<Node>, IPersistable
     public uint Id { get; set; }
     public float3 Pos { get; private set; }
     public int NodeIndex { get; private set; }
+    [SaveID]
     public Lane InLane { get; set; }
+    [SaveID]
     public Lane OutLane { get; set; }
+    [SaveID]
     public Intersection Intersection { get; set; }
+    
     public Node() { }
     public Node(float3 pos, float elevation, int nodeIndex)
     {
@@ -34,29 +38,6 @@ public class Node : IComparable<Node>, IPersistable
     public int CompareTo(Node other)
     {
         return NodeIndex.CompareTo(other.NodeIndex);
-    }
-
-    public void Save(Writer writer)
-    {
-        writer.Write(Id);
-        writer.Write(Pos);
-        writer.Write(NodeIndex);
-        writer.Write(InLane == null ? 0 : InLane.Id);
-        writer.Write(OutLane == null ? 0 : OutLane.Id);
-        writer.Write(Intersection.Id);
-    }
-
-    public void Load(Reader reader)
-    {
-        Id = reader.ReadUint();
-        Pos = reader.ReadFloat3();
-        NodeIndex = reader.ReadInt();
-        uint inLaneId = reader.ReadUint();
-        InLane = inLaneId == 0 ? null : new() { Id = inLaneId };
-        uint outLaneId = reader.ReadUint();
-        OutLane = outLaneId == 0 ? null : new() { Id = outLaneId };
-        uint ixId = reader.ReadUint();
-        Intersection = ixId == 0 ? null : new() { Id = ixId};
     }
 
     public override bool Equals(object obj)

@@ -6,12 +6,19 @@ using UnityEngine;
 public class Path : IEdge<Vertex>, IPersistable
 {
     public uint Id { get; set; }
+    [SaveID]
     public Curve Curve { get; set; }
+    [SaveID]
     public Vertex Source { get; set; }
+    [SaveID]
     public Vertex Target { get; set; }
+    [SaveID]
     public Path InterweavingPath { get; set; }
+    [NotSaved]
     public List<Car> Cars { get; set; }
+    [NotSaved]
     public Car IncomingCar { get; set; }
+    [NotSaved]
     public float Length { get => Curve.Length; }
 
     public Path() { Cars = new(); }
@@ -43,25 +50,6 @@ public class Path : IEdge<Vertex>, IPersistable
         }
 
         return false;
-    }
-
-    public void Save(Writer writer)
-    {
-        writer.Write(Id);
-        writer.Write(Curve.Id);
-        writer.Write(Source.Id);
-        writer.Write(Target.Id);
-        writer.Write(InterweavingPath == null ? 0 : InterweavingPath.Id);
-    }
-
-    public void Load(Reader reader)
-    {
-        Id = reader.ReadUint();
-        Curve = new() { Id = reader.ReadUint() };
-        Source = new() { Id = reader.ReadUint() };
-        Target = new() { Id = reader.ReadUint() };
-        uint interweavingPathId = reader.ReadUint();
-        InterweavingPath = interweavingPathId == 0 ? null : new() { Id = interweavingPathId };
     }
 
     public override bool Equals(object obj)

@@ -6,15 +6,25 @@ public class Lane : IPersistable
 {
     public uint Id { get; set; }
     public int LaneIndex { get; private set; }
+    [SaveID]
     public Vertex StartVertex { get; set; }
+    [SaveID]
     public Vertex EndVertex { get; set; }
+    [SaveID]
     public Node StartNode { get; set; }
+    [SaveID]
     public Node EndNode { get; set; }
+    [SaveID]
     public Curve Curve { get; set; }
+    [SaveID]
     public Road Road { get; set; }
+    [SaveID]
     public Path InnerPath { get; set; }
+    [NotSaved]
     public float3 StartPos { get => StartNode.Pos; }
+    [NotSaved]
     public float3 EndPos { get => EndNode.Pos; }
+    [NotSaved]
     public float Length { get => Curve.Length; }
 
     public Lane() { }
@@ -59,32 +69,6 @@ public class Lane : IPersistable
     public override string ToString()
     {
         return "Lane " + LaneIndex + " of Road " + Road.Id;
-    }
-
-    public void Save(Writer writer)
-    {
-        writer.Write(Id);
-        writer.Write(LaneIndex);
-        writer.Write(StartVertex.Id);
-        writer.Write(EndVertex.Id);
-        writer.Write(StartNode.Id);
-        writer.Write(EndNode.Id);
-        writer.Write(Curve.Id);
-        writer.Write(Road.Id);
-        writer.Write(InnerPath.Id);
-    }
-
-    public void Load(Reader reader)
-    {
-        Id = reader.ReadUint();
-        LaneIndex = reader.ReadInt();
-        StartVertex = new() { Id = reader.ReadUint() };
-        EndVertex = new() { Id = reader.ReadUint() };
-        StartNode = new() { Id = reader.ReadUint() };
-        EndNode = new() { Id = reader.ReadUint() };
-        Curve = new() { Id = reader.ReadUint() };
-        Road = new() { Id = reader.ReadUint() };
-        InnerPath = new() { Id = reader.ReadUint() };
     }
 
     public override bool Equals(object obj)

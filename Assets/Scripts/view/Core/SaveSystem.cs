@@ -25,6 +25,7 @@ public static class SaveSystem
 
     public static int SaveGame()
     {
+        Build.RemoveAllGhostRoads();
         Storage storage = new();
         return storage.Save(Game.GameSave);
     }

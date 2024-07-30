@@ -8,16 +8,26 @@ using UnityEngine.Splines;
 public class Road : IPersistable
 {
     public uint Id { get; set; }
+    [SaveID]
     public Curve Curve { get; set; }
     public int LaneCount { get; private set; }
+    [SaveIDCollection]
     public List<Lane> Lanes { get; set; }
+    [SaveID]
     public Intersection StartIntersection { get; set; }
+    [SaveID]
     public Intersection EndIntersection { get; set; }
+    [NotSaved]
     public bool IsGhost { get; set; }
+    [NotSaved]
     public RoadOutline LeftOutline { get; set; }
+    [NotSaved]
     public RoadOutline RightOutline { get; set; }
+    [NotSaved]
     public float3 StartPos { get => Curve.StartPos; }
+    [NotSaved]
     public float3 EndPos { get => Curve.EndPos; }
+    [NotSaved]
     public float Length { get => Curve.Length; }
 
     public Road()
@@ -112,29 +122,6 @@ public class Road : IPersistable
         Ray ray = new(clickPos, Vector3.up);
         Curve.GetNearestPoint(ray, out float distanceOnCurve);
         return distanceOnCurve;
-    }
-
-    public void Save(Writer writer)
-    {
-        writer.Write(Id);
-        writer.Write(Curve.Id);
-        writer.Write(LaneCount);
-        foreach (Lane l in Lanes)
-            writer.Write(l.Id);
-        writer.Write(StartIntersection.Id);
-        writer.Write(EndIntersection.Id);
-    }
-
-    public void Load(Reader reader)
-    {
-        Id = reader.ReadUint();
-        Curve = new() { Id = reader.ReadUint() };
-        LaneCount = reader.ReadInt();
-        Lanes = new();
-        for (int i = 0; i < LaneCount; i++)
-            Lanes.Add(new() { Id = reader.ReadUint() });
-        StartIntersection = new() { Id = reader.ReadUint() };
-        EndIntersection = new() { Id = reader.ReadUint() };
     }
     
     public override bool Equals(object obj)
