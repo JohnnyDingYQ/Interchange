@@ -4,7 +4,7 @@ using QuikGraph;
 
 public class GameSave : IPersistable
 {
-    float versionNumber = 0.1f;
+    public readonly float versionNumber = 0.1f;
     public uint CarServiced { get; set; }
     [IPersistableDict(typeof(Node))]
     public Dictionary<uint, Node> Nodes { get; private set; }

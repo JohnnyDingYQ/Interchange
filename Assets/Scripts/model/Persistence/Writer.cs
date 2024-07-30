@@ -52,12 +52,15 @@ public class Writer
         writer.Write(bezierCurve.P0.x);
         writer.Write(bezierCurve.P0.y);
         writer.Write(bezierCurve.P0.z);
+
         writer.Write(bezierCurve.P1.x);
         writer.Write(bezierCurve.P1.y);
         writer.Write(bezierCurve.P1.z);
+
         writer.Write(bezierCurve.P2.x);
         writer.Write(bezierCurve.P2.y);
         writer.Write(bezierCurve.P2.z);
+        
         writer.Write(bezierCurve.P3.x);
         writer.Write(bezierCurve.P3.y);
         writer.Write(bezierCurve.P3.z);

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Unity.Mathematics;
-using Unity.Plastic.Newtonsoft.Json;
 using System;
 using System.Collections;
+using UnityEngine.Splines;
 
 public class RoadOutline : IEnumerable<float3>
 {
@@ -83,8 +83,8 @@ public class RoadOutline : IEnumerable<float3>
     public override bool Equals(object obj)
     {
         if (obj is RoadOutline other)
-            return IPersistable.Equals(StartCurve, other.StartCurve) && IPersistable.Equals(MidCurve, other.MidCurve)
-                && IPersistable.Equals(EndCurve, other.EndCurve);
+            return Equals(StartCurve, other.StartCurve) && Equals(MidCurve, other.MidCurve)
+                && Equals(EndCurve, other.EndCurve);
         else
             return false;
     }

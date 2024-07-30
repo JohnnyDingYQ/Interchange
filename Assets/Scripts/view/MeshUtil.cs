@@ -17,6 +17,7 @@ public static class MeshUtil
         leftLength = road.LeftOutline.GetSize();
         rightLength = road.RightOutline.GetSize();
         Assert.IsTrue(leftLength == rightLength);
+        Assert.AreEqual(RoadOutline.MidNumPoint + RoadOutline.EndsNumPoint * 2, leftLength, $"{leftLength}");
         v3Verts.Clear();
         foreach (float3 pos in road.LeftOutline)
         {

@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// Evaluates and updates the outlines and paths for the given intersection.

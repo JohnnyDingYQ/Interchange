@@ -47,7 +47,7 @@ public class Curve : IPersistable
         bCurveLength = CurveUtility.CalculateLength(bCurve);
     }
 
-    void CreateDistanceCache()
+    public void CreateDistanceCache()
     {
         lut = new DistanceToInterpolation[30];
         CurveUtility.CalculateCurveLengths(bCurve, lut);
@@ -395,9 +395,9 @@ public class Curve : IPersistable
         }
     }
 
-    public Curve GetEndT()
+    public BezierCurve GetCurve()
     {
-        return nextCurve;
+        return bCurve;
     }
     
     public override bool Equals(object obj)
@@ -406,7 +406,8 @@ public class Curve : IPersistable
             return Id == other.Id && bCurve.P0.Equals(other.bCurve.P0) && bCurve.P1.Equals(other.bCurve.P1)
                 && bCurve.P2.Equals(other.bCurve.P2) && bCurve.P3.Equals(other.bCurve.P3) && bCurveLength == other.bCurveLength
                 && offsetDistance == other.offsetDistance && startDistance == other.startDistance && endDistance == other.endDistance
-                && startT == other.startT && endT == other.endT && IPersistable.Equals(nextCurve, other.nextCurve);
+                && startT == other.startT && endT == other.endT && !(nextCurve == null ^ other.nextCurve == null)
+                && ((nextCurve == null && other.nextCurve == null) || nextCurve.Equals(other.nextCurve));
 
         else
             return false;
