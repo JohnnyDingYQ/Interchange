@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Unity.Mathematics;
 using UnityEngine.Splines;
@@ -7,11 +8,32 @@ public class Reader
 {
     readonly BinaryReader reader;
     public int Offset { get; private set; }
+    public Dictionary<Type, Dictionary<uint, IPersistable>> Lut { get; set; }
 
     public Reader(BinaryReader binaryReader)
     {
         reader = binaryReader;
         Offset = 0;
+        Lut = new();
+    }
+
+    public IPersistable CreateInstance(Type type, uint id)
+    {
+        if (Lut.ContainsKey(type))
+        {
+            Dictionary<uint, IPersistable> collection = Lut[type];
+            if (collection.ContainsKey(id))
+                return collection[id];
+            else if (id != 0)
+            {
+                collection[id] = (IPersistable) Activator.CreateInstance(type);
+                collection[id].Id = id;
+                return collection[id];
+            }
+        }
+        IPersistable item =  (IPersistable) Activator.CreateInstance(type);
+        item.Id = id;
+        return item;
     }
 
     public float ReadFloat()

@@ -4,21 +4,13 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
+
 public interface IPersistable
 {
     public uint Id { get; set; }
     public virtual void Save(Writer writer)
     {
-        Type type = GetType();
-        PropertyInfo[] properties = type.GetProperties();
-        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-        List<FieldProperty> fieldProperties = new();
-        foreach (FieldInfo field in fields)
-            fieldProperties.Add(new(field, this));
-        foreach (PropertyInfo prop in properties)
-            fieldProperties.Add(new(prop, this));
-
-        foreach (FieldProperty fieldProperty in fieldProperties)
+        foreach (FieldProperty fieldProperty in GetFieldProperties())
         {
             if (fieldProperty.GetCustomAttribute<NotSavedAttribute>() != null || fieldProperty.Name.Contains("k__BackingField"))
                 continue;
@@ -37,48 +29,74 @@ public interface IPersistable
                 SaveIPersistable(writer, fieldProperty);
                 continue;
             }
+            if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
+            {
+                SaveIPersistableDict(writer, fieldProperty);
+                continue;
+            }
+
             dynamic value = fieldProperty.GetValue();
             writer.Write(value);
         }
 
         static void SaveId(Writer writer, FieldProperty fieldProperty)
         {
-            object referenced = fieldProperty.GetValue();
-            if (referenced == null)
+            if (fieldProperty.GetValue() == null)
+            {
                 writer.Write(0);
+                return;
+            }
+            if (fieldProperty.GetValue() is IPersistable persistable)
+                writer.Write(persistable.Id);
             else
-                writer.Write(((IPersistable)fieldProperty.GetValue()).Id);
+                throw new InvalidOperationException($"{fieldProperty.Name} does not implement IPersistable");
         }
 
         static void SaveIPersistable(Writer writer, FieldProperty fieldProperty)
         {
-            object val = fieldProperty.GetValue();
-            MethodInfo saveMethod = fieldProperty.Type().GetMethod("Save")
-                ?? throw new InvalidOperationException("Type does not support Save method");
-            saveMethod.Invoke(val, new object[] { writer });
+            if (fieldProperty.GetValue() is IPersistable persistable)
+                persistable.Save(writer);
+            else
+                throw new InvalidOperationException($"{fieldProperty.Name} does not implement IPersistable");
         }
 
         static void SaveIdCollection(Writer writer, FieldProperty fieldProperty)
         {
-            IEnumerable<IPersistable> referenced = (IEnumerable<IPersistable>)fieldProperty.GetValue();
-            if (referenced == null)
-                throw new InvalidOperationException($"Property collection {fieldProperty.Name} is null");
-            writer.Write(referenced.Count());
-            foreach (IPersistable item in referenced)
-                writer.Write(item.Id);
+            if (fieldProperty.GetValue() is IEnumerable<IPersistable> collection)
+            {
+                writer.Write(collection.Count());
+                foreach (IPersistable persistable in collection)
+                    writer.Write(persistable.Id);
+            }
+            else
+                throw new InvalidOperationException($"{fieldProperty.Name} is either null or not collection of IPersistable");
         }
 
+        void SaveIPersistableDict(Writer writer, FieldProperty fieldProperty)
+        {
+            Type type = fieldProperty.Type();
+            Type itemType = GetGenericCollectionItemType(type, 1);
+            if (itemType.GetInterface("IPersistable") == null)
+                throw new InvalidOperationException($"{fieldProperty.Name} item does not implement IPersistable");
+            dynamic collection = fieldProperty.GetValue();
+            writer.Write(collection.Count);
+            foreach (IPersistable item in collection.Values)
+            {
+                writer.Write(item.Id);
+                item.Save(writer);
+            }
+        }
     }
     public virtual void Load(Reader reader)
     {
-        Type type = GetType();
-        PropertyInfo[] properties = type.GetProperties();
-        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-        List<FieldProperty> fieldProperties = new();
-        foreach (FieldInfo field in fields)
-            fieldProperties.Add(new(field, this));
-        foreach (PropertyInfo prop in properties)
-            fieldProperties.Add(new(prop, this));
+        List<FieldProperty> fieldProperties = GetFieldProperties();
+        foreach (FieldProperty fieldProperty in fieldProperties)
+        {
+            if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
+            {
+                reader.Lut[GetGenericCollectionItemType(fieldProperty.Type(), 1)] = new();
+            }
+        }
 
         foreach (FieldProperty fieldProperty in fieldProperties)
         {
@@ -86,25 +104,22 @@ public interface IPersistable
                 continue;
             if (fieldProperty.GetCustomAttribute<SaveIDAttribute>() != null)
             {
-                uint id = reader.ReadUint();
-                if (id == 0)
-                    fieldProperty.SetValue(null);
-                else
-                {
-                    IPersistable obj = (IPersistable)Activator.CreateInstance(fieldProperty.Type());
-                    obj.Id = id;
-                    fieldProperty.SetValue(obj);
-                }
+                LoadID(reader, fieldProperty);
                 continue;
             }
             if (fieldProperty.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
             {
-                SaveIDCollection(reader, fieldProperty);
+                LoadIDCollection(reader, fieldProperty);
                 continue;
             }
             if (fieldProperty.GetCustomAttribute<IPersistableImplementedAttribute>() != null)
             {
                 LoadIPersistable(reader, fieldProperty);
+                continue;
+            }
+            if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
+            {
+                LoadIPersistableDict(reader, fieldProperty);
                 continue;
             }
 
@@ -114,17 +129,7 @@ public interface IPersistable
             fieldProperty.SetValue(readValue);
         }
 
-        static Type GetGenericCollectionItemType(Type collectionType, int offset = 0)
-        {
-            if (collectionType.IsGenericType)
-            {
-                Type[] typeArguments = collectionType.GetGenericArguments();
-                return typeArguments[offset];
-            }
-            throw new ArgumentException("The provided type is not a generic collection");
-        }
-
-        static void SaveIDCollection(Reader reader, FieldProperty fieldProperty)
+        void LoadIDCollection(Reader reader, FieldProperty fieldProperty)
         {
             int count = reader.ReadInt();
             Type type = fieldProperty.Type();
@@ -136,8 +141,8 @@ public interface IPersistable
 
             for (int i = 0; i < count; i++)
             {
-                IPersistable item = (IPersistable)Activator.CreateInstance(itemType);
-                item.Id = reader.ReadUint();
+                uint id = reader.ReadUint();
+                IPersistable item = reader.CreateInstance(itemType, id);
                 addMethod.Invoke(collection, new object[] { item });
             }
 
@@ -152,6 +157,37 @@ public interface IPersistable
             loadMethod.Invoke(restored, new object[] { reader });
             fieldProperty.SetValue(restored);
         }
+
+        static void LoadID(Reader reader, FieldProperty fieldProperty)
+        {
+            uint id = reader.ReadUint();
+            if (id == 0)
+                fieldProperty.SetValue(null);
+            else
+            {
+                IPersistable obj = reader.CreateInstance(fieldProperty.Type(), id);
+                fieldProperty.SetValue(obj);
+            }
+        }
+
+        void LoadIPersistableDict(Reader reader, FieldProperty fieldProperty)
+        {
+            Type itemType = GetGenericCollectionItemType(fieldProperty.Type(), 1);
+            int count = reader.ReadInt();
+            for (int i = 0; i < count; i++)
+            {
+                IPersistable restored = reader.CreateInstance(itemType, reader.ReadUint());
+                restored.Load(reader);
+            }
+            object collection = Activator.CreateInstance(fieldProperty.Type());
+            MethodInfo addMethod = fieldProperty.Type().GetMethod("Add")
+                ?? throw new InvalidOperationException("Property does not support Add operation");
+            foreach (object item in reader.Lut[itemType].Values)
+            {
+                addMethod.Invoke(collection, new object[] { ((IPersistable)item).Id, item });
+            }
+            fieldProperty.SetValue(collection);
+        }
     }
 
     public static bool Equals(IPersistable a, IPersistable b)
@@ -160,7 +196,32 @@ public interface IPersistable
             return true;
         if (a == null || b == null)
             return false;
+        if (a.GetType() != b.GetType())
+            return false;
         return a.Id == b.Id;
+    }
+
+    Type GetGenericCollectionItemType(Type collectionType, int offset = 0)
+    {
+        if (collectionType.IsGenericType)
+        {
+            Type[] typeArguments = collectionType.GetGenericArguments();
+            return typeArguments[offset];
+        }
+        throw new ArgumentException("The provided type is not a generic collection");
+    }
+
+    private List<FieldProperty> GetFieldProperties()
+    {
+        Type type = GetType();
+        PropertyInfo[] properties = type.GetProperties();
+        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+        List<FieldProperty> fieldProperties = new();
+        foreach (FieldInfo field in fields)
+            fieldProperties.Add(new(field, this));
+        foreach (PropertyInfo prop in properties)
+            fieldProperties.Add(new(prop, this));
+        return fieldProperties;
     }
 
     private class FieldProperty

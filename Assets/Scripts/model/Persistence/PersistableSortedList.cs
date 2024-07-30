@@ -20,7 +20,7 @@ public class PersistableSortedList : SortedList<int, Node>, IPersistable
         for (int i = 0; i < nodeCount; i++)
         {
             int index = reader.ReadInt();
-            this[index] = new() { Id = reader.ReadUint() };
+            this[index] = (Node) reader.CreateInstance(typeof(Node), reader.ReadUint());
         }
     }
 }
