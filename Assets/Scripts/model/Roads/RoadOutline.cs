@@ -82,19 +82,8 @@ public class RoadOutline : IEnumerable<float3>
 
     public override bool Equals(object obj)
     {
-        if (obj is RoadOutline other)
-        {
-            List<float3> a = this.ToList();
-            List<float3> b = other.ToList();
-            for (int i = 0; i < a.Count; i++)
-                if (!MyNumerics.IsApproxEqual(a[i], b[i]))
-                {
-                    Debug.Log(a[i]);
-                    Debug.Log(b[i]);
-                    return false;
-                }
-            return true;
-        }
+        if (obj is RoadOutline other)    
+            return Equals(StartCurve, other.StartCurve) && Equals(MidCurve, other.MidCurve) && Equals(EndCurve, other.EndCurve);
         else
             return false;
     }

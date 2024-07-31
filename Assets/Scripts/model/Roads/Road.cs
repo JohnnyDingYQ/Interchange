@@ -131,7 +131,8 @@ public class Road : IPersistable
             return Id == other.Id && IPersistable.Equals(Curve, other.Curve) && LaneCount == other.LaneCount
                 && Lanes.Select(l => l.Id).SequenceEqual(other.Lanes.Select(l => l.Id))
                 && IPersistable.Equals(StartIntersection, other.StartIntersection)
-                && IPersistable.Equals(EndIntersection, other.EndIntersection);
+                && IPersistable.Equals(EndIntersection, other.EndIntersection)
+                && Equals(LeftOutline, other.LeftOutline) && Equals(RightOutline, other.RightOutline);
         }
         else
             return false;

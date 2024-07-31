@@ -32,29 +32,16 @@ public static class IntersectionUtil
             if (p != null)
             {
                 p.Curve.GetNearestPoint(new(ix.Nodes.Last().Pos, ix.Normal), out float distanceOnCurve);
-                // foreach (float3 pos in p.Curve.GetOutline(5))
-                        // DebugExtension.DebugPoint(pos, Color.cyan, 1, 10000);
-                // DebugExtension.DebugPoint(p.Curve.EndPos, Color.cyan, 1, 3);
                 Curve curve = p.Curve.Duplicate();
-                // DebugExtension.DebugPoint(p.Curve.EndPos, Color.black, 1, 3);
                 if (orientation == Orientation.Left)
-                {
-                    
                     curve.Offset(Constants.RoadOutlineSeparation);
-                }
                 else
                     curve.Offset(-Constants.RoadOutlineSeparation);
 
-
-
                 if (direction == Direction.Out)
-                {
                     return curve.AddStartDistance(distanceOnCurve);
-                }
                 else
-                {
                     return curve.AddEndDistance(p.Curve.Length - distanceOnCurve);
-                }
             }
             else
             {

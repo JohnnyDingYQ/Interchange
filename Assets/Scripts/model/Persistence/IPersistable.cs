@@ -152,8 +152,6 @@ public interface IPersistable
 
         void LoadID(Reader reader, FieldProperty fieldProperty)
         {
-            if (fieldProperty.Type() == typeof(Curve))
-                Debug.Log(GetType());
             uint id = reader.ReadUint();
             if (id == 0)
                 fieldProperty.SetValue(null);
