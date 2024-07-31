@@ -29,6 +29,12 @@ public static class MeshUtil
             v3Verts.Add(ToVector3(pos));
             normals.Add(Vector3.up);
         }
+        // foreach (float3 pos in road.LeftOutline.Start)
+        // {
+        //     Debug.Log(pos);
+        // }
+        // foreach (Vector3 pos in v3Verts)
+        //     DebugExtension.DebugPoint(pos, Color.black, 1, 10000);
         Mesh mesh = new();
         tris.Clear();
         uvs.Clear();
@@ -59,7 +65,7 @@ public static class MeshUtil
         for (float i = 0; i < RoadOutline.EndsNumPoint; i++)
             uvs.Add(new(1, i / (RoadOutline.EndsNumPoint - 1) * midStart * numRepeat));
         for (float i = 0; i < RoadOutline.MidNumPoint; i++)
-            uvs.Add(new(1, (midStart + i / (RoadOutline.MidNumPoint - 1) * (midEnd - midStart))  * numRepeat));
+            uvs.Add(new(1, (midStart + i / (RoadOutline.MidNumPoint - 1) * (midEnd - midStart)) * numRepeat));
         for (float i = 0; i < RoadOutline.EndsNumPoint; i++)
             uvs.Add(new(1, (midEnd + i / (RoadOutline.EndsNumPoint - 1) * midStart) * numRepeat));
 

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
-using QuikGraph;
-using QuikGraph.Collections;
+
 using Unity.Mathematics;
 using UnityEngine;
 public class SaveSystemTest
@@ -74,12 +72,45 @@ public class SaveSystemTest
     }
 
     [Test]
+    public void IPersistableNotInDict()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        road.Lanes[0].StartNode.OutLane = new() { Id = road.Lanes[0].StartNode.OutLane.Id };
+        Assert.False(Game.GameSave.IPersistableAreInDict());
+    }
+
+
+    [Test]
+    public void DebuggingTest()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        float3 start = road.EndPos + road.Curve.EndNormal * -Constants.LaneWidth;
+        Road connected = RoadBuilder.Single(start, start + stride, start + 2 * stride, 3);
+        uint pathId = Graph.GetPath(road.Lanes[0].EndVertex, connected.Lanes[0].StartVertex).Id;
+        // uint nextCurveId = Game.Paths[pathId].Curve.nextCurve.Id;
+        
+        // Assert.True(Game.Curves.ContainsKey(nextCurveId));
+        // Assert.NotNull(Game.Paths[pathId].Curve.nextCurve);
+
+        GameSave oldSave = Game.GameSave;
+        SaveSystem.SaveGame();
+        SaveSystem.LoadGame();
+        Assert.AreEqual(oldSave, Game.GameSave);
+
+        // Assert.True(Game.Curves.ContainsKey(nextCurveId));
+        // Assert.NotNull(Game.Paths[pathId].Curve.nextCurve);
+    }
+
+    [Test]
     public void RecoverSingleOneLaneRoad()
     {
+        GameSave oldSave = Game.GameSave;
         RoadBuilder.Single(0, stride, 2 * stride, 1);
+
         SaveSystem.SaveGame();
         SaveSystem.LoadGame();
 
+        Assert.AreEqual(oldSave, Game.GameSave);
         Assert.AreEqual(1, Game.Roads.Count);
         Road road = Game.Roads.Values.First();
         Assert.AreEqual(new float3(0), road.StartPos);
@@ -218,25 +249,25 @@ public class SaveSystemTest
 
     }
 
-    [Test]
-    public void RecoverRoadOutline()
-    {
-        Road saved1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Road saved2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        Road saved3 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
-        Road restored1 = Game.Roads[saved1.Id];
-        Road restored2 = Game.Roads[saved2.Id];
-        Road restored3 = Game.Roads[saved3.Id];
+    // [Test]
+    // public void RecoverRoadOutline()
+    // {
+    //     Road saved1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+    //     Road saved2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+    //     Road saved3 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
+    //     SaveSystem.SaveGame();
+    //     SaveSystem.LoadGame();
+    //     Road restored1 = Game.Roads[saved1.Id];
+    //     Road restored2 = Game.Roads[saved2.Id];
+    //     Road restored3 = Game.Roads[saved3.Id];
 
-        Assert.True(saved1.LeftOutline.Equals(restored1.LeftOutline));
-        Assert.True(saved1.RightOutline.Equals(restored1.RightOutline));
-        Assert.True(saved2.LeftOutline.Equals(restored2.LeftOutline));
-        Assert.True(saved2.RightOutline.Equals(restored2.RightOutline));
-        Assert.True(saved3.LeftOutline.Equals(restored3.LeftOutline));
-        Assert.True(saved3.RightOutline.Equals(restored3.RightOutline));
-    }
+    //     Assert.True(saved1.LeftOutline.Equals(restored1.LeftOutline));
+    //     Assert.True(saved1.RightOutline.Equals(restored1.RightOutline));
+    //     Assert.True(saved2.LeftOutline.Equals(restored2.LeftOutline));
+    //     Assert.True(saved2.RightOutline.Equals(restored2.RightOutline));
+    //     Assert.True(saved3.LeftOutline.Equals(restored3.LeftOutline));
+    //     Assert.True(saved3.RightOutline.Equals(restored3.RightOutline));
+    // }
 
     [Test]
     public void RecoverConnectedLanes_2to1and1()

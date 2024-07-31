@@ -74,6 +74,8 @@ public static class Game
             return;
         curve.Id = FindNextAvailableKey(Curves.Keys);
         Curves[curve.Id] = curve;
+        if (curve.GetNextCurve() != null)
+            RegisterCurve(curve.GetNextCurve());
     }
 
     public static void RemoveCurve(Curve curve)

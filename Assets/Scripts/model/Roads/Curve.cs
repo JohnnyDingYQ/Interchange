@@ -16,7 +16,7 @@ public class Curve : IPersistable
     float startDistance, endDistance;
     float startT = 0, endT = 1;
     [SaveID]
-    public Curve nextCurve;
+    Curve nextCurve;
     [NotSaved]
     DistanceToInterpolation[] lut;
     [NotSaved]
@@ -45,6 +45,11 @@ public class Curve : IPersistable
         bCurve = curve;
         CreateDistanceCache();
         bCurveLength = CurveUtility.CalculateLength(bCurve);
+    }
+
+    public Curve GetNextCurve()
+    {
+        return nextCurve;
     }
 
     public void CreateDistanceCache()
@@ -403,11 +408,13 @@ public class Curve : IPersistable
     public override bool Equals(object obj)
     {
         if (obj is Curve other)
+        {
             return Id == other.Id && bCurve.P0.Equals(other.bCurve.P0) && bCurve.P1.Equals(other.bCurve.P1)
                 && bCurve.P2.Equals(other.bCurve.P2) && bCurve.P3.Equals(other.bCurve.P3) && bCurveLength == other.bCurveLength
                 && offsetDistance == other.offsetDistance && startDistance == other.startDistance && endDistance == other.endDistance
                 && startT == other.startT && endT == other.endT && !(nextCurve == null ^ other.nextCurve == null)
                 && ((nextCurve == null && other.nextCurve == null) || nextCurve.Equals(other.nextCurve));
+        }
 
         else
             return false;

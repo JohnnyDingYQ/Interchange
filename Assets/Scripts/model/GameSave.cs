@@ -1,24 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using QuikGraph;
+using System;
+using System.Collections;
+using System.Reflection;
 
 public class GameSave : IPersistable
 {
     public readonly float versionNumber = 0.1f;
     public uint CarServiced { get; set; }
-    [IPersistableDict(typeof(Node))]
+    [IPersistableDict]
     public Dictionary<uint, Node> Nodes { get; private set; }
-    [IPersistableDict(typeof(Road))]
+    [IPersistableDict]
     public Dictionary<uint, Road> Roads { get; private set; }
-    [IPersistableDict(typeof(Intersection))]
+    [IPersistableDict]
     public Dictionary<uint, Intersection> Intersections { get; private set; }
-    [IPersistableDict(typeof(Lane))]
+    [IPersistableDict]
     public Dictionary<uint, Lane> Lanes { get; private set; }
-    [IPersistableDict(typeof(Vertex))]
+    [IPersistableDict]
     public Dictionary<uint, Vertex> Vertices { get; private set; }
-    [IPersistableDict(typeof(Path))]
+    [IPersistableDict]
     public Dictionary<uint, Path> Paths { get; private set; }
-    [IPersistableDict(typeof(Curve))]
+    [IPersistableDict]
     public Dictionary<uint, Curve> Curves { get; private set; }
     [NotSaved]
     public Dictionary<uint, Car> Cars { get; private set; }
@@ -37,96 +40,86 @@ public class GameSave : IPersistable
         CarServiced = 0;
     }
 
-    // public void Load(Reader reader)
-    // {
-    //     versionNumber = reader.ReadFloat();
-    //     CarServiced = reader.ReadUint();
+    public bool IPersistableAreInDict()
+    {
+        List<FieldProperty> fieldProperties = FieldProperty.GetFieldProperties(GetType(), this);
+        Dictionary<Type, Dictionary<uint, IPersistable>> lut = new();
+        foreach (FieldProperty fieldProperty in fieldProperties)
+            if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
+            {
+                Dictionary<uint, IPersistable> dict = new();
+                object value = fieldProperty.GetValue();
+                PropertyInfo valuesProp = fieldProperty.Type().GetProperty("Values");
+                dynamic values = valuesProp.GetValue(value);
+                foreach (IPersistable item in values)
+                    dict[item.Id] = item;
 
-    //     ReadCollection(reader, Nodes);
-    //     ReadCollection(reader, Roads);
-    //     ReadCollection(reader, Intersections);
-    //     ReadCollection(reader, Lanes);
-    //     ReadCollection(reader, Vertices);
-    //     ReadCollection(reader, Paths);
-    //     ReadCollection(reader, Curves);
+                lut[fieldProperty.GetGenericCollectionItemType(1)] = dict;
+            }
+        foreach (FieldProperty fieldProperty in fieldProperties)
+            if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
+            {
+                dynamic dict = fieldProperty.GetValue(this);
+                Type itemType = fieldProperty.GetGenericCollectionItemType(1);
+                List<FieldProperty> itemProperties = FieldProperty.GetFieldProperties(itemType, null);
+                foreach (IPersistable itemInDict in dict.Values)
+                {
+                    foreach (FieldProperty itemProperty in itemProperties)
+                    {
+                        if (itemProperty.GetCustomAttribute<SaveIDAttribute>() != null)
+                        {
+                            IPersistable item = (IPersistable)itemProperty.GetValue(itemInDict);
+                            if (item == null)
+                                continue;
+                            if (!Equals(item, lut[itemProperty.Type()][item.Id]))
+                                return false;
+                            continue;
+                        }
+                        if (itemProperty.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
+                        {
+                            if (itemProperty.GetValue(itemInDict) is IEnumerable<IPersistable> collection)
+                            {
+                                foreach (IPersistable item in collection)
+                                    if (!Equals(item, lut[itemProperty.GetGenericCollectionItemType(0)][item.Id]))
+                                        return false;
+                            }
+                            else
+                                throw new InvalidOperationException();
+                            continue;
+                        }
+                    }
+                }
+            }
 
-    //     RestoreObjectReferences();
+        return true;
+    }
 
-    //     static void ReadCollection<T>(Reader reader, Dictionary<uint, T> dict)
-    //         where T: IPersistable, new()
-    //     {
-    //         dict.Clear();
-    //         int count = reader.ReadInt();
-    //         for (int i = 0; i < count; i++)
-    //         {
-    //             T restored = new();
-    //             restored.Load(reader);
-    //             dict.Add(restored.Id, restored);
-    //         }
-    //     }
+    public override bool Equals(object obj)
+    {
+        if (obj is GameSave other)
+        {
+            foreach (FieldProperty fieldProperty in FieldProperty.GetFieldProperties(GetType(), this))
+            {
+                if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
+                {
+                    dynamic dict = fieldProperty.GetValue(this);
+                    dynamic otherDict = fieldProperty.GetValue(other);
+                    if (dict.Count != otherDict.Count)
+                        return false;
+                    foreach (uint key in dict.Keys)
+                        if (!Equals(dict[key], otherDict[key]))
+                            return false;
+                    continue;
+                }
+            }
+            return true;
+        }
+        else
+            return false;
+    }
 
-    //     void RestoreObjectReferences()
-    //     {
-    //         foreach (Node node in Nodes.Values)
-    //         {
-    //             if (node.InLane != null)
-    //                 node.InLane = Lanes[node.InLane.Id];
-    //             if (node.OutLane != null)
-    //                 node.OutLane = Lanes[node.OutLane.Id];
-    //             node.Intersection = Intersections[node.Intersection.Id];
-    //         }
-
-    //         foreach (Road road in Roads.Values)
-    //         {
-    //             road.Curve = Curves[road.Curve.Id];
-    //             for (int i = 0; i < road.Lanes.Count; i++)
-    //                 road.Lanes[i] = Lanes[road.Lanes[i].Id];
-    //             road.StartIntersection = Intersections[road.StartIntersection.Id];
-    //             road.EndIntersection = Intersections[road.EndIntersection.Id];
-    //         }
-
-    //         foreach (Intersection ix in Intersections.Values)
-    //         {
-    //             List<Node> nodes = new();
-    //             for (int i = 0; i < ix.Nodes.Count; i++)
-    //                 nodes.Add(Nodes[ix.Nodes[i].Id]);
-    //             ix.SetNodes(nodes);
-    //             HashSet<Road> inRoad = new();
-    //             foreach (Road road in ix.InRoads)
-    //                 inRoad.Add(Roads[road.Id]);
-    //             HashSet<Road> outRoad = new();
-    //             foreach (Road road in ix.OutRoads)
-    //                 outRoad.Add(Roads[road.Id]);
-    //             ix.SetInRoads(inRoad);
-    //             ix.SetOutRoads(outRoad);
-    //         }
-
-    //         foreach (Lane lane in Lanes.Values)
-    //         {
-    //             lane.Curve = Curves[lane.Curve.Id];
-    //             lane.StartVertex = Vertices[lane.StartVertex.Id];
-    //             lane.EndVertex = Vertices[lane.EndVertex.Id];
-    //             lane.StartNode = Nodes[lane.StartNode.Id];
-    //             lane.EndNode = Nodes[lane.EndNode.Id];
-    //             lane.Road = Roads[lane.Road.Id];
-    //             lane.InnerPath = Paths[lane.InnerPath.Id];
-    //         }
-            
-    //         foreach (Vertex vertex in Vertices.Values)
-    //             vertex.Lane = Lanes[vertex.Lane.Id];
-
-    //         foreach (Path path in Paths.Values)
-    //         {
-    //             path.Curve = Curves[path.Curve.Id];
-    //             path.Source = Vertices[path.Source.Id];
-    //             path.Target = Vertices[path.Target.Id];
-    //             if (path.InterweavingPath != null)
-    //                 path.InterweavingPath = Paths[path.InterweavingPath.Id];
-    //         }
-
-    //         foreach (Curve curve in Curves.Values)
-    //             if (curve.nextCurve != null)
-    //                 curve.nextCurve = Curves[curve.nextCurve.Id]; 
-    //     }
-    // }
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }

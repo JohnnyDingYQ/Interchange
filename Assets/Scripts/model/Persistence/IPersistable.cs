@@ -10,10 +10,8 @@ public interface IPersistable
     public uint Id { get; set; }
     public virtual void Save(Writer writer)
     {
-        foreach (FieldProperty fieldProperty in GetFieldProperties())
+        foreach (FieldProperty fieldProperty in FieldProperty.GetFieldProperties(GetType(), this))
         {
-            if (fieldProperty.GetCustomAttribute<NotSavedAttribute>() != null || fieldProperty.Name.Contains("k__BackingField"))
-                continue;
             if (fieldProperty.GetCustomAttribute<SaveIDAttribute>() != null)
             {
                 SaveId(writer, fieldProperty);
@@ -89,19 +87,13 @@ public interface IPersistable
     }
     public virtual void Load(Reader reader)
     {
-        List<FieldProperty> fieldProperties = GetFieldProperties();
+        List<FieldProperty> fieldProperties = FieldProperty.GetFieldProperties(GetType(), this);
         foreach (FieldProperty fieldProperty in fieldProperties)
-        {
             if (fieldProperty.GetCustomAttribute<IPersistableDictAttribute>() != null)
-            {
                 reader.Lut[GetGenericCollectionItemType(fieldProperty.Type(), 1)] = new();
-            }
-        }
 
         foreach (FieldProperty fieldProperty in fieldProperties)
         {
-            if (fieldProperty.GetCustomAttribute<NotSavedAttribute>() != null || fieldProperty.Name.Contains("k__BackingField"))
-                continue;
             if (fieldProperty.GetCustomAttribute<SaveIDAttribute>() != null)
             {
                 LoadID(reader, fieldProperty);
@@ -158,8 +150,10 @@ public interface IPersistable
             fieldProperty.SetValue(restored);
         }
 
-        static void LoadID(Reader reader, FieldProperty fieldProperty)
+        void LoadID(Reader reader, FieldProperty fieldProperty)
         {
+            if (fieldProperty.Type() == typeof(Curve))
+                Debug.Log(GetType());
             uint id = reader.ReadUint();
             if (id == 0)
                 fieldProperty.SetValue(null);
@@ -211,67 +205,4 @@ public interface IPersistable
         throw new ArgumentException("The provided type is not a generic collection");
     }
 
-    private List<FieldProperty> GetFieldProperties()
-    {
-        Type type = GetType();
-        PropertyInfo[] properties = type.GetProperties();
-        FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-        List<FieldProperty> fieldProperties = new();
-        foreach (FieldInfo field in fields)
-            fieldProperties.Add(new(field, this));
-        foreach (PropertyInfo prop in properties)
-            fieldProperties.Add(new(prop, this));
-        return fieldProperties;
-    }
-
-    private class FieldProperty
-    {
-        readonly FieldInfo fieldInfo;
-        readonly PropertyInfo propertyInfo;
-        readonly object obj;
-        readonly bool isField;
-        public string Name { get => isField ? fieldInfo.Name : propertyInfo.Name; }
-        public FieldProperty(PropertyInfo p, object s)
-        {
-            propertyInfo = p;
-            obj = s;
-            isField = false;
-        }
-
-        public FieldProperty(FieldInfo f, object s)
-        {
-            fieldInfo = f;
-            obj = s;
-            isField = true;
-        }
-
-        public void SetValue(object value)
-        {
-            if (isField)
-                fieldInfo.SetValue(obj, value);
-            else
-                propertyInfo.SetValue(obj, value);
-        }
-
-        public object GetValue()
-        {
-            if (isField)
-                return fieldInfo.GetValue(obj);
-            return propertyInfo.GetValue(obj);
-        }
-
-        public Type Type()
-        {
-            if (isField)
-                return fieldInfo.FieldType;
-            return propertyInfo.PropertyType;
-        }
-
-        public T GetCustomAttribute<T>() where T : Attribute
-        {
-            if (isField)
-                return fieldInfo.GetCustomAttribute<T>();
-            return propertyInfo.GetCustomAttribute<T>();
-        }
-    }
 }
