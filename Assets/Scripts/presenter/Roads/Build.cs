@@ -11,10 +11,11 @@ public static class Build
     private static float3 pivotPos;
     private static bool startAssigned, pivotAssigned;
     private static Zone startZone;
+    static readonly SupportLine supportLine = new();
     public static int LaneCount { get; set; }
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
-    public static List<Tuple<float3, float3>> SupportLines { get; }
+    public static Action<SupportLine> SupportedLineUpdated;
     public static bool BuildsGhostRoad { get; set; }
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
@@ -27,7 +28,6 @@ public static class Build
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
-        SupportLines = new();
         BuildsGhostRoad = true;
         GhostRoads = new();
         StraightMode = false;
@@ -56,16 +56,18 @@ public static class Build
         RemoveAllGhostRoads();
     }
 
-    public static List<Tuple<float3, float3>> SetSupportLines()
+    public static SupportLine SetSupportLines()
     {
-        SupportLines.Clear();
+        supportLine.Segment1Set = false;
+        supportLine.Segment2Set = false;
         if (startAssigned)
         {
             float3 startPoint = StartTarget.Snapped ? StartTarget.Pos : StartTarget.ClickPos;
             float3 pivotPoint = pivotPos;
             startPoint.y = 0;
             pivotPoint.y = 0;
-            SupportLines.Add(new(startPoint, pivotPoint));
+            supportLine.Segment1Set = true;
+            supportLine.Segment1 = new(startPoint, pivotPoint);
         }
         if (pivotAssigned && EndTarget != null)
         {
@@ -73,9 +75,11 @@ public static class Build
             float3 pivotPoint = pivotPos;
             endPoint.y = 0;
             pivotPoint.y = 0;
-            SupportLines.Add(new(pivotPoint, endPoint));
+            supportLine.Segment2Set = true;
+            supportLine.Segment2 = new(pivotPoint, endPoint);
         }
-        return SupportLines;
+        SupportedLineUpdated?.Invoke(supportLine);
+        return supportLine;
     }
 
     public static void RemoveAllGhostRoads()

@@ -8,5 +8,6 @@ public enum HUDLayer
 {
     Intersections,
     DirectionArrows,
+    SupportLines,
     SnapPoints
 }

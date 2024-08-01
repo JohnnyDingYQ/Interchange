@@ -9,32 +9,51 @@ public class LengthLabels : MonoBehaviour
 {
     [SerializeField]
     private TextLabel textLabel;
-    private List<TextLabel> labels;
+    private TextLabel label1;
+    private TextLabel label2;
 
     void Awake()
     {
-        labels = new();
-        for (int i = 0; i < 2; i++)
-            labels.Add(Instantiate(textLabel, gameObject.transform));
+        label1 = Instantiate(textLabel, gameObject.transform);
+        label2 = Instantiate(textLabel, gameObject.transform);
     }
 
-    void FixedUpdate()
+    void OnEnable()
     {
-        for (int i = 0; i < Build.SupportLines.Count; i++)
-        {
-            TextLabel l = labels[i];
-            Tuple<float3, float3> s = Build.SupportLines[i];
+        Build.SupportedLineUpdated += DrawLengthLabel;
+    }
 
-            l.gameObject.SetActive(true);
-            l.ApplyWorldPos((s.Item1 + s.Item2) / 2);
-            l.SetText(Round(math.length(s.Item1 - s.Item2), 1) + "u");
+    void OnDisable()
+    {
+
+        Build.SupportedLineUpdated -= DrawLengthLabel;
+    }
+
+    void DrawLengthLabel(SupportLine supportLine)
+    {
+        supportLine.ReplaceYCoord(Main.GetHUDObjectHeight(HUDLayer.SupportLines));
+        if (supportLine.Segment1Set)
+        {
+            label1.gameObject.SetActive(true);
+            label1.ApplyWorldPos((supportLine.Segment1.start + supportLine.Segment1.end) / 2);
+            label1.SetText(Round(math.length(supportLine.Segment1.start - supportLine.Segment1.end), 1) + "u");
         }
-        for (int i = Build.SupportLines.Count; i < labels.Count; i++)
-            labels[i].gameObject.SetActive(false);
+        else
+            label1.gameObject.SetActive(false);
+
+        if (supportLine.Segment2Set)
+        {
+            label2.gameObject.SetActive(true);
+            label2.ApplyWorldPos((supportLine.Segment2.start + supportLine.Segment2.end) / 2);
+            label2.SetText(Round(math.length(supportLine.Segment2.start - supportLine.Segment2.end), 1) + "u");
+        }
+        else
+            label2.gameObject.SetActive(false);
+
     }
 
     float Round(float n, int places)
     {
-        return (float) (Math.Round(n * Math.Pow(10, places)) / Math.Pow(10, places));
+        return (float)(Math.Round(n * Math.Pow(10, places)) / Math.Pow(10, places));
     }
 }

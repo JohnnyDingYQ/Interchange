@@ -7,30 +7,41 @@ public class AngleLabels : MonoBehaviour
 {
     [SerializeField]
     private TextLabel textLabel;
-    private List<TextLabel> labels;
+    private TextLabel label;
 
     void Awake()
     {
-        labels = new();
-        for (int i = 0; i < 2; i++)
-            labels.Add(Instantiate(textLabel, gameObject.transform));
+        label = Instantiate(textLabel, gameObject.transform);
     }
 
-    void FixedUpdate()
+    void OnEnable()
     {
-        List<Tuple<float3, float3>> t = Build.SupportLines;
-        for (int i = 1; i < Build.SupportLines.Count; i++)
-        {
-            TextLabel l = labels[i];
-            Tuple<float3, float3> s1 = Build.SupportLines[i - 1];
-            Tuple<float3, float3> s2 = Build.SupportLines[i];
+        Build.SupportedLineUpdated += DrawAngelLabel;
+    }
 
-            l.gameObject.SetActive(true);
-            l.ApplyWorldPos(s1.Item2);
-            l.SetText(Round(MyNumerics.AngleInDegrees(s2.Item1 - s2.Item2, s1.Item2 - s1.Item1), 1) + "°");
+    void OnDisable()
+    {
+
+        Build.SupportedLineUpdated -= DrawAngelLabel;
+    }
+
+
+    void DrawAngelLabel(SupportLine supportLine)
+    {
+        supportLine.ReplaceYCoord(Main.GetHUDObjectHeight(HUDLayer.SupportLines));
+        if (!supportLine.Segment1Set)
+        {
+            label.gameObject.SetActive(false);
+            return;
         }
-        for (int i = Build.SupportLines.Count; i < labels.Count; i++)
-            labels[i].gameObject.SetActive(false);
+        label.gameObject.SetActive(true);
+        label.ApplyWorldPos(supportLine.Segment1.end);
+        float angle = MyNumerics.AngleInDegrees(
+            supportLine.Segment2.end - supportLine.Segment2.start,
+            supportLine.Segment1.end - supportLine.Segment1.start
+        );
+        label.SetText(Round(angle, 1) + "°");
+
     }
 
     float Round(float n, int places)

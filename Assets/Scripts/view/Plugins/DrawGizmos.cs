@@ -32,8 +32,6 @@ public class DrawGizmos : MonoBehaviour
             Gizmos.DrawVertices(DrawDuration);
         if (DrawOutline)
             Gizmos.DrawOutline(DrawDuration);
-        if (DrawSupportLines)
-            Gizmos.DrawSupportLine(DrawDuration);
         
     }
 }
