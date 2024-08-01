@@ -47,7 +47,7 @@ public class Roads : MonoBehaviour
         roadComp.gameObject.isStatic = true;
         roadComp.gameObject.layer = LayerMask.NameToLayer(roadLayerName);
         roadMapping[road.Id] = roadComp;
-        
+
         SetRoadArrow(roadComp);
         SetupTexture(roadComp);
 
@@ -99,6 +99,13 @@ public class Roads : MonoBehaviour
     {
         Destroy(roadMapping[road.Id].gameObject);
         roadMapping.Remove(road.Id);
+    }
+
+    public void DestoryAll()
+    {
+        while (transform.childCount > 0)
+            DestroyImmediate(transform.GetChild(0).gameObject);
+        roadMapping.Clear();
     }
 
     public static void UpdateHoveredRoad()

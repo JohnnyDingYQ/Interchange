@@ -81,6 +81,8 @@ public static class Game
     public static void RemoveCurve(Curve curve)
     {
         Curves.Remove(curve.Id);
+        if (curve.GetNextCurve() != null)
+            RemoveCurve(curve.GetNextCurve());
     }
 
     public static void RegisterIntersection(Intersection i)
@@ -99,7 +101,7 @@ public static class Game
         IntersectionRemoved?.Invoke(i);
     }
 
-    public static void UpdateIntersection(Intersection ix)
+    public static void UpdateIntersectionRoads(Intersection ix)
     {
         foreach (Road r in ix.Roads)
             RoadUpdated?.Invoke(r);
@@ -170,6 +172,11 @@ public static class Game
     public static void InvokeRoadRemoved(Road road)
     {
         RoadRemoved?.Invoke(road);
+    }
+
+    public static void InvokeIntersectionAdded(Intersection ix)
+    {
+        IntersectionAdded?.Invoke(ix);
     }
 
     static void SanityCheck()

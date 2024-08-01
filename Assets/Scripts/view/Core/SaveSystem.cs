@@ -9,32 +9,25 @@ public static class SaveSystem
         Game.WipeState();
         Storage storage = new();
         int loadedBytes = storage.Load(Game.GameSave);
-        RestoreGameState();
+        InitializeGameSave();
         Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
         return loadedBytes;
 
-        static void RestoreGameState()
+        static void InitializeGameSave()
         {
             Graph.CancelBinding();
             Graph.AddVerticesAndPathRange(Game.Paths.Values);
             Graph.ApplyBinding();
+
+
             foreach (Curve c in Game.Curves.Values)
                 c.CreateDistanceCache();
-
-            // create road and inner outline
+            // set inner outline
             foreach (Road r in Game.Roads.Values)
-            {
                 r.SetInnerOutline();
-                Game.InvokeRoadAdded(r);
-            }
-            // create outline at ends for all roads
+            // set outline at ends 
             foreach (Intersection i in Game.Intersections.Values)
                 IntersectionUtil.EvaluateOutline(i);
-
-
-            // update mesh
-            foreach (Intersection i in Game.Intersections.Values)
-                Game.UpdateIntersection(i);
         }
     }
 

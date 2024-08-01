@@ -7,6 +7,10 @@ public class Main : MonoBehaviour
     readonly bool debugMode = true;
     [SerializeField]
     DevPanel devPanel;
+    [SerializeField]
+    Roads roads;
+    [SerializeField]
+    Intersections intersections;
     uint frameElapsed = 0;
 
     void Start()
@@ -17,7 +21,7 @@ public class Main : MonoBehaviour
         UnityEngine.Random.InitState(now); // different seed for each game session
         Debug.Log("Seed: " + now);
         // UnityEngine.Random.InitState(1439289702);
-        
+
         devPanel.gameObject.SetActive(debugMode);
     }
 
@@ -36,6 +40,20 @@ public class Main : MonoBehaviour
 
     public static float GetHUDObjectHeight(HUDLayer layer)
     {
-        return Constants.MaxElevation + ((int) layer + 1) * 0.01f;
+        return Constants.MaxElevation + ((int)layer + 1) * 0.01f;
+    }
+
+    public void ComplyToGameSave()
+    {
+        roads.DestoryAll();
+        intersections.DestoryAll();
+        foreach (Road road in Game.Roads.Values)
+            Game.InvokeRoadAdded(road);
+        foreach (Intersection ix in Game.Intersections.Values)
+        {
+            Game.InvokeIntersectionAdded(ix);
+            Game.UpdateIntersectionRoads(ix);
+        }
+
     }
 }

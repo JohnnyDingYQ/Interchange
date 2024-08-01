@@ -129,9 +129,14 @@ public class RemoveRoadTest
         Assert.AreEqual(0, Game.Intersections.Count);
     }
 
-    // [Test]
-    // public void RemoveTwoLaneRoadRemovesIntersection()
-    // {
-    //     Road road1 = RoadBuilder
-    // }
+    [Test]
+    public void RemoveConnectedRoadCurve()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        
+        Assert.True(Game.RemoveRoad(road0));
+        Assert.True(Game.RemoveRoad(road1));
+        Assert.AreEqual(0, Game.Curves.Count);
+    }
 }

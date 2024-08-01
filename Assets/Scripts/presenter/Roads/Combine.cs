@@ -48,7 +48,7 @@ public static class Combine
             left.Lanes[i].EndNode.InLane = left.Lanes[i];
         }
         left.EndIntersection.AddRoad(left, Direction.In);
-        Game.UpdateIntersection(left.StartIntersection);
+        Game.UpdateIntersectionRoads(left.StartIntersection);
 
         // Debug.Log(left.Curve.GetChainLength());
         return left;

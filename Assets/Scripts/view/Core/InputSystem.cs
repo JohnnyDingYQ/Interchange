@@ -21,6 +21,8 @@ public class InputSystem : MonoBehaviour
     private SquareSelector squareSelectorPrefab;
     [SerializeField]
     ModeToggle modeToggle;
+    [SerializeField]
+    Main main;
 
     void Awake()
     {
@@ -171,6 +173,7 @@ public class InputSystem : MonoBehaviour
     void LoadGame(InputAction.CallbackContext context)
     {
         SaveSystem.LoadGame();
+        main.ComplyToGameSave();
     }
     void DivideRoad(InputAction.CallbackContext context)
     {
@@ -181,9 +184,8 @@ public class InputSystem : MonoBehaviour
             return;
         }
         if (Roads.HoveredRoad != null)
-        {
             Divide.HandleDivideCommand(Roads.HoveredRoad.Road, MouseWorldPos);
-        }
+        
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {

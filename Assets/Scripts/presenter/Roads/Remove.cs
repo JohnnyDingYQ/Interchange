@@ -83,9 +83,9 @@ public static class Remove
             if (option != RoadRemovalOption.Divide)
             {
                 if (!road.StartIntersection.IsEmpty())
-                    Game.UpdateIntersection(road.StartIntersection);
+                    Game.UpdateIntersectionRoads(road.StartIntersection);
                 if (!road.EndIntersection.IsEmpty())
-                    Game.UpdateIntersection(road.EndIntersection);
+                    Game.UpdateIntersectionRoads(road.EndIntersection);
             }
 
         }

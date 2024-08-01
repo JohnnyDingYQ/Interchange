@@ -38,7 +38,7 @@ public static class Divide
         OperateOutline();
         Game.RemoveRoad(road, RoadRemovalOption.Divide);
         Build.ConnectRoadStartToNodes(leftRoad.EndIntersection, 0, rightRoad);
-        Game.UpdateIntersection(leftRoad.EndIntersection);
+        Game.UpdateIntersectionRoads(leftRoad.EndIntersection);
 
         return new SubRoads(leftRoad, rightRoad);
 
