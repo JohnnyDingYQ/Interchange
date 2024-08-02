@@ -11,6 +11,10 @@ public class Main : MonoBehaviour
     Roads roads;
     [SerializeField]
     Intersections intersections;
+    [SerializeField]
+    CarDriver carDriver;
+    [SerializeField]
+    ModeToggle modeToggle;
     uint frameElapsed = 0;
 
     void Start()
@@ -47,6 +51,7 @@ public class Main : MonoBehaviour
     {
         roads.DestoryAll();
         intersections.DestoryAll();
+        carDriver.DestoryAll();
         foreach (Road road in Game.Roads.Values)
             Game.InvokeRoadAdded(road);
         foreach (Intersection ix in Game.Intersections.Values)
@@ -54,6 +59,7 @@ public class Main : MonoBehaviour
             Game.InvokeIntersectionAdded(ix);
             Game.UpdateIntersectionRoads(ix);
         }
-
+        CarScheduler.DetermineZoneConnectedness();
+        modeToggle.SwitchToBuildMode();
     }
 }

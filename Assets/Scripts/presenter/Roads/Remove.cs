@@ -10,7 +10,6 @@ public static class Remove
     public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
         Game.Roads.Remove(road.Id);
-        road.Id = 0;
         Game.RemoveCurve(road.Curve);
         foreach (Lane lane in road.Lanes)
         {
@@ -60,6 +59,7 @@ public static class Remove
             EvaluateIntersections(road, option);
 
         Game.InvokeRoadRemoved(road);
+        road.Id = 0;
         return true;
 
         static void EvaluateIntersections(Road road, RoadRemovalOption option)

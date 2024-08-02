@@ -100,8 +100,8 @@ public static class Game
     {
         Assert.IsTrue(Intersections.Keys.Contains(i.Id));
         Intersections.Remove(i.Id);
-        i.Id = 0;
         IntersectionRemoved?.Invoke(i);
+        i.Id = 0;
     }
 
     public static void UpdateIntersectionRoads(Intersection ix)

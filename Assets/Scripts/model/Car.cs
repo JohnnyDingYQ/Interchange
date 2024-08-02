@@ -3,14 +3,15 @@ using UnityEngine.Assertions;
 using UnityEngine;
 
 
-public class Car
+public class Car : IPersistable
 {
     public uint Id { get; set; }
-    public bool IsTraveling { get; set; }
     public bool IsDone { get; private set; }
     public float3 Pos { get; private set; }
+    [NotSaved]
     public float DistanceOnEdge { get => path.DistanceOnEdge; }
     public float Speed { get; set; }
+    [SaveID]
     public Path path;
 
     public Car(Path path)

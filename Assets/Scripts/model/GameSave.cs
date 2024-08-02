@@ -80,7 +80,7 @@ public class GameSave : IPersistable
                                 continue;
                             if (!Equals(item, lut[itemProperty.Type()][item.Id]))
                             {
-                                Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
+                                // Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
                                 return false;
                             }
                             continue;
@@ -92,7 +92,7 @@ public class GameSave : IPersistable
                                 foreach (IPersistable item in collection)
                                     if (!Equals(item, lut[itemProperty.GetGenericCollectionItemType(0)][item.Id]))
                                     {
-                                        Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
+                                        // Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
                                         return false;
                                     }
                             }

@@ -48,4 +48,11 @@ public class CarDriver : MonoBehaviour
     {
         carPool.Release(carMapping[car.Id]);
     }
+
+    public void DestoryAll()
+    {
+        while (transform.childCount > 0)
+            DestroyImmediate(transform.GetChild(0).gameObject);
+        carMapping.Clear();
+    }
 }

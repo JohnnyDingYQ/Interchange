@@ -19,22 +19,23 @@ public class ModeToggle : MonoBehaviour
             SwitchToViewMode();
         else
             SwitchToBuildMode();
-        IsInBuildMode = !IsInBuildMode;
         Game.BuildModeOn = IsInBuildMode;
     }
 
-    void SwitchToBuildMode()
+    public void SwitchToBuildMode()
     {
         Camera.main.cullingMask = ~(1 << LayerMask.NameToLayer("Cars"));
         CarDriver.TimeScale = 0;
         gameUI.StartPauseAnimation();
+        IsInBuildMode = true;
     }
 
-    void SwitchToViewMode()
+    public void SwitchToViewMode()
     {
         Camera.main.cullingMask = LayerMask.NameToLayer("Everything");
         CarDriver.TimeScale = 1;
         Build.ResetSelection();
         gameUI.StartUnpauseAnimation();
+        IsInBuildMode = false;
     }
 }

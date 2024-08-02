@@ -3,9 +3,12 @@ using System.Collections.Generic;
 public class Zone : IPersistable
 {
     public uint Id { get; set; }
-    readonly HashSet<Vertex> vertices = new();
+    [SaveIDCollection]
+    protected HashSet<Vertex> vertices = new();
     [NotSaved]
     public ReadOnlySet<Vertex> Vertices { get => vertices.AsReadOnly(); }
+
+    public Zone() { }
 
     public Zone(uint id)
     {

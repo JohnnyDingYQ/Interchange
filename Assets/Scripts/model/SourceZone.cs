@@ -3,6 +3,8 @@ using Assets.Scripts.model.Roads;
 
 public class SourceZone : Zone
 {
+    public SourceZone() { ConnectedTargets = new(); }
+
     [NotSaved]
     public Dictionary<TargetZone, IEnumerable<Edge>> ConnectedTargets { get; private set; }
     public const float ScheduleInterval = 1.5f;
