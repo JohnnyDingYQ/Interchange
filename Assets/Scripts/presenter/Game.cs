@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Assertions;
+using Interchange;
 
 public static class Game
 {
@@ -13,10 +14,10 @@ public static class Game
     public static Dictionary<uint, Lane> Lanes { get => GameSave.Lanes; }
     public static Dictionary<uint, Vertex> Vertices { get => GameSave.Vertices; }
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
-    public static Dictionary<uint, Path> Paths { get => GameSave.Paths; }
+    public static Dictionary<uint, Edge> Edges { get => GameSave.Edges; }
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
-    public static Dictionary<uint, Zone> SourceZones { get; set; }
-    public static Dictionary<uint, Zone> TargetZones { get; set; }
+    public static Dictionary<uint, SourceZone> SourceZones { get; set; }
+    public static Dictionary<uint, TargetZone> TargetZones { get; set; }
     public static Road HoveredRoad { get; set; }
     public static Zone HoveredZone { get; set; }
     public static uint CarServiced { get; set; }
@@ -58,7 +59,7 @@ public static class Game
             Graph.AddVertex(lane.StartVertex);
             Graph.AddVertex(lane.EndVertex);
             if (!road.IsGhost)
-                Graph.AddPath(lane.InnerPath);
+                Graph.AddEdge(lane.InnerEdge);
             RegisterLane(lane);
             RegisterCurve(lane.Curve);
         }

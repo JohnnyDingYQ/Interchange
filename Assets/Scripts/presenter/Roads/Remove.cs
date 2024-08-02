@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Interchange;
 
 public static class Remove
 {
@@ -14,7 +15,7 @@ public static class Remove
         Game.RemoveCurve(road.Curve);
         foreach (Lane lane in road.Lanes)
         {
-            List<Path> toRemove = new();
+            List<Edge> toRemove = new();
             if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
                 Game.SourceZones?.Values.ToList().ForEach(zone =>
@@ -32,11 +33,11 @@ public static class Remove
             }
             else
             {
-                foreach (Path p in Game.Paths.Values)
+                foreach (Edge p in Game.Edges.Values)
                     if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
                         toRemove.Add(p);
             }
-            toRemove.ForEach(p => Graph.RemovePath(p));
+            toRemove.ForEach(p => Graph.RemoveEdge(p));
 
             if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
@@ -66,7 +67,7 @@ public static class Remove
         {
             if (!road.StartIntersection.IsEmpty())
             {
-                IntersectionUtil.EvaluatePaths(road.StartIntersection);
+                IntersectionUtil.EvaluateEdges(road.StartIntersection);
                 IntersectionUtil.EvaluateOutline(road.StartIntersection);
             }
             else
@@ -74,7 +75,7 @@ public static class Remove
 
             if (!road.EndIntersection.IsEmpty())
             {
-                IntersectionUtil.EvaluatePaths(road.EndIntersection);
+                IntersectionUtil.EvaluateEdges(road.EndIntersection);
                 IntersectionUtil.EvaluateOutline(road.EndIntersection);
             }
             else

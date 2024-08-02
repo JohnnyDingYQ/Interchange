@@ -5,9 +5,9 @@ using Unity.Mathematics;
 public static class CarControl
 {
     static readonly HashSet<Car> toRemove = new();
-    static bool IsOnValidPath(Car car)
+    static bool IsOnValidEdge(Car car)
     {
-        return Game.Paths.ContainsKey(car.CurrentPath.Id);
+        return Game.Edges.ContainsKey(car.CurrentEdge.Id);
     }
 
     public static void PassTime(float deltaTime)
@@ -18,7 +18,7 @@ public static class CarControl
                 car.Start();
             if (!car.IsTraveling)
                 continue;
-            if (IsOnValidPath(car))
+            if (IsOnValidEdge(car))
                 car.Move(deltaTime);
             else
                 car.Cancel();

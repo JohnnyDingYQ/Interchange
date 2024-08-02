@@ -33,8 +33,8 @@ public static class Combine
             Graph.RemoveVertex(left.Lanes[i].EndVertex);
             Graph.RemoveVertex(right.Lanes[i].StartVertex);
             left.Lanes[i].EndVertex = right.Lanes[i].EndVertex;
-            left.Lanes[i].InitInnerPath();
-            Graph.AddPath(left.Lanes[i].InnerPath);
+            left.Lanes[i].InitInnerEdge();
+            Graph.AddEdge(left.Lanes[i].InnerEdge);
         }
 
         left.SetInnerOutline();

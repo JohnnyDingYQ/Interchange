@@ -40,7 +40,7 @@ public class ReplaceTest
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(6, Game.Nodes.Count);
         Assert.AreEqual(6, Game.Vertices.Count);
-        Assert.AreEqual(3, Game.Paths.Count);
+        Assert.AreEqual(3, Game.Edges.Count);
         Assert.AreEqual(3, Game.Lanes.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
     }
@@ -57,7 +57,7 @@ public class ReplaceTest
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(2, Game.Nodes.Count);
         Assert.AreEqual(2, Game.Vertices.Count);
-        Assert.AreEqual(1, Game.Paths.Count);
+        Assert.AreEqual(1, Game.Edges.Count);
         Assert.AreEqual(1, Game.Lanes.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
     }
@@ -75,7 +75,7 @@ public class ReplaceTest
         Assert.AreEqual(2, Game.Roads.Count);
         Assert.AreEqual(7, Game.Nodes.Count);
         Assert.AreEqual(8, Game.Vertices.Count);
-        Assert.AreEqual(7, Game.Paths.Count);
+        Assert.AreEqual(7, Game.Edges.Count);
         Assert.AreEqual(4, Game.Lanes.Count);
         Assert.AreEqual(3, Game.Intersections.Count);
     }
@@ -138,7 +138,7 @@ public class ReplaceTest
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(4, Game.Nodes.Count);
         Assert.AreEqual(4, Game.Vertices.Count);
-        Assert.AreEqual(2, Game.Paths.Count);
+        Assert.AreEqual(2, Game.Edges.Count);
         Assert.AreEqual(2, Game.Lanes.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
         float3 expectedPos = (road.Lanes[0].StartNode.Pos + road.Lanes[1].StartNode.Pos) / 2;
@@ -164,7 +164,7 @@ public class ReplaceTest
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(6, Game.Nodes.Count);
         Assert.AreEqual(6, Game.Vertices.Count);
-        Assert.AreEqual(3, Game.Paths.Count);
+        Assert.AreEqual(3, Game.Edges.Count);
         Assert.AreEqual(3, Game.Lanes.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
     }

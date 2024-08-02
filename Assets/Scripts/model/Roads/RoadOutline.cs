@@ -14,7 +14,7 @@ public class RoadOutline : IEnumerable<float3>
     public Curve StartCurve { get; set; }
     public Curve MidCurve { get; set; }
     public Curve EndCurve { get; set; }
-    public const int EndsNumPoint = 10;
+    public const int EndsNumPoint = 5;
     public const int MidNumPoint = 20;
 
     IEnumerable<float3> GetCurveOutline(Curve curve, int numPoints)

@@ -20,7 +20,7 @@ public class GameSave : IPersistable
     [IPersistableDict]
     public Dictionary<uint, Vertex> Vertices { get; private set; }
     [IPersistableDict]
-    public Dictionary<uint, Path> Paths { get; private set; }
+    public Dictionary<uint, Interchange.Edge> Edges { get; private set; }
     [IPersistableDict]
     public Dictionary<uint, Curve> Curves { get; private set; }
     [NotSaved]
@@ -30,7 +30,7 @@ public class GameSave : IPersistable
     public GameSave()
     {
         Vertices = new();
-        Paths = new();
+        Edges = new();
         Lanes = new();
         Roads = new();
         Nodes = new();

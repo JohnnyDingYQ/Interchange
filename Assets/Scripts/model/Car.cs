@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 using UnityEngine;
+using Interchange;
 
 public class Car
 {
@@ -11,56 +12,56 @@ public class Car
     public bool IsTraveling { get; set; }
     public bool IsDone { get; private set; }
     public float3 Pos { get; private set; }
-    private readonly Path[] paths;
-    public float DistanceOnPath { get; set; }
-    private int pathIndex;
-    public Path CurrentPath {get => paths[pathIndex];}
+    private readonly Edge[] edges;
+    public float DistanceOnEdge { get; set; }
+    private int edgeIndex;
+    public Edge CurrentEdge {get => edges[edgeIndex];}
     private float speed;
     private bool isBraking;
 
-    public Car(Path[] paths)
+    public Car(Edge[] edges)
     {
-        Assert.IsNotNull(paths);
-        this.paths = paths;
+        Assert.IsNotNull(edges);
+        this.edges = edges;
         IsTraveling = false;
-        DistanceOnPath = 0;
-        pathIndex = 0;
+        DistanceOnEdge = 0;
+        edgeIndex = 0;
         speed = 0;
         Pos = new(0, -100, 0);
     }
     public void Start()
     {
         IsTraveling = true;
-        paths.First().Source.ScheduledCars--;
+        edges.First().Source.ScheduledCars--;
     }
     public void Move(float deltaTime)
     {
         if (IsDone)
             return;
         isBraking = false;
-        Path path = paths[pathIndex];
-        Path nextPath = pathIndex + 1 < paths.Count() ? paths[pathIndex + 1] : null;
+        Edge edge = edges[edgeIndex];
+        Edge nextEdge = edgeIndex + 1 < edges.Count() ? edges[edgeIndex + 1] : null;
         int carIndex = GetCarIndex();
 
-        if (!IsLeadingCarOnPath())
+        if (!IsLeadingCarOnEdge())
             LookForCarAhead();
-        else if (nextPath != null)
-            LookForPathAhead();
+        else if (nextEdge != null)
+            LookForEdgeAhead();
         
         if (!isBraking)
             speed = MathF.Min(speed + deltaTime * Constants.CarAcceleration, Constants.CarMaxSpeed);
 
-        DistanceOnPath += deltaTime * speed;
+        DistanceOnEdge += deltaTime * speed;
         
-        if (DistanceOnPath > path.Length)
+        if (DistanceOnEdge > edge.Length)
         {
-            path.Cars.RemoveAt(0);
-            pathIndex++;
-            if (nextPath != null)
+            edge.Cars.RemoveAt(0);
+            edgeIndex++;
+            if (nextEdge != null)
             {
-                nextPath.IncomingCar = null;
-                nextPath.AddCar(this);
-                Pos = nextPath.Curve.StartPos;
+                nextEdge.IncomingCar = null;
+                nextEdge.AddCar(this);
+                Pos = nextEdge.Curve.StartPos;
             }
             else
             {
@@ -68,43 +69,43 @@ public class Car
             }
             return;
         }
-        Pos = path.Curve.EvaluateDistancePos(DistanceOnPath);
+        Pos = edge.Curve.EvaluateDistancePos(DistanceOnEdge);
 
         # region EXTRACTED FUNCTIONS
         int GetCarIndex()
         {
-            int carIndex = path.Cars.IndexOf(this);
+            int carIndex = edge.Cars.IndexOf(this);
             if (carIndex == -1)
             {
-                carIndex = path.Cars.Count();
-                path.Cars.Add(this);
+                carIndex = edge.Cars.Count();
+                edge.Cars.Add(this);
             }
             return carIndex;
         }
 
         void LookForCarAhead()
         {
-            float distToNextCar = path.Cars[carIndex - 1].DistanceOnPath - DistanceOnPath;
+            float distToNextCar = edge.Cars[carIndex - 1].DistanceOnEdge - DistanceOnEdge;
             if (distToNextCar < Constants.CarMinimumSeparation)
             {
                 isBraking = true;
-                speed = distToNextCar / Constants.CarMinimumSeparation * path.Cars[carIndex - 1].speed;
+                speed = distToNextCar / Constants.CarMinimumSeparation * edge.Cars[carIndex - 1].speed;
             }
         }
 
-        void LookForPathAhead()
+        void LookForEdgeAhead()
         {
-            if (path.Length - DistanceOnPath < Constants.CarMinimumSeparation && nextPath.IncomingCar == null)
-                nextPath.IncomingCar = this;
-            if (nextPath.IsBlockedFor(this))
+            if (edge.Length - DistanceOnEdge < Constants.CarMinimumSeparation && nextEdge.IncomingCar == null)
+                nextEdge.IncomingCar = this;
+            if (nextEdge.IsBlockedFor(this))
             {
                 isBraking = true;
-                float distFromEnd = path.Length - DistanceOnPath;
+                float distFromEnd = edge.Length - DistanceOnEdge;
                 speed = MathF.Max(Constants.CarMinSpeed, speed - deltaTime * Constants.CarDeceleration / distFromEnd);
             }
         }
 
-        bool IsLeadingCarOnPath()
+        bool IsLeadingCarOnEdge()
         {
             return carIndex == 0;
         }
@@ -113,9 +114,9 @@ public class Car
 
     public bool SpawnBlocked()
     {
-        Path path = paths.First();
-        if (path.Cars.Count > 0)
-            if (path.Cars.Last().DistanceOnPath < Constants.CarMinimumSeparation)
+        Edge edge = edges.First();
+        if (edge.Cars.Count > 0)
+            if (edge.Cars.Last().DistanceOnEdge < Constants.CarMinimumSeparation)
                 return true;
         return false;
     }

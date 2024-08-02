@@ -7,7 +7,7 @@ public class DevPanel : MonoBehaviour
     private VisualElement root;
     private Toggle drawCenter;
     private Toggle drawLanes;
-    private Toggle drawPaths;
+    private Toggle drawEdges;
     private Toggle drawOutline;
     private Toggle drawPx;
     private Toggle drawVertices;
@@ -28,7 +28,7 @@ public class DevPanel : MonoBehaviour
 
         drawCenter = root.Q<Toggle>("RoadCenter");
         drawLanes = root.Q<Toggle>("RoadLanes");
-        drawPaths = root.Q<Toggle>("RoadPaths");
+        drawEdges = root.Q<Toggle>("RoadPaths");
         drawOutline = root.Q<Toggle>("RoadOutline");
         drawPx = root.Q<Toggle>("RoadPx");
         drawVertices = root.Q<Toggle>("RoadVertices");
@@ -38,8 +38,8 @@ public class DevPanel : MonoBehaviour
 
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
-        drawPaths.RegisterCallback<ChangeEvent<bool>>(TogglePath);
-        drawPaths.value = true;
+        drawEdges.RegisterCallback<ChangeEvent<bool>>(ToggleEdge);
+        drawEdges.value = true;
         drawLanes.RegisterCallback<ChangeEvent<bool>>(ToggleLanes);
         drawLanes.value = true;
         drawPx.RegisterCallback<ChangeEvent<bool>>(TogglePx);
@@ -72,7 +72,7 @@ public class DevPanel : MonoBehaviour
         root.UnregisterCallback<MouseEnterEvent>(MouseReturnGameWorld);
         root.UnregisterCallback<MouseLeaveEvent>(MouseLeaveGameWorld);
         drawCenter.UnregisterCallback<ChangeEvent<bool>>(TogglecCenter);
-        drawPaths.UnregisterCallback<ChangeEvent<bool>>(TogglePath);
+        drawEdges.UnregisterCallback<ChangeEvent<bool>>(ToggleEdge);
         drawLanes.UnregisterCallback<ChangeEvent<bool>>(ToggleLanes);
         drawPx.UnregisterCallback<ChangeEvent<bool>>(TogglePx);
         drawOutline.UnregisterCallback<ChangeEvent<bool>>(ToggleOutline);
@@ -93,9 +93,9 @@ public class DevPanel : MonoBehaviour
     {
         DrawGizmos.DrawCenter = e.newValue;
     }
-    void TogglePath(ChangeEvent<bool> e)
+    void ToggleEdge(ChangeEvent<bool> e)
     {
-        DrawGizmos.DrawPaths = e.newValue;
+        DrawGizmos.DrawEdges = e.newValue;
     }
     void ToggleLanes(ChangeEvent<bool> e)
     {

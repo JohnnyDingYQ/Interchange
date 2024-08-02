@@ -4,7 +4,7 @@ public class DrawGizmos : MonoBehaviour
 {
     public static bool DrawCenter { get; set; }
     public static bool DrawLanes { get; set; }
-    public static bool DrawPaths { get; set; }
+    public static bool DrawEdges { get; set; }
     public static bool DrawOutline { get; set; }
     public static bool DrawPx { get; set; }
     public static bool DrawVertices { get; set; }
@@ -22,8 +22,8 @@ public class DrawGizmos : MonoBehaviour
         // return;
         if (DrawCenter)
             Gizmos.DrawRoadCenter(DrawDuration);
-        if (DrawPaths)
-            Gizmos.DrawPaths(DrawDuration);
+        if (DrawEdges)
+            Gizmos.DrawEdges(DrawDuration);
         if (DrawLanes)
             Gizmos.DrawLanes(DrawDuration);
         if (DrawPx)

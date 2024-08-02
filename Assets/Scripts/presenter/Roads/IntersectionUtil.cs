@@ -5,9 +5,10 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
+using Interchange;
 
 /// <summary>
-/// Evaluates and updates the outlines and paths for the given intersection.
+/// Evaluates and updates the outlines and edges for the given intersection.
 /// </summary>
 public static class IntersectionUtil
 {
@@ -28,7 +29,7 @@ public static class IntersectionUtil
 
         Curve GetOutlineCurve(Road road, Orientation orientation, Direction direction)
         {
-            Path p = GetPath(road, orientation, direction);
+            Edge p = GetEdge(road, orientation, direction);
             if (p != null)
             {
                 p.Curve.GetNearestPoint(new(ix.Nodes.Last().Pos, ix.Normal), out float distanceOnCurve);
@@ -60,13 +61,13 @@ public static class IntersectionUtil
 
         }
 
-        Path GetPath(Road road, Orientation orientation, Direction direction)
+        Edge GetEdge(Road road, Orientation orientation, Direction direction)
         {
-            List<Path> edges = null;
+            List<Edge> edges = null;
             if (direction == Direction.In)
-                edges = Graph.GetOutPaths(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex);
+                edges = Graph.GetOutEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex);
             else if (direction == Direction.Out)
-                edges = Graph.GetInPaths(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
+                edges = Graph.GetInEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
 
             if (edges != null && edges.Count() != 0)
             {
@@ -94,18 +95,18 @@ public static class IntersectionUtil
         }
     }
 
-    public static void EvaluatePaths(Intersection ix)
+    public static void EvaluateEdges(Intersection ix)
     {
-        ClearAllPaths();
+        ClearAllEdges();
 
         if (ix.InRoads.Count == 0 || ix.OutRoads.Count == 0)
             return;
 
-        BuildStraightPaths(ix);
-        BuildLaneChangingPaths(ix);
+        BuildStraightEdges(ix);
+        BuildLaneChangingEdges(ix);
         AutoMergeOrExpandLanes(ix);
 
-        void BuildStraightPaths(Intersection ix)
+        void BuildStraightEdges(Intersection ix)
         {
             foreach (Node node in ix.Nodes)
                 if (node.InLane != null && node.OutLane != null)
@@ -115,13 +116,13 @@ public static class IntersectionUtil
                     Curve right = node.OutLane.Curve.Duplicate();
                     right = right.AddEndDistance(right.Length - Constants.VertexDistanceFromRoadEnds);
                     left.Add(right);
-                    Path path = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
-                    Graph.AddPath(path);
+                    Edge edge = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
+                    Graph.AddEdge(edge);
                 }
 
         }
 
-        void BuildLaneChangingPaths(Intersection ix)
+        void BuildLaneChangingEdges(Intersection ix)
         {
             for (int j = 1; j < ix.Nodes.Count; j++)
             {
@@ -129,10 +130,10 @@ public static class IntersectionUtil
                 Node previousNode = ix.Nodes[j - 1];
                 if (NodesBelongToUniqueRoad(currentNode, previousNode))
                 {
-                    Path leftPath = BuildPathLane2Lane(currentNode.InLane, previousNode.OutLane);
-                    Path rightPath = BuildPathLane2Lane(previousNode.InLane, currentNode.OutLane);
-                    leftPath.InterweavingPath = rightPath;
-                    rightPath.InterweavingPath = leftPath;
+                    Edge leftEdge = BuildEdgeLane2Lane(currentNode.InLane, previousNode.OutLane);
+                    Edge rightEdge = BuildEdgeLane2Lane(previousNode.InLane, currentNode.OutLane);
+                    leftEdge.InterweavingEdge = rightEdge;
+                    rightEdge.InterweavingEdge = leftEdge;
                 }
             }
         }
@@ -147,7 +148,7 @@ public static class IntersectionUtil
                         continue;
                     Node targetNode = Math.Abs(n.NodeIndex - ix.FirstNodeWithRoad(Direction.Out).NodeIndex) < Math.Abs(n.NodeIndex - ix.LastNodeWithRoad(Direction.Out).NodeIndex) ?
                         ix.FirstNodeWithRoad(Direction.Out) : ix.LastNodeWithRoad(Direction.Out);
-                    BuildPathNode2Node(n, targetNode);
+                    BuildEdgeNode2Node(n, targetNode);
                 }
 
                 if (n.InLane == null)
@@ -156,20 +157,20 @@ public static class IntersectionUtil
                         continue;
                     Node targetNode = Math.Abs(n.NodeIndex - ix.FirstNodeWithRoad(Direction.In).NodeIndex) < Math.Abs(n.NodeIndex - ix.LastNodeWithRoad(Direction.In).NodeIndex) ?
                         ix.FirstNodeWithRoad(Direction.In) : ix.LastNodeWithRoad(Direction.In);
-                    BuildPathNode2Node(targetNode, n);
+                    BuildEdgeNode2Node(targetNode, n);
                 }
             }
         }
 
-        void ClearAllPaths()
+        void ClearAllEdges()
         {
-            List<Path> pathsToRemove = new();
+            List<Edge> edgesToRemove = new();
             foreach (Road road in ix.InRoads)
                 foreach (Lane lane in road.Lanes)
-                    pathsToRemove.AddRange(Graph.GetOutPaths(lane.EndVertex));
+                    edgesToRemove.AddRange(Graph.GetOutEdges(lane.EndVertex));
 
-            foreach (Path path in pathsToRemove)
-                Graph.RemovePath(path);
+            foreach (Edge edge in edgesToRemove)
+                Graph.RemoveEdge(edge);
 
         }
 
@@ -180,30 +181,30 @@ public static class IntersectionUtil
             return node1.InLane.Road == node2.InLane.Road && node1.OutLane.Road == node2.OutLane.Road;
         }
 
-        void BuildPathNode2Node(Node node1, Node node2)
+        void BuildEdgeNode2Node(Node node1, Node node2)
         {
             if (node1.InLane != null && node2.OutLane != null)
-                BuildPathLane2Lane(node1.InLane, node2.OutLane);
+                BuildEdgeLane2Lane(node1.InLane, node2.OutLane);
 
         }
 
-        Path BuildPathLane2Lane(Lane lane1, Lane lane2)
+        Edge BuildEdgeLane2Lane(Lane lane1, Lane lane2)
         {
-            return BuildPath(lane1.EndVertex, lane2.StartVertex);
+            return BuildEdge(lane1.EndVertex, lane2.StartVertex);
         }
 
-        Path BuildPath(Vertex start, Vertex end)
+        Edge BuildEdge(Vertex start, Vertex end)
         {
-            Path existingPath = Graph.GetPath(start, end);
-            if (existingPath != null)
+            Edge existingEdge = Graph.GetEdge(start, end);
+            if (existingEdge != null)
                 return null;
 
             float3 pos1 = start.Pos + Constants.MinLaneLength / 3 * start.Tangent;
             float3 pos2 = end.Pos - Constants.MinLaneLength / 3 * end.Tangent;
             Curve Curve = new(new BezierCurve(start.Pos, pos1, pos2, end.Pos));
-            Path newPath = new(Curve, start, end);
-            Graph.AddPath(newPath);
-            return newPath;
+            Edge newEdge = new(Curve, start, end);
+            Graph.AddEdge(newEdge);
+            return newEdge;
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Interchange;
 
 public static class DemandsSatisfer
 {
@@ -47,11 +48,11 @@ public static class DemandsSatisfer
 
     public static Car AttemptSchedule(Vertex origin, Vertex dest)
     {
-        IEnumerable<Path> paths = Graph.ShortestPathAStar(origin, dest);
-        if (!ScheduleAllowed(paths))
+        IEnumerable<Edge> edges = Graph.ShortestPathAStar(origin, dest);
+        if (!ScheduleAllowed(edges))
             return null;
-        Car car = new(paths.ToArray());
-        paths.First().Source.ScheduledCars++;
+        Car car = new(edges.ToArray());
+        edges.First().Source.ScheduledCars++;
         return car;
     }
 
@@ -62,10 +63,10 @@ public static class DemandsSatisfer
         return AttemptSchedule(start, end);
     }
 
-    static bool ScheduleAllowed(IEnumerable<Path> paths)
+    static bool ScheduleAllowed(IEnumerable<Edge> edges)
     {
-        if (paths == null)
+        if (edges == null)
             return false;
-        return paths.First().Source.ScheduledCars < Constants.MaxVertexWaitingCar;
+        return edges.First().Source.ScheduledCars < Constants.MaxVertexWaitingCar;
     }
 }

@@ -81,8 +81,8 @@ public static class Divide
                 laneRight.EndVertex = lane.EndVertex;
                 laneLeft.StartVertex.SetOwnerLane(laneLeft, Side.Start);
                 laneRight.EndVertex.SetOwnerLane(laneRight, Side.End);
-                laneLeft.InnerPath = new(laneLeft.InnerPath.Curve, laneLeft.StartVertex, laneLeft.EndVertex);
-                laneRight.InnerPath = new(laneRight.InnerPath.Curve, laneRight.StartVertex, laneRight.EndVertex);
+                laneLeft.InnerEdge = new(laneLeft.InnerEdge.Curve, laneLeft.StartVertex, laneLeft.EndVertex);
+                laneRight.InnerEdge = new(laneRight.InnerEdge.Curve, laneRight.StartVertex, laneRight.EndVertex);
             }
         }
 

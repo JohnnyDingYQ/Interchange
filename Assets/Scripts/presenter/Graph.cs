@@ -5,10 +5,11 @@ using QuikGraph;
 using QuikGraph.Algorithms;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
+using Interchange;
 
 public static class Graph
 {
-    private static AdjacencyGraph<Vertex, Path> graph = new();
+    private static AdjacencyGraph<Vertex, Edge> graph = new();
 
 
     static Graph()
@@ -19,17 +20,17 @@ public static class Graph
     public static void ApplyBinding()
     {
         graph.VertexAdded += RegisterVertex;
-        graph.EdgeAdded += RegisterPath;
+        graph.EdgeAdded += RegisterEdge;
         graph.VertexRemoved += UnregisterVertex;
-        graph.EdgeRemoved += UnregisterPath;
+        graph.EdgeRemoved += UnregisterEdge;
     }
 
     public static void CancelBinding()
     {
         graph.VertexAdded -= RegisterVertex;
-        graph.EdgeAdded -= RegisterPath;
+        graph.EdgeAdded -= RegisterEdge;
         graph.VertexRemoved -= UnregisterVertex;
-        graph.EdgeRemoved -= UnregisterPath;
+        graph.EdgeRemoved -= UnregisterEdge;
     }
 
     static void RegisterVertex(Vertex v)
@@ -37,10 +38,10 @@ public static class Graph
         Game.Vertices[v.Id] = v;
     }
 
-    static void RegisterPath(Path p)
+    static void RegisterEdge(Edge edge)
     {
-        Game.Paths[p.Id] = p;
-        Game.RegisterCurve(p.Curve);
+        Game.Edges[edge.Id] = edge;
+        Game.RegisterCurve(edge.Curve);
     }
 
     static void UnregisterVertex(Vertex v)
@@ -48,9 +49,9 @@ public static class Graph
         Game.Vertices.Remove(v.Id);
     }
 
-    static void UnregisterPath(Path p)
+    static void UnregisterEdge(Edge p)
     {
-        Game.Paths.Remove(p.Id);
+        Game.Edges.Remove(p.Id);
         Game.RemoveCurve(p.Curve);
     }
 
@@ -67,10 +68,10 @@ public static class Graph
         return graph.AddVertex(v);
     }
 
-    public static bool AddPath(Path p)
+    public static bool AddEdge(Edge p)
     {
-        if (!Game.Paths.ContainsKey(p.Id))
-            p.Id = Game.FindNextAvailableKey(Game.Paths.Keys);
+        if (!Game.Edges.ContainsKey(p.Id))
+            p.Id = Game.FindNextAvailableKey(Game.Edges.Keys);
         return graph.AddEdge(p);
     }
 
@@ -79,7 +80,7 @@ public static class Graph
         return graph.RemoveVertex(v);
     }
 
-    public static bool RemovePath(Path p)
+    public static bool RemoveEdge(Edge p)
     {
         return graph.RemoveEdge(p);
     }
@@ -90,52 +91,52 @@ public static class Graph
         return graph.ContainsVertex(v);
     }
 
-    public static bool ContainsPath(Path p)
+    public static bool ContainsEdge(Edge p)
     {
         return graph.ContainsEdge(p);
     }
 
-    public static bool ContainsPath(Lane from, Lane to)
+    public static bool ContainsEdge(Lane from, Lane to)
     {
-        return ContainsPath(from.EndVertex, to.StartVertex) || ContainsPath(to.EndVertex, from.StartVertex);
+        return ContainsEdge(from.EndVertex, to.StartVertex) || ContainsEdge(to.EndVertex, from.StartVertex);
     }
-    public static bool ContainsPath(Vertex from, Vertex to)
+    public static bool ContainsEdge(Vertex from, Vertex to)
     {
         return graph.ContainsEdge(from, to);
     }
 
-    public static void AddVerticesAndPathRange(IEnumerable<Path> paths)
+    public static void AddVerticesAndEdgeRange(IEnumerable<Edge> edges)
     {
-        graph.AddVerticesAndEdgeRange(paths);
+        graph.AddVerticesAndEdgeRange(edges);
     }
 
-    public static List<Path> GetOutPaths(Vertex v)
+    public static List<Edge> GetOutEdges(Vertex v)
     {
-        graph.TryGetOutEdges(v, out IEnumerable<Path> edges);
+        graph.TryGetOutEdges(v, out IEnumerable<Edge> edges);
         if (edges == null)
             return new();
         return edges.ToList();
     }
 
-    public static IEnumerable<Path> ShortestPathAStar(Vertex start, Vertex end)
+    public static IEnumerable<Edge> ShortestPathAStar(Vertex start, Vertex end)
     {
         Assert.IsNotNull(start);
         Assert.IsNotNull(end);
-        TryFunc<Vertex, IEnumerable<Path>> tryFunc = graph.ShortestPathsAStar(
-            (Path p) => p.Length,
+        TryFunc<Vertex, IEnumerable<Edge>> tryFunc = graph.ShortestPathsAStar(
+            (Edge p) => p.Length,
             (Vertex to) => math.distance(start.Pos, to.Pos),
             start
         );
-        tryFunc(end, out IEnumerable<Path> paths);
-        return paths;
+        tryFunc(end, out IEnumerable<Edge> edges);
+        return edges;
     }
 
-    public static List<Path> GetInPaths(Vertex vertex)
+    public static List<Edge> GetInEdges(Vertex vertex)
     {
-        HashSet<Path> p = new();
+        HashSet<Edge> p = new();
         foreach (Vertex v in graph.Vertices)
         {
-            foreach (Path e in graph.OutEdges(v))
+            foreach (Edge e in graph.OutEdges(v))
             {
                 if (e.Target.GetHashCode() == vertex.GetHashCode())
                     p.Add(e);
@@ -144,9 +145,9 @@ public static class Graph
         return p.ToList();
     }
 
-    public static Path GetPath(Vertex start, Vertex end)
+    public static Edge GetEdge(Vertex start, Vertex end)
     {
-        graph.TryGetEdge(start, end, out Path edge);
+        graph.TryGetEdge(start, end, out Edge edge);
         return edge;
     }
 }

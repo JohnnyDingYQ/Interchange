@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
+using Interchange;
 
 public static class Gizmos
 {
@@ -58,11 +59,11 @@ public static class Gizmos
         }
     }
 
-    public static void DrawPaths(float duration)
+    public static void DrawEdges(float duration)
     {
-        foreach (Path path in Game.Paths.Values)
+        foreach (Edge edge in Game.Edges.Values)
         {
-            DrawCurve(path.Curve, Color.yellow, duration);
+            DrawCurve(edge.Curve, Color.yellow, duration);
         }
     }
 

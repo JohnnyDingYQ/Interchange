@@ -16,7 +16,7 @@ public static class SaveSystem
         static void InitializeGameSave()
         {
             Graph.CancelBinding();
-            Graph.AddVerticesAndPathRange(Game.Paths.Values);
+            Graph.AddVerticesAndEdgeRange(Game.Edges.Values);
             Graph.ApplyBinding();
 
 

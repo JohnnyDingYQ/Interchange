@@ -16,8 +16,8 @@ public class ZoneTest
         Game.TargetZones = new();
         for (uint i = 1; i < 4; i++)
         {
-            Game.SourceZones.Add(i, new(i, ZoneType.Source));
-            Game.TargetZones.Add(i, new(i, ZoneType.Target));
+            Game.SourceZones.Add(i, new(i));
+            Game.TargetZones.Add(i, new(i));
         }
     }
 

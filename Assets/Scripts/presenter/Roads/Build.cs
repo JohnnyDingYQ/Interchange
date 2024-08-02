@@ -433,7 +433,7 @@ public static class Build
         }
 
         road.StartIntersection.AddRoad(road, Direction.Out);
-        IntersectionUtil.EvaluatePaths(road.StartIntersection);
+        IntersectionUtil.EvaluateEdges(road.StartIntersection);
         IntersectionUtil.EvaluateOutline(road.StartIntersection);
     }
 
@@ -448,7 +448,7 @@ public static class Build
             road.Lanes[i].EndNode = node;
         }
         road.EndIntersection.AddRoad(road, Direction.In);
-        IntersectionUtil.EvaluatePaths(road.EndIntersection);
+        IntersectionUtil.EvaluateEdges(road.EndIntersection);
         IntersectionUtil.EvaluateOutline(road.EndIntersection);
     }
 

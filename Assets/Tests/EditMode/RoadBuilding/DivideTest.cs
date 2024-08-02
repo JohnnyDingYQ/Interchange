@@ -204,7 +204,7 @@ public class DivideTest
     }
 
     [Test]
-    public void PathsAreValid()
+    public void EdgesAreValid()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
         SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
@@ -213,7 +213,7 @@ public class DivideTest
             for (int j = 0; j < 3; j++)
                 if (Math.Abs(i - j) < 2)
                 {
-                    Assert.True(Graph.ContainsPath(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
+                    Assert.True(Graph.ContainsEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
                     Assert.NotNull(Graph.ShortestPathAStar(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
                 }
     }
@@ -228,7 +228,7 @@ public class DivideTest
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
                 if (Math.Abs(i - j) < 2)
-                    Assert.True(Graph.ContainsPath(road1.Lanes[i], subRoads.Left.Lanes[j]));
+                    Assert.True(Graph.ContainsEdge(road1.Lanes[i], subRoads.Left.Lanes[j]));
     }
 
     [Test]

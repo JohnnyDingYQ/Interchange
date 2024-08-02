@@ -2,6 +2,8 @@ using Unity.Mathematics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Interchange;
+
 public class Lane : IPersistable
 {
     public uint Id { get; set; }
@@ -19,7 +21,7 @@ public class Lane : IPersistable
     [SaveID]
     public Road Road { get; set; }
     [SaveID]
-    public Path InnerPath { get; set; }
+    public Edge InnerEdge { get; set; }
     [NotSaved]
     public float3 StartPos { get => StartNode.Pos; }
     [NotSaved]
@@ -57,13 +59,13 @@ public class Lane : IPersistable
         EndVertex = new(this, Side.End);
     }
 
-    public void InitInnerPath()
+    public void InitInnerEdge()
     {
         Curve curve = Curve.Duplicate();
         curve = curve.AddStartDistance(Constants.VertexDistanceFromRoadEnds);
         curve = curve.AddEndDistance(Constants.VertexDistanceFromRoadEnds);
-        Path path = new(curve, StartVertex, EndVertex);
-        InnerPath = path;
+        Edge edge = new(curve, StartVertex, EndVertex);
+        InnerEdge = edge;
     }
 
     public override string ToString()
@@ -77,7 +79,7 @@ public class Lane : IPersistable
             return Id == other.Id && IPersistable.Equals(StartVertex, other.StartVertex) && IPersistable.Equals(EndVertex, other.EndVertex)
                 && IPersistable.Equals(StartNode, other.StartNode) && IPersistable.Equals(EndNode, other.EndNode)
                 && IPersistable.Equals(Curve, other.Curve) && IPersistable.Equals(Road, other.Road)
-                && LaneIndex == other.LaneIndex && IPersistable.Equals(InnerPath, other.InnerPath);
+                && LaneIndex == other.LaneIndex && IPersistable.Equals(InnerEdge, other.InnerEdge);
         else
             return false;
     }

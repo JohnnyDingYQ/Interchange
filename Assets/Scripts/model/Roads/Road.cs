@@ -61,7 +61,7 @@ public class Road : IPersistable
         {
             l.InitNodes();
             l.InitVertices();
-            l.InitInnerPath();
+            l.InitInnerEdge();
         }
         StartIntersection = new(this, Direction.Out);
         EndIntersection = new(this, Direction.In);
@@ -72,8 +72,8 @@ public class Road : IPersistable
 
     public void SetInnerOutline()
     {
-        LeftOutline.MidCurve = Lanes.First().InnerPath.Curve.Duplicate().Offset(Constants.RoadOutlineSeparation);
-        RightOutline.MidCurve = Lanes.Last().InnerPath.Curve.Duplicate().Offset(-Constants.RoadOutlineSeparation);
+        LeftOutline.MidCurve = Lanes.First().InnerEdge.Curve.Duplicate().Offset(Constants.RoadOutlineSeparation);
+        RightOutline.MidCurve = Lanes.Last().InnerEdge.Curve.Duplicate().Offset(-Constants.RoadOutlineSeparation);
     }
 
     public List<Node> GetNodes(Side side)
