@@ -6,7 +6,6 @@ public class Vertex : IPersistable
     public uint Id { get; set; }
     [SaveID]
     public Lane Lane { get; set; }
-    public int ScheduledCars { get; set; }
     [NotSaved]
     public float3 Pos { get => GetPos(); }
     [NotSaved]
@@ -50,7 +49,7 @@ public class Vertex : IPersistable
     public override bool Equals(object obj)
     {
         if (obj is Vertex other)
-            return Id == other.Id && ScheduledCars == other.ScheduledCars && side == other.side && Lane.Id == other.Lane.Id;
+            return Id == other.Id && side == other.side && Lane.Id == other.Lane.Id;
         else
             return false;
     }

@@ -21,7 +21,7 @@ public class CarTest
     public void SimplePathCompletion()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Car car = DemandsSatisfer.AttemptSchedule(road, road);
+        Car car = CarScheduler.AttemptSchedule(road, road);
         Assert.NotNull(car);
         Game.RegisterCar(car);
         for (float i = 0; i < maxGivenTime; i += deltaTime)
@@ -35,7 +35,7 @@ public class CarTest
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
-        Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
+        Car car = CarScheduler.AttemptSchedule(road0, road2);
         Assert.NotNull(car);
         Game.RegisterCar(car);
         for (float i = 0; i < maxGivenTime; i += deltaTime)
@@ -49,9 +49,9 @@ public class CarTest
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
-        for (int i = 0; i < Constants.MaxVertexWaitingCar; i++)
+        for (int i = 0; i < 10; i++)
         {
-            Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
+            Car car = CarScheduler.AttemptSchedule(road0, road2);
             Assert.NotNull(car);
             Game.RegisterCar(car);
         }
@@ -70,9 +70,9 @@ public class CarTest
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
         Road road2 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 3);
-        for (int i = 0; i < Constants.MaxVertexWaitingCar; i++)
+        for (int i = 0; i < 10; i++)
         {
-            Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
+            Car car = CarScheduler.AttemptSchedule(road0, road2);
             Assert.NotNull(car);
             Game.RegisterCar(car);
         }
@@ -87,28 +87,12 @@ public class CarTest
     }
 
     [Test]
-    public void TooManyCarsScheduledForVertex()
-    {
-        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        Road road2 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
-        for (int i = 0; i <= Constants.MaxVertexWaitingCar; i++)
-        {
-            Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
-            if (i < Constants.MaxVertexWaitingCar)
-                Assert.NotNull(car);
-            else
-                Assert.Null(car);
-        }
-    }
-
-    [Test]
     public void PathRemoved()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
-        Car car = DemandsSatisfer.AttemptSchedule(road0, road2);
+        Car car = CarScheduler.AttemptSchedule(road0, road2);
         Game.RegisterCar(car);
         for (float i = 0; i < 0.3f; i += deltaTime)
             CarControl.PassTime(deltaTime);

@@ -27,8 +27,6 @@ public class Main : MonoBehaviour
 
     void Update()
     {
-        DemandsGenerator.GenerateDemands(Time.deltaTime);
-        DemandsSatisfer.SatisfyDemands(Time.deltaTime);
         if (frameElapsed % 2 == 0)
         {
             Roads.UpdateHoveredRoad();

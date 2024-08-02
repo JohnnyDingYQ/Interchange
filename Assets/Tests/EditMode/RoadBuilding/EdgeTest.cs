@@ -1,7 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
-using Interchange;
+using Assets.Scripts.model.Roads;
 
 public class EdgeTest
 {

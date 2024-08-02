@@ -2,7 +2,7 @@ using Unity.Mathematics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Interchange;
+using Assets.Scripts.model.Roads;
 
 public class Lane : IPersistable
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 using UnityEngine;
-using Interchange;
+using Assets.Scripts.model.Roads;
 
 public class Car
 {
@@ -16,10 +16,9 @@ public class Car
     public float Speed { get; set; }
     public Path path;
 
-    public Car(Edge[] edges)
+    public Car(Path path)
     {
-        Assert.IsNotNull(edges);
-        path = new(edges);
+        this.path = path;
         Speed = 0;
         Pos = new(0, -100, 0);
     }

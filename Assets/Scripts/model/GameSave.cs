@@ -4,6 +4,7 @@ using QuikGraph;
 using System;
 using System.Collections;
 using System.Reflection;
+using Assets.Scripts.model.Roads;
 
 public class GameSave : IPersistable
 {
@@ -20,7 +21,7 @@ public class GameSave : IPersistable
     [IPersistableDict]
     public Dictionary<uint, Vertex> Vertices { get; private set; }
     [IPersistableDict]
-    public Dictionary<uint, Interchange.Edge> Edges { get; private set; }
+    public Dictionary<uint, Edge> Edges { get; private set; }
     [IPersistableDict]
     public Dictionary<uint, Curve> Curves { get; private set; }
     [NotSaved]

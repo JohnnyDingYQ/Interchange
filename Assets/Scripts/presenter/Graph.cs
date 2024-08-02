@@ -5,7 +5,7 @@ using QuikGraph;
 using QuikGraph.Algorithms;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
-using Interchange;
+using Assets.Scripts.model.Roads;
 
 public static class Graph
 {

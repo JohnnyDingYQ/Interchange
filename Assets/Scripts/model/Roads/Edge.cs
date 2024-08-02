@@ -3,7 +3,7 @@ using QuikGraph;
 using UnityEngine.Assertions;
 using UnityEngine;
 
-namespace Interchange
+namespace Assets.Scripts.model.Roads
 {
     public class Edge : IEdge<Vertex>, IPersistable
     {
