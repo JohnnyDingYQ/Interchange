@@ -35,7 +35,6 @@ namespace Interchange
 
         public void AddCar(Car car)
         {
-            car.DistanceOnEdge = 0;
             Cars.Add(car);
         }
 
