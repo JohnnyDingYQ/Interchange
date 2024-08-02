@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using Assets.Scripts.model.Roads;
 using Unity.Mathematics;
@@ -10,17 +11,16 @@ public class Path
     public float3 Pos { get => CurrentEdge.Curve.EvaluateDistancePos(DistanceOnEdge); }
     public Edge CurrentEdge { get => edges.Last(); }
     public float DistanceOnEdge { get; set; }
-    public bool IsDone { get; private set; }
 
     public Path(IEnumerable<Edge> given)
     {
         edges = given.Reverse().ToList();
     }
-
+    
     public void Move(Car car, float deltaTime)
     {
         bool isBraking;
-        if (IsDone)
+        if (car.IsDone)
             return;
         isBraking = false;
         Edge edge = edges.Last();
@@ -49,7 +49,6 @@ public class Path
             }
             else
             {
-                IsDone = true;
                 car.Cancel();
             }
             return;

@@ -9,12 +9,12 @@ public static class Remove
     // only called in Game.cs
     public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
-        if (!Game.Roads.ContainsKey(road.Id))
-            return false;
         Game.Roads.Remove(road.Id);
+        road.Id = 0;
         Game.RemoveCurve(road.Curve);
         foreach (Lane lane in road.Lanes)
         {
+            Game.RemoveLane(lane);
             List<Edge> toRemove = new();
             if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
@@ -52,7 +52,6 @@ public static class Remove
                         Game.RemoveNode(lane.EndNode);
                 }
             }
-            Game.RemoveLane(lane);
         }
         road.StartIntersection.RemoveRoad(road, Direction.Out);
         road.EndIntersection.RemoveRoad(road, Direction.In);

@@ -360,25 +360,26 @@ public static class Build
 
         void HandleZoneConnection()
         {
-            if (roads != null && LaneCount == 1)
+            if (LaneCount == 1)
             {
-                if (startZone?.Type == ZoneType.Source && roads.First().StartPos.y == Constants.MinElevation)
+                if (startZone is SourceZone && roads.First().StartPos.y == Constants.MinElevation)
                 {
-                    startZone?.AddVertex(roads.First().Lanes.Single().StartVertex);
+                    startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
                     roads.Last().EndIntersection.OutRoads
                         .Where(r => r.LaneCount == 1)
                         .Select(r => r.Lanes.Single()).ToList()
                         .ForEach(l => startZone.RemoveVertex(l.StartVertex));
                 }
-                if (Game.HoveredZone?.Type == ZoneType.Target && roads.Last().EndPos.y == Constants.MinElevation)
+                if (Game.HoveredZone is TargetZone && roads.Last().EndPos.y == Constants.MinElevation)
                 {
-                    Game.HoveredZone?.AddVertex(roads.Last().Lanes.Single().EndVertex);
+                    Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
                     roads.First().StartIntersection.InRoads
                         .Where(r => r.LaneCount == 1)
                         .Select(r => r.Lanes.Single()).ToList()
                         .ForEach(l => Game.HoveredZone.RemoveVertex(l.EndVertex));
                 }
             }
+            CarScheduler.DetermineZoneConnectedness();
         }
         #endregion
     }

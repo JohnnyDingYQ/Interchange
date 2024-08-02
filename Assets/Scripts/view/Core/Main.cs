@@ -27,6 +27,8 @@ public class Main : MonoBehaviour
 
     void Update()
     {
+        if (!Game.BuildModeOn)
+            CarScheduler.Schedule(Time.deltaTime);
         if (frameElapsed % 2 == 0)
         {
             Roads.UpdateHoveredRoad();

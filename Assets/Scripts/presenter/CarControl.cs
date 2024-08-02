@@ -15,7 +15,9 @@ public static class CarControl
         foreach (Car car in Game.Cars.Values)
         {
             if (IsOnValidEdge(car))
+            {
                 car.Move(deltaTime);
+            }
             else
                 car.Cancel();
             if (car.IsDone)

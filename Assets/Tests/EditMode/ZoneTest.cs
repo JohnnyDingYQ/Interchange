@@ -12,8 +12,6 @@ public class ZoneTest
     public void SetUp()
     {
         Game.WipeState();
-        Game.SourceZones = new();
-        Game.TargetZones = new();
         for (uint i = 1; i < 4; i++)
         {
             Game.SourceZones.Add(i, new(i));

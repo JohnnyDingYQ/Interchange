@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -161,5 +162,20 @@ public class SaveSystemTest
 
         Assert.AreEqual(2, Game.Roads.Count);
         Assert.AreEqual(3, Game.Nodes.Count);
+    }
+
+    [Test]
+    public void SaveLoadAfterReplaceRoad()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Build.LaneCount = 3;
+        Game.HoveredRoad = road; 
+        Build.HandleHover(stride);
+        Build.HandleBuildCommand(stride);
+        Assert.AreEqual(3, Game.Roads.Values.Single().Lanes.Count);
+        GameSave oldSave = Game.GameSave;
+        SaveSystem.SaveGame();
+        SaveSystem.LoadGame();
+        Assert.AreEqual(oldSave, Game.GameSave);
     }
 }

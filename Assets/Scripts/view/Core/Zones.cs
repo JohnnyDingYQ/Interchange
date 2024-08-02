@@ -13,9 +13,6 @@ public class Zones : MonoBehaviour
 
     void Awake()
     {
-        Game.SourceZones ??= new();
-        Game.TargetZones ??= new();
-
         foreach (Transform child in sourceZones.transform)
         {
             uint id = uint.Parse(child.gameObject.name);

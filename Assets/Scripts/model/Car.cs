@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 using UnityEngine;
-using Assets.Scripts.model.Roads;
+
 
 public class Car
 {
@@ -32,5 +29,10 @@ public class Car
     public void Cancel()
     {
         IsDone = true;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

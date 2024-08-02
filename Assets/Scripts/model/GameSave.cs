@@ -24,6 +24,10 @@ public class GameSave : IPersistable
     public Dictionary<uint, Edge> Edges { get; private set; }
     [IPersistableDict]
     public Dictionary<uint, Curve> Curves { get; private set; }
+    [IPersistableDict]
+    public static Dictionary<uint, SourceZone> SourceZones { get; private set; }
+    [IPersistableDict]
+    public static Dictionary<uint, TargetZone> TargetZones { get; private set; }
     [NotSaved]
     public Dictionary<uint, Car> Cars { get; private set; }
     public uint Id { get; set; }
@@ -38,6 +42,8 @@ public class GameSave : IPersistable
         Intersections = new();
         Cars = new();
         Curves = new();
+        SourceZones = new();
+        TargetZones = new();
         CarServiced = 0;
     }
 
@@ -73,7 +79,10 @@ public class GameSave : IPersistable
                             if (item == null)
                                 continue;
                             if (!Equals(item, lut[itemProperty.Type()][item.Id]))
+                            {
+                                Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
                                 return false;
+                            }
                             continue;
                         }
                         if (itemProperty.GetCustomAttribute<SaveIDCollectionAttribute>() != null)
@@ -82,7 +91,10 @@ public class GameSave : IPersistable
                             {
                                 foreach (IPersistable item in collection)
                                     if (!Equals(item, lut[itemProperty.GetGenericCollectionItemType(0)][item.Id]))
+                                    {
+                                        Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
                                         return false;
+                                    }
                             }
                             else
                                 throw new InvalidOperationException();

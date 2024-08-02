@@ -16,8 +16,8 @@ public static class Game
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
     public static Dictionary<uint, Edge> Edges { get => GameSave.Edges; }
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
-    public static Dictionary<uint, SourceZone> SourceZones { get; set; }
-    public static Dictionary<uint, TargetZone> TargetZones { get; set; }
+    public static Dictionary<uint, SourceZone> SourceZones { get => GameSave.SourceZones; }
+    public static Dictionary<uint, TargetZone> TargetZones { get => GameSave.TargetZones; }
     public static Road HoveredRoad { get; set; }
     public static Zone HoveredZone { get; set; }
     public static uint CarServiced { get; set; }
@@ -82,6 +82,7 @@ public static class Game
     public static void RemoveCurve(Curve curve)
     {
         Curves.Remove(curve.Id);
+        curve.Id = 0;
         if (curve.GetNextCurve() != null)
             RemoveCurve(curve.GetNextCurve());
     }
@@ -99,6 +100,7 @@ public static class Game
     {
         Assert.IsTrue(Intersections.Keys.Contains(i.Id));
         Intersections.Remove(i.Id);
+        i.Id = 0;
         IntersectionRemoved?.Invoke(i);
     }
 
@@ -121,6 +123,7 @@ public static class Game
     {
         Assert.IsTrue(Lanes.Keys.Contains(lane.Id));
         Lanes.Remove(lane.Id);
+        lane.Id = 0;
         RemoveCurve(lane.Curve);
     }
 
@@ -136,6 +139,7 @@ public static class Game
     public static void RemoveNode(Node node)
     {
         Nodes.Remove(node.Id);
+        node.Id = 0;
         node.Intersection.RemoveNode(node);
     }
 

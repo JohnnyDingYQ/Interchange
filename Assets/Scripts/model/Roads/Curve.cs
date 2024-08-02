@@ -404,7 +404,12 @@ public class Curve : IPersistable
     {
         return bCurve;
     }
-    
+
+    public float GetOffset()
+    {
+        return startDistance;
+    }
+
     public override bool Equals(object obj)
     {
         if (obj is Curve other)
@@ -415,7 +420,6 @@ public class Curve : IPersistable
                 && startT == other.startT && endT == other.endT && !(nextCurve == null ^ other.nextCurve == null)
                 && ((nextCurve == null && other.nextCurve == null) || nextCurve.Equals(other.nextCurve));
         }
-
         else
             return false;
     }

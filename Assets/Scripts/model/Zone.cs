@@ -1,19 +1,15 @@
 using System.Collections.Generic;
 
-public class Zone
+public class Zone : IPersistable
 {
     public uint Id { get; set; }
     readonly HashSet<Vertex> vertices = new();
+    [NotSaved]
     public ReadOnlySet<Vertex> Vertices { get => vertices.AsReadOnly(); }
-    public ZoneType Type { get; set; }
 
-    public Dictionary<uint, int> Destinations = new();
-    public float CarSpawnInterval;
-
-    public Zone(uint id, ZoneType zoneType)
+    public Zone(uint id)
     {
         Id = id;
-        Type = zoneType;
     }
 
     public void AddVertex(Vertex v)
