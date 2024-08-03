@@ -87,7 +87,7 @@ public class CarTest
     }
 
     [Test]
-    public void PathRemoved()
+    public void PathEdgeRemoved()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Assets.Scripts.model.Roads;
+using System.Collections.ObjectModel;
 
 public static class CarScheduler
 {
@@ -46,15 +47,24 @@ public static class CarScheduler
         foreach (SourceZone source in Game.SourceZones.Values)
             foreach (TargetZone target in Game.TargetZones.Values)
             {
-                if (source.Vertices.Count == 0 || target.Vertices.Count == 0)
-                    continue;
-                IEnumerable<Edge> edges = Graph.ShortestPathAStar(source.Vertices.First(), target.Vertices.First());
-                if (edges != null)
+                bool pathFound = false;
+                foreach (Vertex sourceVertex in source.Vertices)
                 {
-                    source.ConnectedTargets.Add(target, edges);
-                    target.ConnectedSources.Add(source);
-                    
+                    foreach (Vertex targetVertex in target.Vertices)
+                    {
+                        IEnumerable<Edge> edges = Graph.ShortestPathAStar(sourceVertex, targetVertex);
+                        if (edges != null)
+                        {
+                            source.ConnectedTargets.Add(target, edges);
+                            target.ConnectedSources.Add(source);
+                            pathFound = true;
+                            break;
+                        }
+                    }
+                    if (pathFound)
+                        break;
                 }
+
             }
     }
     public static Car AttemptSchedule(Zone source, Zone target)

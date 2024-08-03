@@ -94,4 +94,30 @@ public class ZoneTest
         
         Assert.AreEqual(0, Game.SourceZones[1].Vertices.Count);
     }
+
+    [Test]
+    public void MultipleVerticesInSourceZone()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Game.SourceZones[1].AddVertex(road1.Lanes[0].StartVertex);
+        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.TargetZones[1].AddVertex(road0.Lanes[0].EndVertex);
+        CarScheduler.DetermineZoneConnectedness();
+
+        Assert.AreNotEqual(0, Game.SourceZones[1].ConnectedTargets.Count);
+    }
+
+    [Test]
+    public void MultipleVerticesInTargetZone()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.TargetZones[1].AddVertex(road1.Lanes[0].EndVertex);
+        Game.TargetZones[1].AddVertex(road0.Lanes[0].EndVertex);
+        CarScheduler.DetermineZoneConnectedness();
+
+        Assert.AreNotEqual(0, Game.SourceZones[1].ConnectedTargets.Count);
+    }
 }
