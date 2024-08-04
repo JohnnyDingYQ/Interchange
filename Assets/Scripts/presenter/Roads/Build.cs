@@ -21,9 +21,9 @@ public static class Build
     public static bool ParallelBuildOn { get; set; }
     public static float ParallelSpacing { get; set; }
     public static int Elevation { get; set; }
-    public static bool ReplaceSuggestionOn { get; set; }
     public static bool StraightMode { get; set; }
     public static bool ContinuousBuilding { get; set; }
+    public static bool ReplaceSuggestionOn { get => StartTarget.IsReplaceSuggestion && EndTarget.IsReplaceSuggestion; }
 
     static Build()
     {
@@ -44,7 +44,6 @@ public static class Build
         GhostRoads = new();
         ParallelBuildOn = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
-        ReplaceSuggestionOn = false;
         roadEndInZone = false;
         ContinuousBuilding = false;
     }
@@ -55,7 +54,6 @@ public static class Build
         pivotAssigned = false;
         StartTarget = null;
         EndTarget = null;
-        ReplaceSuggestionOn = false;
         StraightMode = false;
         roadEndInZone = false;
         RemoveAllGhostRoads();
@@ -112,7 +110,8 @@ public static class Build
             float offset = isOnLeftSide ? distance : -distance;
             StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
             EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
-
+            StartTarget.IsReplaceSuggestion = true;
+            EndTarget.IsReplaceSuggestion = true;
         }
 
         void HandlePosAsStart(float3 pos)
@@ -123,11 +122,9 @@ public static class Build
             {
                 StartTarget = Snapping.Snap(pos, LaneCount, Side.Start);
                 EndTarget = null;
-                ReplaceSuggestionOn = false;
             }
             else
             {
-                ReplaceSuggestionOn = true;
                 SetupReplaceSuggestion(road, distOnRoad);
             }
         }
@@ -235,7 +232,6 @@ public static class Build
             foreach (Node node in EndTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)
                     Game.RemoveNode(node);
-            ReplaceSuggestionOn = false;
             return roads;
         }
     }

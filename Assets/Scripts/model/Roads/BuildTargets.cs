@@ -13,4 +13,5 @@ public class BuildTargets
     public Road SelectedRoad { get; set; }
     public List<float3> NodesPos { get; set; }
     public Side Side { get; set; }
+    public bool IsReplaceSuggestion { get; set; }
 }

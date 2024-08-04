@@ -1,28 +1,41 @@
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Zones : MonoBehaviour
 {
     [SerializeField]
-    GameObject sourceZones;
-    [SerializeField]
-    GameObject targetZones;
+    GameObject districts;
 
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
 
     void Awake()
     {
-        foreach (Transform child in sourceZones.transform)
+        uint districtCount = 1;
+        foreach (Transform district in districts.transform)
         {
-            uint id = uint.Parse(child.gameObject.name);
-            Game.SourceZones.Add(id, new(id));
-        }
-
-        foreach (Transform child in targetZones.transform)
-        {
-            uint id = uint.Parse(child.gameObject.name);
-            Game.TargetZones.Add(id, new(id));
+            // Debug.Log(district.name);
+            // Debug.Log(districtCount);
+            Transform sourceZones = district.transform.GetChild(0);
+            Transform targetZones = district.transform.GetChild(1);
+            Assert.IsTrue(sourceZones.name.Equals("Source Zones"));
+            Assert.IsTrue(targetZones.name.Equals("Target Zones"));
+            uint zoneCount = 1;
+            foreach (Transform sourceZone in sourceZones.transform)
+            {
+                uint id = (zoneCount++ << 7) + (districtCount << 1);
+                Game.SourceZones.Add(id, new(id));
+                sourceZone.name = id.ToString();
+            }
+            zoneCount = 1;
+            foreach (Transform targetZone in targetZones.transform)
+            {
+                uint id = (zoneCount++ << 7) + (districtCount << 1) + 1;
+                Game.TargetZones.Add(id, new(id));
+                targetZone.name = id.ToString();
+            }
+            districtCount++;
         }
     }
     
