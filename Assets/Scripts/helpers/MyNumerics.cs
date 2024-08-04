@@ -46,4 +46,9 @@ public static class MyNumerics
         float t2 = (p1.y * v1.x + p2.x * v1.y - p1.x * v1.y - p2.y * v1.x) / (v2.y * v1.x - v2.x * v1.y);
         return p2 + t2 * v2;
     }
+
+    public static float Round(float n, int places)
+    {
+        return (float)(Math.Round(n * Math.Pow(10, places)) / Math.Pow(10, places));
+    }
 }

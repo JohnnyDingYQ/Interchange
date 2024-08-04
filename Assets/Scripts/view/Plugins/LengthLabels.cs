@@ -36,7 +36,7 @@ public class LengthLabels : MonoBehaviour
         {
             label1.gameObject.SetActive(true);
             label1.ApplyWorldPos((supportLine.Segment1.start + supportLine.Segment1.end) / 2);
-            label1.SetText(Round(math.length(supportLine.Segment1.start - supportLine.Segment1.end), 1) + "u");
+            label1.SetText(MyNumerics.Round(math.length(supportLine.Segment1.start - supportLine.Segment1.end), 1) + "u");
         }
         else
             label1.gameObject.SetActive(false);
@@ -45,15 +45,11 @@ public class LengthLabels : MonoBehaviour
         {
             label2.gameObject.SetActive(true);
             label2.ApplyWorldPos((supportLine.Segment2.start + supportLine.Segment2.end) / 2);
-            label2.SetText(Round(math.length(supportLine.Segment2.start - supportLine.Segment2.end), 1) + "u");
+            label2.SetText(MyNumerics.Round(math.length(supportLine.Segment2.start - supportLine.Segment2.end), 1) + "u");
         }
         else
             label2.gameObject.SetActive(false);
 
     }
 
-    float Round(float n, int places)
-    {
-        return (float)(Math.Round(n * Math.Pow(10, places)) / Math.Pow(10, places));
-    }
 }

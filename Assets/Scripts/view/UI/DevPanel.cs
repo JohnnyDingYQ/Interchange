@@ -13,9 +13,10 @@ public class DevPanel : MonoBehaviour
     private Toggle drawVertices;
     private Toggle ghostRoad;
     private Toggle supportLines;
-    private Toggle enforceTangent;
+    private Toggle continuousBuilding;
     private static TextElement elevation;
     private static TextElement carServiced;
+    private static TextElement connectedness;
     private readonly StringBuilder stringBuilder = new();
     void OnEnable()
     {
@@ -25,6 +26,7 @@ public class DevPanel : MonoBehaviour
 
         elevation = root.Q<TextElement>("Elevation");
         carServiced = root.Q<TextElement>("CarServiced");
+        connectedness = root.Q<TextElement>("Connectedness");
 
         drawCenter = root.Q<Toggle>("RoadCenter");
         drawLanes = root.Q<Toggle>("RoadLanes");
@@ -34,7 +36,7 @@ public class DevPanel : MonoBehaviour
         drawVertices = root.Q<Toggle>("RoadVertices");
         ghostRoad = root.Q<Toggle>("Ghost");
         supportLines = root.Q<Toggle>("SupportLines");
-        enforceTangent = root.Q<Toggle>("EnforceTangent");
+        continuousBuilding = root.Q<Toggle>("ContinuousBuilding");
 
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
@@ -52,6 +54,8 @@ public class DevPanel : MonoBehaviour
         supportLines.value = true;
         ghostRoad.RegisterCallback<ChangeEvent<bool>>(ToggleGhost);
         ghostRoad.value = true;
+        continuousBuilding.RegisterCallback<ChangeEvent<bool>>(ToggleContinuousBuilding);
+        continuousBuilding.value = true;
     }
 
     void Update()
@@ -65,6 +69,12 @@ public class DevPanel : MonoBehaviour
         stringBuilder.Append("Cars Serviced: ");
         stringBuilder.Append(Game.CarServiced);
         carServiced.text = stringBuilder.ToString();
+
+        stringBuilder.Clear();
+        stringBuilder.Append("Connectedness: ");
+        stringBuilder.Append(CarScheduler.Connectedness);
+        stringBuilder.Append(" %");
+        connectedness.text = stringBuilder.ToString();
     }
 
     void OnDisable()
@@ -79,6 +89,7 @@ public class DevPanel : MonoBehaviour
         drawVertices.UnregisterCallback<ChangeEvent<bool>>(ToggleVertices);
         supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
         ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
+        continuousBuilding.UnregisterCallback<ChangeEvent<bool>>(ToggleContinuousBuilding);
     }
 
     void MouseReturnGameWorld(MouseEnterEvent e)
@@ -120,5 +131,9 @@ public class DevPanel : MonoBehaviour
     void ToggleSupportLines(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawSupportLines = e.newValue;
+    }
+    void ToggleContinuousBuilding(ChangeEvent<bool> e)
+    {
+        Build.ContinuousBuilding = e.newValue;
     }
 }

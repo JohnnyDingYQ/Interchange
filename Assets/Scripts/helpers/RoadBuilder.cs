@@ -7,6 +7,7 @@ public static class RoadBuilder
 {
     public static Road Single(float3 start, float3 pivot, float3 end, int laneCount)
     {
+        Build.ResetSelection();
         Build.LaneCount = laneCount;
         Build.HandleBuildCommand(start);
         Build.HandleBuildCommand(pivot);

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Assets.Scripts.model.Roads;
-using System.Collections.ObjectModel;
 
 public static class CarScheduler
 {
+    static public float Connectedness { get; set; }
+
     static CarScheduler()
     {
         Game.RoadRemoved += DetermineZoneConnectedness;
@@ -39,6 +40,7 @@ public static class CarScheduler
 
     public static void DetermineZoneConnectedness()
     {
+        int connectionCount = 0;
         foreach (SourceZone source in Game.SourceZones.Values)
             source.ConnectedTargets.Clear();
         foreach (TargetZone target in Game.TargetZones.Values)
@@ -58,6 +60,7 @@ public static class CarScheduler
                             source.ConnectedTargets.Add(target, edges);
                             target.ConnectedSources.Add(source);
                             pathFound = true;
+                            connectionCount++;
                             break;
                         }
                     }
@@ -66,6 +69,8 @@ public static class CarScheduler
                 }
 
             }
+        Connectedness = (float) connectionCount / (Game.SourceZones.Count * Game.TargetZones.Count);
+        Connectedness = MyNumerics.Round(Connectedness * 100, 3);
     }
     public static Car AttemptSchedule(Zone source, Zone target)
     {

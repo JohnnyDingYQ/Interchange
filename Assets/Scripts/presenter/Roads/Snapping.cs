@@ -14,7 +14,8 @@ public static class Snapping
             ClickPos = pos,
             SelectedRoad = Game.HoveredRoad,
             Pos = pos,
-            Snapped = false
+            Snapped = false,
+            Side = side
         };
 
         List<Node> nodes = Game.Nodes.Values

@@ -9,7 +9,7 @@ using UnityEngine.Splines;
 public static class Build
 {
     private static float3 pivotPos;
-    private static bool startAssigned, pivotAssigned;
+    private static bool startAssigned, pivotAssigned, roadEndInZone;
     private static Zone startZone;
     static readonly SupportLine supportLine = new();
     public static int LaneCount { get; set; }
@@ -23,6 +23,8 @@ public static class Build
     public static int Elevation { get; set; }
     public static bool ReplaceSuggestionOn { get; set; }
     public static bool StraightMode { get; set; }
+    public static bool ContinuousBuilding { get; set; }
+
     static Build()
     {
         LaneCount = 1;
@@ -43,6 +45,8 @@ public static class Build
         ParallelBuildOn = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
         ReplaceSuggestionOn = false;
+        roadEndInZone = false;
+        ContinuousBuilding = false;
     }
 
     public static void ResetSelection()
@@ -53,6 +57,7 @@ public static class Build
         EndTarget = null;
         ReplaceSuggestionOn = false;
         StraightMode = false;
+        roadEndInZone = false;
         RemoveAllGhostRoads();
     }
 
@@ -203,7 +208,13 @@ public static class Build
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
             roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
-        ResetSelection();
+        if (!EndTarget.Snapped && !roadEndInZone && ContinuousBuilding)
+        {
+            ResetSelection();
+            HandleBuildCommand(clickPos);
+        }
+        else
+            ResetSelection();
         return roads;
 
         List<Road> BuildSuggested()
@@ -372,6 +383,7 @@ public static class Build
                 }
                 if (Game.HoveredZone is TargetZone && roads.Last().EndPos.y == Constants.MinElevation)
                 {
+                    roadEndInZone = true;
                     Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
                     roads.First().StartIntersection.InRoads
                         .Where(r => r.LaneCount == 1)
@@ -410,12 +422,17 @@ public static class Build
     }
 
 
-    static float3 AlignPivot(BuildTargets startTarget, float3 p)
+    static float3 AlignPivot(BuildTargets buildTarget, float3 p)
     {
-        Assert.IsNotNull(startTarget);
+        Assert.IsNotNull(buildTarget);
         float oldY = p.y;
-        if (startTarget.TangentAssigned)
-            p = math.project(p - startTarget.Pos, startTarget.Tangent) + startTarget.Pos;
+        if (buildTarget.TangentAssigned)
+        {
+            float3 projection = math.project(p - buildTarget.Pos, buildTarget.Tangent);
+            if (math.dot(buildTarget.Tangent, projection) < 0 && buildTarget.Side == Side.Start)
+                projection = 0;
+            p =  projection + buildTarget.Pos;
+        }
         else
             return p;
         p.y = oldY;

@@ -4,6 +4,7 @@
     <ui:VisualElement style="flex-grow: 1;" class="devPanel">
         <ui:TextElement text="Elevation:" name="Elevation"/>
         <ui:TextElement text="Serviced:" name="CarServiced"/>
+        <ui:TextElement text="Connectedness: " name="Connectedness"/>
         <ui:Foldout text="Roads" name="MyFoldout" value="true">
             <ui:Toggle text="Center" name="RoadCenter" />
             <ui:Toggle text="Lanes" name="RoadLanes" />
@@ -12,7 +13,8 @@
             <ui:Toggle text="Control Points" name="RoadPx" />
             <ui:Toggle text="Vertices" name="RoadVertices" />
             <ui:Toggle text="Support Lines" name="SupportLines" />
-            <ui:Toggle text="Build Ghost" name="Ghost" />
+            <ui:Toggle text="Builds Ghost" name="Ghost" />
+            <ui:Toggle text="Continuous Building" name="ContinuousBuilding" />
         </ui:Foldout>
     </ui:VisualElement>
 </ui:UXML>

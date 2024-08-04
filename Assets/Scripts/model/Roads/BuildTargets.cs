@@ -12,4 +12,5 @@ public class BuildTargets
     public bool TangentAssigned { get; set; }
     public Road SelectedRoad { get; set; }
     public List<float3> NodesPos { get; set; }
+    public Side Side { get; set; }
 }
