@@ -1,0 +1,2 @@
+This project uses work by Jonathan Shewchuk and Triangle.NET but does not intend to distribute its source code.
+Instead, obtain Triangle and Triangle.NET for free at https://github.com/wo80/Triangle.NET
