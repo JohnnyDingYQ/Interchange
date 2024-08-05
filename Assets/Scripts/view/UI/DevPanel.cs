@@ -17,7 +17,9 @@ public class DevPanel : MonoBehaviour
     private static TextElement elevation;
     private static TextElement carServiced;
     private static TextElement connectedness;
-    private readonly StringBuilder stringBuilder = new();
+    private static TextElement debug1;
+    private static TextElement debug2;
+    private static readonly StringBuilder stringBuilder = new();
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
@@ -27,6 +29,8 @@ public class DevPanel : MonoBehaviour
         elevation = root.Q<TextElement>("Elevation");
         carServiced = root.Q<TextElement>("CarServiced");
         connectedness = root.Q<TextElement>("Connectedness");
+        debug1 = root.Q<TextElement>("Debug1");
+        debug2 = root.Q<TextElement>("Debug2");
 
         drawCenter = root.Q<Toggle>("RoadCenter");
         drawLanes = root.Q<Toggle>("RoadLanes");
@@ -75,6 +79,22 @@ public class DevPanel : MonoBehaviour
         stringBuilder.Append(CarScheduler.Connectedness);
         stringBuilder.Append(" %");
         connectedness.text = stringBuilder.ToString();
+    }
+
+    public static void SetDebug1Text(string s)
+    {
+        stringBuilder.Clear();
+        stringBuilder.Append("Debug1: ");
+        stringBuilder.Append(s);
+        debug1.text = stringBuilder.ToString();
+    }
+
+    public static void SetDebug2Text(string s)
+    {
+        stringBuilder.Clear();
+        stringBuilder.Append("Debug2: ");
+        stringBuilder.Append(s);
+        debug2.text = stringBuilder.ToString();
     }
 
     void OnDisable()

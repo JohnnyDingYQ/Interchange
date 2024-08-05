@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CarHumbleObject : MonoBehaviour
+public class CarObject : MonoBehaviour
 {
     public Car Car { get; set; }
 

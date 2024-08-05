@@ -71,7 +71,15 @@ public static class CarScheduler
             }
         Connectedness = (float) connectionCount / (Game.SourceZones.Count * Game.TargetZones.Count);
         Connectedness = MyNumerics.Round(Connectedness * 100, 3);
+        DetermineDistrictConnectedness();
     }
+
+    static void DetermineDistrictConnectedness()
+    {
+        foreach (District district in Game.Districts.Values)
+            district.CalculateConnectedness();
+    }
+
     public static Car AttemptSchedule(Zone source, Zone target)
     {
         if (source.Vertices.Count == 0 || target.Vertices.Count == 0)

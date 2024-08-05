@@ -18,8 +18,10 @@ public static class Game
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
     public static Dictionary<uint, SourceZone> SourceZones { get => GameSave.SourceZones; }
     public static Dictionary<uint, TargetZone> TargetZones { get => GameSave.TargetZones; }
+    public static Dictionary<uint, District> Districts { get => GameSave.Districts; }
     public static Road HoveredRoad { get; set; }
     public static Zone HoveredZone { get; set; }
+    public static District HoveredDistrict { get; set; }
     public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;

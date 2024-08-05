@@ -37,10 +37,16 @@ public class Main : MonoBehaviour
         if (frameElapsed % 2 == 0)
         {
             Roads.UpdateHoveredRoad();
-            Zones.UpdateHoveredZone();
+            Zones.UpdateHoveredZoneAndDistrict();
             Build.HandleHover(InputSystem.MouseWorldPos);
         }
         frameElapsed++;
+        
+        if (Game.Districts.Count == 2)
+        {
+            DevPanel.SetDebug1Text(Game.Districts[1].Connectedness.ToString());
+            DevPanel.SetDebug2Text(Game.Districts[2].Connectedness.ToString());
+        }
     }
 
     public static float GetHUDObjectHeight(HUDLayer layer)

@@ -28,6 +28,8 @@ public class GameSave : IPersistable
     public static Dictionary<uint, SourceZone> SourceZones { get; private set; }
     [IPersistableDict]
     public static Dictionary<uint, TargetZone> TargetZones { get; private set; }
+    [IPersistableDict]
+    public static Dictionary<uint, District> Districts { get; private set; }
     [NotSaved]
     public Dictionary<uint, Car> Cars { get; private set; }
     public uint Id { get; set; }
@@ -44,6 +46,7 @@ public class GameSave : IPersistable
         Curves = new();
         SourceZones = new();
         TargetZones = new();
+        Districts = new();
         CarServiced = 0;
     }
 

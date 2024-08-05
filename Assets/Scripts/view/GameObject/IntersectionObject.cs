@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class IntersectionHumbleObject : MonoBehaviour
+public class IntersectionObject : MonoBehaviour
 {
     public Intersection Intersection { get; set; }
 }

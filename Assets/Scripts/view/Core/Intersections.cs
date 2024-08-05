@@ -6,8 +6,8 @@ using UnityEngine;
 public class Intersections : MonoBehaviour
 {
     [SerializeField]
-    IntersectionHumbleObject intersectionPrefab;
-    Dictionary<uint, IntersectionHumbleObject> intersectionMapping = new();
+    IntersectionObject intersectionPrefab;
+    Dictionary<uint, IntersectionObject> intersectionMapping = new();
 
     void OnEnable()
     {
@@ -23,7 +23,7 @@ public class Intersections : MonoBehaviour
 
     public void InstantiateIntersection(Intersection ix)
     {
-        IntersectionHumbleObject ixObject = Instantiate(intersectionPrefab, transform);
+        IntersectionObject ixObject = Instantiate(intersectionPrefab, transform);
         ixObject.Intersection = ix;
         float3 pos = GetCenter(ix);
         pos.y = Main.GetHUDObjectHeight(HUDLayer.Intersections);

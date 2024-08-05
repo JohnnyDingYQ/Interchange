@@ -5,9 +5,9 @@ using UnityEngine.Assertions;
 
 public class CarDriver : MonoBehaviour
 {
-    [SerializeField] CarHumbleObject carPrefab;
-    static Dictionary<uint, CarHumbleObject> carMapping;
-    ObjectPool<CarHumbleObject> carPool;
+    [SerializeField] CarObject carPrefab;
+    static Dictionary<uint, CarObject> carMapping;
+    ObjectPool<CarObject> carPool;
     public static float TimeScale = 1;
     void Awake()
     {
@@ -38,7 +38,7 @@ public class CarDriver : MonoBehaviour
 
     void CarAdded(Car car)
     {
-        CarHumbleObject carObject = carPool.Get();
+        CarObject carObject = carPool.Get();
         carObject.Car = car;
         carMapping[car.Id] = carObject;
         carObject.gameObject.layer = LayerMask.NameToLayer("Cars");

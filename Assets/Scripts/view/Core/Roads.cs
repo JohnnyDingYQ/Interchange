@@ -7,14 +7,14 @@ using UnityEngine.Assertions;
 public class Roads : MonoBehaviour
 {
     [SerializeField]
-    private RoadHumbleObject roadPrefab;
+    private RoadObject roadPrefab;
     [SerializeField]
     private GameObject arrowPrefab;
     [SerializeField]
     Texture oneLaneTex, twoLaneTex, threeLaneTex;
-    private static Dictionary<uint, RoadHumbleObject> roadMapping;
-    public static RoadHumbleObject HoveredRoad { get; set; }
-    public static List<RoadHumbleObject> SelectedRoads { get; set; }
+    private static Dictionary<uint, RoadObject> roadMapping;
+    public static RoadObject HoveredRoad { get; set; }
+    public static List<RoadObject> SelectedRoads { get; set; }
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
     private const int MaxColliderHits = 100;
@@ -41,7 +41,7 @@ public class Roads : MonoBehaviour
         if (roadMapping.ContainsKey(road.Id))
             DestroyRoad(roadMapping[road.Id].Road);
 
-        RoadHumbleObject roadComp = Instantiate(roadPrefab, transform, true);
+        RoadObject roadComp = Instantiate(roadPrefab, transform, true);
         roadComp.name = $"Road-{road.Id}";
         roadComp.Road = road;
         roadComp.gameObject.isStatic = true;
@@ -51,7 +51,7 @@ public class Roads : MonoBehaviour
         SetRoadArrow(roadComp);
         SetupTexture(roadComp);
 
-        void SetupTexture(RoadHumbleObject roadGameObject)
+        void SetupTexture(RoadObject roadGameObject)
         {
             Material material = roadGameObject.GetComponent<Renderer>().material;
             if (road.LaneCount == 1)
@@ -63,7 +63,7 @@ public class Roads : MonoBehaviour
         }
     }
 
-    void SetRoadArrow(RoadHumbleObject roadObject)
+    void SetRoadArrow(RoadObject roadObject)
     {
         Assert.IsNotNull(roadObject.Road);
         GameObject arrow;
@@ -89,7 +89,7 @@ public class Roads : MonoBehaviour
     public void UpdateRoad(Road road)
     {
         Mesh m = MeshUtil.GetMesh(road);
-        RoadHumbleObject roadObject = roadMapping[road.Id];
+        RoadObject roadObject = roadMapping[road.Id];
         roadObject.GetComponent<MeshFilter>().mesh = m;
         roadObject.GetComponent<MeshCollider>().sharedMesh = m;
         SetRoadArrow(roadObject);
@@ -124,7 +124,7 @@ public class Roads : MonoBehaviour
         for (int i = 0; i < hitCount; i++)
         {
             RaycastHit hit = hitResults[i];
-            if (hit.collider.gameObject.TryGetComponent<RoadHumbleObject>(out var roadComp))
+            if (hit.collider.gameObject.TryGetComponent<RoadObject>(out var roadComp))
             {
                 if (roadComp.Road.IsGhost)
                     continue;
@@ -150,7 +150,7 @@ public class Roads : MonoBehaviour
         for (int i = 0; i < colliderCount; i++)
         {
             Collider hitCollider = hitColliders[i];
-            if (hitCollider.TryGetComponent<RoadHumbleObject>(out var roadComp))
+            if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))
             {
                 HighLight(roadComp.gameObject);
                 SelectedRoads.Add(roadComp);
@@ -160,7 +160,7 @@ public class Roads : MonoBehaviour
 
     public static void ClearSelected()
     {
-        foreach (RoadHumbleObject g in SelectedRoads)
+        foreach (RoadObject g in SelectedRoads)
             if (g != null)
                 UnHighLight(g.gameObject);
         SelectedRoads.Clear();

@@ -5,6 +5,8 @@
         <ui:TextElement text="Elevation:" name="Elevation"/>
         <ui:TextElement text="Serviced:" name="CarServiced"/>
         <ui:TextElement text="Connectedness: " name="Connectedness"/>
+        <ui:TextElement text="Debug1: " name="Debug1"/>
+        <ui:TextElement text="Debug2: " name="Debug2"/>
         <ui:Foldout text="Roads" name="MyFoldout" value="true">
             <ui:Toggle text="Center" name="RoadCenter" />
             <ui:Toggle text="Lanes" name="RoadLanes" />
