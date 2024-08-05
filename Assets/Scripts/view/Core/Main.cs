@@ -27,6 +27,7 @@ public class Main : MonoBehaviour
         Debug.Log("Seed: " + now);
         // UnityEngine.Random.InitState(1439289702);
 
+        Game.Districts[1].Enable();
         devPanel.gameObject.SetActive(debugMode);
     }
 
@@ -41,7 +42,7 @@ public class Main : MonoBehaviour
             Build.HandleHover(InputSystem.MouseWorldPos);
         }
         frameElapsed++;
-        
+
         if (Game.Districts.Count == 2)
         {
             DevPanel.SetDebug1Text(Game.Districts[1].Connectedness.ToString());

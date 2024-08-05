@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class Zone : IPersistable
 {
@@ -29,5 +32,18 @@ public class Zone : IPersistable
     {
         if (Enabled)
             vertices.Remove(v);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Zone other)
+            return Id == other.Id && Enabled == other.Enabled && vertices.Select(v => Id).SequenceEqual(other.vertices.Select(v => Id));
+        else
+            return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

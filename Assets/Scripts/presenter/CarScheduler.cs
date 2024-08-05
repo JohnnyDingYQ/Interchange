@@ -72,6 +72,7 @@ public static class CarScheduler
         Connectedness = (float) connectionCount / (Game.SourceZones.Count * Game.TargetZones.Count);
         Connectedness = MyNumerics.Round(Connectedness * 100, 3);
         DetermineDistrictConnectedness();
+        Progression.CheckProgression();
     }
 
     static void DetermineDistrictConnectedness()

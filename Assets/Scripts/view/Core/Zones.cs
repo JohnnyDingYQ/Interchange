@@ -7,6 +7,8 @@ public class Zones : MonoBehaviour
 {
     [SerializeField]
     GameObject districts;
+    [SerializeField]
+    ZoneMaterial zoneMaterial;
 
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
@@ -39,6 +41,7 @@ public class Zones : MonoBehaviour
                 sourceZone.name = id.ToString();
                 ZoneObject zoneObject = sourceZone.gameObject.AddComponent<ZoneObject>();
                 zoneObject.Zone = newZone;
+                zoneObject.zoneMaterial = zoneMaterial;
             }
             zoneCount = 1;
             foreach (Transform targetZone in targetZones.transform)
@@ -50,8 +53,9 @@ public class Zones : MonoBehaviour
                 targetZone.name = id.ToString();
                 ZoneObject zoneObject = targetZone.gameObject.AddComponent<ZoneObject>();
                 zoneObject.Zone = newZone;
+                zoneObject.zoneMaterial = zoneMaterial;
             }
-
+            d.Disable();
             districtCount++;
         }
     }

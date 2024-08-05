@@ -582,6 +582,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   districts: {fileID: 467897665}
+  zoneMaterial: {fileID: 11400000, guid: ea70320d92554a4479162c4eaf6b2472, type: 2}
 --- !u!1 &207837833
 GameObject:
   m_ObjectHideFlags: 0
@@ -1645,8 +1646,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 50247580}
   - {fileID: 1781984710}
+  - {fileID: 50247580}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &575485495
