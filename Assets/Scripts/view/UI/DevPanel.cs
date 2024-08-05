@@ -76,7 +76,7 @@ public class DevPanel : MonoBehaviour
 
         stringBuilder.Clear();
         stringBuilder.Append("Connectedness: ");
-        stringBuilder.Append(CarScheduler.Connectedness);
+        stringBuilder.Append(Progression.GlobalConnectedness);
         stringBuilder.Append(" %");
         connectedness.text = stringBuilder.ToString();
     }

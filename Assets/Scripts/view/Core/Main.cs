@@ -16,6 +16,8 @@ public class Main : MonoBehaviour
     CarDriver carDriver;
     [SerializeField]
     ModeToggle modeToggle;
+    [SerializeField]
+    Zones zones;
     uint frameElapsed = 0;
 
     void Start()
@@ -43,11 +45,9 @@ public class Main : MonoBehaviour
         }
         frameElapsed++;
 
-        if (Game.Districts.Count == 2)
-        {
-            DevPanel.SetDebug1Text(Game.Districts[1].Connectedness.ToString());
-            DevPanel.SetDebug2Text(Game.Districts[2].Connectedness.ToString());
-        }
+        DevPanel.SetDebug1Text(Game.Districts[1].Connectedness.ToString());
+        DevPanel.SetDebug2Text(Game.Districts[2].Connectedness.ToString());
+
     }
 
     public static float GetHUDObjectHeight(HUDLayer layer)
@@ -67,7 +67,8 @@ public class Main : MonoBehaviour
             Game.InvokeIntersectionAdded(ix);
             Game.UpdateIntersectionRoads(ix);
         }
-        CarScheduler.DetermineZoneConnectedness();
+        CarScheduler.FindNewConnection();
         modeToggle.SwitchToBuildMode();
+        zones.UpdateZoneObjectReferences();
     }
 }

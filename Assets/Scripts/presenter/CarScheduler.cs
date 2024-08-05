@@ -6,11 +6,12 @@ using Assets.Scripts.model.Roads;
 
 public static class CarScheduler
 {
-    static public float Connectedness { get; set; }
+    public static event Action ConnectionUpdated;
 
     static CarScheduler()
     {
-        Game.RoadRemoved += DetermineZoneConnectedness;
+        Game.RoadRemoved += DeleteMissingConnection;
+        Build.RoadsBuilt += FindNewConnection;
     }
 
     public static void Schedule(float deltaTime)
@@ -32,53 +33,66 @@ public static class CarScheduler
         }
     }
 
-    public static void DetermineZoneConnectedness(Road road)
+    public static void FindNewConnection()
     {
-        if (!road.IsGhost)
-            DetermineZoneConnectedness();
-    }
-
-    public static void DetermineZoneConnectedness()
-    {
-        int connectionCount = 0;
-        foreach (SourceZone source in Game.SourceZones.Values)
-            source.ConnectedTargets.Clear();
-        foreach (TargetZone target in Game.TargetZones.Values)
-            target.ConnectedSources.Clear();
-
+        bool changed = false;
         foreach (SourceZone source in Game.SourceZones.Values)
             foreach (TargetZone target in Game.TargetZones.Values)
-            {
-                bool pathFound = false;
-                foreach (Vertex sourceVertex in source.Vertices)
+                if (!source.ConnectedTargets.ContainsKey(target))
                 {
-                    foreach (Vertex targetVertex in target.Vertices)
+                    IEnumerable<Edge> pathEdges = FindPathSourceToTarget(source, target);
+                    if (pathEdges != null)
                     {
-                        IEnumerable<Edge> edges = Graph.ShortestPathAStar(sourceVertex, targetVertex);
-                        if (edges != null)
-                        {
-                            source.ConnectedTargets.Add(target, edges);
-                            target.ConnectedSources.Add(source);
-                            pathFound = true;
-                            connectionCount++;
-                            break;
-                        }
+                        changed = true;
+                        source.ConnectedTargets.Add(target, pathEdges);
+                        target.ConnectedSources.Add(source);
                     }
-                    if (pathFound)
-                        break;
                 }
-
-            }
-        Connectedness = (float) connectionCount / (Game.SourceZones.Count * Game.TargetZones.Count);
-        Connectedness = MyNumerics.Round(Connectedness * 100, 3);
-        DetermineDistrictConnectedness();
-        Progression.CheckProgression();
+        if (changed)
+        {
+            if (ConnectionUpdated == null)
+                Progression.CheckProgression();
+            ConnectionUpdated.Invoke();
+        }
     }
 
-    static void DetermineDistrictConnectedness()
+    static void DeleteMissingConnection(Road road)
     {
-        foreach (District district in Game.Districts.Values)
-            district.CalculateConnectedness();
+        if (road.IsGhost)
+            return;
+        bool changed = false;
+        foreach (SourceZone source in Game.SourceZones.Values)
+            foreach (TargetZone target in Game.TargetZones.Values)
+                if (source.ConnectedTargets.ContainsKey(target))
+                {
+                    IEnumerable<Edge> pathEdges = FindPathSourceToTarget(source, target);
+                    if (pathEdges == null)
+                    {
+                        changed = true;
+                        source.ConnectedTargets.Remove(target);
+                        target.ConnectedSources.Remove(source);
+                    }
+                }
+        if (changed)
+        {
+            if (ConnectionUpdated == null)
+                Progression.CheckProgression();
+            ConnectionUpdated.Invoke();
+        }
+    }
+
+    static IEnumerable<Edge> FindPathSourceToTarget(SourceZone source, TargetZone target)
+    {
+        foreach (Vertex sourceVertex in source.Vertices)
+        {
+            foreach (Vertex targetVertex in target.Vertices)
+            {
+                IEnumerable<Edge> edges = Graph.ShortestPathAStar(sourceVertex, targetVertex);
+                if (edges != null)
+                    return edges;
+            }
+        }
+        return null;
     }
 
     public static Car AttemptSchedule(Zone source, Zone target)

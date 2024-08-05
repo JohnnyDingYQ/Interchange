@@ -42,6 +42,8 @@ public static class Game
         GameSave = new();
         BuildModeOn = true;
         HoveredRoad = null;
+        HoveredZone = null;
+        HoveredDistrict = null;
     }
 
     public static uint FindNextAvailableKey(ICollection<uint> dict)

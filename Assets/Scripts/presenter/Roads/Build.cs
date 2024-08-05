@@ -15,7 +15,8 @@ public static class Build
     public static int LaneCount { get; set; }
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
-    public static Action<SupportLine> SupportedLineUpdated;
+    public static event Action<SupportLine> SupportedLineUpdated;
+    public static event Action RoadsBuilt;
     public static bool BuildsGhostRoad { get; set; }
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
@@ -46,6 +47,7 @@ public static class Build
         ParallelSpacing = Constants.DefaultParallelSpacing;
         roadEndInZone = false;
         ContinuousBuilding = false;
+        LaneCount = 1;
     }
 
     public static void ResetSelection()
@@ -212,6 +214,7 @@ public static class Build
         }
         else
             ResetSelection();
+        CarScheduler.FindNewConnection();
         return roads;
 
         List<Road> BuildSuggested()
@@ -367,8 +370,9 @@ public static class Build
 
         void HandleZoneConnection()
         {
-            if (LaneCount == 1)
+            if (road.LaneCount == 1)
             {
+                
                 if (startZone is SourceZone && roads.First().StartPos.y == Constants.MinElevation)
                 {
                     startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
@@ -387,7 +391,6 @@ public static class Build
                         .ForEach(l => Game.HoveredZone.RemoveVertex(l.EndVertex));
                 }
             }
-            CarScheduler.DetermineZoneConnectedness();
         }
         #endregion
     }

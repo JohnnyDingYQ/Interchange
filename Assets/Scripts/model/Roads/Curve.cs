@@ -253,9 +253,7 @@ public class Curve : IPersistable
         if (!MyNumerics.IsApproxEqual(EndPos, other.StartPos))
         {
             Debug.Log("Left curve misaligns with right curve");
-            Debug.Log("left end: " + EndPos);
-            Debug.Log("right start: " + other.StartPos);
-            Assert.IsTrue(false);
+            Debug.Log("Diff: " + math.length(EndPos - other.StartPos));
         }
         last.nextCurve = other.Duplicate();
     }

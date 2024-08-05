@@ -19,8 +19,6 @@ public static class SaveSystem
             Graph.CancelBinding();
             Graph.AddVerticesAndEdgeRange(Game.Edges.Values);
             Graph.ApplyBinding();
-
-
             foreach (Curve c in Game.Curves.Values)
                 c.CreateDistanceCache();
             // set inner outline

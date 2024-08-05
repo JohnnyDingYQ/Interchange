@@ -26,4 +26,16 @@ public static class RoadBuilder
         List<Road> roads = Build.HandleBuildCommand(end);
         return roads;
     }
+
+    public static Road ZoneToZone(float3 start, float3 pivot, float3 end, SourceZone source, TargetZone target)
+    {
+        Build.LaneCount = 1;
+        Game.HoveredZone = source;
+        Build.HandleBuildCommand(start);
+        Build.HandleBuildCommand(pivot);
+        Game.HoveredZone = target;
+        Road road = Build.HandleBuildCommand(end).Single();
+        Game.HoveredZone = null;
+        return road;
+    }
 }

@@ -14,7 +14,7 @@ public class DrawGizmos : MonoBehaviour
 
     void Start()
     {
-        InvokeRepeating("Draw", 0f, DrawDuration);
+        // InvokeRepeating("Draw", 0f, DrawDuration);
     }
 
     void Draw()

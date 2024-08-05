@@ -1,14 +1,12 @@
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
-using Unity.Collections;
 using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TriangleNet.Geometry;
 using TriangleNet.Meshing;
-using TriangleNet.Meshing.Algorithm;
 
 
 public class DistrictObject : MonoBehaviour

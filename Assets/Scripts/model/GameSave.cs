@@ -81,6 +81,8 @@ public class GameSave : IPersistable
                             IPersistable item = (IPersistable)itemProperty.GetValue(itemInDict);
                             if (item == null)
                                 continue;
+                            if (item.Id == 0)
+                                throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id is zero");
                             if (!Equals(item, lut[itemProperty.Type()][item.Id]))
                             {
                                 // Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
@@ -93,11 +95,15 @@ public class GameSave : IPersistable
                             if (itemProperty.GetValue(itemInDict) is IEnumerable<IPersistable> collection)
                             {
                                 foreach (IPersistable item in collection)
+                                {
+                                    if (item.Id == 0)
+                                        throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id is zero");
                                     if (!Equals(item, lut[itemProperty.GetGenericCollectionItemType(0)][item.Id]))
                                     {
                                         // Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
                                         return false;
                                     }
+                                }
                             }
                             else
                                 throw new InvalidOperationException();
@@ -124,7 +130,10 @@ public class GameSave : IPersistable
                         return false;
                     foreach (uint key in dict.Keys)
                         if (!Equals(dict[key], otherDict[key]))
+                        {
+                            Debug.Log($"{fieldProperty.Name} does not match");
                             return false;
+                        }
                     continue;
                 }
             }

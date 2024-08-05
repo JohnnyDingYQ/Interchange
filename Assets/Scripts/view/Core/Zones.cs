@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -9,6 +10,7 @@ public class Zones : MonoBehaviour
     GameObject districts;
     [SerializeField]
     ZoneMaterial zoneMaterial;
+    Dictionary<uint, ZoneObject> zoneMapping = new();
 
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
@@ -26,7 +28,7 @@ public class Zones : MonoBehaviour
             Assert.IsTrue(spline.name.Equals("Spline"));
 
             District d = new(districtCount, district.name);
-            Game.Districts[districtCount] = d;
+            Game.Districts[d.Id] = d;
             DistrictObject districtObject = district.gameObject.AddComponent<DistrictObject>();
             districtObject.Init(spline.GetComponent<SplineContainer>());
             districtObject.District = d;
@@ -42,6 +44,7 @@ public class Zones : MonoBehaviour
                 ZoneObject zoneObject = sourceZone.gameObject.AddComponent<ZoneObject>();
                 zoneObject.Zone = newZone;
                 zoneObject.zoneMaterial = zoneMaterial;
+                zoneMapping[id] = zoneObject;
             }
             zoneCount = 1;
             foreach (Transform targetZone in targetZones.transform)
@@ -54,6 +57,7 @@ public class Zones : MonoBehaviour
                 ZoneObject zoneObject = targetZone.gameObject.AddComponent<ZoneObject>();
                 zoneObject.Zone = newZone;
                 zoneObject.zoneMaterial = zoneMaterial;
+                zoneMapping[id] = zoneObject;
             }
             d.Disable();
             districtCount++;
@@ -78,6 +82,17 @@ public class Zones : MonoBehaviour
                 Game.HoveredZone = zoneObject.Zone;
             if (hit.collider.gameObject.TryGetComponent<DistrictObject>(out var districtObject))
                 Game.HoveredDistrict = districtObject.District;
+        }
+    }
+
+    public void UpdateZoneObjectReferences()
+    {
+        foreach (ZoneObject zoneObject in zoneMapping.Values)
+        {
+            if (zoneObject.Zone is SourceZone)
+                zoneObject.Zone = Game.SourceZones[zoneObject.Zone.Id];
+            else
+                zoneObject.Zone = Game.TargetZones[zoneObject.Zone.Id];
         }
     }
 }

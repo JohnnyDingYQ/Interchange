@@ -2911,6 +2911,7 @@ MonoBehaviour:
   intersections: {fileID: 985838739}
   carDriver: {fileID: 1260736909}
   modeToggle: {fileID: 2084363009}
+  zones: {fileID: 190404220}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

@@ -103,7 +103,7 @@ public class ZoneTest
         Game.SourceZones[1].AddVertex(road1.Lanes[0].StartVertex);
         Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
         Game.TargetZones[1].AddVertex(road0.Lanes[0].EndVertex);
-        CarScheduler.DetermineZoneConnectedness();
+        CarScheduler.FindNewConnection();
 
         Assert.AreNotEqual(0, Game.SourceZones[1].ConnectedTargets.Count);
     }
@@ -116,7 +116,7 @@ public class ZoneTest
         Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
         Game.TargetZones[1].AddVertex(road1.Lanes[0].EndVertex);
         Game.TargetZones[1].AddVertex(road0.Lanes[0].EndVertex);
-        CarScheduler.DetermineZoneConnectedness();
+        CarScheduler.FindNewConnection();
 
         Assert.AreNotEqual(0, Game.SourceZones[1].ConnectedTargets.Count);
     }
