@@ -1,20 +1,21 @@
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
-using iShape.Geometry;
-using iShape.Triangulation.Shape.Delaunay;
-using iShape.Geometry.Container;
 using Unity.Collections;
 using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TriangleNet.Geometry;
+using TriangleNet.Meshing;
+using TriangleNet.Meshing.Algorithm;
+
 
 public class DistrictObject : MonoBehaviour
 {
-    private const int DecimalAccuracy = 10;
-    private const float AngleThreshold = 6f;
-    private const float ZoneResolution = 0.1f;
+    private const int DecimalAccuracy = 100;
+    private const float AngleThreshold = 4f;
+    private const float ZoneResolution = 0.15f;
     private const float TangentApproximation = 0.001f;
     public District District { get; set; }
 
@@ -28,7 +29,7 @@ public class DistrictObject : MonoBehaviour
         {
             Spline spline = splineContainer.Splines.First();
             Mesh mesh = new();
-            List<IntVector> verts2D = new();
+            Polygon polygon = new();
             List<Vector3> verts3D = new();
             float length = spline.GetLength();
             int numPoints = (int)(length * ZoneResolution - 1);
@@ -60,29 +61,48 @@ public class DistrictObject : MonoBehaviour
                     prevTangent = tangent;
                 }
             }
-            foreach (Vector3 pos in verts3D)
-                DebugExtension.DebugPoint(pos, Color.black, 15, 10000);
+            // foreach (Vector3 pos in verts3D)
+            //     DebugExtension.DebugPoint(pos, Color.black, 15, 10000);
             // return;
-            NativeArray<IntVector> nativeArray = new(verts2D.ToArray(), Allocator.Temp);
-            PlainShape poly = new(nativeArray, true, Allocator.Temp);
-            NativeArray<int> tris = Triangulation.DelaunayTriangulate(poly, Allocator.Temp);
+            ;
+            var options = new ConstraintOptions() { ConformingDelaunay = true, Convex = false };
+            var qualityOptions = new QualityOptions { MinimumAngle = 20.0f };
+            // GenericMesher genericMesher = new(new SweepLine());
+            IMesh imesh = polygon.Triangulate(options, qualityOptions);
+            // IMesh imesh = genericMesher.Triangulate(polygon, options);
+            var triangles = new List<int>();
+            List<TriangleNet.Geometry.Vertex> vertices = imesh.Vertices.ToList();
+            foreach (var triangle in imesh.Triangles)
+            {
+                // Get vertex indices for each triangle
+                int index0 = vertices.IndexOf(triangle.GetVertex(0));
+                int index1 = vertices.IndexOf(triangle.GetVertex(1));
+                int index2 = vertices.IndexOf(triangle.GetVertex(2));
+
+                triangles.Add(index2);
+                triangles.Add(index1);
+                triangles.Add(index0);
+            }
+            Debug.Log(imesh.Vertices.Count);
+            Debug.Log(verts3D.Count);
+            foreach (TriangleNet.Geometry.Vertex vertex in imesh.Vertices)
+            {
+                verts3D.Add(new((float)vertex.X, 0, (float)vertex.Y));
+            }
             mesh.SetVertices(verts3D);
-            mesh.SetTriangles(tris.ToArray(), 0);
-            nativeArray.Dispose();
-            tris.Dispose();
-            poly.Dispose();
+            mesh.SetTriangles(triangles.ToArray(), 0);
             MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
 
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
-            // gameObject.AddComponent<MeshRenderer>();
+            gameObject.AddComponent<MeshRenderer>();
 
             void AddPoint(float3 pos)
             {
                 // DebugExtension.DebugPoint(pos, Color.cyan, 5, 10000);
-                verts2D.Add(new((long)(pos.x * DecimalAccuracy), (long)(pos.z * DecimalAccuracy)));
-                verts3D.Add(new(pos.x, 0, pos.z));
+                polygon.Add(new(pos.x, pos.z));
+                // polygon.Add(new Segment())
             }
         }
     }

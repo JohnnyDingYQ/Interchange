@@ -12,7 +12,7 @@ public class Zones : MonoBehaviour
 
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
-
+    
     void Awake()
     {
         uint districtCount = 1;
