@@ -10,7 +10,7 @@ public class ZoneObject : MonoBehaviour
 
     public void Init(SplineContainer splineContainer)
     {
-        Mesh mesh = MeshUtil.GetPolygonMesh(splineContainer);
+        Mesh mesh = MeshUtil.GetPolygonMesh(splineContainer, 0.2f);
         MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
         meshCollider.sharedMesh = mesh;
 

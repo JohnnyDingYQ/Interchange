@@ -197,7 +197,7 @@ public class InputSystem : MonoBehaviour
     }
     void Deselect(InputAction.CallbackContext context)
     {
-        Build.ResetSelection();
+        Build.UndoBuildCommand();
         Roads.ClearSelected();
         bulkSelectPerformed = false;
     }

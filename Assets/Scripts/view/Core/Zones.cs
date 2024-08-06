@@ -58,6 +58,7 @@ public class Zones : MonoBehaviour
         void InitZoneObject(GameObject gameObject, Zone newZone)
         {
             ZoneObject zoneObject = gameObject.AddComponent<ZoneObject>();
+            gameObject.name = newZone.Id.ToString();
             zoneObject.Zone = newZone;
             zoneObject.zoneMaterial = zoneMaterial;
             zoneMapping[newZone.Id] = zoneObject;

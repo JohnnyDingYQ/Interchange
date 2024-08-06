@@ -49,6 +49,19 @@ public static class Build
         LaneCount = 1;
     }
 
+    public static void UndoBuildCommand()
+    {
+        if (pivotAssigned)
+        {
+            pivotAssigned = false;
+            return;
+        }
+        if (startAssigned)
+        {
+            ResetSelection();
+        }
+    }
+
     public static void ResetSelection()
     {
         startAssigned = false;
