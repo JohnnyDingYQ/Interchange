@@ -13,7 +13,6 @@ public static class Combine
     {
         if (!CombineIsValid(ix))
         {
-            Debug.Log("invalid");
             return null;
         }
         Road left = ix.InRoads.Single();

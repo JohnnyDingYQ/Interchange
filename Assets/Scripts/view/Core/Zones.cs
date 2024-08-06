@@ -10,7 +10,7 @@ public class Zones : MonoBehaviour
     GameObject districts;
     [SerializeField]
     ZoneMaterial zoneMaterial;
-    Dictionary<uint, ZoneObject> zoneMapping = new();
+    readonly Dictionary<uint, ZoneObject> zoneMapping = new();
 
     private const int MaxRaycastHits = 10;
     private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
@@ -18,50 +18,52 @@ public class Zones : MonoBehaviour
     void Awake()
     {
         uint districtCount = 1;
-        foreach (Transform district in districts.transform)
+        foreach (Transform districtTransform in districts.transform)
         {
-            Transform sourceZones = district.transform.GetChild(0);
-            Transform targetZones = district.transform.GetChild(1);
-            Transform spline = district.transform.GetChild(2);
+            Transform sourceZones = districtTransform.transform.GetChild(0);
+            Transform targetZones = districtTransform.transform.GetChild(1);
+            Transform spline = districtTransform.transform.GetChild(2);
             Assert.IsTrue(sourceZones.name.Equals("Source Zones"));
             Assert.IsTrue(targetZones.name.Equals("Target Zones"));
             Assert.IsTrue(spline.name.Equals("Spline"));
 
-            District d = new(districtCount, district.name);
-            Game.Districts[d.Id] = d;
-            DistrictObject districtObject = district.gameObject.AddComponent<DistrictObject>();
+            District newDistrict = new(districtCount, districtTransform.name);
+            Game.Districts[newDistrict.Id] = newDistrict;
+            DistrictObject districtObject = districtTransform.gameObject.AddComponent<DistrictObject>();
             districtObject.Init(spline.GetComponent<SplineContainer>());
-            districtObject.District = d;
+            districtObject.District = newDistrict;
 
             uint zoneCount = 1;
             foreach (Transform sourceZone in sourceZones.transform)
             {
                 uint id = (zoneCount++ << (Zone.DistrictBitWidth + 1)) + (districtCount << 1);
                 SourceZone newZone = new(id);
-                d.SourceZones.Add(newZone);
+                newDistrict.SourceZones.Add(newZone);
                 Game.SourceZones.Add(id, newZone);
-                sourceZone.name = id.ToString();
-                ZoneObject zoneObject = sourceZone.gameObject.AddComponent<ZoneObject>();
-                zoneObject.Zone = newZone;
-                zoneObject.zoneMaterial = zoneMaterial;
-                zoneMapping[id] = zoneObject;
+                InitZoneObject(sourceZone.gameObject, newZone);
             }
             zoneCount = 1;
             foreach (Transform targetZone in targetZones.transform)
             {
                 uint id = (zoneCount++ << (Zone.DistrictBitWidth + 1)) + (districtCount << 1) + 1;
                 TargetZone newZone = new(id);
-                d.TargetZones.Add(newZone);
+                newDistrict.TargetZones.Add(newZone);
                 Game.TargetZones.Add(id, newZone);
-                targetZone.name = id.ToString();
-                ZoneObject zoneObject = targetZone.gameObject.AddComponent<ZoneObject>();
-                zoneObject.Zone = newZone;
-                zoneObject.zoneMaterial = zoneMaterial;
-                zoneMapping[id] = zoneObject;
+                InitZoneObject(targetZone.gameObject, newZone);
             }
-            d.Disable();
+            newDistrict.Disable();
             districtCount++;
         }
+
+        void InitZoneObject(GameObject gameObject, Zone newZone)
+        {
+            ZoneObject zoneObject = gameObject.AddComponent<ZoneObject>();
+            zoneObject.Zone = newZone;
+            zoneObject.zoneMaterial = zoneMaterial;
+            zoneMapping[newZone.Id] = zoneObject;
+            zoneObject.Init(gameObject.GetComponent<SplineContainer>());
+        }
+
     }
 
     public static void UpdateHoveredZoneAndDistrict()

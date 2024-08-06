@@ -16,7 +16,6 @@ public static class Build
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
     public static event Action<SupportLine> SupportedLineUpdated;
-    public static event Action RoadsBuilt;
     public static bool BuildsGhostRoad { get; set; }
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
@@ -214,7 +213,8 @@ public static class Build
         }
         else
             ResetSelection();
-        CarScheduler.FindNewConnection();
+        if (roads != null)
+            CarScheduler.FindNewConnection();
         return roads;
 
         List<Road> BuildSuggested()

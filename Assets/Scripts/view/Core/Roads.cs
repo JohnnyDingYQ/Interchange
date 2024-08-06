@@ -88,7 +88,7 @@ public class Roads : MonoBehaviour
 
     public void UpdateRoad(Road road)
     {
-        Mesh m = MeshUtil.GetMesh(road);
+        Mesh m = MeshUtil.GetRoadMesh(road);
         RoadObject roadObject = roadMapping[road.Id];
         roadObject.GetComponent<MeshFilter>().mesh = m;
         roadObject.GetComponent<MeshCollider>().sharedMesh = m;

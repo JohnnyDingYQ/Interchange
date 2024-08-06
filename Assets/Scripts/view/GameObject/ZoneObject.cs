@@ -1,10 +1,24 @@
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class ZoneObject : MonoBehaviour
 {
     public ZoneMaterial zoneMaterial;
     public Zone Zone { get; set; }
     bool prev;
+    Renderer meshRenderer;
+
+    public void Init(SplineContainer splineContainer)
+    {
+        Mesh mesh = MeshUtil.GetPolygonMesh(splineContainer);
+        MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+        meshCollider.sharedMesh = mesh;
+
+        MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+        meshFilter.mesh = mesh;
+        meshRenderer = gameObject.AddComponent<MeshRenderer>();
+        UpdateMaterial();
+    }
 
     void Start()
     {
@@ -20,12 +34,11 @@ public class ZoneObject : MonoBehaviour
 
     void UpdateMaterial()
     {
-        Renderer renderer = GetComponent<Renderer>();
         if (!Zone.Enabled)
-            renderer.material = zoneMaterial.DisbaledMaterial;
+            meshRenderer.material = zoneMaterial.DisbaledMaterial;
         else if (Zone is SourceZone)
-            renderer.material = zoneMaterial.SourceMaterial;
+            meshRenderer.material = zoneMaterial.SourceMaterial;
         else if (Zone is TargetZone)
-            renderer.material = zoneMaterial.TargetMaterial;
+            meshRenderer.material = zoneMaterial.TargetMaterial;
     }
 }

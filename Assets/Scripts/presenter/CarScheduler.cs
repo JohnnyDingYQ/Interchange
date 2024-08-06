@@ -11,7 +11,6 @@ public static class CarScheduler
     static CarScheduler()
     {
         Game.RoadRemoved += DeleteMissingConnection;
-        Build.RoadsBuilt += FindNewConnection;
     }
 
     public static void Schedule(float deltaTime)

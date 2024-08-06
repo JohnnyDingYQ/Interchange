@@ -12,5 +12,5 @@ for i = 1:numel(img)
     end
 end
 % img = imbilatfilt(img);
-% imshow(img);
+imshow(img);
 imwrite(img, "out.png", "png");
