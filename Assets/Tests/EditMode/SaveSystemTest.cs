@@ -6,6 +6,8 @@ using UnityEngine;
 public class SaveSystemTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
+    static readonly string saveName = "testSave";
+    SaveSystem testSaveSystem = new(saveName);
 
     [SetUp]
     public void SetUp()
@@ -19,7 +21,7 @@ public class SaveSystemTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Vertex original = road.Lanes[0].StartVertex;
 
-        Storage storage = new();
+        Storage storage = new(saveName);
         int writtenBytes = storage.Save(original);
         Vertex loaded = new();
         int readBytes = storage.Load(loaded);
@@ -36,7 +38,7 @@ public class SaveSystemTest
         original = original.AddEndDistance(Constants.MinLaneLength / 5);
         original.Offset(3);
         original.Id = 5;
-        Storage storage = new();
+        Storage storage = new(saveName);
         storage.Save(original);
         Curve loaded = new();
         storage.Load(loaded);
@@ -50,7 +52,7 @@ public class SaveSystemTest
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Intersection original = road.EndIntersection;
-        Storage storage = new();
+        Storage storage = new(saveName);
         storage.Save(original);
         Intersection loaded = new();
         storage.Load(loaded);
@@ -72,8 +74,8 @@ public class SaveSystemTest
         RoadBuilder.Single(0, stride, 2 * stride, 1);
 
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -82,8 +84,8 @@ public class SaveSystemTest
     {
         RoadBuilder.Single(0, stride, 2 * stride, 3);
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -94,8 +96,8 @@ public class SaveSystemTest
         RoadBuilder.Single(3 * stride, 4 * stride, 5 * stride, 1);
 
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -106,8 +108,8 @@ public class SaveSystemTest
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -119,8 +121,8 @@ public class SaveSystemTest
         RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
 
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -132,8 +134,8 @@ public class SaveSystemTest
         RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
         RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -145,8 +147,8 @@ public class SaveSystemTest
         Game.RemoveRoad(road1);
 
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -155,8 +157,8 @@ public class SaveSystemTest
     {
         RoadBuilder.Single(0, stride, 2 * stride, 1);
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
         RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
@@ -174,8 +176,8 @@ public class SaveSystemTest
         Build.HandleBuildCommand(stride);
         Assert.AreEqual(3, Game.Roads.Values.Single().Lanes.Count);
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
     }
 
@@ -185,8 +187,8 @@ public class SaveSystemTest
         Game.SourceZones.Add(1, new(1));
         Game.TargetZones.Add(1, new(1));
         GameSave oldSave = Game.GameSave;
-        SaveSystem.SaveGame();
-        SaveSystem.LoadGame();
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
         Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
 
@@ -196,5 +198,20 @@ public class SaveSystemTest
         Assert.AreSame(road.Lanes[0].StartVertex, Game.SourceZones[1].Vertices.Single());
         Assert.AreSame(road.Lanes[0].EndVertex, Game.TargetZones[1].Vertices.Single());
         Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
+    }
+
+    [Test]
+    public void CombineAndSaveLoad()
+    {
+        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road combined = Combine.CombineRoads(left.EndIntersection);
+
+
+        GameSave oldSave = Game.GameSave;
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
+        Assert.AreEqual(oldSave, Game.GameSave);
+
     }
 }

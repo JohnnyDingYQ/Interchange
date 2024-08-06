@@ -26,7 +26,8 @@ public class CombineRoadsTest
         Assert.AreSame(combined, left);
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
-        Assert.AreEqual(1, Game.Edges.Count);
+        Assert.AreEqual(0, Game.Edges.Count);
+        Assert.AreEqual(1, Graph.EdgeCount);
         Assert.AreEqual(2, Game.Nodes.Count);
         Assert.AreEqual(1, Game.Lanes.Count);
         Assert.True(Game.Nodes.Values.Contains(combined.Lanes[0].StartNode));
@@ -66,7 +67,8 @@ public class CombineRoadsTest
 
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
-        Assert.AreEqual(1, Game.Edges.Count);
+        Assert.AreEqual(1, Graph.EdgeCount);
+        Assert.AreEqual(0, Game.Edges.Count);
         Assert.AreEqual(2, Game.Nodes.Count);
         Assert.AreEqual(2, Game.Vertices.Count);
     }

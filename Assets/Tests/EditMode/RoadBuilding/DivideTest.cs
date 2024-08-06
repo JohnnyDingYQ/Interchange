@@ -214,7 +214,7 @@ public class DivideTest
                 if (Math.Abs(i - j) < 2)
                 {
                     Assert.True(Graph.ContainsEdge(subRoads.Left.Lanes[i], subRoads.Right.Lanes[j]));
-                    Assert.NotNull(Graph.ShortestPathAStar(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
+                    Assert.NotNull(Graph.AStar(subRoads.Left.Lanes[i].StartVertex, subRoads.Right.Lanes[j].EndVertex));
                 }
     }
 

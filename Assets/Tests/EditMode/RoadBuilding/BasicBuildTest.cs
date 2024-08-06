@@ -29,7 +29,6 @@ public class BasicBuildTest
 
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(1, road.Lanes.Count);
-        Assert.AreEqual(3, Game.Curves.Count);
         Assert.True(MyNumerics.IsApproxEqual(0, lane.StartNode.Pos));
         Assert.True(MyNumerics.IsApproxEqual(2 * stride, lane.EndNode.Pos));
         Assert.True(Game.Nodes.ContainsKey(lane.StartNode.Id));
@@ -55,7 +54,6 @@ public class BasicBuildTest
         Assert.AreEqual(2, road.Lanes.Count);
         Assert.AreEqual(new float3(0), road.StartPos);
         Assert.AreEqual(2 * stride, road.EndPos);
-        Assert.AreEqual(5, Game.Curves.Count);
         Assert.True(Game.Nodes.ContainsKey(lane0.StartNode.Id));
         Assert.True(Game.Nodes.ContainsKey(lane0.EndNode.Id));
         Assert.True(Game.Nodes.ContainsKey(lane1.StartNode.Id));
@@ -197,28 +195,6 @@ public class BasicBuildTest
         );
 
         Assert.AreEqual(2, Game.Roads.Count);
-    }
-
-    [Test]
-    public void BadSegmentRatio()
-    {
-        Road road1 = RoadBuilder.Single(
-            0,
-            new(0, 0, Constants.MinLaneLength),
-            new(0, 0, Constants.MinLaneLength + Constants.MinLaneLength * (Constants.MinSegmentRatio - 0.01f)),
-            1
-        );
-
-        Road road2 = RoadBuilder.Single(
-            0,
-            new(0, 0, Constants.MinLaneLength  * (Constants.MinSegmentRatio - 0.01f)),
-            new(0, 0, Constants.MinLaneLength  * (Constants.MinSegmentRatio - 0.01f) + Constants.MinLaneLength),
-            1
-        );
-
-        Assert.Null(road1);
-        Assert.Null(road2);
-        Assert.AreEqual(0, Game.Roads.Count);
     }
 
     [Test]

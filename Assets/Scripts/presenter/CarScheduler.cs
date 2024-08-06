@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Assets.Scripts.model.Roads;
+using QuikGraph;
 
 public static class CarScheduler
 {
@@ -32,21 +33,29 @@ public static class CarScheduler
         }
     }
 
+
     public static void FindNewConnection()
     {
         bool changed = false;
         foreach (SourceZone source in Game.SourceZones.Values)
-            foreach (TargetZone target in Game.TargetZones.Values)
-                if (!source.ConnectedTargets.ContainsKey(target))
-                {
-                    IEnumerable<Edge> pathEdges = FindPathSourceToTarget(source, target);
-                    if (pathEdges != null)
+        {
+            foreach (Vertex startV in source.Vertices)
+            {
+                TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
+                foreach (TargetZone target in Game.TargetZones.Values.Where(z => !source.ConnectedTargets.ContainsKey(z)))
+                    foreach (Vertex endV in target.Vertices)
                     {
-                        changed = true;
-                        source.ConnectedTargets.Add(target, pathEdges);
-                        target.ConnectedSources.Add(source);
+                        tryFunc(endV, out IEnumerable<Edge> pathEdges);
+                        if (pathEdges != null)
+                        {
+                            changed = true;
+                            source.ConnectedTargets.Add(target, pathEdges);
+                            target.ConnectedSources.Add(source);
+                            break;
+                        }
                     }
-                }
+            }
+        }
         if (changed)
         {
             if (ConnectionUpdated == null)
@@ -60,18 +69,29 @@ public static class CarScheduler
         if (road.IsGhost)
             return;
         bool changed = false;
-        foreach (SourceZone source in Game.SourceZones.Values)
-            foreach (TargetZone target in Game.TargetZones.Values)
-                if (source.ConnectedTargets.ContainsKey(target))
-                {
-                    IEnumerable<Edge> pathEdges = FindPathSourceToTarget(source, target);
-                    if (pathEdges == null)
+        foreach (SourceZone source in Game.SourceZones.Values.Where(z => z.ConnectedTargets.Count != 0))
+        {
+            HashSet<TargetZone> unfoundTargets = source.ConnectedTargets.Keys.ToHashSet();
+            foreach (Vertex startV in source.Vertices)
+            {
+                TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
+                foreach (TargetZone target in source.ConnectedTargets.Keys)
+                    foreach (Vertex endV in target.Vertices)
                     {
-                        changed = true;
-                        source.ConnectedTargets.Remove(target);
-                        target.ConnectedSources.Remove(source);
+                        tryFunc(endV, out IEnumerable<Edge> pathEdges);
+                        if (pathEdges != null)
+                            unfoundTargets.Remove(target);
+                        
                     }
-                }
+            }
+            foreach (TargetZone unfound in unfoundTargets)
+            {
+                changed = true;
+                source.ConnectedTargets.Remove(unfound);
+                unfound.ConnectedSources.Remove(source);
+            }
+        }
+
         if (changed)
         {
             if (ConnectionUpdated == null)
@@ -86,7 +106,7 @@ public static class CarScheduler
         {
             foreach (Vertex targetVertex in target.Vertices)
             {
-                IEnumerable<Edge> edges = Graph.ShortestPathAStar(sourceVertex, targetVertex);
+                IEnumerable<Edge> edges = Graph.AStar(sourceVertex, targetVertex);
                 if (edges != null)
                     return edges;
             }
@@ -105,7 +125,7 @@ public static class CarScheduler
 
     public static Car AttemptSchedule(Vertex origin, Vertex dest)
     {
-        IEnumerable<Edge> edges = Graph.ShortestPathAStar(origin, dest);
+        IEnumerable<Edge> edges = Graph.AStar(origin, dest);
         Car car = new(new(edges));
         return car;
     }

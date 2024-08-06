@@ -50,7 +50,7 @@ public class RemoveRoadTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Assert.True(Game.RemoveRoad(road));
-        Assert.AreEqual(0, Game.Edges.Count);
+        Assert.AreEqual(0, Graph.EdgeCount);
     }
 
     [Test]
@@ -83,7 +83,7 @@ public class RemoveRoadTest
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Game.RemoveRoad(road1);
 
-        Assert.AreEqual(3, Game.Edges.Count);
+        Assert.AreEqual(3, Graph.EdgeCount);
     }
 
     [Test]
@@ -92,17 +92,17 @@ public class RemoveRoadTest
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes[0].EndPos - road1.EndPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
-        Assert.AreEqual(5, Game.Edges.Count);
+        Assert.AreEqual(5, Graph.EdgeCount);
         Road road3 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.AreEqual(6, Game.Edges.Count);
+        Assert.AreEqual(6, Graph.EdgeCount);
 
         Assert.True(Game.RemoveRoad(road3));
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[0]));
-        Assert.AreEqual(5, Game.Edges.Count);
+        Assert.AreEqual(5, Graph.EdgeCount);
 
         Assert.True(Game.RemoveRoad(road2));
-        Assert.AreEqual(2, Game.Edges.Count);
+        Assert.AreEqual(2, Graph.EdgeCount);
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class RemoveRoadTest
         Assert.True(Graph.ContainsEdge(road2.Lanes[0], road1.Lanes[1]));
 
         Assert.True(Game.RemoveRoad(road2));
-        Assert.AreEqual(2, Game.Edges.Count);
+        Assert.AreEqual(2, Graph.EdgeCount);
     }
 
     [Test]

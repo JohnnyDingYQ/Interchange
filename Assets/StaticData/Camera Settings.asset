@@ -16,14 +16,23 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0009613037
-      value: 0.013977051
+      time: -0.0008544922
+      value: 0.0066223145
       inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 0.17634238
+      value: 0.073115855
+      inSlope: 0.3053542
+      outSlope: 0.3053542
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1.0054932
       value: 0.2467804
@@ -61,6 +70,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   MaxHeight: 2500
-  ZoomMultiplier: 180
+  ZoomMultiplier: 220
   PanMultiplier: 3750
   driftDecayExponentMultiplier: 14

@@ -160,7 +160,15 @@ public static class Build
                         StartTarget = Snapping.Snap(startPos, LaneCount, Side.Start);
                     }
                     else if (StartTarget.Snapped)
-                        pivotPos = Vector3.Lerp(StartTarget.Pos, EndTarget.Pos, 0.5f);
+                    {
+                        if (MyNumerics.Get2DVectorsIntersection(
+                            StartTarget.Pos.xz, StartTarget.Tangent.xz,
+                            EndTarget.Pos.xz, -EndTarget.Tangent.xz,
+                            out Vector2 pt))
+                            pivotPos = new(pt.x, (StartTarget.Pos.y + EndTarget.Pos.y) / 2, pt.y);
+                        else
+                            pivotPos = Vector3.Lerp(StartTarget.Pos, EndTarget.Pos, 0.5f);
+                    }
                     else
                         pivotPos = AlignPivot(EndTarget, pivotPos);
                 }
@@ -286,7 +294,7 @@ public static class Build
     {
         float3 startPos = startTarget.Pos;
         float3 endPos = endTarget.Pos;
-        if (RoadIsTooBent() || BadSegmentRatio())
+        if (RoadIsTooBent())
             return null;
         Road road = new(GetCurve(), LaneCount);
         if (road.HasLaneShorterThanMinLaneLength())
@@ -305,14 +313,6 @@ public static class Build
             if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
                 return true;
             return false;
-        }
-
-        bool BadSegmentRatio()
-        {
-            float segA = math.length(pivotPos - startPos);
-            float segB = math.length(pivotPos - endPos);
-            float ratio = segA > segB ? segB / segA : segA / segB;
-            return ratio < Constants.MinSegmentRatio;
         }
     }
 
@@ -385,7 +385,7 @@ public static class Build
         {
             if (road.LaneCount == 1)
             {
-                
+
                 if (startZone is SourceZone && roads.First().StartPos.y == Constants.MinElevation)
                 {
                     startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
@@ -443,7 +443,7 @@ public static class Build
             float3 projection = math.project(p - buildTarget.Pos, buildTarget.Tangent);
             if (math.dot(buildTarget.Tangent, projection) < 0 && buildTarget.Side == Side.Start)
                 projection = 0;
-            p =  projection + buildTarget.Pos;
+            p = projection + buildTarget.Pos;
         }
         else
             return p;

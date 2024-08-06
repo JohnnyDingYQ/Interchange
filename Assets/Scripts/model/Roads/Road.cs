@@ -54,9 +54,12 @@ public class Road : IPersistable
 
     private void InitRoad()
     {
-        InitLanes();
+        Lanes = new();
+        for (int i = 0; i < LaneCount; i++)
+            Lanes.Add(new(this, i));
         if (HasLaneShorterThanMinLaneLength())
             return;
+    
         foreach (Lane l in Lanes)
         {
             l.InitNodes();
@@ -104,13 +107,6 @@ public class Road : IPersistable
         return false;
     }
 
-    void InitLanes()
-    {
-        Lanes = new();
-        for (int i = 0; i < LaneCount; i++)
-            Lanes.Add(new(this, i));
-    }
-
     public bool DistanceBetweenVertices(float distance)
     {
         return distance >= Constants.VertexDistanceFromRoadEnds && (Length - distance) >= Constants.VertexDistanceFromRoadEnds;
@@ -131,8 +127,7 @@ public class Road : IPersistable
             return Id == other.Id && IPersistable.Equals(Curve, other.Curve) && LaneCount == other.LaneCount
                 && Lanes.Select(l => l.Id).SequenceEqual(other.Lanes.Select(l => l.Id))
                 && IPersistable.Equals(StartIntersection, other.StartIntersection)
-                && IPersistable.Equals(EndIntersection, other.EndIntersection)
-                && Equals(LeftOutline, other.LeftOutline) && Equals(RightOutline, other.RightOutline);
+                && IPersistable.Equals(EndIntersection, other.EndIntersection);
         }
         else
             return false;

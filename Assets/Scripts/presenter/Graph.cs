@@ -10,6 +10,8 @@ using Assets.Scripts.model.Roads;
 public static class Graph
 {
     private static AdjacencyGraph<Vertex, Edge> graph = new();
+    public static int EdgeCount { get => graph.EdgeCount; }
+    public static int VertexCount { get => graph.VertexCount; }
 
 
     static Graph()
@@ -35,11 +37,15 @@ public static class Graph
 
     static void RegisterVertex(Vertex v)
     {
+        if (Game.Vertices.ContainsKey(v.Id))
+            return;
         Game.Vertices[v.Id] = v;
     }
 
     static void RegisterEdge(Edge edge)
     {
+        if (Game.Edges.ContainsKey(edge.Id))
+            return;
         Game.Edges[edge.Id] = edge;
         Game.RegisterCurve(edge.Curve);
     }
@@ -77,11 +83,15 @@ public static class Graph
 
     public static bool RemoveVertex(Vertex v)
     {
+        if (v.Id == 0)
+            return false;
         return graph.RemoveVertex(v);
     }
 
     public static bool RemoveEdge(Edge p)
     {
+        if (p.Id == 0)
+            return false;
         return graph.RemoveEdge(p);
     }
 
@@ -118,7 +128,7 @@ public static class Graph
         return edges.ToList();
     }
 
-    public static IEnumerable<Edge> ShortestPathAStar(Vertex start, Vertex end)
+    public static IEnumerable<Edge> AStar(Vertex start, Vertex end)
     {
         Assert.IsNotNull(start);
         Assert.IsNotNull(end);
@@ -129,6 +139,16 @@ public static class Graph
         );
         tryFunc(end, out IEnumerable<Edge> edges);
         return edges;
+    }
+
+    public static TryFunc<Vertex, IEnumerable<Edge>> GetAStarTryFunc(Vertex start)
+    {
+        Assert.IsNotNull(start);
+        return graph.ShortestPathsAStar(
+            (Edge p) => p.Length,
+            (Vertex to) => math.distance(start.Pos, to.Pos),
+            start
+        );
     }
 
     public static List<Edge> GetInEdges(Vertex vertex)

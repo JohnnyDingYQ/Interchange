@@ -82,8 +82,10 @@ public class RoadOutline : IEnumerable<float3>
 
     public override bool Equals(object obj)
     {
-        if (obj is RoadOutline other)    
+        if (obj is RoadOutline other)
+        {
             return Equals(StartCurve, other.StartCurve) && Equals(MidCurve, other.MidCurve) && Equals(EndCurve, other.EndCurve);
+        }
         else
             return false;
     }

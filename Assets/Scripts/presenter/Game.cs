@@ -63,9 +63,12 @@ public static class Game
             Graph.AddVertex(lane.StartVertex);
             Graph.AddVertex(lane.EndVertex);
             if (!road.IsGhost)
+            {
+                Graph.CancelBinding();
                 Graph.AddEdge(lane.InnerEdge);
+                Graph.ApplyBinding();
+            }
             RegisterLane(lane);
-            RegisterCurve(lane.Curve);
         }
         RegisterIntersection(road.StartIntersection);
         RegisterIntersection(road.EndIntersection);
@@ -76,7 +79,10 @@ public static class Game
     public static void RegisterCurve(Curve curve)
     {
         if (curve.Id != 0)
-            return;
+            if (curve.GetNextCurve() != null)
+                RegisterCurve(curve.GetNextCurve());
+            else
+                return;
         curve.Id = FindNextAvailableKey(Curves.Keys);
         Curves[curve.Id] = curve;
         if (curve.GetNextCurve() != null)
@@ -116,11 +122,10 @@ public static class Game
 
     public static void RegisterLane(Lane lane)
     {
-        if (!Lanes.Values.Contains(lane))
-        {
-            lane.Id = FindNextAvailableKey(Lanes.Keys);
-            Lanes[lane.Id] = lane;
-        }
+        if (lane.Id != 0)
+            return;
+        lane.Id = FindNextAvailableKey(Lanes.Keys);
+        Lanes[lane.Id] = lane;
     }
 
     public static void RemoveLane(Lane lane)
@@ -128,7 +133,6 @@ public static class Game
         Assert.IsTrue(Lanes.Keys.Contains(lane.Id));
         Lanes.Remove(lane.Id);
         lane.Id = 0;
-        RemoveCurve(lane.Curve);
     }
 
     public static void RegisterNode(Node node)

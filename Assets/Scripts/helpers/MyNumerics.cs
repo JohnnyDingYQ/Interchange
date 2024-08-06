@@ -33,6 +33,11 @@ public static class MyNumerics
         return MathF.Acos(math.dot(a, b) / math.length(a) / math.length(b)) / MathF.PI * 180;
     }
 
+    public static float AngleInDegrees(float2 a, float2 b)
+    {
+        return AngleInDegrees(new float3(a.x, 0, a.y), new float3(b.x, 0, b.y));
+    }
+
     public static int GetRandomIndex(int length)
     {
         Assert.AreNotEqual(0, length);
@@ -40,11 +45,24 @@ public static class MyNumerics
         return index != length ? index : GetRandomIndex(length);
     }
 
-    public static float2 Get2DVectorsIntersection(Vector2 p1, Vector2 v1, Vector2 p2, Vector2 v2)
+    public static bool Get2DVectorsIntersection(Vector2 p1, Vector2 v1, Vector2 p2, Vector2 v2, out Vector2 pos)
     {
-        Assert.IsFalse(Vector2.Distance(math.normalize(v1), math.normalize(v2)) < 0.01f);
+        float angle = AngleInDegrees(v1, v2);
+        if (angle > 179.5f || angle < 0.5f)
+        {
+            pos = new(0, 0);
+            return false;
+        }
         float t2 = (p1.y * v1.x + p2.x * v1.y - p1.x * v1.y - p2.y * v1.x) / (v2.y * v1.x - v2.x * v1.y);
-        return p2 + t2 * v2;
+        pos = p2 + t2 * v2;
+        float t1 = (pos.x - p1.x) / v1.x;
+        if (t2 < 0 || t1 < 0)
+        {
+            pos = new(0, 0);
+            return false;
+        }
+        return true;
+        
     }
 
     public static float Round(float n, int places)

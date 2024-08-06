@@ -81,8 +81,8 @@ public class GameSave : IPersistable
                             IPersistable item = (IPersistable)itemProperty.GetValue(itemInDict);
                             if (item == null)
                                 continue;
-                            if (item.Id == 0)
-                                throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id is zero");
+                            if (item.Id == 0 || !lut[itemProperty.Type()].ContainsKey(item.Id))
+                                throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id {item.Id} does not exist");
                             if (!Equals(item, lut[itemProperty.Type()][item.Id]))
                             {
                                 // Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
@@ -96,8 +96,8 @@ public class GameSave : IPersistable
                             {
                                 foreach (IPersistable item in collection)
                                 {
-                                    if (item.Id == 0)
-                                        throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id is zero");
+                                    if (item.Id == 0 || !lut[itemProperty.GetGenericCollectionItemType(0)].ContainsKey(item.Id))
+                                        throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id {item.Id} does not exist");
                                     if (!Equals(item, lut[itemProperty.GetGenericCollectionItemType(0)][item.Id]))
                                     {
                                         // Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");

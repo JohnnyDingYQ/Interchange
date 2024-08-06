@@ -70,7 +70,7 @@ public class EdgeTest
         foreach (Edge p in Game.Edges.Values)
             Assert.True(p.Curve.Length <= road1.Curve.Length);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[i]));
     }
@@ -84,7 +84,7 @@ public class EdgeTest
         foreach (Edge p in Game.Edges.Values)
             Assert.True(p.Curve.Length <= road1.Curve.Length);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
     }
@@ -96,20 +96,20 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
-        Assert.AreEqual(8, Game.Edges.Count);
+        Assert.AreEqual(8, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road4.Lanes[0]));
@@ -122,20 +122,20 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
 
         Road road3 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
-        Assert.AreEqual(8, Game.Edges.Count);
+        Assert.AreEqual(8, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road2.Lanes[0]));
 
         Road road4 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road4.Lanes[0]));
@@ -148,17 +148,17 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().EndPos - road1.EndPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride , 1);
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road4.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road3.Lanes[0]));
@@ -171,20 +171,20 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
-        Assert.AreEqual(8, Game.Edges.Count);
+        Assert.AreEqual(8, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road4.Lanes[0]));
@@ -197,20 +197,20 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         Road road2 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
 
         Road road3 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
-        Assert.AreEqual(8, Game.Edges.Count);
+        Assert.AreEqual(8, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road2.Lanes[0]));
 
         Road road4 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
 
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road3.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road4.Lanes[0]));
@@ -223,17 +223,17 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 1);
 
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         for (int i = 0; i < 3; i++)
             Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[0]));
         
         Road road3 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 1);
-        Assert.AreEqual(7, Game.Edges.Count);
+        Assert.AreEqual(7, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road3.Lanes[0]));
 
         Road road4 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road4.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road3.Lanes[0]));
@@ -246,14 +246,14 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset * 2, 3 * stride + offset * 2, 4 * stride + offset * 2, 2);
 
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[1]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[1]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road2.Lanes[1]));
 
         Road road3 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
-        Assert.AreEqual(13, Game.Edges.Count);
+        Assert.AreEqual(13, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[1]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road3.Lanes[0]));
@@ -269,14 +269,14 @@ public class EdgeTest
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
         Road road2 = RoadBuilder.Single(2 * stride + offset * 2, 3 * stride + offset * 2, 4 * stride + offset * 2, 2);
 
-        Assert.AreEqual(9, Game.Edges.Count);
+        Assert.AreEqual(9, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[1]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road2.Lanes[1]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[2], road2.Lanes[1]));
 
         Road road3 = RoadBuilder.Single(2 * stride - offset, 3 * stride - offset, 4 * stride - offset, 2);
-        Assert.AreEqual(13, Game.Edges.Count);
+        Assert.AreEqual(13, Graph.EdgeCount);
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[0]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[0], road2.Lanes[1]));
         Assert.True(Graph.ContainsEdge(road1.Lanes[1], road3.Lanes[0]));

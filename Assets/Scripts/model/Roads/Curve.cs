@@ -403,10 +403,6 @@ public class Curve : IPersistable
         return bCurve;
     }
 
-    public float GetOffset()
-    {
-        return startDistance;
-    }
 
     public override bool Equals(object obj)
     {

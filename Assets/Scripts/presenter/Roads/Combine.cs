@@ -19,6 +19,8 @@ public static class Combine
         Road right = ix.OutRoads.Single();
 
         left.Curve.Add(right.Curve);
+        
+        Game.RegisterCurve(left.Curve.GetNextCurve());
         left.EndIntersection = right.EndIntersection;
         left.EndIntersection.RemoveRoad(right, Direction.In);
 
@@ -32,8 +34,11 @@ public static class Combine
             Graph.RemoveVertex(left.Lanes[i].EndVertex);
             Graph.RemoveVertex(right.Lanes[i].StartVertex);
             left.Lanes[i].EndVertex = right.Lanes[i].EndVertex;
+            left.Lanes[i].EndVertex.Lane = left.Lanes[i];
             left.Lanes[i].InitInnerEdge();
+            Graph.CancelBinding();
             Graph.AddEdge(left.Lanes[i].InnerEdge);
+            Graph.ApplyBinding();
         }
 
         left.SetInnerOutline();
@@ -48,8 +53,6 @@ public static class Combine
         }
         left.EndIntersection.AddRoad(left, Direction.In);
         Game.UpdateIntersectionRoads(left.StartIntersection);
-
-        // Debug.Log(left.Curve.GetChainLength());
         return left;
 
     }

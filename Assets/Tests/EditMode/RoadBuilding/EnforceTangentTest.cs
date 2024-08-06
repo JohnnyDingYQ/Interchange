@@ -7,6 +7,8 @@ using UnityEngine;
 public class EnforcesTangentTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
+    float3 up = new(0, 0, Constants.MinLaneLength);
+    float3 right = new(Constants.MinLaneLength, 0, 0);
     [SetUp]
     public void SetUp()
     {
@@ -35,13 +37,22 @@ public class EnforcesTangentTest
     }
 
     [Test]
-    public void EnforcesTangentAtBothEnds()
+    public void EnforcesTangentAtBothEndsParallel()
     {
-        float3 up = new(0, 0, Constants.MinLaneLength);
-        float3 offset = new(Constants.MinLaneLength, 0, 0);
         Road start = RoadBuilder.Single(0, up, 2 * up, 1);
-        Road end = RoadBuilder.Single(offset + 3 * up, offset + 4 * up, offset + 5 * up, 1);
-        Road mid = RoadBuilder.Single(2 * up, Vector3.Lerp(2 * up, offset + 3 * up, 0.5f), offset + 3 * up, 1);
+        Road end = RoadBuilder.Single(right + 3 * up, right + 4 * up, right + 5 * up, 1);
+        Road mid = RoadBuilder.Single(2 * up, Vector3.Lerp(2 * up, right + 3 * up, 0.5f), right + 3 * up, 1);
+
+        Assert.True(MyNumerics.IsApproxEqual(start.Curve.EndTangent, mid.Curve.StartTangent));
+        Assert.True(MyNumerics.IsApproxEqual(mid.Curve.EndTangent, end.Curve.StartTangent));
+    }
+
+    [Test]
+    public void EnforcesTangentAtBothEndsRightAngle()
+    {
+        Road start = RoadBuilder.Single(-2 * up, -up, 0, 1);
+        Road end = RoadBuilder.Single(2 * up + 2 * right, 2 * up + 3 * right, 2 * up + 4 * right, 1);
+        Road mid = RoadBuilder.Single(0, math.lerp(0, 2 * up + 2 * right, 0.5f) ,2 * up + 2 * right, 1);
 
         Assert.True(MyNumerics.IsApproxEqual(start.Curve.EndTangent, mid.Curve.StartTangent));
         Assert.True(MyNumerics.IsApproxEqual(mid.Curve.EndTangent, end.Curve.StartTangent));
@@ -50,8 +61,6 @@ public class EnforcesTangentTest
     [Test]
     public void StraightModeAtStart()
     {
-        float3 up = new(0, 0, Constants.MinLaneLength);
-        float3 right = new(Constants.MinLaneLength, 0, 0);
         Road other = RoadBuilder.Single(2 * right + 2 * up, 2 * right + 3 * up, 2 * right + 4 * up, 1);
         Build.StraightMode = true;
         Road straight = RoadBuilder.Single(0, right + up, 2 * right + 2 * up, 1);
@@ -63,8 +72,6 @@ public class EnforcesTangentTest
     [Test]
     public void StraightModeAtEnd()
     {
-        float3 up = new(0, 0, Constants.MinLaneLength);
-        float3 right = new(Constants.MinLaneLength, 0, 0);
         Road other = RoadBuilder.Single(0, right + up, 2 * right + 2 * up, 1);
         Build.StraightMode = true;
         Road straight = RoadBuilder.Single(2 * right + 2 * up, 2 * right + 3 * up, 2 * right + 4 * up, 1);

@@ -17,10 +17,10 @@ public class Lane : IPersistable
     [SaveID]
     public Node EndNode { get; set; }
     [SaveID]
-    public Curve Curve { get; set; }
-    [SaveID]
     public Road Road { get; set; }
-    [SaveID]
+    [NotSaved]
+    public Curve Curve { get; set; }
+    [NotSaved]
     public Edge InnerEdge { get; set; }
     [NotSaved]
     public float3 StartPos { get => StartNode.Pos; }
@@ -79,7 +79,7 @@ public class Lane : IPersistable
             return Id == other.Id && IPersistable.Equals(StartVertex, other.StartVertex) && IPersistable.Equals(EndVertex, other.EndVertex)
                 && IPersistable.Equals(StartNode, other.StartNode) && IPersistable.Equals(EndNode, other.EndNode)
                 && IPersistable.Equals(Curve, other.Curve) && IPersistable.Equals(Road, other.Road)
-                && LaneIndex == other.LaneIndex && IPersistable.Equals(InnerEdge, other.InnerEdge);
+                && LaneIndex == other.LaneIndex;
         else
             return false;
     }

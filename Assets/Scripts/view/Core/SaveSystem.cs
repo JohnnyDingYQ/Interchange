@@ -1,14 +1,20 @@
-using System.Linq;
-using Unity.Mathematics;
+using Assets.Scripts.model.Roads;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public static class SaveSystem
+public class SaveSystem
 {
-    public static int LoadGame()
+    string filename;
+
+    public SaveSystem(string fName)
+    {
+        filename = fName;
+    }
+
+    public int LoadGame()
     {
         Game.WipeState();
-        Storage storage = new();
+        Storage storage = new(filename);
         int loadedBytes = storage.Load(Game.GameSave);
         InitializeGameSave();
         Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
@@ -16,25 +22,40 @@ public static class SaveSystem
 
         static void InitializeGameSave()
         {
-            Graph.CancelBinding();
-            Graph.AddVerticesAndEdgeRange(Game.Edges.Values);
-            Graph.ApplyBinding();
+
+            foreach (Vertex v in Game.Vertices.Values)
+                Graph.AddVertex(v);
+            
+            foreach (Edge e in Game.Edges.Values)
+                Graph.AddEdge(e);
+            
             foreach (Curve c in Game.Curves.Values)
                 c.CreateDistanceCache();
+
+            foreach (Lane l in Game.Lanes.Values)
+            {
+                l.InitCurve();
+                l.InitInnerEdge();
+                Graph.CancelBinding();
+                Graph.AddEdge(l.InnerEdge);
+                Graph.ApplyBinding();
+            }
+            
             // set inner outline
             foreach (Road r in Game.Roads.Values)
                 r.SetInnerOutline();
+
             // set outline at ends 
             foreach (Intersection i in Game.Intersections.Values)
                 IntersectionUtil.EvaluateOutline(i);
         }
     }
 
-    public static int SaveGame()
+    public int SaveGame()
     {
         Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
         Build.RemoveAllGhostRoads();
-        Storage storage = new();
+        Storage storage = new(filename);
         return storage.Save(Game.GameSave);
     }
 

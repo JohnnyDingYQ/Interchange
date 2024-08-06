@@ -5,9 +5,9 @@ public class Storage
 {
     string savePath;
 
-    public Storage()
+    public Storage(string filename)
     {
-        savePath = System.IO.Path.Combine(Application.persistentDataPath, "saveFile");
+        savePath = System.IO.Path.Combine(Application.persistentDataPath, filename);
     }
     public int Save(IPersistable o)
     {
