@@ -36,17 +36,9 @@ public class Road : IPersistable
         RightOutline = new();
     }
 
-    public Road(float3 startPos, float3 pivotPos, float3 endPos, int laneCount)
+    public Road(Curve curve, int laneCount)
     {
-        LaneCount = laneCount;
-        Curve = new(new BezierCurve(startPos, pivotPos, endPos));
-
-        InitRoad();
-    }
-
-    public Road(Curve bs, int laneCount)
-    {
-        Curve = bs;
+        Curve = curve;
         LaneCount = laneCount;
 
         InitRoad();

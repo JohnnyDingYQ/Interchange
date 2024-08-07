@@ -45,14 +45,6 @@ public class CompoundOperationTest
             subRoads = Divide.HandleDivideCommand(combined, 4.5f * stride + new float3(0, 2, 2));
             Assert.NotNull(subRoads);
         }
-
-        // static float GetRandomFloat(System.Random random, float minValue, float maxValue)
-        // {
-        //     double range = maxValue - minValue;
-        //     double sample = random.NextDouble(); // Generates a random double between 0.0 and 1.0
-        //     double scaled = (sample * range) + minValue; // Scales the random value to the desired range
-        //     return (float)scaled;
-        // }
     }
 
     [Test]
@@ -69,5 +61,20 @@ public class CompoundOperationTest
             combined = Combine.CombineRoads(subRoads.Left.EndIntersection);
             Assert.AreEqual(2, Game.Intersections.Count);
         }
+    }
+
+    [Test]
+    public void CombineAndDivideNextCurveRegistered()
+    {
+        Road left = RoadBuilder.Single(0, 2 * stride, 4 * stride, 3);
+        SubRoads subRoads = Divide.DivideRoad(left, math.length(2 * stride));
+        left = Combine.CombineRoads(subRoads.Left.EndIntersection);
+        subRoads = Divide.DivideRoad(left, math.length(2 * stride) + 0.01f);
+        left = Combine.CombineRoads(subRoads.Left.EndIntersection);
+        subRoads = Divide.DivideRoad(left, math.length(2 * stride) + 0.01f);
+
+        foreach (Curve curve in Game.Curves.Values)
+            if (curve.GetNextCurve() != null)
+                Assert.AreNotEqual(0, curve.GetNextCurve().Id);
     }
 }

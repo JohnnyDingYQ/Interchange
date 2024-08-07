@@ -19,7 +19,7 @@ public static class Divide
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         int laneCount = road.LaneCount;
-        road.Curve.Split(distanceOnCurve, out Curve left, out Curve right);
+        road.Curve.Duplicate().Split(distanceOnCurve, out Curve left, out Curve right);
         Road leftRoad = new(left, laneCount)
         {
             IsGhost = road.IsGhost

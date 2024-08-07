@@ -235,9 +235,23 @@ public class Intersection : IPersistable
         return true;
     }
 
+    public bool LaneChangeLike()
+    {
+        if (InRoads.Count != 1 || OutRoads.Count != 1)
+            return false;
+        int emptyCount = 0;
+        foreach (Node n in nodes.Values)
+        {
+            Assert.IsFalse(n.InLane == null && n.OutLane == null);
+            if (n.InLane == null || n.OutLane == null)
+                emptyCount++;
+        }
+        return emptyCount <= 1;
+    }
+
     public void DetermineSafety()
     {
-        if (outRoads.Count == 0 || IsForLaneChangeOnly())
+        if (outRoads.Count == 0 || LaneChangeLike() || outRoads.Count == 1)
         {
             IsSafe = true;
             return;
@@ -250,7 +264,7 @@ public class Intersection : IPersistable
             Intersection prev = inRoad.Lanes[0].StartNode.Intersection;
             for (int i = 0; i < count; i++)
             {
-                if (!prev.IsForLaneChangeOnly())
+                if (!prev.LaneChangeLike())
                 {
                     IsSafe = false;
                     return;

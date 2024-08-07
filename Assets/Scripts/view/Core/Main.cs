@@ -63,10 +63,10 @@ public class Main : MonoBehaviour
         foreach (Road road in Game.Roads.Values)
             Game.InvokeRoadAdded(road);
         foreach (Intersection ix in Game.Intersections.Values)
-        {
             Game.InvokeIntersectionAdded(ix);
+        foreach (Intersection ix in Game.Intersections.Values)
             Game.UpdateIntersection(ix);
-        }
+
         CarScheduler.FindNewConnection();
         modeToggle.SwitchToBuildMode();
         zones.UpdateZoneObjectReferences();

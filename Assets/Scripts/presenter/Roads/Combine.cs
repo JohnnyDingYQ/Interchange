@@ -20,7 +20,7 @@ public static class Combine
 
         left.Curve.Add(right.Curve);
         
-        Game.RegisterCurve(left.Curve.GetNextCurve());
+        Game.RegisterCurve(left.Curve);
         left.EndIntersection = right.EndIntersection;
         left.EndIntersection.RemoveRoad(right, Direction.In);
 

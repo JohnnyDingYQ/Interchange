@@ -44,8 +44,6 @@ public class Intersections : MonoBehaviour
 
     void UpdateIntersection(Intersection ix)
     {
-        if (!ix.IsSafe)
-            Debug.Log("what");
         intersectionMapping[ix.Id].GetComponent<Renderer>().material.SetColor("_Color", ix.IsSafe ? safeColor : unsafeColor);
     }
 
