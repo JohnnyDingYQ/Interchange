@@ -52,7 +52,7 @@ public static class Combine
             left.Lanes[i].EndNode.InLane = left.Lanes[i];
         }
         left.EndIntersection.AddRoad(left, Direction.In);
-        Game.UpdateIntersectionRoads(left.StartIntersection);
+        Game.UpdateIntersection(left.StartIntersection);
         return left;
 
     }

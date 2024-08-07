@@ -346,8 +346,8 @@ public static class Build
             HandleZoneConnection();
         }
 
-        Game.UpdateIntersectionRoads(road.StartIntersection);
-        Game.UpdateIntersectionRoads(roads.Last().EndIntersection);
+        Game.UpdateIntersection(road.StartIntersection);
+        Game.UpdateIntersection(roads.Last().EndIntersection);
         return roads;
 
         # region extracted funcitons

@@ -39,10 +39,13 @@ public static class CarScheduler
         bool changed = false;
         foreach (SourceZone source in Game.SourceZones.Values)
         {
+            IEnumerable<TargetZone> targetWithoutPath = Game.TargetZones.Values.Where(z => !source.ConnectedTargets.ContainsKey(z));
+            if (targetWithoutPath.Count() == 0)
+                continue;
             foreach (Vertex startV in source.Vertices)
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
-                foreach (TargetZone target in Game.TargetZones.Values.Where(z => !source.ConnectedTargets.ContainsKey(z)))
+                foreach (TargetZone target in targetWithoutPath)
                     foreach (Vertex endV in target.Vertices)
                     {
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);
@@ -81,7 +84,7 @@ public static class CarScheduler
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);
                         if (pathEdges != null)
                             unfoundTargets.Remove(target);
-                        
+
                     }
             }
             foreach (TargetZone unfound in unfoundTargets)
@@ -98,20 +101,6 @@ public static class CarScheduler
                 Progression.CheckProgression();
             ConnectionUpdated.Invoke();
         }
-    }
-
-    static IEnumerable<Edge> FindPathSourceToTarget(SourceZone source, TargetZone target)
-    {
-        foreach (Vertex sourceVertex in source.Vertices)
-        {
-            foreach (Vertex targetVertex in target.Vertices)
-            {
-                IEnumerable<Edge> edges = Graph.AStar(sourceVertex, targetVertex);
-                if (edges != null)
-                    return edges;
-            }
-        }
-        return null;
     }
 
     public static Car AttemptSchedule(Zone source, Zone target)

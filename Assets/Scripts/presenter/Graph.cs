@@ -9,7 +9,7 @@ using Assets.Scripts.model.Roads;
 
 public static class Graph
 {
-    private static AdjacencyGraph<Vertex, Edge> graph = new();
+    private static BidirectionalGraph<Vertex, Edge> graph = new();
     public static int EdgeCount { get => graph.EdgeCount; }
     public static int VertexCount { get => graph.VertexCount; }
 
@@ -120,12 +120,9 @@ public static class Graph
         graph.AddVerticesAndEdgeRange(edges);
     }
 
-    public static List<Edge> GetOutEdges(Vertex v)
+    public static IEnumerable<Edge> OutEdges(Vertex v)
     {
-        graph.TryGetOutEdges(v, out IEnumerable<Edge> edges);
-        if (edges == null)
-            return new();
-        return edges.ToList();
+        return graph.OutEdges(v);
     }
 
     public static IEnumerable<Edge> AStar(Vertex start, Vertex end)
@@ -151,18 +148,14 @@ public static class Graph
         );
     }
 
-    public static List<Edge> GetInEdges(Vertex vertex)
+    public static IEnumerable<Edge> InEdges(Vertex vertex)
     {
-        HashSet<Edge> p = new();
-        foreach (Vertex v in graph.Vertices)
-        {
-            foreach (Edge e in graph.OutEdges(v))
-            {
-                if (e.Target.GetHashCode() == vertex.GetHashCode())
-                    p.Add(e);
-            }
-        }
-        return p.ToList();
+        return graph.InEdges(vertex);
+    }
+
+    public static int InDegree(Vertex vertex)
+    {
+        return graph.InDegree(vertex);
     }
 
     public static Edge GetEdge(Vertex start, Vertex end)

@@ -3020,6 +3020,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   intersectionPrefab: {fileID: 797989268070218883, guid: 3a8efc3aa4fa95142bbfc3201fd74eef, type: 3}
+  safeColor: {r: 1, g: 1, b: 1, a: 0}
+  unsafeColor: {r: 0.8745098, g: 0.101960786, b: 0.10953837, a: 0}
 --- !u!1 &1041566845
 GameObject:
   m_ObjectHideFlags: 0

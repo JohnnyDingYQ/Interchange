@@ -63,11 +63,11 @@ public static class IntersectionUtil
 
         Edge GetEdge(Road road, Orientation orientation, Direction direction)
         {
-            List<Edge> edges = null;
+            IEnumerable<Edge> edges = null;
             if (direction == Direction.In)
-                edges = Graph.GetOutEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex);
+                edges = Graph.OutEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].EndVertex);
             else if (direction == Direction.Out)
-                edges = Graph.GetInEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
+                edges = Graph.InEdges(road.Lanes[orientation == Orientation.Left ? 0 : road.Lanes.Count - 1].StartVertex);
 
             if (edges != null && edges.Count() != 0)
             {
@@ -167,7 +167,7 @@ public static class IntersectionUtil
             List<Edge> edgesToRemove = new();
             foreach (Road road in ix.InRoads)
                 foreach (Lane lane in road.Lanes)
-                    edgesToRemove.AddRange(Graph.GetOutEdges(lane.EndVertex));
+                    edgesToRemove.AddRange(Graph.OutEdges(lane.EndVertex));
 
             foreach (Edge edge in edgesToRemove)
                 Graph.RemoveEdge(edge);

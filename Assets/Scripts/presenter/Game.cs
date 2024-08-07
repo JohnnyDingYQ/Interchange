@@ -25,7 +25,7 @@ public static class Game
     public static uint CarServiced { get; set; }
     public static bool BuildModeOn { get; set; }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;
-    public static event Action<Intersection> IntersectionAdded, IntersectionRemoved;
+    public static event Action<Intersection> IntersectionAdded, IntersectionUpdated, IntersectionRemoved;
     public static event Action<Car> CarAdded, CarRemoved;
 
     static Game()
@@ -114,10 +114,12 @@ public static class Game
         i.Id = 0;
     }
 
-    public static void UpdateIntersectionRoads(Intersection ix)
+    public static void UpdateIntersection(Intersection ix)
     {
+        ix.DetermineSafety();
         foreach (Road r in ix.Roads)
             RoadUpdated?.Invoke(r);
+        IntersectionUpdated?.Invoke(ix);
     }
 
     public static void RegisterLane(Lane lane)

@@ -7,17 +7,23 @@ public class Intersections : MonoBehaviour
 {
     [SerializeField]
     IntersectionObject intersectionPrefab;
-    Dictionary<uint, IntersectionObject> intersectionMapping = new();
+    [SerializeField]
+    Color safeColor;
+    [SerializeField]
+    Color unsafeColor;
+    readonly Dictionary<uint, IntersectionObject> intersectionMapping = new();
 
     void OnEnable()
     {
         Game.IntersectionAdded += InstantiateIntersection;
+        Game.IntersectionUpdated += UpdateIntersection;
         Game.IntersectionRemoved += DestroyIntersection;
     }
 
     void OnDisable()
     {
         Game.IntersectionAdded -= InstantiateIntersection;
+        Game.IntersectionUpdated -= UpdateIntersection;
         Game.IntersectionRemoved -= DestroyIntersection;
     }
 
@@ -34,6 +40,13 @@ public class Intersections : MonoBehaviour
     public void DestroyIntersection(Intersection ix)
     {
         Destroy(intersectionMapping[ix.Id].gameObject);
+    }
+
+    void UpdateIntersection(Intersection ix)
+    {
+        if (!ix.IsSafe)
+            Debug.Log("what");
+        intersectionMapping[ix.Id].GetComponent<Renderer>().material.SetColor("_Color", ix.IsSafe ? safeColor : unsafeColor);
     }
 
     public void DestoryAll()

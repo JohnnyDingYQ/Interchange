@@ -15,6 +15,7 @@ public class Intersection : IPersistable
     private HashSet<Road> outRoads = new();
     [IPersistableImplemented]
     private readonly PersistableSortedList nodes = new();
+    public bool IsSafe { get; set; }
     public float3 Normal { get; private set; }
     public float3 Tangent { get; private set; }
     public float3 PointOnInSide { get; private set; }
@@ -233,6 +234,33 @@ public class Intersection : IPersistable
                 return false;
         return true;
     }
+
+    public void DetermineSafety()
+    {
+        if (outRoads.Count == 0 || IsForLaneChangeOnly())
+        {
+            IsSafe = true;
+            return;
+        }
+        foreach (Road inRoad in inRoads)
+        {
+            int count = inRoad.LaneCount - 1;
+            if (count == 0)
+                continue;
+            Intersection prev = inRoad.Lanes[0].StartNode.Intersection;
+            for (int i = 0; i < count; i++)
+            {
+                if (!prev.IsForLaneChangeOnly())
+                {
+                    IsSafe = false;
+                    return;
+                }
+                prev = prev.InRoads.Single().Lanes[0].StartNode.Intersection;
+            }
+        }
+        IsSafe = true;
+    }
+
     public override string ToString()
     {
         return "Intersection " + Id;

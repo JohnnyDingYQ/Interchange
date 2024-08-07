@@ -65,7 +65,7 @@ public class Main : MonoBehaviour
         foreach (Intersection ix in Game.Intersections.Values)
         {
             Game.InvokeIntersectionAdded(ix);
-            Game.UpdateIntersectionRoads(ix);
+            Game.UpdateIntersection(ix);
         }
         CarScheduler.FindNewConnection();
         modeToggle.SwitchToBuildMode();
