@@ -116,10 +116,28 @@ public static class Game
 
     public static void UpdateIntersection(Intersection ix)
     {
-        ix.DetermineSafety();
+        UpdateSafetyAhead(ix, 0, Constants.MaxLaneCount - 1);
+
         foreach (Road r in ix.Roads)
             RoadUpdated?.Invoke(r);
         IntersectionUpdated?.Invoke(ix);
+
+        static void UpdateSafetyAhead(Intersection ix, int depth, int maxDepth)
+        {
+            ix.DetermineSafety();
+            IntersectionUpdated?.Invoke(ix);
+            if (depth == maxDepth)
+                return;
+            HashSet<Intersection> nextDepth = new();
+            foreach (Road outRoad in ix.OutRoads)
+            {
+                foreach (Lane lane in outRoad.Lanes)
+                    nextDepth.Add(lane.EndNode.Intersection);
+            }
+            foreach (Intersection intersection in nextDepth)
+                UpdateSafetyAhead(intersection, depth + 1, maxDepth);
+
+        }
     }
 
     public static void RegisterLane(Lane lane)

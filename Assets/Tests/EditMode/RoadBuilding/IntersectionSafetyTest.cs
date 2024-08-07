@@ -136,4 +136,22 @@ public class IntersectionSafetyTest
         Assert.IsTrue(oneLane.StartIntersection.IsSafe);
         Assert.IsTrue(threeLane.StartIntersection.IsSafe);
     }
+
+    [Test]
+    public void LaneChangeUpdatesUnsafeIntersectionInFront()
+    {
+        Road threeLane = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
+        Road oneLane = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
+        Assert.IsFalse(threeLane.EndIntersection.IsSafe);
+
+        Road laneChangeA = RoadBuilder.Single(0,  stride, 2 * stride, 3);
+        Assert.IsFalse(threeLane.EndIntersection.IsSafe);
+        
+        Road laneChangeB = RoadBuilder.Single(-2 * stride, -stride, 0, 3);
+        Assert.IsTrue(threeLane.EndIntersection.IsSafe);
+
+        Game.RemoveRoad(laneChangeB);
+        Assert.IsFalse(threeLane.EndIntersection.IsSafe);
+
+    }
 }
