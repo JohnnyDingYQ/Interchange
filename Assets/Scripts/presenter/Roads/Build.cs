@@ -191,7 +191,7 @@ public static class Build
             if (ParallelBuildOn)
                 BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
             else
-                BuildRoad(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
+                BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Ghost);
     }
 
     public static void ToggletParallelBuild()
@@ -208,7 +208,7 @@ public static class Build
         UpdateBuildTargetsAndPivot(clickPos);
         if (ReplaceSuggestionOn)
         {
-            roads = new() { BuildSuggested() };
+            roads = BuildSuggested();
             ResetSelection();
             return roads;
         }
@@ -226,7 +226,7 @@ public static class Build
         if (ParallelBuildOn)
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
-            roads = new() { BuildRoad(StartTarget, pivotPos, EndTarget, BuildMode.Actual) };
+            roads = BuildRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         if (!EndTarget.Snapped && !roadEndInZone && ContinuousBuilding)
         {
             ResetSelection();
@@ -238,7 +238,7 @@ public static class Build
             CarScheduler.FindNewConnection();
         return roads;
 
-        static Road BuildSuggested()
+        List<Road> BuildSuggested()
         {
             float roadMidIndex = StartTarget.Offset + (float)LaneCount / 2;
             float currMidIndex = StartTarget.SelectedRoad.Lanes.First().StartNode.NodeIndex
@@ -246,7 +246,8 @@ public static class Build
             float offsetDist = (currMidIndex - roadMidIndex) * Constants.LaneWidth;
             Road road = new(StartTarget.SelectedRoad.Curve.Offset(offsetDist), LaneCount);
             Game.RemoveRoad(StartTarget.SelectedRoad, RoadRemovalOption.Replace);
-            road = ProcessRoad(road, StartTarget, EndTarget);
+            roads = ProcessRoad(road, StartTarget, EndTarget);
+            Assert.IsTrue(road == roads.Single());
 
             foreach (Node node in StartTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.OutLane) && node.InLane == null)
@@ -255,11 +256,11 @@ public static class Build
             foreach (Node node in EndTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)
                     Game.RemoveNode(node);
-            return road;
+            return roads;
         }
     }
 
-    static Road BuildRoad(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
+    static List<Road> BuildRoads(BuildTargets startTarget, float3 pivotPos, BuildTargets endTarget, BuildMode buildMode)
     {
         Road road = InitRoad(startTarget, pivotPos, endTarget);
         if (road == null)
@@ -284,11 +285,8 @@ public static class Build
             road.IsGhost = true;
             parallel.IsGhost = true;
         }
-        List<Road> roads = new()
-        {
-            ProcessRoad(road, startTarget, endTarget),
-            ProcessRoad(parallel, startTargetParallel, endTargetParallel)
-        };
+        List<Road> roads = ProcessRoad(road, startTarget, endTarget);
+        roads.AddRange(ProcessRoad(parallel, startTargetParallel, endTargetParallel));
         return roads;
     }
 
@@ -318,7 +316,7 @@ public static class Build
         }
     }
 
-    static Road ProcessRoad(Road road, BuildTargets startTarget, BuildTargets endTarget)
+    static List<Road> ProcessRoad(Road road, BuildTargets startTarget, BuildTargets endTarget)
     {
         if (startTarget.Snapped)
             road.StartIntersection = startTarget.Intersection;
@@ -336,37 +334,71 @@ public static class Build
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
+        List<Road> roads = new() { road };
+
         RegisterNodes(road);
 
         if (road.IsGhost)
-            GhostRoads.Add(road.Id);
+            GhostRoads.AddRange(roads.Select(r => r.Id));
         else
         {
+            AutoDivideRoad();
             HandleZoneConnection();
         }
 
         Game.UpdateIntersection(road.StartIntersection);
-        Game.UpdateIntersection(road.EndIntersection);
-        return road;
+        Game.UpdateIntersection(roads.Last().EndIntersection);
+        return roads;
 
         # region extracted funcitons
+        static float GetLongestLaneLength(Road road)
+        {
+            float length = 0;
+            foreach (Lane lane in road.Lanes)
+                length = Math.Max(length, lane.Length);
+            return length;
+        }
+
+        void AutoDivideRoad()
+        {
+            float longestLength = GetLongestLaneLength(road);
+            if (longestLength <= Constants.MaxLaneLength)
+                return;
+            int divisions = 2;
+            while (longestLength / divisions > Constants.MaxLaneLength)
+                divisions++;
+            RecursiveRoadDivision(road, divisions, roads);
+        }
+
+        static void RecursiveRoadDivision(Road road, int divisions, List<Road> roads)
+        {
+            if (divisions == 1)
+                return;
+            SubRoads subRoads = Divide.DivideRoad(road, road.Curve.Length / divisions);
+            roads.Remove(road);
+            roads.Add(subRoads.Left);
+            roads.Add(subRoads.Right);
+            RecursiveRoadDivision(subRoads.Right, divisions - 1, roads);
+        }
+
         void HandleZoneConnection()
         {
             if (road.LaneCount == 1)
             {
-                if (startZone is SourceZone && road.StartPos.y == Constants.MinElevation)
+
+                if (startZone is SourceZone && roads.First().StartPos.y == Constants.MinElevation)
                 {
-                    startZone.AddVertex(road.Lanes.Single().StartVertex);
-                    road.EndIntersection.OutRoads
+                    startZone.AddVertex(roads.First().Lanes.Single().StartVertex);
+                    roads.Last().EndIntersection.OutRoads
                         .Where(r => r.LaneCount == 1)
                         .Select(r => r.Lanes.Single()).ToList()
                         .ForEach(l => startZone.RemoveVertex(l.StartVertex));
                 }
-                if (Game.HoveredZone is TargetZone && road.EndPos.y == Constants.MinElevation)
+                if (Game.HoveredZone is TargetZone && roads.Last().EndPos.y == Constants.MinElevation)
                 {
                     roadEndInZone = true;
-                    Game.HoveredZone.AddVertex(road.Lanes.Single().EndVertex);
-                    road.StartIntersection.InRoads
+                    Game.HoveredZone.AddVertex(roads.Last().Lanes.Single().EndVertex);
+                    roads.First().StartIntersection.InRoads
                         .Where(r => r.LaneCount == 1)
                         .Select(r => r.Lanes.Single()).ToList()
                         .ForEach(l => Game.HoveredZone.RemoveVertex(l.EndVertex));
