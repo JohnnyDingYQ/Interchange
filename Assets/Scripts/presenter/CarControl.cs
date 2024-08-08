@@ -7,7 +7,7 @@ public static class CarControl
     static readonly HashSet<Car> toRemove = new();
     static bool IsOnValidEdge(Car car)
     {
-        return Game.Edges.ContainsKey(car.path.CurrentEdge.Id);
+        return Game.Edges.ContainsKey(car.CurrentEdge.Id);
     }
 
     public static void PassTime(float deltaTime)

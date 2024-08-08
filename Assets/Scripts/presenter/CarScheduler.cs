@@ -23,7 +23,7 @@ public static class CarScheduler
                 if (source.ConnectedTargets.Count != 0)
                 {
                     Game.RegisterCar(new(
-                        new(source.ConnectedTargets.Values.ElementAt(MyNumerics.GetRandomIndex(source.ConnectedTargets.Count)))
+                        source.ConnectedTargets.Values.ElementAt(MyNumerics.GetRandomIndex(source.ConnectedTargets.Count))
                     ));
                     source.ScheduleCooldown = SourceZone.ScheduleInterval;
                 }
@@ -52,7 +52,7 @@ public static class CarScheduler
                         if (pathEdges != null)
                         {
                             changed = true;
-                            source.ConnectedTargets.Add(target, pathEdges);
+                            source.ConnectedTargets.Add(target, new(pathEdges));
                             target.ConnectedSources.Add(source);
                             break;
                         }

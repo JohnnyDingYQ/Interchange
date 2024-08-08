@@ -27,7 +27,8 @@ public class CarDriver : MonoBehaviour
 
     void Update()
     {
-        CarControl.PassTime(Time.deltaTime * TimeScale);
+        if (!Game.BuildModeOn)
+            CarControl.PassTime(Time.deltaTime * TimeScale);
     }
 
     void OnDestroy()

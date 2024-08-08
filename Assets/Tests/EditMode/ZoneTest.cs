@@ -76,7 +76,7 @@ public class ZoneTest
         Build.HandleBuildCommand(stride);
         Game.HoveredZone = Game.TargetZones[1];
         Build.HandleBuildCommand(2 * stride);
-        Road road = RoadBuilder.Single(2  * stride, 3 * stride, 4 * stride, 1);
+        Road road = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
 
         Assert.AreEqual(1, Game.TargetZones[1].Vertices.Count);
         Assert.AreEqual(road.Lanes.Single().EndVertex, Game.TargetZones[1].Vertices.Single());
@@ -91,7 +91,7 @@ public class ZoneTest
         Build.HandleBuildCommand(3 * stride);
         Road road = Build.HandleBuildCommand(4 * stride).Single();
         Game.RemoveRoad(road);
-        
+
         Assert.AreEqual(0, Game.SourceZones[1].Vertices.Count);
     }
 
@@ -119,5 +119,19 @@ public class ZoneTest
         CarScheduler.FindNewConnection();
 
         Assert.AreNotEqual(0, Game.SourceZones[1].ConnectedTargets.Count);
+    }
+
+    [Test]
+    public void SimpleScheduleTest()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.TargetZones[1].AddVertex(road0.Lanes[0].EndVertex);
+        CarScheduler.FindNewConnection();
+        Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
+        Assert.AreEqual(0, Game.Cars.Count);
+        CarScheduler.Schedule(0.1f);
+
+        Assert.AreNotEqual(0, Game.Cars.Count);
     }
 }

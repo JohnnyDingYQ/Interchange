@@ -6,7 +6,7 @@ public class SourceZone : Zone
     public SourceZone() { ConnectedTargets = new(); }
 
     [NotSaved]
-    public Dictionary<TargetZone, IEnumerable<Edge>> ConnectedTargets { get; private set; }
+    public Dictionary<TargetZone, Path> ConnectedTargets { get; private set; }
     [NotSaved]
     public const float ScheduleInterval = 1.5f;
     [NotSaved]
