@@ -7,7 +7,6 @@ public class Vertex : IPersistable
     Side side;
     [SaveID]
     public Lane Lane { get; set; }
-    [NotSaved]
     public float ScheduleCooldown { get; set; }
     [NotSaved]
     public float3 Pos { get => GetPos(); }

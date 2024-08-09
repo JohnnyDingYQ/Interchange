@@ -4,6 +4,7 @@ using UnityEngine;
 using Assets.Scripts.model.Roads;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 
 public class Car : IPersistable
@@ -12,18 +13,25 @@ public class Car : IPersistable
     public bool IsDone { get; private set; }
     float distanceOnEdge;
     int edgeIndex;
+    float speed;
     [SaveID]
-    public Path path;
-    public float Speed { get; set; }
+    readonly SourceZone sourceZone;
+    [SaveID]
+    readonly TargetZone targetZone;
     [NotSaved]
-    public Edge CurrentEdge { get => path.Edges[edgeIndex]; }
+    public Path Path { get => sourceZone.ConnectedTargets.GetValueOrDefault(targetZone); }
+    [NotSaved]
+    public Edge CurrentEdge { get => Path.Edges[edgeIndex]; }
     [NotSaved]
     public float3 Pos { get => CurrentEdge.Curve.EvaluateDistancePos(distanceOnEdge); }
 
-    public Car(Path path)
+    public Car() { }
+
+    public Car(SourceZone sourceZone, TargetZone targetZone)
     {
-        this.path = path;
-        Speed = 0;
+        this.sourceZone = sourceZone;
+        this.targetZone = targetZone;
+        speed = 0;
     }
 
     public void Move(float deltaTime)
@@ -32,8 +40,8 @@ public class Car : IPersistable
         if (IsDone)
             return;
         isBraking = false;
-        Edge edge = path.Edges[edgeIndex];
-        Edge nextEdge = edgeIndex < path.Edges.Count - 1 ? path.Edges[edgeIndex + 1] : null;
+        Edge edge = Path.Edges[edgeIndex];
+        Edge nextEdge = edgeIndex < Path.Edges.Count - 1 ? Path.Edges[edgeIndex + 1] : null;
         int carIndex = GetCarIndex();
 
         if (!IsLeadingCarOnEdge())
@@ -42,9 +50,9 @@ public class Car : IPersistable
             LookForEdgeAhead();
 
         if (!isBraking)
-            Speed = MathF.Min(Speed + deltaTime * Constants.CarAcceleration, Constants.CarMaxSpeed);
+            speed = MathF.Min(speed + deltaTime * Constants.CarAcceleration, Constants.CarMaxSpeed);
 
-        distanceOnEdge += deltaTime * Speed;
+        distanceOnEdge += deltaTime * speed;
 
         if (distanceOnEdge > edge.Length)
         {
@@ -82,7 +90,7 @@ public class Car : IPersistable
             if (distToNextCar < Constants.CarMinimumSeparation)
             {
                 isBraking = true;
-                Speed = distToNextCar / Constants.CarMinimumSeparation * edge.Cars[carIndex - 1].Speed;
+                speed = distToNextCar / Constants.CarMinimumSeparation * edge.Cars[carIndex - 1].speed;
             }
         }
 
@@ -94,7 +102,7 @@ public class Car : IPersistable
             {
                 isBraking = true;
                 float distFromEnd = edge.Length - distanceOnEdge;
-                Speed = MathF.Max(Constants.CarMinSpeed, Speed - deltaTime * Constants.CarDeceleration / distFromEnd);
+                speed = MathF.Max(Constants.CarMinSpeed, speed - deltaTime * Constants.CarDeceleration / distFromEnd);
             }
         }
 

@@ -2804,7 +2804,7 @@ MonoBehaviour:
   devPanel: {fileID: 1857876031}
   roads: {fileID: 11189983}
   intersections: {fileID: 985838739}
-  carDriver: {fileID: 1260736909}
+  cars: {fileID: 1260736909}
   modeToggle: {fileID: 2084363009}
   zones: {fileID: 190404220}
 --- !u!1 &963194225
@@ -3587,7 +3587,7 @@ GameObject:
   - component: {fileID: 1260736908}
   - component: {fileID: 1260736909}
   m_Layer: 0
-  m_Name: CarDriver
+  m_Name: Cars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

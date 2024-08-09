@@ -3,7 +3,7 @@ using UnityEngine.Pool;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class CarDriver : MonoBehaviour
+public class Cars : MonoBehaviour
 {
     [SerializeField] CarObject carPrefab;
     static Dictionary<uint, CarObject> carMapping;

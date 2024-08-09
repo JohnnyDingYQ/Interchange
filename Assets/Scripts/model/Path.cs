@@ -5,11 +5,15 @@ using System.Linq;
 using Assets.Scripts.model.Roads;
 using Unity.Mathematics;
 
-public class Path
+public class Path : IPersistable
 {
-    public readonly List<Edge> Edges;
+    public uint Id { get; set; }
+    [SaveIDCollection]
+    public List<Edge> Edges { get; set; }
     public float Length { get; private set; }
-    
+
+    public Path() { Edges = new(); }
+
     public Path(IEnumerable<Edge> edges)
     {
         Edges = edges.ToList();

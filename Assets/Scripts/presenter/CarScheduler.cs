@@ -17,14 +17,15 @@ public static class CarScheduler
     {
         foreach (SourceZone source in Game.SourceZones.Values)
         {
-            IEnumerable<Path> randomOrder = source.ConnectedTargets.Values.OrderBy(x => Game.Random.Next());
-            foreach (Path path in randomOrder)
+            IEnumerable<TargetZone> randomOrder = source.ConnectedTargets.Keys.OrderBy(x => Game.Random.Next());
+            foreach (TargetZone target in randomOrder)
             {
+                Path path = source.ConnectedTargets[target];
                 Vertex startVertex = GetStartingVertex(path);
                 Assert.IsTrue(source.Vertices.Contains(startVertex));
                 if (startVertex.ScheduleCooldown <= 0)
                 {
-                    Game.RegisterCar(new(path));
+                    Game.RegisterCar(new(source, target));
                     startVertex.ScheduleCooldown = SourceZone.ScheduleInterval + deltaTime;
                 }
             }
@@ -73,13 +74,19 @@ public static class CarScheduler
             float length = 0;
             foreach (Edge edge in pathEdges)
                 length += edge.Length;
-            if (source.ConnectedTargets.TryGetValue(target, out Path path))
+            if (source.ConnectedTargets.TryGetValue(target, out Path existingPath))
             {
-                if (path.Length > length)
-                    source.ConnectedTargets[target] = new(pathEdges);
+                if (existingPath.Length > length)
+                {
+                    Path shorterPath = new(pathEdges);
+                    source.ConnectedTargets[target] = shorterPath;
+                }
             }
             else
-                source.ConnectedTargets.Add(target, new(pathEdges));
+            {
+                Path path = new(pathEdges);
+                source.ConnectedTargets[target] = path;
+            }
             target.ConnectedSources.Add(source);
         }
     }
@@ -114,19 +121,5 @@ public static class CarScheduler
 
         if (changed)
             Progression.CheckProgression();
-    }
-
-    public static Car AttemptSchedule(Vertex origin, Vertex dest)
-    {
-        IEnumerable<Edge> edges = Graph.AStar(origin, dest);
-        Car car = new(new(edges));
-        return car;
-    }
-
-    public static Car AttemptSchedule(Road origin, Road dest)
-    {
-        Vertex start = origin.Lanes[MyNumerics.GetRandomIndex(origin.LaneCount)].StartVertex;
-        Vertex end = dest.Lanes[MyNumerics.GetRandomIndex(dest.LaneCount)].EndVertex;
-        return AttemptSchedule(start, end);
     }
 }

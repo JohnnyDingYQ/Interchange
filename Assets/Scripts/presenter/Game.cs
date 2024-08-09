@@ -188,7 +188,6 @@ public static class Game
 
     public static void RegisterCar(Car car)
     {
-        Assert.IsFalse(Cars.ContainsValue(car));
         car.Id = FindNextAvailableKey(Cars.Keys);
         Cars[car.Id] = car;
         CarAdded?.Invoke(car);
@@ -196,7 +195,6 @@ public static class Game
 
     public static void RemoveCar(Car car)
     {
-        Assert.IsTrue(Cars.ContainsValue(car));
         Cars.Remove(car.Id);
         CarRemoved?.Invoke(car);
     }
@@ -214,6 +212,11 @@ public static class Game
     public static void InvokeIntersectionAdded(Intersection ix)
     {
         IntersectionAdded?.Invoke(ix);
+    }
+
+    public static void InvokeCarAdded(Car car)
+    {
+        CarAdded?.Invoke(car);
     }
 
     static void SanityCheck()

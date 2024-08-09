@@ -13,7 +13,7 @@ public class Main : MonoBehaviour
     [SerializeField]
     Intersections intersections;
     [SerializeField]
-    CarDriver carDriver;
+    Cars cars;
     [SerializeField]
     ModeToggle modeToggle;
     [SerializeField]
@@ -58,7 +58,7 @@ public class Main : MonoBehaviour
     {
         roads.DestoryAll();
         intersections.DestoryAll();
-        carDriver.DestoryAll();
+        cars.DestoryAll();
         foreach (Road road in Game.Roads.Values)
             Game.InvokeRoadAdded(road);
         foreach (Intersection ix in Game.Intersections.Values)
@@ -67,6 +67,10 @@ public class Main : MonoBehaviour
             Game.UpdateIntersection(ix);
 
         CarScheduler.FindNewConnection();
+
+        foreach (Car car in Game.Cars.Values)
+            Game.InvokeCarAdded(car);
+
         modeToggle.SwitchToBuildMode();
         zones.UpdateZoneObjectReferences();
     }

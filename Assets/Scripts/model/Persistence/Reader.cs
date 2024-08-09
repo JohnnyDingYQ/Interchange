@@ -26,12 +26,12 @@ public class Reader
                 return collection[id];
             else if (id != 0)
             {
-                collection[id] = (IPersistable) Activator.CreateInstance(type);
+                collection[id] = (IPersistable)Activator.CreateInstance(type);
                 collection[id].Id = id;
                 return collection[id];
             }
         }
-        IPersistable item =  (IPersistable) Activator.CreateInstance(type);
+        IPersistable item = (IPersistable)Activator.CreateInstance(type);
         item.Id = id;
         return item;
     }
