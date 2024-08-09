@@ -122,16 +122,21 @@ public class ZoneTest
     }
 
     [Test]
-    public void SimpleScheduleTest()
+    public void SimpleZonePathFinding()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
         Game.TargetZones[1].AddVertex(road0.Lanes[0].EndVertex);
+        Assert.AreEqual(0, Game.SourceZones[1].ConnectedTargets.Count);
         CarScheduler.FindNewConnection();
         Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
-        Assert.AreEqual(0, Game.Cars.Count);
-        CarScheduler.Schedule(0.1f);
+    }
 
-        Assert.AreNotEqual(0, Game.Cars.Count);
+    [Test]
+    public void BuildRoadBetweenZones()
+    {
+        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
+        Assert.AreEqual(1, Game.Roads.Count);
+        Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
     }
 }

@@ -7,7 +7,6 @@ public static class Progression
     public static float GlobalConnectedness { get; private set; }
     static Progression()
     {
-        CarScheduler.ConnectionUpdated += CheckProgression;
     }
 
     public static void CheckProgression()

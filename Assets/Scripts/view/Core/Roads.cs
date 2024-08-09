@@ -86,7 +86,7 @@ public class Roads : MonoBehaviour
         arrow.transform.localScale = new(0.8f, 0.8f, 0.8f);
     }
 
-    public void UpdateRoad(Road road)
+    void UpdateRoad(Road road)
     {
         Mesh m = MeshUtil.GetRoadMesh(road);
         RoadObject roadObject = roadMapping[road.Id];

@@ -36,7 +36,7 @@ public class Curve : IPersistable
     [NotSaved]
     public float3 EndNormal { get => GetEndNormal(); }
     [NotSaved]
-    const float GetNearestPointTolerance = 0.0001f;
+    const float GetNearestPointTolerance = 0.001f;
     [NotSaved]
     const float minimumCurveLength = 0.005f;
 

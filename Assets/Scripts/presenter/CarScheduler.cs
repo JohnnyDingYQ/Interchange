@@ -7,8 +7,6 @@ using QuikGraph;
 
 public static class CarScheduler
 {
-    public static event Action ConnectionUpdated;
-
     static CarScheduler()
     {
         Game.RoadRemoved += DeleteMissingConnection;
@@ -60,11 +58,7 @@ public static class CarScheduler
             }
         }
         if (changed)
-        {
-            if (ConnectionUpdated == null)
-                Progression.CheckProgression();
-            ConnectionUpdated.Invoke();
-        }
+            Progression.CheckProgression();
     }
 
     static void DeleteMissingConnection(Road road)
@@ -96,20 +90,7 @@ public static class CarScheduler
         }
 
         if (changed)
-        {
-            if (ConnectionUpdated == null)
-                Progression.CheckProgression();
-            ConnectionUpdated.Invoke();
-        }
-    }
-
-    public static Car AttemptSchedule(Zone source, Zone target)
-    {
-        if (source.Vertices.Count == 0 || target.Vertices.Count == 0)
-            return null;
-        Vertex startV = source.Vertices.ElementAt(MyNumerics.GetRandomIndex(source.Vertices.Count));
-        Vertex endV = target.Vertices.ElementAt(MyNumerics.GetRandomIndex(target.Vertices.Count));
-        return AttemptSchedule(startV, endV);
+            Progression.CheckProgression();
     }
 
     public static Car AttemptSchedule(Vertex origin, Vertex dest)
