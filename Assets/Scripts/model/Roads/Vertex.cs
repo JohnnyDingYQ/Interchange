@@ -4,13 +4,15 @@ using Unity.Mathematics;
 public class Vertex : IPersistable
 {
     public uint Id { get; set; }
+    Side side;
     [SaveID]
     public Lane Lane { get; set; }
+    [NotSaved]
+    public float ScheduleCooldown { get; set; }
     [NotSaved]
     public float3 Pos { get => GetPos(); }
     [NotSaved]
     public float3 Tangent { get => GetTangent(); }
-    Side side;
 
     public Vertex() { }
 

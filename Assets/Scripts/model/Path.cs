@@ -7,10 +7,13 @@ using Unity.Mathematics;
 
 public class Path
 {
-    public readonly List<Edge> edges;
+    public readonly List<Edge> Edges;
+    public float Length { get; private set; }
     
-    public Path(IEnumerable<Edge> given)
+    public Path(IEnumerable<Edge> edges)
     {
-        edges = given.ToList();
+        Edges = edges.ToList();
+        foreach (Edge edge in Edges)
+            Length += edge.Length;
     }
 }

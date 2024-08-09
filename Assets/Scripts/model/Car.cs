@@ -10,13 +10,15 @@ public class Car : IPersistable
 {
     public uint Id { get; set; }
     public bool IsDone { get; private set; }
-    public Edge CurrentEdge { get => path.edges[edgeIndex]; }
-    public float3 Pos { get => CurrentEdge.Curve.EvaluateDistancePos(distanceOnEdge); }
     float distanceOnEdge;
     int edgeIndex;
-    public float Speed { get; set; }
     [SaveID]
     public Path path;
+    public float Speed { get; set; }
+    [NotSaved]
+    public Edge CurrentEdge { get => path.Edges[edgeIndex]; }
+    [NotSaved]
+    public float3 Pos { get => CurrentEdge.Curve.EvaluateDistancePos(distanceOnEdge); }
 
     public Car(Path path)
     {
@@ -30,8 +32,8 @@ public class Car : IPersistable
         if (IsDone)
             return;
         isBraking = false;
-        Edge edge = path.edges[edgeIndex];
-        Edge nextEdge = edgeIndex < path.edges.Count - 1 ? path.edges[edgeIndex + 1] : null;
+        Edge edge = path.Edges[edgeIndex];
+        Edge nextEdge = edgeIndex < path.Edges.Count - 1 ? path.Edges[edgeIndex + 1] : null;
         int carIndex = GetCarIndex();
 
         if (!IsLeadingCarOnEdge())

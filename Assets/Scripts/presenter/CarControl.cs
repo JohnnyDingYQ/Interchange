@@ -7,7 +7,7 @@ public static class CarControl
     static readonly HashSet<Car> toRemove = new();
     static bool IsOnValidEdge(Car car)
     {
-        return Game.Edges.ContainsKey(car.CurrentEdge.Id);
+        return Graph.ContainsEdge(car.CurrentEdge);
     }
 
     public static void PassTime(float deltaTime)
@@ -19,7 +19,10 @@ public static class CarControl
                 car.Move(deltaTime);
             }
             else
+            {
+                Debug.Log("cancelled");
                 car.Cancel();
+            }
             if (car.IsDone)
             {
                 Game.CarServiced++;

@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Assets.Scripts.model.Roads;
 using QuikGraph;
+using UnityEngine.Assertions;
 
 public static class CarScheduler
 {
@@ -16,18 +17,26 @@ public static class CarScheduler
     {
         foreach (SourceZone source in Game.SourceZones.Values)
         {
-            if (source.ScheduleCooldown <= 0)
+            IEnumerable<Path> randomOrder = source.ConnectedTargets.Values.OrderBy(x => Game.Random.Next());
+            foreach (Path path in randomOrder)
             {
-                if (source.ConnectedTargets.Count != 0)
+                Vertex startVertex = GetStartingVertex(path);
+                Assert.IsTrue(source.Vertices.Contains(startVertex));
+                if (startVertex.ScheduleCooldown <= 0)
                 {
-                    Game.RegisterCar(new(
-                        source.ConnectedTargets.Values.ElementAt(MyNumerics.GetRandomIndex(source.ConnectedTargets.Count))
-                    ));
-                    source.ScheduleCooldown = SourceZone.ScheduleInterval;
+                    Game.RegisterCar(new(path));
+                    startVertex.ScheduleCooldown = SourceZone.ScheduleInterval + deltaTime;
                 }
             }
-            else
-                source.ScheduleCooldown -= deltaTime;
+            foreach (Vertex vertex in source.Vertices)
+            {
+                vertex.ScheduleCooldown -= deltaTime;
+            }
+        }
+
+        static Vertex GetStartingVertex(Path path)
+        {
+            return path.Edges.First().Source;
         }
     }
 
@@ -50,8 +59,7 @@ public static class CarScheduler
                         if (pathEdges != null)
                         {
                             changed = true;
-                            source.ConnectedTargets.Add(target, new(pathEdges));
-                            target.ConnectedSources.Add(source);
+                            AddPath(source, target, pathEdges);
                             break;
                         }
                     }
@@ -59,6 +67,21 @@ public static class CarScheduler
         }
         if (changed)
             Progression.CheckProgression();
+
+        static void AddPath(SourceZone source, TargetZone target, IEnumerable<Edge> pathEdges)
+        {
+            float length = 0;
+            foreach (Edge edge in pathEdges)
+                length += edge.Length;
+            if (source.ConnectedTargets.TryGetValue(target, out Path path))
+            {
+                if (path.Length > length)
+                    source.ConnectedTargets[target] = new(pathEdges);
+            }
+            else
+                source.ConnectedTargets.Add(target, new(pathEdges));
+            target.ConnectedSources.Add(source);
+        }
     }
 
     static void DeleteMissingConnection(Road road)

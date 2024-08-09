@@ -27,6 +27,7 @@ public static class Game
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;
     public static event Action<Intersection> IntersectionAdded, IntersectionUpdated, IntersectionRemoved;
     public static event Action<Car> CarAdded, CarRemoved;
+    public static System.Random Random = new();
 
     static Game()
     {

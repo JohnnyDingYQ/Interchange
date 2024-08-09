@@ -30,7 +30,7 @@ public class GameSave : IPersistable
     public static Dictionary<uint, TargetZone> TargetZones { get; private set; }
     [IPersistableDict]
     public static Dictionary<uint, District> Districts { get; private set; }
-    [NotSaved]
+    [IPersistableDict]
     public Dictionary<uint, Car> Cars { get; private set; }
     public uint Id { get; set; }
 

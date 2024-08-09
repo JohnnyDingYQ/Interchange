@@ -25,7 +25,6 @@ public class Main : MonoBehaviour
         Application.targetFrameRate = 165;
         Physics.queriesHitTriggers = false;
         int now = (int)DateTime.Now.Ticks;
-        UnityEngine.Random.InitState(now); // different seed for each game session
         Debug.Log("Seed: " + now);
         // UnityEngine.Random.InitState(1439289702);
 
