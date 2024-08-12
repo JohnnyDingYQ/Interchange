@@ -103,6 +103,7 @@ public static class MeshUtil
                 if (MyNumerics.AngleInDegrees(prevTangent, spline.EvaluateTangent(interpolation - TangnetApproximation)) > angleThreshold)
                 {
                     BezierKnot knot = spline.Knots.ElementAt(knotIndex);
+                    AddPoint(knot.Position);
                     vertices.Add(new(knot.Position.x, knot.Position.z));
                     prevTangent = spline.EvaluateTangent(interpolation + TangnetApproximation);
                 }
@@ -113,7 +114,7 @@ public static class MeshUtil
             float angleFromPrev = MyNumerics.AngleInDegrees(prevTangent, tangent);
             if (prevTangent.Equals(0) || angleFromPrev > angleThreshold)
             {
-                vertices.Add(new(pos.x, pos.z));
+                AddPoint(pos);
                 prevTangent = tangent;
             }
         }
@@ -146,5 +147,10 @@ public static class MeshUtil
         mesh.SetTriangles(triangles.ToArray(), 0);
         mesh.SetNormals(Enumerable.Repeat(Vector3.up, verts3D.Count).ToArray());
         return mesh;
+
+        void AddPoint(float3 pos)
+        {
+            vertices.Add(new(pos.x, pos.z));
+        }
     }
 }

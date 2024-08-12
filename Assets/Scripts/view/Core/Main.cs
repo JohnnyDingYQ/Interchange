@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 public class Main : MonoBehaviour
 {
-    readonly bool debugMode = true;
+    readonly bool debugMode = false;
     [SerializeField]
     DevPanel devPanel;
     [SerializeField]

@@ -4,9 +4,10 @@ using UnityEngine.UIElements;
 
 public class GameUI: MonoBehaviour
 {
-    private VisualElement root;
+    public VisualElement root;
     private static VisualElement unpause;
     private static VisualElement pause;
+    private static VisualElement districtLabels;
     private const float animationDuration = 1;
     readonly WaitForSeconds waitAnimationDuration = new(animationDuration);
     Coroutine unpauseAnimation;
@@ -17,6 +18,7 @@ public class GameUI: MonoBehaviour
         root = GetComponent<UIDocument>().rootVisualElement;
         unpause = root.Q<VisualElement>("start");
         pause = root.Q<VisualElement>("pause");
+        districtLabels = root.Q<VisualElement>("districtLabels");
     }
 
     public void StartUnpauseAnimation()
@@ -47,5 +49,12 @@ public class GameUI: MonoBehaviour
         pause.style.display = DisplayStyle.Flex;
         yield return waitAnimationDuration;
         pause.style.display = DisplayStyle.None;
+    }
+
+    public DistrictLabel AddDistrictLabel()
+    {
+        TextElement label = new();
+        districtLabels.Add(label);
+        return new(label);
     }
 }

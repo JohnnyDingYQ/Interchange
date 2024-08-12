@@ -5,15 +5,29 @@
 }
 
 .start {
-    background-image: url("/Assets/UI/static/arrow.svg");
+    background-image: url('project://database/Assets/UI/static/arrow.svg?fileID=7388822144124034973&guid=8e7da07c69f9648b9bd297f8d4a2fb58&type=3#arrow');
     height: 150px;
     width: 150px;
     display: none;
 }
 
 .pause {
-    background-image: url("/Assets/UI/static/pause.svg");
+    background-image: url('project://database/Assets/UI/static/pause.svg?fileID=7388822144124034973&guid=d29a5f302d8b5495f8c5a6e502061f0c&type=3#pause');
     height: 150px;
     width: 150px;
     display: none;
+}
+
+.districtLabels {
+    position: absolute;
+    overflow: visible;
+    left: 0;
+    top: 0;
+}
+
+.districtLabels TextElement {
+    position: absolute;
+    text-align: center;
+    -unity-text-align: middle-center;
+    color: black;
 }

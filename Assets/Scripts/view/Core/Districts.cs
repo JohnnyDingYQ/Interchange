@@ -10,11 +10,18 @@ public class Districts : MonoBehaviour
     GameObject districts;
     [SerializeField]
     ZoneMaterial zoneMaterial;
+    [SerializeField]
+    GameUI gameUI;
     readonly Dictionary<uint, ZoneObject> zoneMapping = new();
+    readonly Dictionary<uint, DistrictObject> districtMapping = new();
 
-    void Awake()
+    void Start()
     {
         InitZoneAndDistricts();
+    }
+
+    void Update()
+    {
     }
 
     public void InitZoneAndDistricts()
@@ -32,8 +39,10 @@ public class Districts : MonoBehaviour
             District newDistrict = new(districtCount, districtTransform.name);
             Game.Districts[newDistrict.Id] = newDistrict;
             DistrictObject districtObject = districtTransform.gameObject.AddComponent<DistrictObject>();
-            districtObject.Init(spline.GetComponent<SplineContainer>());
+            districtObject.Init(spline.GetComponent<SplineContainer>(), gameUI.AddDistrictLabel());
+            DebugExtension.DebugPoint(districtObject.Center, Color.black, 50, 10000);
             districtObject.District = newDistrict;
+            districtMapping[newDistrict.Id] = districtObject;
 
             uint zoneCount = 1;
             foreach (Transform sourceZone in sourceZones.transform)
