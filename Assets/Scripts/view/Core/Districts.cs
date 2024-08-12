@@ -87,5 +87,10 @@ public class Districts : MonoBehaviour
             else
                 zoneObject.Zone = Game.TargetZones[zoneObject.Zone.Id];
         }
+
+        foreach (DistrictObject districtObject in districtMapping.Values)
+        {
+            districtObject.District = Game.Districts[districtObject.District.Id];
+        }
     }
 }

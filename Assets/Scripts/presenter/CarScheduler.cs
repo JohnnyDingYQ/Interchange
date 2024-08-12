@@ -91,10 +91,15 @@ public static class CarScheduler
         }
     }
 
-    static void DeleteMissingConnection(Road road)
+    public static void DeleteMissingConnection(Road road)
     {
-        if (road.IsGhost)
-            return;
+        if (!road.IsGhost)
+            DeleteMissingConnection();
+    }
+
+
+    public static void DeleteMissingConnection()
+    {
         bool changed = false;
         foreach (SourceZone source in Game.SourceZones.Values.Where(z => z.ConnectedTargets.Count != 0))
         {
@@ -102,12 +107,16 @@ public static class CarScheduler
             foreach (Vertex startV in source.Vertices)
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
-                foreach (TargetZone target in source.ConnectedTargets.Keys)
+                List<TargetZone> targets = new(source.ConnectedTargets.Keys);
+                foreach (TargetZone target in targets)
                     foreach (Vertex endV in target.Vertices)
                     {
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);
                         if (pathEdges != null)
+                        {
                             unfoundTargets.Remove(target);
+                            source.ConnectedTargets[target] = new(pathEdges);
+                        }
 
                     }
             }

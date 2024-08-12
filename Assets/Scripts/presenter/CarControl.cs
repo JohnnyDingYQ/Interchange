@@ -20,7 +20,6 @@ public static class CarControl
             }
             else
             {
-                Debug.Log("cancelled");
                 car.Cancel();
             }
             if (car.IsDone)

@@ -32,9 +32,9 @@ public static class Remove
             }
             else
             {
-                foreach (Edge p in Game.Edges.Values)
-                    if (p.Source == lane.StartVertex && p.Target == lane.EndVertex)
-                        toRemove.Add(p);
+                Edge edge = Graph.GetEdge(lane.StartVertex, lane.EndVertex);
+                if (edge != null)
+                    toRemove.Add(edge);
             }
             toRemove.ForEach(p => Graph.RemoveEdge(p));
 

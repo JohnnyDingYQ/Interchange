@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.model.Roads;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class ZoneTest
+public class ZonePathTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 0);
 
@@ -138,5 +139,36 @@ public class ZoneTest
         Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
+    }
+
+    
+    [Test]
+    public void DivideFindsNewPath()
+    {
+        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
+        Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
+        Divide.DivideRoad(road, math.length(stride));
+        Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
+        Assert.AreEqual(3, Game.SourceZones[1].ConnectedTargets.Values.Single().Edges.Count);
+
+        foreach (Edge edge in Game.SourceZones[1].ConnectedTargets.Values.Single().Edges)
+            Assert.True(Graph.ContainsEdge(edge));
+    }
+
+    
+    [Test]
+    public void CombineFindsNewPath()
+    {
+        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road right = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Game.SourceZones[1].AddVertex(left.Lanes[0].StartVertex);
+        Game.TargetZones[1].AddVertex(right.Lanes[0].EndVertex);
+        CarScheduler.FindNewConnection();
+        Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Count);
+
+        Combine.CombineRoads(left.EndIntersection);
+        Assert.AreEqual(1, Game.SourceZones[1].ConnectedTargets.Values.Single().Edges.Count);
+        foreach (Edge edge in Game.SourceZones[1].ConnectedTargets.Values.Single().Edges)
+            Assert.True(Graph.ContainsEdge(edge));
     }
 }

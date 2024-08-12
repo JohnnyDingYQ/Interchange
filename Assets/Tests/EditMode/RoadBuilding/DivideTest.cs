@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.model.Roads;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -33,6 +34,17 @@ public class DivideTest
         Assert.AreEqual(1, Roads.Count);
         Divide.DivideRoad(road, road.Length / 2);
         Assert.AreEqual(2, Roads.Count);
+    }
+
+    [Test]
+    public void RemovesOriginalEdges()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+
+        Assert.AreEqual(1, Roads.Count);
+        Divide.DivideRoad(road, road.Length / 2);
+        
+        Assert.False(Graph.ContainsEdge(road.Lanes[0].InnerEdge));
     }
 
     [Test]

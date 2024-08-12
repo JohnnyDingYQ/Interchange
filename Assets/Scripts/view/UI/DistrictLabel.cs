@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 public class DistrictLabel
 {
-    TextElement textElement;
+    readonly TextElement textElement;
     float connectivity;
 
     public DistrictLabel(TextElement textElement)

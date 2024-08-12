@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class CombineRoadsTest
+public class CombineTest
 {
     float3 stride = Constants.MinLaneLength * new float3(0, 0, 1);
 

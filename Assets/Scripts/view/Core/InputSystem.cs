@@ -170,12 +170,14 @@ public class InputSystem : MonoBehaviour
     {
         SaveSystem saveSystem = new("saveFile");
         saveSystem.SaveGame();
+        Debug.Log("Game Saved");
     }
     void LoadGame(InputAction.CallbackContext context)
     {
         SaveSystem saveSystem = new("saveFile");
         saveSystem.LoadGame();
         main.ComplyToGameSave();
+        Debug.Log("Game Loaded");
     }
     void DivideRoad(InputAction.CallbackContext context)
     {

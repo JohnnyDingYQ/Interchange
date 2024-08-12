@@ -65,12 +65,12 @@ public class Main : MonoBehaviour
         foreach (Intersection ix in Game.Intersections.Values)
             Game.UpdateIntersection(ix);
 
-        CarScheduler.FindNewConnection();
-
         foreach (Car car in Game.Cars.Values)
             Game.InvokeCarAdded(car);
 
         modeToggle.SwitchToBuildMode();
         zones.UpdateZoneObjectReferences();
+
+        CarScheduler.FindNewConnection();
     }
 }

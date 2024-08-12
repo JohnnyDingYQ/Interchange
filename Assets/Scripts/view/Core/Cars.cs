@@ -55,5 +55,6 @@ public class Cars : MonoBehaviour
         while (transform.childCount > 0)
             DestroyImmediate(transform.GetChild(0).gameObject);
         carMapping.Clear();
+        carPool.Clear();
     }
 }

@@ -11,7 +11,7 @@ public class Storage
     }
     public int Save(IPersistable o)
     {
-        using var writer = new BinaryWriter(File.Open(savePath, FileMode.Create));
+        using var writer = new BinaryWriter(File.Open(savePath, FileMode.OpenOrCreate));
         Writer myWriter = new(writer);
         o.Save(myWriter);
         return myWriter.Offset;

@@ -10,10 +10,11 @@ using System.Collections.Generic;
 public class Car : IPersistable
 {
     public uint Id { get; set; }
-    public bool IsDone { get; private set; }
     float distanceOnEdge;
     int edgeIndex;
     float speed;
+    public float TimeTaken { get; private set; }
+    public bool IsDone { get; private set; }
     [SaveID]
     readonly SourceZone sourceZone;
     [SaveID]
@@ -39,6 +40,7 @@ public class Car : IPersistable
         bool isBraking;
         if (IsDone)
             return;
+        TimeTaken += deltaTime;
         isBraking = false;
         Edge edge = Path.Edges[edgeIndex];
         Edge nextEdge = edgeIndex < Path.Edges.Count - 1 ? Path.Edges[edgeIndex + 1] : null;

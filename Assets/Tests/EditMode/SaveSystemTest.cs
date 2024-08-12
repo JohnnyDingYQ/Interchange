@@ -7,7 +7,7 @@ public class SaveSystemTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
     static readonly string saveName = "testSave";
-    SaveSystem testSaveSystem = new(saveName);
+    readonly SaveSystem testSaveSystem = new(saveName);
 
     [SetUp]
     public void SetUp()
