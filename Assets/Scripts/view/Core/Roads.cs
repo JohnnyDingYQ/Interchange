@@ -15,8 +15,6 @@ public class Roads : MonoBehaviour
     private static Dictionary<uint, RoadObject> roadMapping;
     public static RoadObject HoveredRoad { get; set; }
     public static List<RoadObject> SelectedRoads { get; set; }
-    private const int MaxRaycastHits = 10;
-    private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
     private const int MaxColliderHits = 100;
     private static readonly Collider[] hitColliders = new Collider[MaxColliderHits];
     private const string roadLayerName = "Roads";
@@ -34,6 +32,17 @@ public class Roads : MonoBehaviour
         Game.RoadAdded -= InstantiateRoad;
         Game.RoadUpdated -= UpdateRoad;
         Game.RoadRemoved -= DestroyRoad;
+    }
+
+    void Update()
+    {
+        if (HoveredRoad != null)
+            UnHighLight(HoveredRoad.gameObject);
+        if (Game.HoveredRoad != null && roadMapping.TryGetValue(Game.HoveredRoad.Id, out var value))
+        {
+            HoveredRoad = value;
+            HighLight(HoveredRoad.gameObject);
+        }
     }
 
     void InstantiateRoad(Road road)
@@ -108,34 +117,6 @@ public class Roads : MonoBehaviour
         roadMapping.Clear();
     }
 
-    public static void UpdateHoveredRoad()
-    {
-        if (HoveredRoad != null)
-            UnHighLight(HoveredRoad.gameObject);
-        float3 mousePos = InputSystem.MouseWorldPos;
-        mousePos.y = Constants.MaxElevation + 1;
-
-        // Perform the raycast and store the number of hits
-        int hitCount = Physics.RaycastNonAlloc(new Ray(mousePos, new float3(0, -1, 0)), hitResults, Constants.MaxElevation + 2);
-
-        HoveredRoad = null; // Reset HoveredRoad initially
-        Game.HoveredRoad = null;
-
-        for (int i = 0; i < hitCount; i++)
-        {
-            RaycastHit hit = hitResults[i];
-            if (hit.collider.gameObject.TryGetComponent<RoadObject>(out var roadComp))
-            {
-                if (roadComp.Road.IsGhost)
-                    continue;
-
-                HoveredRoad = roadComp;
-                Game.HoveredRoad = roadComp.Road;
-                HighLight(roadComp.gameObject);
-                return;
-            }
-        }
-    }
 
     public static void BulkSelect(float3 start, float3 end)
     {

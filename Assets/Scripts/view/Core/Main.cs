@@ -17,7 +17,7 @@ public class Main : MonoBehaviour
     [SerializeField]
     ModeToggle modeToggle;
     [SerializeField]
-    Zones zones;
+    Districts zones;
     uint frameElapsed = 0;
 
     void Start()
@@ -38,8 +38,7 @@ public class Main : MonoBehaviour
             CarScheduler.Schedule(Time.deltaTime);
         if (frameElapsed % 2 == 0)
         {
-            Roads.UpdateHoveredRoad();
-            Zones.UpdateHoveredZoneAndDistrict();
+            Hover.UpdateHovered();
             Build.HandleHover(InputSystem.MouseWorldPos);
         }
         frameElapsed++;

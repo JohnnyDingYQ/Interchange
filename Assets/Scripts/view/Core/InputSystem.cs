@@ -185,8 +185,8 @@ public class InputSystem : MonoBehaviour
             Combine.CombineRoads(ix);
             return;
         }
-        if (Roads.HoveredRoad != null)
-            Divide.HandleDivideCommand(Roads.HoveredRoad.Road, MouseWorldPos);
+        if (Game.HoveredRoad != null)
+            Divide.HandleDivideCommand(Game.HoveredRoad, MouseWorldPos);
         
     }
     void RemoveRoad(InputAction.CallbackContext context)

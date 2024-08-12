@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
-public class Zones : MonoBehaviour
+public class Districts : MonoBehaviour
 {
     [SerializeField]
     GameObject districts;
@@ -12,10 +12,12 @@ public class Zones : MonoBehaviour
     ZoneMaterial zoneMaterial;
     readonly Dictionary<uint, ZoneObject> zoneMapping = new();
 
-    private const int MaxRaycastHits = 10;
-    private static readonly RaycastHit[] hitResults = new RaycastHit[MaxRaycastHits];
-    
     void Awake()
+    {
+        InitZoneAndDistricts();
+    }
+
+    public void InitZoneAndDistricts()
     {
         uint districtCount = 1;
         foreach (Transform districtTransform in districts.transform)
@@ -65,27 +67,6 @@ public class Zones : MonoBehaviour
             zoneObject.Init(gameObject.GetComponent<SplineContainer>());
         }
 
-    }
-
-    public static void UpdateHoveredZoneAndDistrict()
-    {
-        float3 mousePos = InputSystem.MouseWorldPos;
-        mousePos.y = Constants.MinElevation + 1;
-
-        // Perform the raycast and store the number of hits
-        int hitCount = Physics.RaycastNonAlloc(new Ray(mousePos, new float3(0, -1, 0)), hitResults, 10);
-
-        Game.HoveredZone = null;
-        Game.HoveredDistrict = null;
-
-        for (int i = 0; i < hitCount; i++)
-        {
-            RaycastHit hit = hitResults[i];
-            if (hit.collider.gameObject.TryGetComponent<ZoneObject>(out var zoneObject))
-                Game.HoveredZone = zoneObject.Zone;
-            if (hit.collider.gameObject.TryGetComponent<DistrictObject>(out var districtObject))
-                Game.HoveredDistrict = districtObject.District;
-        }
     }
 
     public void UpdateZoneObjectReferences()
