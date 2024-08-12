@@ -242,7 +242,6 @@ public class Intersection : IPersistable
         int emptyCount = 0;
         foreach (Node n in nodes.Values)
         {
-            Assert.IsFalse(n.InLane == null && n.OutLane == null);
             if (n.InLane == null || n.OutLane == null)
                 emptyCount++;
         }

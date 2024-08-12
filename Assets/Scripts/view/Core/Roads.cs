@@ -36,7 +36,7 @@ public class Roads : MonoBehaviour
 
     void Update()
     {
-        if (HoveredRoad != null)
+        if (HoveredRoad != null && SelectedRoads.Count == 0)
             UnHighLight(HoveredRoad.gameObject);
         if (Game.HoveredRoad != null && roadMapping.TryGetValue(Game.HoveredRoad.Id, out var value))
         {

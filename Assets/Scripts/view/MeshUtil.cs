@@ -21,7 +21,6 @@ public static class MeshUtil
         leftLength = road.LeftOutline.GetSize();
         rightLength = road.RightOutline.GetSize();
         Assert.IsTrue(leftLength == rightLength);
-        Assert.AreEqual(RoadOutline.MidNumPoint + RoadOutline.EndsNumPoint * 2, leftLength, $"{leftLength}");
         v3Verts.Clear();
         foreach (float3 pos in road.LeftOutline)
         {
@@ -56,15 +55,15 @@ public static class MeshUtil
         float midEnd = 1 - midStart;
         for (float i = 0; i < RoadOutline.EndsNumPoint; i++)
             uvs.Add(new(0, i / (RoadOutline.EndsNumPoint - 1) * midStart * numRepeat));
-        for (float i = 0; i < RoadOutline.MidNumPoint; i++)
-            uvs.Add(new(0, (midStart + i / (RoadOutline.MidNumPoint - 1) * (midEnd - midStart)) * numRepeat));
+        for (float i = 0; i < road.LeftOutline.MidNumPoint; i++)
+            uvs.Add(new(0, (midStart + i / (road.LeftOutline.MidNumPoint - 1) * (midEnd - midStart)) * numRepeat));
         for (float i = 0; i < RoadOutline.EndsNumPoint; i++)
             uvs.Add(new(0, (midEnd + i / (RoadOutline.EndsNumPoint - 1) * midStart) * numRepeat));
 
         for (float i = 0; i < RoadOutline.EndsNumPoint; i++)
             uvs.Add(new(1, i / (RoadOutline.EndsNumPoint - 1) * midStart * numRepeat));
-        for (float i = 0; i < RoadOutline.MidNumPoint; i++)
-            uvs.Add(new(1, (midStart + i / (RoadOutline.MidNumPoint - 1) * (midEnd - midStart)) * numRepeat));
+        for (float i = 0; i < road.RightOutline.MidNumPoint; i++)
+            uvs.Add(new(1, (midStart + i / (road.RightOutline.MidNumPoint - 1) * (midEnd - midStart)) * numRepeat));
         for (float i = 0; i < RoadOutline.EndsNumPoint; i++)
             uvs.Add(new(1, (midEnd + i / (RoadOutline.EndsNumPoint - 1) * midStart) * numRepeat));
 

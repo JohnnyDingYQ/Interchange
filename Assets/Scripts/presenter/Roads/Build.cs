@@ -34,6 +34,7 @@ public static class Build
         GhostRoads = new();
         StraightMode = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
+        Game.RoadRemoved += RoadRemoved;
     }
 
     public static void Reset()
@@ -47,6 +48,19 @@ public static class Build
         roadEndInZone = false;
         ContinuousBuilding = false;
         LaneCount = 1;
+    }
+
+    static void RoadRemoved(Road road)
+    {
+        if (road.IsGhost || StartTarget == null)
+            return;
+        if (road.EndIntersection == StartTarget.Intersection)
+            ResetSelection();
+    } 
+
+    public static bool StartAssigned()
+    {
+        return startAssigned;
     }
 
     public static void UndoBuildCommand()
@@ -247,11 +261,13 @@ public static class Build
             float offsetDist = (currMidIndex - roadMidIndex) * Constants.LaneWidth;
             Road road = new(StartTarget.SelectedRoad.Curve.Offset(offsetDist), LaneCount);
             Game.RemoveRoad(StartTarget.SelectedRoad, RoadRemovalOption.Replace);
-            road = ProcessRoad(road, StartTarget, EndTarget);
 
+            road = ProcessRoad(road, StartTarget, EndTarget);
             foreach (Node node in StartTarget.Intersection.Nodes)
+            {
                 if (!road.Lanes.Contains(node.OutLane) && node.InLane == null)
                     Game.RemoveNode(node);
+            }
 
             foreach (Node node in EndTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)

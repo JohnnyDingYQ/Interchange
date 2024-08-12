@@ -7,6 +7,7 @@ public static class RoadBuilder
 {
     public static Road Single(float3 start, float3 pivot, float3 end, int laneCount)
     {
+        Build.ContinuousBuilding = false;
         Build.ResetSelection();
         Build.LaneCount = laneCount;
         Build.HandleBuildCommand(start);
@@ -20,6 +21,7 @@ public static class RoadBuilder
 
     public static List<Road> Many(float3 start, float3 pivot, float3 end, int laneCount)
     {
+        Build.ContinuousBuilding = false;
         Build.LaneCount = laneCount;
         Build.HandleBuildCommand(start);
         Build.HandleBuildCommand(pivot);
@@ -29,6 +31,7 @@ public static class RoadBuilder
 
     public static Road ZoneToZone(float3 start, float3 pivot, float3 end, SourceZone source, TargetZone target)
     {
+        Build.ContinuousBuilding = false;
         Build.LaneCount = 1;
         Game.HoveredZone = source;
         Build.HandleBuildCommand(start);

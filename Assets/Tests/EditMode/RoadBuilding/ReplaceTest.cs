@@ -168,4 +168,20 @@ public class ReplaceTest
         Assert.AreEqual(3, Game.Lanes.Count);
         Assert.AreEqual(2, Game.Intersections.Count);
     }
+
+    [Test]
+    public void DeleteEmptyNode()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Node toDelete0 = road0.Lanes[0].EndNode;
+        Node toDelete1 = road0.Lanes[2].EndNode;
+        Build.LaneCount = 1;
+        Game.HoveredRoad = road0;
+        Build.HandleHover(stride);
+        Build.HandleBuildCommand(stride);
+        
+        Assert.False(Game.Nodes.ContainsValue(toDelete0));
+        Assert.False(Game.Nodes.ContainsValue(toDelete1));
+    }
 }

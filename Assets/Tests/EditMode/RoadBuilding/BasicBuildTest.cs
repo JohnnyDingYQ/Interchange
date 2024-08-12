@@ -207,7 +207,18 @@ public class BasicBuildTest
 
         Assert.AreSame(road0.EndIntersection.Nodes.Single().InLane, road0.Lanes.Single());
     }
+    
+    [Test]
+    public void ContinuousBuildButRoadRemoved()
+    {
+        Build.ContinuousBuilding = true;
+        Build.HandleBuildCommand(0);
+        Build.HandleBuildCommand(stride);
+        Road road = Build.HandleBuildCommand(2 * stride).Single();
 
+        Game.RemoveRoad(road);
+        Assert.False(Build.StartAssigned());
+    }
 
     #region Helpers
     public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)
