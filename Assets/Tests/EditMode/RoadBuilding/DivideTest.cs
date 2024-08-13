@@ -43,7 +43,7 @@ public class DivideTest
 
         Assert.AreEqual(1, Roads.Count);
         Divide.DivideRoad(road, road.Length / 2);
-        
+
         Assert.False(Graph.ContainsEdge(road.Lanes[0].InnerEdge));
     }
 
@@ -261,7 +261,7 @@ public class DivideTest
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
         SubRoads subRoads = Divide.HandleDivideCommand(road, stride);
-        
+
         Assert.AreEqual(4, Game.Vertices.Count);
         Assert.True(Game.Vertices.Values.Contains(subRoads.Left.Lanes[0].StartVertex));
         Assert.True(Game.Vertices.Values.Contains(subRoads.Left.Lanes[0].EndVertex));
@@ -298,5 +298,24 @@ public class DivideTest
         SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
         Assert.NotNull(subRoads);
         Assert.AreEqual(2, Game.Roads.Count);
+    }
+
+    [Test]
+    public void DivideExtremelyLongRoad()
+    {
+        float longLength = 2000;
+        Road road = RoadBuilder.Single(
+            0,
+            Vector3.up * longLength / 2,
+            Vector3.up * longLength,
+            1
+        );
+        SubRoads subRoads = Divide.DivideRoad(road, longLength - Constants.MinLaneLength - 0.5f);
+
+        Assert.NotNull(subRoads);
+        Assert.True(MyNumerics.IsApproxEqual(longLength - Constants.MinLaneLength - 0.5f, subRoads.Left.Length),
+            "Expected: " + (longLength - Constants.MinLaneLength - 0.5f) + "Actual: " + subRoads.Left.Length);
+        Assert.True(MyNumerics.IsApproxEqual(Constants.MinLaneLength + 0.5f, subRoads.Right.Length),
+            "Expected: " + (Constants.MinLaneLength + 0.5f) + "Actual: " + subRoads.Right.Length);
     }
 }

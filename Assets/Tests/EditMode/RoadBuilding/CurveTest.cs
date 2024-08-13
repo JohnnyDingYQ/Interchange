@@ -21,13 +21,13 @@ public class CurveTest
         float decrement = curve.Length / 5;
 
         curve = curve.AddStartDistance(decrement);
-        float3 prevStart = curve.StartPos; 
+        float3 prevStart = curve.StartPos;
         curve = curve.AddStartDistance(decrement);
         Assert.AreNotEqual(prevStart, curve.StartPos);
         Assert.True(MyNumerics.IsApproxEqual(math.length(prevStart - curve.StartPos), decrement));
 
         curve.AddEndDistance(decrement);
-        float3 prevEnd = curve.EndPos; 
+        float3 prevEnd = curve.EndPos;
         curve.AddEndDistance(decrement);
         Assert.AreNotEqual(prevStart, curve.EndPos);
         Assert.True(MyNumerics.IsApproxEqual(math.length(prevEnd - curve.EndPos), decrement));
@@ -39,7 +39,7 @@ public class CurveTest
         Curve curve = new(new(0, stride, 2 * stride));
         float singleSegmentLength = curve.Length;
         curve.Add(new(new(2 * stride, 3 * stride, 4 * stride)));
-        
+
         curve = curve.AddStartDistance(1.5f * singleSegmentLength);
         Assert.True(MyNumerics.IsApproxEqual(curve.Length, 0.5f * singleSegmentLength));
         Assert.True(MyNumerics.IsApproxEqual(3 * stride, curve.StartPos));
@@ -51,7 +51,7 @@ public class CurveTest
         Curve curve = new(new(0, stride, 2 * stride));
         float singleSegmentLength = curve.Length;
         curve.Add(new(new(2 * stride, 3 * stride, 4 * stride)));
-        
+
         curve = curve.AddEndDistance(1.5f * singleSegmentLength);
         Assert.True(MyNumerics.IsApproxEqual(curve.Length, 0.5f * singleSegmentLength));
         Assert.True(MyNumerics.IsApproxEqual(stride, curve.EndPos));
@@ -74,7 +74,7 @@ public class CurveTest
         curve.Add(new(new(2 * stride, 3 * stride, 4 * stride)));
         float combinedLength = curve.Length;
         curve.Split(decrement * 1.5f, out Curve left, out Curve right);
-        
+
         Assert.AreEqual(combinedLength, curve.Length);
         Assert.True(MyNumerics.IsApproxEqual(decrement * 1.5f, left.Length));
         Assert.True(MyNumerics.IsApproxEqual(decrement * 0.5f, right.Length));
@@ -93,5 +93,28 @@ public class CurveTest
             left.Split(singleSegmentLength, out left, out right);
         }
         Assert.True(MyNumerics.IsApproxEqual(left.Length, right.Length));
+    }
+
+    [Test]
+    public void SplitLongCurve()
+    {
+        float longLength = 2000;
+        float3 up = new(0, 0, 1);
+        Curve curve = new(new(0, up * longLength / 2, up * longLength));
+        curve.Split(1, out Curve left, out Curve right);
+        
+        Assert.IsTrue(MyNumerics.IsApproxEqual(1, left.Length));
+        Assert.IsTrue(MyNumerics.IsApproxEqual(longLength - 1, right.Length));
+    }
+
+    [Test]
+    public void GetNearestPointLongCurve()
+    {
+        float longLength = 2000;
+        float3 up = new(0, 0, 1);
+        Curve curve = new(new(0, up * longLength / 2, up * longLength));
+        curve.GetNearestPoint(new Ray(up + new float3(0, 1, 0), new(0, -1, 0)), out float distanceOnCurve);
+
+        Assert.IsTrue(MyNumerics.IsApproxEqual(1, distanceOnCurve));
     }
 }

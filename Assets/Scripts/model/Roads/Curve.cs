@@ -39,14 +39,18 @@ public class Curve : IPersistable
     const float GetNearestPointTolerance = 0.001f;
     [NotSaved]
     const float minimumCurveLength = 0.005f;
+    [NotSaved]
+    const int cacheSizeBase = 3;
+    [NotSaved]
+    const float cacheSizeExponent = 0.65f;
 
     public Curve() { }
 
     public Curve(BezierCurve curve)
     {
         bCurve = curve;
-        CreateDistanceCache();
         bCurveLength = CurveUtility.CalculateLength(bCurve);
+        CreateDistanceCache();
     }
 
     public Curve GetNextCurve()
@@ -56,7 +60,7 @@ public class Curve : IPersistable
 
     public void CreateDistanceCache()
     {
-        lut = new DistanceToInterpolation[30];
+        lut = new DistanceToInterpolation[cacheSizeBase + (int)Math.Pow(bCurveLength, cacheSizeExponent)];
         CurveUtility.CalculateCurveLengths(bCurve, lut);
     }
 
