@@ -39,10 +39,6 @@ public class Curve : IPersistable
     const float GetNearestPointTolerance = 0.001f;
     [NotSaved]
     const float minimumCurveLength = 0.005f;
-    [NotSaved]
-    const int cacheSizeBase = 3;
-    [NotSaved]
-    const float cacheSizeExponent = 0.65f;
 
     public Curve() { }
 
@@ -60,7 +56,7 @@ public class Curve : IPersistable
 
     public void CreateDistanceCache()
     {
-        lut = new DistanceToInterpolation[cacheSizeBase + (int)Math.Pow(bCurveLength, cacheSizeExponent)];
+        lut = new DistanceToInterpolation[30];
         CurveUtility.CalculateCurveLengths(bCurve, lut);
     }
 
@@ -147,6 +143,18 @@ public class Curve : IPersistable
             curve = curve.nextCurve;
         }
         return count;
+    }
+
+    public int GetChainDepth()
+    {
+        int chainDepth = 1;
+        Curve current = this;
+        while (current.nextCurve != null)
+        {
+            chainDepth++;
+            current = current.nextCurve;
+        }
+        return chainDepth;
     }
 
     public float GetDistanceToInterpolation(float distance)
@@ -258,8 +266,7 @@ public class Curve : IPersistable
         Curve last = GetLastCurve();
         if (!MyNumerics.IsApproxEqual(EndPos, other.StartPos))
         {
-            Debug.Log("Left curve misaligns with right curve");
-            Debug.Log("Diff: " + math.length(EndPos - other.StartPos));
+            Debug.Log("Left curve misaligns with right curve... Diff: " + math.length(EndPos - other.StartPos));
         }
         last.nextCurve = other.Duplicate();
     }
@@ -402,6 +409,25 @@ public class Curve : IPersistable
         {
             return GetEnumerator();
         }
+    }
+
+    public Curve SplitInToSegments(int segmemtCount)
+    {
+        Assert.IsNull(nextCurve);
+        if (segmemtCount <= 1)
+            return this;
+        
+        float segmentLength = SegmentLength / segmemtCount;
+        Split(segmentLength, out Curve head, out Curve right);
+        Curve current = head;
+        for (int i = 0; i < segmemtCount - 2; i++)
+        {
+            right.Split(segmentLength, out Curve left, out right);
+            current.nextCurve = left;
+            current = current.nextCurve;
+        }
+        current.nextCurve = right;
+        return head;
     }
 
     public BezierCurve GetCurve()

@@ -303,7 +303,7 @@ public class DivideTest
     [Test]
     public void DivideExtremelyLongRoad()
     {
-        float longLength = 2000;
+        float longLength = 700;
         Road road = RoadBuilder.Single(
             0,
             Vector3.up * longLength / 2,

@@ -12,7 +12,8 @@ public static class Build
     private static bool startAssigned, pivotAssigned, roadEndInZone;
     private static Zone startZone;
     static readonly SupportLine supportLine = new();
-    public static int LaneCount { get; set; }
+    private static int laneCount;
+    public static int LaneCount { get => laneCount; set { laneCount = value; ReassignStartTarget(); } }
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
     public static event Action<SupportLine> SupportedLineUpdated;
@@ -56,11 +57,19 @@ public static class Build
             return;
         if (road.EndIntersection == StartTarget.Intersection)
             ResetSelection();
-    } 
+    }
 
     public static bool StartAssigned()
     {
         return startAssigned;
+    }
+
+    static void ReassignStartTarget()
+    {
+        if (startAssigned)
+        {
+            StartTarget = Snapping.Snap(StartTarget.ClickPos, LaneCount, Side.Start);
+        }
     }
 
     public static void UndoBuildCommand()
@@ -293,6 +302,7 @@ public static class Build
             return null;
         Curve offsetted = road.Curve.Duplicate().Offset(ParallelSpacing);
         offsetted = offsetted.ReverseChain();
+        // Debug.Log(math.length(road.Curve.StartPos + offsetted.EndPos));
         BuildTargets startTargetParallel = Snapping.Snap(offsetted.StartPos, LaneCount, Side.Start);
         BuildTargets endTargetParallel = Snapping.Snap(offsetted.EndPos, LaneCount, Side.End);
         Road parallel = new(offsetted, LaneCount);
@@ -318,6 +328,8 @@ public static class Build
         Road road = new(GetCurve(), LaneCount);
         if (road.HasLaneShorterThanMinLaneLength())
             return null;
+        int segmemtCount = (int) MathF.Ceiling(road.Curve.Length / Constants.MaxRoadCurveLength);
+        road.Curve = road.Curve.SplitInToSegments(segmemtCount);
         return road;
 
         bool RoadIsTooBent()

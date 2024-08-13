@@ -117,4 +117,34 @@ public class CurveTest
 
         Assert.IsTrue(MyNumerics.IsApproxEqual(1, distanceOnCurve));
     }
+
+    [Test]
+    public void ReverseTest()
+    {
+        float3 up = new(0, 0, 500);
+        float3 right = new(500, 0, 0);
+        Curve curve = new(new(0, up, up + right));
+        Curve reversed = curve.Duplicate().Offset(1).ReverseChain();
+
+        Assert.AreEqual(curve.StartPos + curve.StartNormal, reversed.EndPos);
+        Assert.AreEqual(curve.EndPos + curve.EndNormal, reversed.StartPos);
+    }
+
+    [Test]
+    public void SplitToSegmentsTest()
+    {
+        int segmentCount = 3;
+        Curve curve = new(new(0, stride, 2 * stride));
+        curve = curve.SplitInToSegments(segmentCount);
+        float length = curve.SegmentLength;
+        Curve current = curve;
+
+        Assert.IsTrue(MyNumerics.IsApproxEqual(math.length(2  * stride), curve.Length));
+        for (int i = 0; i < segmentCount - 1; i++)
+        {
+            current = current.GetNextCurve();
+            Assert.IsTrue(MyNumerics.IsApproxEqual(length, current.SegmentLength));
+        }
+    
+    }
 }

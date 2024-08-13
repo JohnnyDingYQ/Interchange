@@ -3,7 +3,7 @@ public static class Constants
     public const float LaneWidth = 2f;
     public const float BuildSnapTolerance = LaneWidth / 2.5f;
     public const float MinLaneLength = LaneWidth * 5;
-    public const float MaxLaneLength = LaneWidth * 35;
+    public const float MaxRoadCurveLength = 200;
     public const int MaxLaneCount = 3;
     public const float MinSegmentRatio = 0.2f;
     public const float RoadOutlineSeparation = LaneWidth / 2;
