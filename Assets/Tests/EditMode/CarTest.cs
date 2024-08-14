@@ -29,7 +29,7 @@ public class CarTest
         Assert.AreEqual(1, Game.Cars.Count);
         Car car = Game.Cars.Values.Single();
 
-        PassTime(4, 0.2f);
+        PassTime(4);
         Assert.AreEqual(0, Game.Cars.Count);
     }
 
@@ -43,28 +43,108 @@ public class CarTest
         Game.TargetZones[1].AddVertex(road2.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
         CarScheduler.Schedule(0);
-        Assert.AreEqual(1, Game.Cars.Count);
         Car car = Game.Cars.Values.Single();
 
-        PassTime(4, 0.2f);
+        PassTime(4);
         Assert.AreEqual(0, Game.Cars.Count);
         float timeTaken = car.TimeTaken;
-        
+
         ResetVertexCooldown();
         CarScheduler.Schedule(0);
         Assert.AreEqual(1, Game.Cars.Count);
-        PassTime(timeTaken * 0.8f, 0.2f);
+        PassTime(timeTaken * 0.8f);
         Assert.AreSame(car.CurrentEdge, road2.Lanes[0].InnerEdge);
 
         testSaveSystem.SaveGame();
         testSaveSystem.LoadGame();
-        CarScheduler.FindNewConnection();
 
-        PassTime(timeTaken * 0.2f, 0.2f);
+        PassTime(timeTaken * 0.2f);
         Assert.AreEqual(0, Game.Cars.Count);
     }
 
-    void PassTime(float total, float interval)
+    [Test]
+    public void DivideCancelsCarOnRoad()
+    {
+        float totalLength = 100;
+        Road road = RoadBuilder.ZoneToZone(0, MyNumerics.Up * totalLength / 2, MyNumerics.Up * totalLength, Game.SourceZones[1], Game.TargetZones[1]);
+        CarScheduler.Schedule(0);
+        Car car = Game.Cars.Values.Single();
+
+        Assert.AreEqual(1, Game.Cars.Count);
+        PassTime(0.2f);
+        Divide.DivideRoad(road, totalLength / 2);
+        PassTime(0.2f);
+        Assert.True(car.IsDone);
+    }
+
+    [Test]
+    public void CarUnaffectedByDivideBefore()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.TargetZones[1].AddVertex(road1.Lanes[0].EndVertex);
+        CarScheduler.FindNewConnection();
+        CarScheduler.Schedule(0);
+        Assert.AreEqual(1, Game.Cars.Count);
+        Car car = Game.Cars.Values.Single();
+
+        PassTime(4);
+        Assert.AreEqual(0, Game.Cars.Count);
+        float timeTaken = car.TimeTaken;
+
+        ResetVertexCooldown();
+        CarScheduler.Schedule(0);
+        car = Game.Cars.Values.Single();
+        PassTime(timeTaken * 0.7f);
+        Divide.DivideRoad(road0, math.length(stride));
+        PassTime(0.2f);
+        Assert.True(Graph.ContainsEdge(car.CurrentEdge));
+        PassTime(timeTaken * 0.3f);
+        Assert.AreEqual(0, Game.Cars.Count);
+    }
+
+    [Test]
+    public void CarUnaffectedByDivideAhead()
+    {
+        Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.TargetZones[1].AddVertex(road1.Lanes[0].EndVertex);
+        CarScheduler.FindNewConnection();
+        CarScheduler.Schedule(0);
+        Assert.AreEqual(1, Game.Cars.Count);
+        Car car = Game.Cars.Values.Single();
+
+        PassTime(4);
+        Assert.AreEqual(0, Game.Cars.Count);
+        float timeTaken = car.TimeTaken;
+
+        ResetVertexCooldown();
+        CarScheduler.Schedule(0);
+        car = Game.Cars.Values.Single();
+        PassTime(timeTaken * 0.3f);
+        Divide.DivideRoad(road1, math.length(stride));
+        PassTime(0.2f);
+        Assert.True(Graph.ContainsEdge(car.CurrentEdge));
+        PassTime(timeTaken * 0.7f);
+        Assert.AreEqual(0, Game.Cars.Count);
+    }
+
+    [Test]
+    public void CarCancelsWhenRoadRemoved()
+    {
+        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
+        CarScheduler.Schedule(0);
+        Car car = Game.Cars.Values.Single();
+        PassTime(0.2f);
+
+        Game.RemoveRoad(road);
+        PassTime(0.2f);
+        Assert.True(car.IsDone);
+    }
+
+    void PassTime(float total, float interval = 0.1f)
     {
         for (float i = 0; i < total; i += interval)
             CarControl.PassTime(interval);

@@ -24,7 +24,7 @@ public class ModeToggle : MonoBehaviour
 
     public void SwitchToBuildMode()
     {
-        Camera.main.cullingMask = ~(1 << LayerMask.NameToLayer("Cars"));
+        // Camera.main.cullingMask = ~(1 << LayerMask.NameToLayer("Cars"));
         Cars.TimeScale = 0;
         gameUI.StartPauseAnimation();
         IsInBuildMode = true;

@@ -10,6 +10,7 @@ using Assets.Scripts.model.Roads;
 public static class Graph
 {
     private static BidirectionalGraph<Vertex, Edge> graph = new();
+    public static IEnumerable<Edge> Edges { get => graph.Edges; }
     public static int EdgeCount { get => graph.EdgeCount; }
     public static int VertexCount { get => graph.VertexCount; }
 

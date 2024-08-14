@@ -25,10 +25,10 @@ public class SaveSystem
 
             foreach (Vertex v in Game.Vertices.Values)
                 Graph.AddVertex(v);
-            
+
             foreach (Edge e in Game.Edges.Values)
                 Graph.AddEdge(e);
-            
+
             foreach (Curve c in Game.Curves.Values)
                 c.CreateDistanceCache();
 
@@ -40,7 +40,7 @@ public class SaveSystem
                 Graph.AddEdge(l.InnerEdge);
                 Graph.ApplyBinding();
             }
-            
+
             // set inner outline
             foreach (Road r in Game.Roads.Values)
                 r.SetInnerOutline();
@@ -48,6 +48,13 @@ public class SaveSystem
             // set outline at ends 
             foreach (Intersection i in Game.Intersections.Values)
                 IntersectionUtil.EvaluateOutline(i);
+
+            // paths
+            CarScheduler.FindNewConnection();
+            foreach (Car car in Game.Cars.Values)
+            {
+                car.UpdatePath();
+            }
         }
     }
 

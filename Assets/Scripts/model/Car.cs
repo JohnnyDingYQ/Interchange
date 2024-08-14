@@ -20,30 +20,75 @@ public class Car : IPersistable
     [SaveID]
     readonly TargetZone targetZone;
     [NotSaved]
-    public Path Path { get => sourceZone.ConnectedTargets.GetValueOrDefault(targetZone); }
+    Path path;
     [NotSaved]
-    public Edge CurrentEdge { get => Path.Edges[edgeIndex]; }
+    public Edge CurrentEdge { get => GetCurrentEdge(); }
     [NotSaved]
     public float3 Pos { get => CurrentEdge.Curve.EvaluateDistancePos(distanceOnEdge); }
 
     public Car() { }
 
+    Edge GetCurrentEdge()
+    {
+        if (path == null)
+            return null;
+        if (edgeIndex >= path.Edges.Count)
+            return null;
+        return path.Edges[edgeIndex];
+    }
+
     public Car(SourceZone sourceZone, TargetZone targetZone)
     {
         this.sourceZone = sourceZone;
         this.targetZone = targetZone;
+        path = GetPath();
         speed = 0;
+    }
+
+    Path GetPath()
+    {
+        return sourceZone.ConnectedTargets.GetValueOrDefault(targetZone);
+    }
+
+    public void UpdatePath()
+    {
+        path = GetPath();
+    }
+
+    void CheckForPathChange()
+    {
+        if (path != GetPath())
+        {
+            Debug.Log("udate");
+            Edge currentEdge = CurrentEdge;
+            UpdatePath();
+            if (path == null)
+            {
+                Cancel();
+                return;
+            }
+            int index = path.Edges.IndexOf(currentEdge);
+            if (index == -1) // does not exist
+            {
+                Cancel();
+                return;
+            }
+            Assert.IsTrue(Graph.ContainsEdge(currentEdge));
+            edgeIndex = index;
+        }
     }
 
     public void Move(float deltaTime)
     {
-        bool isBraking;
+        CheckForPathChange();
         if (IsDone)
             return;
+
+        bool isBraking;
         TimeTaken += deltaTime;
         isBraking = false;
-        Edge edge = Path.Edges[edgeIndex];
-        Edge nextEdge = edgeIndex < Path.Edges.Count - 1 ? Path.Edges[edgeIndex + 1] : null;
+        Edge edge = path.Edges[edgeIndex];
+        Edge nextEdge = edgeIndex < path.Edges.Count - 1 ? path.Edges[edgeIndex + 1] : null;
         int carIndex = GetCarIndex();
 
         if (!IsLeadingCarOnEdge())

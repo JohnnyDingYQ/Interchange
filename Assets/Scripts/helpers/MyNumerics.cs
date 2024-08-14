@@ -7,6 +7,8 @@ using UnityEngine.Assertions;
 public static class MyNumerics
 {
     const float DefaultTolerance = 0.01f;
+    public static float3 Up = new(0, 0, 1);
+    public static float3 Right = new(0, 0, 1);
 
     public static bool IsApproxEqual(float3 a, float3 b)
     {

@@ -19,6 +19,7 @@ public class DevPanel : MonoBehaviour
     private static TextElement connectedness;
     private static TextElement debug1;
     private static TextElement debug2;
+    private Button button;
     private static readonly StringBuilder stringBuilder = new();
     void OnEnable()
     {
@@ -41,6 +42,7 @@ public class DevPanel : MonoBehaviour
         ghostRoad = root.Q<Toggle>("Ghost");
         supportLines = root.Q<Toggle>("SupportLines");
         continuousBuilding = root.Q<Toggle>("ContinuousBuilding");
+        button = root.Q<Button>("DrawGizmos");
 
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
@@ -60,6 +62,7 @@ public class DevPanel : MonoBehaviour
         ghostRoad.value = true;
         continuousBuilding.RegisterCallback<ChangeEvent<bool>>(ToggleContinuousBuilding);
         continuousBuilding.value = true;
+        button.RegisterCallback((ClickEvent evt) => DrawGizmos.Draw());
     }
 
     void Update()

@@ -61,7 +61,7 @@ public static class Gizmos
 
     public static void DrawEdges(float duration)
     {
-        foreach (Edge edge in Game.Edges.Values)
+        foreach (Edge edge in Graph.Edges)
         {
             DrawCurve(edge.Curve, Color.yellow, duration);
         }

@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 public class Main : MonoBehaviour
 {
-    readonly bool debugMode = false;
+    readonly bool debugMode = true;
     [SerializeField]
     DevPanel devPanel;
     [SerializeField]
@@ -70,7 +70,5 @@ public class Main : MonoBehaviour
 
         modeToggle.SwitchToBuildMode();
         zones.UpdateZoneObjectReferences();
-
-        CarScheduler.FindNewConnection();
     }
 }

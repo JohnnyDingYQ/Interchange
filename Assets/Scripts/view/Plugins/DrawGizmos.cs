@@ -17,7 +17,7 @@ public class DrawGizmos : MonoBehaviour
         // InvokeRepeating("Draw", 0f, DrawDuration);
     }
 
-    void Draw()
+    public static void Draw()
     {
         // return;
         if (DrawCenter)

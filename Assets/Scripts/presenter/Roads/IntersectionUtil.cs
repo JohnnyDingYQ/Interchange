@@ -74,24 +74,19 @@ public static class IntersectionUtil
                 if (direction == Direction.In)
                 {
                     if (orientation == Orientation.Left)
-                        return edges.OrderBy(e => Component(-ix.Normal, e.Target.Pos)).First();
+                        return edges.OrderBy(e => e.Target.Lane.LaneIndex).First();
                     else
-                        return edges.OrderBy(e => Component(-ix.Normal, e.Target.Pos)).Last();
+                        return edges.OrderBy(e => e.Target.Lane.LaneIndex).Last();
                 }
                 if (direction == Direction.Out)
                 {
                     if (orientation == Orientation.Left)
-                        return edges.OrderBy(e => Component(-ix.Normal, e.Source.Pos)).First();
+                        return edges.OrderBy(e => e.Source.Lane.LaneIndex).First();
                     else
-                        return edges.OrderBy(e => Component(-ix.Normal, e.Source.Pos)).Last();
+                        return edges.OrderBy(e => e.Source.Lane.LaneIndex).Last();
                 }
             }
             return null;
-        }
-
-        static float Component(float3 u, float3 v)
-        {
-            return math.dot(u, v) / math.length(v);
         }
     }
 

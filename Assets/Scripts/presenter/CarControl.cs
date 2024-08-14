@@ -7,13 +7,20 @@ public static class CarControl
     static readonly HashSet<Car> toRemove = new();
     static bool IsOnValidEdge(Car car)
     {
-        return Graph.ContainsEdge(car.CurrentEdge);
+        return car.CurrentEdge != null;
     }
 
     public static void PassTime(float deltaTime)
     {
         foreach (Car car in Game.Cars.Values)
         {
+            if (car.IsDone)
+            {
+                Game.CarServiced++;
+                toRemove.Add(car);
+                continue;
+            }
+
             if (IsOnValidEdge(car))
             {
                 car.Move(deltaTime);
@@ -21,12 +28,11 @@ public static class CarControl
             else
             {
                 car.Cancel();
-            }
-            if (car.IsDone)
-            {
                 Game.CarServiced++;
                 toRemove.Add(car);
+                continue;
             }
+            
         }
         foreach (Car car in toRemove)
             Game.RemoveCar(car);
