@@ -312,7 +312,7 @@ public class EdgeTest
     }
 
     [Test]
-    public void BasicInterweavingPath_2to3Lanes()
+    public void InterweavingPath_2to3Lanes()
     {
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 2);
         float3 offset = road1.Lanes.First().StartPos - road1.StartPos;
@@ -321,5 +321,18 @@ public class EdgeTest
         Edge leftEdge = Graph.GetEdge(road1.Lanes[1].EndVertex, road2.Lanes[1].StartVertex);
         Assert.AreSame(leftEdge, rightEdge.InterweavingEdge);
         Assert.AreSame(rightEdge, leftEdge.InterweavingEdge);
+    }
+
+    [Test]
+    public void InterweavingPath_3to2Lanes()
+    {
+        Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        float3 offset = road1.Curve.EndNormal * Constants.LaneWidth / 2;
+        Road road2 = RoadBuilder.Single(2 * stride + offset, 3 * stride + offset, 4 * stride + offset, 2);
+        Edge rightEdge = Graph.GetEdge(road1.Lanes[0].EndVertex, road2.Lanes[1].StartVertex);
+        Edge leftEdge = Graph.GetEdge(road1.Lanes[1].EndVertex, road2.Lanes[0].StartVertex);
+        Assert.AreSame(leftEdge, rightEdge.InterweavingEdge);
+        Assert.AreSame(rightEdge, leftEdge.InterweavingEdge);
+        Assert.Null(Graph.GetEdge(road1.Lanes[2].EndVertex, road2.Lanes[1].StartVertex).InterweavingEdge);
     }
 }

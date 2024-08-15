@@ -63,8 +63,30 @@ public static class Gizmos
     {
         foreach (Edge edge in Graph.Edges)
         {
+            if (edge.Id == 7)
+            {
+                DrawCurve(edge.Curve, Color.red, duration);
+                Debug.Log(edge.Source.Lane.EndNode.OutLane);
+                // Debug.Log(edge.InterweavingEdge.Id);
+                continue;
+            }
+            if (edge.Id == 215)
+            {
+                DrawCurve(edge.Curve, Color.red, duration);
+                continue;
+            }
             DrawCurve(edge.Curve, Color.yellow, duration);
         }
+
+        int count = 0;
+        foreach (Edge edge in Graph.Edges)
+        {
+            if (edge.Id == (uint) 215)
+            {
+                count ++;
+            }
+        }
+        Debug.Log($"Impossible... {count}, Total count is only {Graph.Edges.Count()}");
     }
 
     public static void DrawOutline(float duration)

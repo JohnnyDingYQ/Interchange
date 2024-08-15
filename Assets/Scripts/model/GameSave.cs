@@ -85,7 +85,7 @@ public class GameSave : IPersistable
                                 throw new InvalidOperationException($"{itemType}'s {itemProperty.Name} id {item.Id} does not exist");
                             if (!Equals(item, lut[itemProperty.Type()][item.Id]))
                             {
-                                Debug.Log($"{itemType}'s {itemProperty.Name} is not recorded in dict");
+                                Debug.Log($"id {itemInDict.Id} {itemType}'s {itemProperty.Name} is not recorded in dict");
                                 return false;
                             }
                             continue;

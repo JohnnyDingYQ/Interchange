@@ -289,7 +289,7 @@ public class Curve : IPersistable
         return math.normalize(CurveUtility.EvaluateTangent(bCurve, t));
     }
 
-    public float GetNearestPoint(Ray ray, out float distanceOnCurve, int resolution = 15)
+    public float GetNearestPoint(Ray ray, out float distanceOnCurve, int resolution = 10)
     {
         float minDistance = float.MaxValue;
         float currDist = 0;

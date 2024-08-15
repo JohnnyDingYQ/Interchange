@@ -59,7 +59,6 @@ public class Car : IPersistable
     {
         if (path != GetPath())
         {
-            Debug.Log("udate");
             Edge currentEdge = CurrentEdge;
             UpdatePath();
             if (path == null)

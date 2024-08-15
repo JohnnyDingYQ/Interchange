@@ -24,7 +24,11 @@ public static class Build
     public static int Elevation { get; set; }
     public static bool StraightMode { get; set; }
     public static bool ContinuousBuilding { get; set; }
-    public static bool ReplaceSuggestionOn { get => StartTarget.IsReplaceSuggestion && EndTarget.IsReplaceSuggestion; }
+    public static bool ReplaceSuggestionOn
+    {
+        get => !startAssigned && !pivotAssigned && StartTarget != null && EndTarget != null &&
+        StartTarget.IsReplaceSuggestion && EndTarget.IsReplaceSuggestion && Game.HoveredRoad != null;
+    }
 
     static Build()
     {
@@ -160,7 +164,7 @@ public static class Build
                 StartTarget = Snapping.Snap(pos, LaneCount, Side.Start);
                 EndTarget = null;
             }
-            else
+            else if (Game.HoveredRoad != null)
             {
                 SetupReplaceSuggestion(road, distOnRoad);
             }
@@ -260,6 +264,7 @@ public static class Build
             ResetSelection();
         if (roads != null)
             CarScheduler.FindNewConnection();
+        Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
         return roads;
 
         static Road BuildSuggested()
@@ -302,7 +307,6 @@ public static class Build
             return null;
         Curve offsetted = road.Curve.Duplicate().Offset(ParallelSpacing);
         offsetted = offsetted.ReverseChain();
-        // Debug.Log(math.length(road.Curve.StartPos + offsetted.EndPos));
         BuildTargets startTargetParallel = Snapping.Snap(offsetted.StartPos, LaneCount, Side.Start);
         BuildTargets endTargetParallel = Snapping.Snap(offsetted.EndPos, LaneCount, Side.End);
         Road parallel = new(offsetted, LaneCount);
@@ -328,7 +332,7 @@ public static class Build
         Road road = new(GetCurve(), LaneCount);
         if (road.HasLaneShorterThanMinLaneLength())
             return null;
-        int segmemtCount = (int) MathF.Ceiling(road.Curve.Length / Constants.MaxRoadCurveLength);
+        int segmemtCount = (int)MathF.Ceiling(road.Curve.Length / Constants.MaxRoadCurveLength);
         road.Curve = road.Curve.SplitInToSegments(segmemtCount);
         return road;
 
@@ -361,7 +365,9 @@ public static class Build
             IntersectionUtil.EvaluateOutline(road.StartIntersection);
 
         if (endTarget.Snapped)
+        {
             ConnectRoadEndToNodes(endTarget.Intersection, endTarget.Offset, road);
+        }
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 

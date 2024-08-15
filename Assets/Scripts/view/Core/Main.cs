@@ -34,6 +34,7 @@ public class Main : MonoBehaviour
 
     void Update()
     {
+        // Debug.Log(Build.ReplaceSuggestionOn);
         if (!Game.BuildModeOn)
             CarScheduler.Schedule(Time.deltaTime);
         if (frameElapsed % 2 == 0)

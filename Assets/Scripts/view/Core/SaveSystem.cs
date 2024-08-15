@@ -1,3 +1,4 @@
+using System.Linq;
 using Assets.Scripts.model.Roads;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -22,7 +23,7 @@ public class SaveSystem
 
         static void InitializeGameSave()
         {
-
+            Graph.CancelBinding();
             foreach (Vertex v in Game.Vertices.Values)
                 Graph.AddVertex(v);
 
@@ -36,11 +37,12 @@ public class SaveSystem
             {
                 l.InitCurve();
                 l.InitInnerEdge();
-                Graph.CancelBinding();
+
                 Graph.AddEdge(l.InnerEdge);
-                Graph.ApplyBinding();
             }
 
+            Graph.ApplyBinding();
+            
             // set inner outline
             foreach (Road r in Game.Roads.Values)
                 r.SetInnerOutline();

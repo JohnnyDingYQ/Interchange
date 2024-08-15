@@ -102,7 +102,7 @@ public class CurveTest
         float3 up = new(0, 0, 1);
         Curve curve = new(new(0, up * longLength / 2, up * longLength));
         curve.Split(1, out Curve left, out Curve right);
-        
+
         Assert.IsTrue(MyNumerics.IsApproxEqual(1, left.Length));
         Assert.IsTrue(MyNumerics.IsApproxEqual(longLength - 1, right.Length));
     }
@@ -139,12 +139,24 @@ public class CurveTest
         float length = curve.SegmentLength;
         Curve current = curve;
 
-        Assert.IsTrue(MyNumerics.IsApproxEqual(math.length(2  * stride), curve.Length));
+        Assert.IsTrue(MyNumerics.IsApproxEqual(math.length(2 * stride), curve.Length));
         for (int i = 0; i < segmentCount - 1; i++)
         {
             current = current.GetNextCurve();
             Assert.IsTrue(MyNumerics.IsApproxEqual(length, current.SegmentLength));
         }
-    
+    }
+
+    [Test]
+    public void GetNearestPointAtEnd()
+    {
+        for (float length = 100; length < 2000; length += 50)
+        {
+            Curve curve = new(new(0, MyNumerics.Right * length / 2, MyNumerics.Right * length));
+            curve.GetNearestPoint(new(new(length - 1, -1, 1), new(0, 1, 0)), out float distA);
+            curve.GetNearestPoint(new(new(length - 2, -1, 1), new(0, 1, 0)), out float distB);
+
+            Assert.AreNotEqual(distA, distB);
+        }
     }
 }

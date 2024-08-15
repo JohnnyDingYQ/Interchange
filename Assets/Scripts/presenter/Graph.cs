@@ -38,16 +38,12 @@ public static class Graph
 
     static void RegisterVertex(Vertex v)
     {
-        if (Game.Vertices.ContainsKey(v.Id))
-            return;
-        Game.Vertices[v.Id] = v;
+        Game.Vertices.Add(v.Id, v);
     }
 
     static void RegisterEdge(Edge edge)
     {
-        if (Game.Edges.ContainsKey(edge.Id))
-            return;
-        Game.Edges[edge.Id] = edge;
+        Game.Edges.Add(edge.Id, edge);
         Game.RegisterCurve(edge.Curve);
     }
 
@@ -70,14 +66,14 @@ public static class Graph
 
     public static bool AddVertex(Vertex v)
     {
-        if (!Game.Vertices.ContainsKey(v.Id))
+        if (v.Id == 0)
             v.Id = Game.FindNextAvailableKey(Game.Vertices.Keys);
         return graph.AddVertex(v);
     }
 
     public static bool AddEdge(Edge p)
     {
-        if (!Game.Edges.ContainsKey(p.Id))
+        if (p.Id == 0)
             p.Id = Game.FindNextAvailableKey(Game.Edges.Keys);
         return graph.AddEdge(p);
     }

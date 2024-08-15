@@ -129,6 +129,8 @@ public static class IntersectionUtil
                     Edge rightEdge = BuildEdgeLane2Lane(previousNode.InLane, currentNode.OutLane);
                     leftEdge.InterweavingEdge = rightEdge;
                     rightEdge.InterweavingEdge = leftEdge;
+                    Assert.IsTrue(Game.Edges.Values.Contains(leftEdge));
+                    Assert.IsTrue(Game.Edges.Values.Contains(rightEdge));
                 }
             }
         }
