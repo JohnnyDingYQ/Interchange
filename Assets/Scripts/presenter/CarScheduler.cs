@@ -26,7 +26,7 @@ public static class CarScheduler
                 if (startVertex.ScheduleCooldown <= 0)
                 {
                     Game.RegisterCar(new(source, target));
-                    startVertex.ScheduleCooldown = SourceZone.ScheduleInterval + deltaTime;
+                    startVertex.ScheduleCooldown = Vertex.ScheduleInterval + deltaTime;
                 }
             }
             foreach (Vertex vertex in source.Vertices)
@@ -47,13 +47,10 @@ public static class CarScheduler
         bool changed = false;
         foreach (SourceZone source in Game.SourceZones.Values)
         {
-            IEnumerable<TargetZone> targetWithoutPath = Game.TargetZones.Values.Where(z => !source.ConnectedTargets.ContainsKey(z));
-            if (targetWithoutPath.Count() == 0)
-                continue;
             foreach (Vertex startV in source.Vertices)
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
-                foreach (TargetZone target in targetWithoutPath)
+                foreach (TargetZone target in  Game.TargetZones.Values)
                     foreach (Vertex endV in target.Vertices)
                     {
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);

@@ -7,8 +7,6 @@ public class SourceZone : Zone
 
     [NotSaved]
     public Dictionary<TargetZone, Path> ConnectedTargets { get; private set; }
-    [NotSaved]
-    public const float ScheduleInterval = 1.5f;
     public SourceZone(uint id) : base(id)
     {
         ConnectedTargets = new();

@@ -18,7 +18,7 @@ namespace Assets.Scripts.model.Roads
         public Edge InterweavingEdge { get; set; }
         [SaveIDCollection]
         public List<Car> Cars { get; set; }
-        [NotSaved]
+        [SaveID]
         public Car IncomingCar { get; set; }
         [NotSaved]
         public bool IsInnerEdge { get; set; }

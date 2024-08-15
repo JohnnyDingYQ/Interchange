@@ -18,5 +18,6 @@
             <ui:Toggle text="Continuous Building" name="ContinuousBuilding" />
         </ui:Foldout>
         <ui:Button text="Draw Gizmos" parse-escape-sequences="true" display-tooltip-when-elided="true" name="DrawGizmos" />
+        <ui:Button text="Delete Cars" parse-escape-sequences="true" display-tooltip-when-elided="true" name="DeleteCars" />
     </ui:VisualElement>
 </ui:UXML>

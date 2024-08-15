@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Assets.Scripts.model.Roads;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,7 +22,8 @@ public class DevPanel : MonoBehaviour
     private static TextElement connectedness;
     private static TextElement debug1;
     private static TextElement debug2;
-    private Button button;
+    private Button button1;
+    private Button button2;
     private static readonly StringBuilder stringBuilder = new();
     void OnEnable()
     {
@@ -42,7 +46,8 @@ public class DevPanel : MonoBehaviour
         ghostRoad = root.Q<Toggle>("Ghost");
         supportLines = root.Q<Toggle>("SupportLines");
         continuousBuilding = root.Q<Toggle>("ContinuousBuilding");
-        button = root.Q<Button>("DrawGizmos");
+        button1 = root.Q<Button>("DrawGizmos");
+        button2 = root.Q<Button>("DeleteCars");
 
         drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
         drawCenter.value = false;
@@ -62,7 +67,14 @@ public class DevPanel : MonoBehaviour
         ghostRoad.value = true;
         continuousBuilding.RegisterCallback<ChangeEvent<bool>>(ToggleContinuousBuilding);
         continuousBuilding.value = true;
-        button.RegisterCallback((ClickEvent evt) => DrawGizmos.Draw());
+        button1.RegisterCallback((ClickEvent evt) => DrawGizmos.Draw());
+        button2.RegisterCallback((ClickEvent evt) =>
+        {
+            List<uint> ids = Game.Cars.Keys.ToList();
+            foreach (uint id in ids) Game.RemoveCar(Game.Cars[id]);
+            foreach (Edge edge in Game.Edges.Values) {edge.IncomingCar = null; edge.Cars.Clear(); }
+            foreach (Vertex vertex in Game.Vertices.Values) vertex.ScheduleCooldown = 0;
+        });
     }
 
     void Update()

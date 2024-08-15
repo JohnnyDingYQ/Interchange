@@ -9,6 +9,8 @@ public class Vertex : IPersistable
     public Lane Lane { get; set; }
     public float ScheduleCooldown { get; set; }
     [NotSaved]
+    public const float ScheduleInterval = 1.5f;
+    [NotSaved]
     public float3 Pos { get => GetPos(); }
     [NotSaved]
     public float3 Tangent { get => GetTangent(); }
