@@ -20,7 +20,7 @@ public static class Graph
         ApplyBinding();
     }
 
-    public static void ApplyBinding()
+    static void ApplyBinding()
     {
         graph.VertexAdded += RegisterVertex;
         graph.EdgeAdded += RegisterEdge;
@@ -28,21 +28,17 @@ public static class Graph
         graph.EdgeRemoved += UnregisterEdge;
     }
 
-    public static void CancelBinding()
-    {
-        graph.VertexAdded -= RegisterVertex;
-        graph.EdgeAdded -= RegisterEdge;
-        graph.VertexRemoved -= UnregisterVertex;
-        graph.EdgeRemoved -= UnregisterEdge;
-    }
-
     static void RegisterVertex(Vertex v)
     {
+        if (Game.Vertices.ContainsKey(v.Id))
+            return;
         Game.Vertices.Add(v.Id, v);
     }
 
     static void RegisterEdge(Edge edge)
     {
+        if (Game.Edges.ContainsKey(edge.Id))
+            return;
         Game.Edges.Add(edge.Id, edge);
         Game.RegisterCurve(edge.Curve);
     }
@@ -68,7 +64,8 @@ public static class Graph
     {
         if (v.Id == 0)
             v.Id = Game.FindNextAvailableKey(Game.Vertices.Keys);
-        return graph.AddVertex(v);
+        bool status = graph.AddVertex(v);
+        return status;
     }
 
     public static bool AddEdge(Edge p)

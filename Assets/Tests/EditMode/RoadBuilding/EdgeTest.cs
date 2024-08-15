@@ -44,6 +44,8 @@ public class EdgeTest
             if (i + 1 < 3)
                 Assert.True(Graph.ContainsEdge(road1.Lanes[i], road2.Lanes[i + 1]));
         }
+
+        Assert.True(Graph.Edges.Select(e => e.Id).Distinct().Count() == Graph.Edges.Count());
     }
 
     [Test]

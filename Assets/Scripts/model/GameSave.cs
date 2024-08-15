@@ -127,7 +127,10 @@ public class GameSave : IPersistable
                     dynamic dict = fieldProperty.GetValue(this);
                     dynamic otherDict = fieldProperty.GetValue(other);
                     if (dict.Count != otherDict.Count)
+                    {
+                        Debug.Log($"{fieldProperty.Name} count is not the same , original {dict.Count} compared {otherDict.Count}");
                         return false;
+                    }
                     foreach (uint key in dict.Keys)
                         if (!Equals(dict[key], otherDict[key]))
                         {

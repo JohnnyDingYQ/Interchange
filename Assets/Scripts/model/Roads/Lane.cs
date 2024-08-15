@@ -20,7 +20,7 @@ public class Lane : IPersistable
     public Road Road { get; set; }
     [NotSaved]
     public Curve Curve { get; set; }
-    [NotSaved]
+    [SaveID]
     public Edge InnerEdge { get; set; }
     [NotSaved]
     public float3 StartPos { get => StartNode.Pos; }
@@ -66,6 +66,7 @@ public class Lane : IPersistable
         curve = curve.AddEndDistance(Constants.VertexDistanceFromRoadEnds);
         Edge edge = new(curve, StartVertex, EndVertex);
         InnerEdge = edge;
+        InnerEdge.IsInnerEdge = true;
     }
 
     public override string ToString()

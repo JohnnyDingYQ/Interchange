@@ -65,9 +65,7 @@ public static class Game
             Graph.AddVertex(lane.EndVertex);
             if (!road.IsGhost)
             {
-                Graph.CancelBinding();
                 Graph.AddEdge(lane.InnerEdge);
-                Graph.ApplyBinding();
             }
             RegisterLane(lane);
         }

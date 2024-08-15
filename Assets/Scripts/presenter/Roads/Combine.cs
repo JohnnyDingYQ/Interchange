@@ -36,9 +36,7 @@ public static class Combine
             left.Lanes[i].EndVertex = right.Lanes[i].EndVertex;
             left.Lanes[i].EndVertex.Lane = left.Lanes[i];
             left.Lanes[i].InitInnerEdge();
-            Graph.CancelBinding();
             Graph.AddEdge(left.Lanes[i].InnerEdge);
-            Graph.ApplyBinding();
         }
 
         left.SetInnerOutline();

@@ -21,6 +21,8 @@ namespace Assets.Scripts.model.Roads
         [NotSaved]
         public Car IncomingCar { get; set; }
         [NotSaved]
+        public bool IsInnerEdge { get; set; }
+        [NotSaved]
         public float Length { get => Curve.Length; }
 
         public Edge() { Cars = new(); }

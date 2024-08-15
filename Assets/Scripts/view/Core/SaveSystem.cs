@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.model.Roads;
 using UnityEngine;
@@ -23,7 +24,6 @@ public class SaveSystem
 
         static void InitializeGameSave()
         {
-            Graph.CancelBinding();
             foreach (Vertex v in Game.Vertices.Values)
                 Graph.AddVertex(v);
 
@@ -36,12 +36,7 @@ public class SaveSystem
             foreach (Lane l in Game.Lanes.Values)
             {
                 l.InitCurve();
-                l.InitInnerEdge();
-
-                Graph.AddEdge(l.InnerEdge);
             }
-
-            Graph.ApplyBinding();
             
             // set inner outline
             foreach (Road r in Game.Roads.Values)
@@ -62,8 +57,8 @@ public class SaveSystem
 
     public int SaveGame()
     {
-        Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
         Build.RemoveAllGhostRoads();
+        Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
         Storage storage = new(filename);
         return storage.Save(Game.GameSave);
     }
