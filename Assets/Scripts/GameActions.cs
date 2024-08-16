@@ -188,6 +188,15 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpinCamera"",
+                    ""type"": ""Value"",
+                    ""id"": ""aa9b8520-e13e-4fd5-81a7-65db48eb351a"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -337,7 +346,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""9cf8bcdb-8c9c-4afd-80d2-b9afbb7fafa2"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""path"": ""<Keyboard>/f"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -370,7 +379,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e8929b3b-afa8-4bbd-8afc-bf97bc86de06"",
-                    ""path"": ""<Keyboard>/z"",
+                    ""path"": ""<Keyboard>/x"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -392,7 +401,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""41e7c391-159f-4531-80d9-bcc1ccdc366f"",
-                    ""path"": ""<Keyboard>/e"",
+                    ""path"": ""<Keyboard>/z"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -476,6 +485,39 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""action"": ""StraightMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""9a12f042-de2e-4127-b678-2f0a8cd88414"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpinCamera"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""ffc5417c-6e9d-4101-802f-c51196d0b1ec"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpinCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""5a867df0-8fde-46fb-89ff-c0388abb8ec5"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SpinCamera"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -502,6 +544,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_DecreaseElevation = m_InGame.FindAction("DecreaseElevation", throwIfNotFound: true);
         m_InGame_IncreaseElevation = m_InGame.FindAction("IncreaseElevation", throwIfNotFound: true);
         m_InGame_StraightMode = m_InGame.FindAction("StraightMode", throwIfNotFound: true);
+        m_InGame_SpinCamera = m_InGame.FindAction("SpinCamera", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -581,6 +624,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_DecreaseElevation;
     private readonly InputAction m_InGame_IncreaseElevation;
     private readonly InputAction m_InGame_StraightMode;
+    private readonly InputAction m_InGame_SpinCamera;
     public struct InGameActions
     {
         private @GameActions m_Wrapper;
@@ -603,6 +647,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @DecreaseElevation => m_Wrapper.m_InGame_DecreaseElevation;
         public InputAction @IncreaseElevation => m_Wrapper.m_InGame_IncreaseElevation;
         public InputAction @StraightMode => m_Wrapper.m_InGame_StraightMode;
+        public InputAction @SpinCamera => m_Wrapper.m_InGame_SpinCamera;
         public InputActionMap Get() { return m_Wrapper.m_InGame; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -666,6 +711,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @StraightMode.started += instance.OnStraightMode;
             @StraightMode.performed += instance.OnStraightMode;
             @StraightMode.canceled += instance.OnStraightMode;
+            @SpinCamera.started += instance.OnSpinCamera;
+            @SpinCamera.performed += instance.OnSpinCamera;
+            @SpinCamera.canceled += instance.OnSpinCamera;
         }
 
         private void UnregisterCallbacks(IInGameActions instance)
@@ -724,6 +772,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @StraightMode.started -= instance.OnStraightMode;
             @StraightMode.performed -= instance.OnStraightMode;
             @StraightMode.canceled -= instance.OnStraightMode;
+            @SpinCamera.started -= instance.OnSpinCamera;
+            @SpinCamera.performed -= instance.OnSpinCamera;
+            @SpinCamera.canceled -= instance.OnSpinCamera;
         }
 
         public void RemoveCallbacks(IInGameActions instance)
@@ -761,5 +812,6 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnDecreaseElevation(InputAction.CallbackContext context);
         void OnIncreaseElevation(InputAction.CallbackContext context);
         void OnStraightMode(InputAction.CallbackContext context);
+        void OnSpinCamera(InputAction.CallbackContext context);
     }
 }

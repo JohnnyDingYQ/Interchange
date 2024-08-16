@@ -16,6 +16,8 @@ public class Hover
 
         Game.HoveredZone = null;
         Game.HoveredDistrict = null;
+        if (Game.HoveredRoad != null)
+            Roads.UnHighLight(Game.HoveredRoad);
         Game.HoveredRoad = null;
         bool roadFound = false;
 
@@ -26,14 +28,14 @@ public class Hover
                 Game.HoveredZone = zoneObject.Zone;
             if (hit.collider.gameObject.TryGetComponent<DistrictObject>(out var districtObject))
                 Game.HoveredDistrict = districtObject.District;
-            if (!roadFound && hit.collider.gameObject.TryGetComponent<RoadObject>(out var roadComp))
-            {
+            if (!Build.StartAssigned() && !roadFound && hit.collider.gameObject.TryGetComponent<RoadObject>(out var roadComp))
                 if (!roadComp.Road.IsGhost)
                 {
                     Game.HoveredRoad = roadComp.Road;
+                    Roads.HighLight(Game.HoveredRoad);
                     roadFound = true;
                 }
-            }
+
         }
     }
 }

@@ -14,15 +14,12 @@ public class InputSystem : MonoBehaviour
     const float MouseDragScreenMultiplier = 0.17f;
     private bool isDraggingCamera;
     private bool parallelSpacingDragEnabled;
-    private bool bulkSelectPerformed;
-    private float3 bulkSelectStartPos;
-    private SquareSelector squareSelector;
-    [SerializeField]
-    private SquareSelector squareSelectorPrefab;
     [SerializeField]
     ModeToggle modeToggle;
     [SerializeField]
     Main main;
+    [SerializeField]
+    Roads roads;
 
     void Awake()
     {
@@ -32,7 +29,6 @@ public class InputSystem : MonoBehaviour
     {
         MouseIsInGameWorld = true;
         MouseWorldPos = new(0, 0, 0);
-        squareSelector = Instantiate(squareSelectorPrefab, transform);
     }
 
     void OnEnable()
@@ -94,19 +90,20 @@ public class InputSystem : MonoBehaviour
     {
         UpdateCameraPos();
         ProcessParallelSpacingDrag();
-        UpdateSquareSelector();
         UpdateMouseWorldPos();
     }
 
     void UpdateCameraPos()
     {
         Vector3 cameraOffset = gameActions.InGame.MoveCamera.ReadValue<Vector3>();
+        
         if (isDraggingCamera)
         {
             cameraOffset.x += (prevScreenMousePos.x - Input.mousePosition.x) * MouseDragScreenMultiplier;
             cameraOffset.z += (prevScreenMousePos.y - Input.mousePosition.y) * MouseDragScreenMultiplier;
         }
         CameraControl.CameraOffset = cameraOffset;
+        CameraControl.CamearSpin = gameActions.InGame.SpinCamera.ReadValue<float>();
     }
 
     void UpdateMouseWorldPos()
@@ -123,19 +120,6 @@ public class InputSystem : MonoBehaviour
 
         prevScreenMousePos.x = Input.mousePosition.x;
         prevScreenMousePos.y = Input.mousePosition.y;
-    }
-
-    void UpdateSquareSelector()
-    {
-        if (bulkSelectPerformed)
-        {
-            squareSelector.gameObject.SetActive(true);
-            float width = Math.Abs(bulkSelectStartPos.x - MouseWorldPos.x);
-            float height = Math.Abs(bulkSelectStartPos.z - MouseWorldPos.z);
-            squareSelector.SetTransform(width, height, bulkSelectStartPos + (MouseWorldPos - bulkSelectStartPos) / 2);
-        }
-        else
-            squareSelector.gameObject.SetActive(false);
     }
 
     void ProcessParallelSpacingDrag()
@@ -203,7 +187,6 @@ public class InputSystem : MonoBehaviour
     {
         Build.UndoBuildCommand();
         Roads.ClearSelected();
-        bulkSelectPerformed = false;
     }
     void IncreaseElevation(InputAction.CallbackContext context)
     {
@@ -239,17 +222,15 @@ public class InputSystem : MonoBehaviour
     }
     void BulkSelectStarted(InputAction.CallbackContext context)
     {
-        bulkSelectStartPos = MouseWorldPos;
+        roads.BulkSelectStart(MouseWorldPos);
     }
     void BulkSelectPerformed(InputAction.CallbackContext context)
     {
-        bulkSelectPerformed = true;
+        roads.BulkSelectPerformed();
     }
     void BulkSelectEnd(InputAction.CallbackContext context)
     {
-        if (bulkSelectPerformed)
-            Roads.BulkSelect(bulkSelectStartPos, MouseWorldPos);
-        bulkSelectPerformed = false;
+        roads.BulkSelect(MouseWorldPos);
     }
     void EnableStraightMode(InputAction.CallbackContext context)
     {

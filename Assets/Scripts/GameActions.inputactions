@@ -166,6 +166,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "SpinCamera",
+                    "type": "Value",
+                    "id": "aa9b8520-e13e-4fd5-81a7-65db48eb351a",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -315,7 +324,7 @@
                 {
                     "name": "",
                     "id": "9cf8bcdb-8c9c-4afd-80d2-b9afbb7fafa2",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -348,7 +357,7 @@
                 {
                     "name": "",
                     "id": "e8929b3b-afa8-4bbd-8afc-bf97bc86de06",
-                    "path": "<Keyboard>/z",
+                    "path": "<Keyboard>/x",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -370,7 +379,7 @@
                 {
                     "name": "",
                     "id": "41e7c391-159f-4531-80d9-bcc1ccdc366f",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/z",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -454,6 +463,39 @@
                     "action": "StraightMode",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "9a12f042-de2e-4127-b678-2f0a8cd88414",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpinCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "ffc5417c-6e9d-4101-802f-c51196d0b1ec",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpinCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "5a867df0-8fde-46fb-89ff-c0388abb8ec5",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SpinCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

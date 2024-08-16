@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -12,6 +13,9 @@ public class Roads : MonoBehaviour
     private GameObject arrowPrefab;
     [SerializeField]
     Texture oneLaneTex, twoLaneTex, threeLaneTex;
+    [SerializeField]
+    private SquareSelector squareSelectorPrefab;
+    SquareSelector squareSelector;
     private static Dictionary<uint, RoadObject> roadMapping;
     public static RoadObject HoveredRoad { get; set; }
     public static List<RoadObject> SelectedRoads { get; set; }
@@ -25,6 +29,13 @@ public class Roads : MonoBehaviour
         Game.RoadRemoved += DestroyRoad;
         roadMapping = new();
         SelectedRoads = new();
+        squareSelector = Instantiate(squareSelectorPrefab, transform);
+    }
+
+    void Update()
+    {
+        if (squareSelector.Performed)
+            UpdateSquareSelector(InputSystem.MouseWorldPos);
     }
 
     void OnDestroy()
@@ -32,17 +43,6 @@ public class Roads : MonoBehaviour
         Game.RoadAdded -= InstantiateRoad;
         Game.RoadUpdated -= UpdateRoad;
         Game.RoadRemoved -= DestroyRoad;
-    }
-
-    void Update()
-    {
-        if (HoveredRoad != null && SelectedRoads.Count == 0)
-            UnHighLight(HoveredRoad.gameObject);
-        if (Game.HoveredRoad != null && roadMapping.TryGetValue(Game.HoveredRoad.Id, out var value))
-        {
-            HoveredRoad = value;
-            HighLight(HoveredRoad.gameObject);
-        }
     }
 
     void InstantiateRoad(Road road)
@@ -81,7 +81,7 @@ public class Roads : MonoBehaviour
         else
             arrow = roadObject.transform.GetChild(0).gameObject;
         float3 pos = roadObject.Road.Curve.EvaluateDistancePos(roadObject.Road.Curve.Length / 2);
-        pos.y = Main.GetHUDObjectHeight(HUDLayer.DirectionArrows);
+        pos.y = MathF.Max(roadObject.Road.StartPos.y, roadObject.Road.EndPos.y);
         arrow.transform.position = pos;
         float3 tangent = roadObject.Road.Curve.EvaluateDistanceTangent(roadObject.Road.Curve.Length / 2);
         float angle = Vector3.Angle(tangent, Vector3.forward);
@@ -117,12 +117,29 @@ public class Roads : MonoBehaviour
         roadMapping.Clear();
     }
 
+    public void BulkSelectStart(float3 pos)
+    {
+        squareSelector.StartPos = pos;
+    }
 
-    public static void BulkSelect(float3 start, float3 end)
+    public void BulkSelectPerformed()
+    {
+        squareSelector.Performed = true;
+    }
+
+    public void UpdateSquareSelector(float3 pos)
+    {
+        squareSelector.gameObject.SetActive(true);
+        float width = Math.Abs(squareSelector.StartPos.x - pos.x);
+        float height = Math.Abs(squareSelector.StartPos.z - pos.z);
+        squareSelector.SetTransform(width, height, squareSelector.StartPos + (pos - squareSelector.StartPos) / 2);
+    }
+
+    public void BulkSelect(float3 end)
     {
         ClearSelected();
-        float3 diff = (start - end) / 2;
-        float3 sum = start + (end - start) / 2;
+        float3 diff = (squareSelector.StartPos - end) / 2;
+        float3 sum = squareSelector.StartPos + (end - squareSelector.StartPos) / 2;
         float3 halfExtent = math.abs(new float3(diff.x, (Constants.MaxElevation + 0.5f) / 2, diff.z));
         float3 center = new(sum.x, Constants.MaxElevation / 2, sum.z);
 
@@ -137,6 +154,8 @@ public class Roads : MonoBehaviour
                 SelectedRoads.Add(roadComp);
             }
         }
+        squareSelector.Performed = false;
+        squareSelector.gameObject.SetActive(false);
     }
 
     public static void ClearSelected()
@@ -152,8 +171,20 @@ public class Roads : MonoBehaviour
         g.layer = LayerMask.NameToLayer("Outline");
     }
 
+    public static void HighLight(Road road)
+    {
+        GameObject g = roadMapping[road.Id].gameObject;
+        g.layer = LayerMask.NameToLayer("Outline");
+    }
+
     static void UnHighLight(GameObject g)
     {
+        g.layer = LayerMask.NameToLayer(roadLayerName);
+    }
+
+    public static void UnHighLight(Road road)
+    {
+        GameObject g = roadMapping[road.Id].gameObject;
         g.layer = LayerMask.NameToLayer(roadLayerName);
     }
 }

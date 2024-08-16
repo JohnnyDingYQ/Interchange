@@ -330,7 +330,7 @@ public static class Build
         if (RoadIsTooBent())
             return null;
         Road road = new(GetCurve(), LaneCount);
-        if (road.HasLaneShorterThanMinLaneLength())
+        if (road.HasLaneShorterThanMinLaneLength() || RoadIsTooSteep())
             return null;
         int segmemtCount = (int)MathF.Ceiling(road.Curve.Length / Constants.MaxRoadCurveLength);
         road.Curve = road.Curve.SplitInToSegments(segmemtCount);
@@ -346,6 +346,14 @@ public static class Build
                     )
             );
             if (angle > Constants.MaxRoadBendAngle * MathF.PI / 180)
+                return true;
+            return false;
+        }
+
+        bool RoadIsTooSteep()
+        {
+            float heightDiff = Math.Abs(startPos.y - endPos.y);
+            if (heightDiff / road.Length > Constants.MaxRampGrade / 100)
                 return true;
             return false;
         }

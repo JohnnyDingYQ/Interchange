@@ -14,7 +14,7 @@ public class Car : IPersistable
     int edgeIndex;
     float speed;
     public float TimeTaken { get; private set; }
-    public bool IsDone { get; private set; }
+    public CarStatus Status { get; private set; }
     [SaveID]
     readonly SourceZone sourceZone;
     [SaveID]
@@ -43,6 +43,7 @@ public class Car : IPersistable
         this.targetZone = targetZone;
         path = GetPath();
         speed = 0;
+        Status = CarStatus.Traveling;
     }
 
     Path GetPath()
@@ -80,7 +81,7 @@ public class Car : IPersistable
     public void Move(float deltaTime)
     {
         CheckForPathChange();
-        if (IsDone)
+        if (Status != CarStatus.Traveling)
             return;
 
         bool isBraking;
@@ -106,14 +107,13 @@ public class Car : IPersistable
             if (nextEdge != null)
             {
                 distanceOnEdge = 0;
-
                 nextEdge.IncomingCar = null;
                 edgeIndex++;
                 nextEdge.AddCar(this);
             }
             else
             {
-                Cancel();
+                Finish();
             }
             return;
         }
@@ -161,7 +161,12 @@ public class Car : IPersistable
 
     public void Cancel()
     {
-        IsDone = true;
+        Status = CarStatus.Canceled;
+    }
+
+    void Finish()
+    {
+        Status = CarStatus.Finished;
     }
 
     public override int GetHashCode()

@@ -10,4 +10,5 @@ public class CameraSettings : ScriptableObject
     public float ZoomMultiplier;
     public float PanMultiplier;
     public float driftDecayExponentMultiplier;
+    public float SpinMuliplier;
 }

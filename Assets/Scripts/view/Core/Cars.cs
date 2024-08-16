@@ -14,15 +14,7 @@ public class Cars : MonoBehaviour
         Game.CarAdded += CarAdded;
         Game.CarRemoved += RemoveCar;
         carMapping = new();
-        carPool = new(
-            () => Instantiate(carPrefab, transform),
-            (o) => { o.gameObject.SetActive(true); o.gameObject.transform.position = new(0, -100, 0); },
-            (o) => o.gameObject.SetActive(false),
-            (o) => Destroy(o.gameObject),
-            false,
-            200,
-            1000
-        );
+        CreatePool();
     }
 
     void Update()
@@ -35,6 +27,19 @@ public class Cars : MonoBehaviour
     {
         Game.CarAdded -= CarAdded;
         Game.CarRemoved -= RemoveCar;
+    }
+
+    void CreatePool()
+    {
+        carPool = new(
+            () => Instantiate(carPrefab, transform),
+            (o) => { o.gameObject.SetActive(true); o.gameObject.transform.position = new(0, -100, 0); },
+            (o) => o.gameObject.SetActive(false),
+            (o) => Destroy(o.gameObject),
+            false,
+            200,
+            1000
+        );
     }
 
     void CarAdded(Car car)
@@ -55,6 +60,6 @@ public class Cars : MonoBehaviour
         while (transform.childCount > 0)
             DestroyImmediate(transform.GetChild(0).gameObject);
         carMapping.Clear();
-        carPool.Clear();
+        CreatePool();
     }
 }

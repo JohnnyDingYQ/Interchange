@@ -73,3 +73,4 @@ MonoBehaviour:
   ZoomMultiplier: 220
   PanMultiplier: 3750
   driftDecayExponentMultiplier: 14
+  SpinMuliplier: 40

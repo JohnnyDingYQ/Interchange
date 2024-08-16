@@ -31,6 +31,7 @@ public class CarTest
 
         PassTime(4);
         Assert.AreEqual(0, Game.Cars.Count);
+        Assert.AreEqual(1, Game.CarServiced);
     }
 
     [Test]
@@ -66,7 +67,7 @@ public class CarTest
     public void DivideCancelsCarOnRoad()
     {
         float totalLength = 100;
-        Road road = RoadBuilder.ZoneToZone(0, MyNumerics.Up * totalLength / 2, MyNumerics.Up * totalLength, Game.SourceZones[1], Game.TargetZones[1]);
+        Road road = RoadBuilder.ZoneToZone(0, MyNumerics.Forward * totalLength / 2, MyNumerics.Forward * totalLength, Game.SourceZones[1], Game.TargetZones[1]);
         CarScheduler.Schedule(0);
         Car car = Game.Cars.Values.Single();
 
@@ -74,7 +75,7 @@ public class CarTest
         PassTime(0.2f);
         Divide.DivideRoad(road, totalLength / 2);
         PassTime(0.2f);
-        Assert.True(car.IsDone);
+        Assert.AreEqual(0, Game.CarServiced);
     }
 
     [Test]
@@ -102,6 +103,7 @@ public class CarTest
         Assert.True(Graph.ContainsEdge(car.CurrentEdge));
         PassTime(timeTaken * 0.3f);
         Assert.AreEqual(0, Game.Cars.Count);
+        Assert.AreEqual(2, Game.CarServiced);
     }
 
     [Test]
@@ -129,6 +131,7 @@ public class CarTest
         Assert.True(Graph.ContainsEdge(car.CurrentEdge));
         PassTime(timeTaken * 0.7f);
         Assert.AreEqual(0, Game.Cars.Count);
+        Assert.AreEqual(2, Game.CarServiced);
     }
 
     [Test]
@@ -141,7 +144,8 @@ public class CarTest
 
         Game.RemoveRoad(road);
         PassTime(0.2f);
-        Assert.True(car.IsDone);
+
+        Assert.AreEqual(0, Game.CarServiced);
     }
 
     void PassTime(float total, float interval = 0.1f)

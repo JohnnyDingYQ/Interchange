@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class SquareSelector : MonoBehaviour
 {
+    public bool Performed;
+    public float3 StartPos;
     Mesh square;
     List<Vector3> unitSquareVerts;
     List<Vector3> updatedVerts;
@@ -43,6 +45,6 @@ public class SquareSelector : MonoBehaviour
         }
         square.SetVertices(updatedVerts);
         center.y = Constants.MaxElevation + 1;
-        gameObject.transform.position = center;
+        gameObject.transform.SetPositionAndRotation(center, Quaternion.identity);
     }
 }

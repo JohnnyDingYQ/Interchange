@@ -236,6 +236,18 @@ public class BasicBuildTest
             || MyNumerics.IsApproxEqual(three.Lanes[1].EndPos, two.Lanes[1].Curve.StartPos));
     }
 
+    [Test]
+    public void RoadTooSteepShouldNotBuild()
+    {
+        float acceptableDiff = Constants.MaxRampGrade / 100 * math.length(2 * stride) - 0.1f;
+        float unacceptableDiff = acceptableDiff + 0.2f;
+        
+        Road road = RoadBuilder.Single(0 , stride, 2 * stride + MyNumerics.Up * unacceptableDiff, 1);
+        Assert.Null(road);
+        road = RoadBuilder.Single(0 , stride, 2 * stride + MyNumerics.Up * acceptableDiff, 1);
+        Assert.NotNull(road);
+    }
+
     #region Helpers
     public void CheckLanesConnection(Road inRoad, Road outRoad, int laneCount)
     {

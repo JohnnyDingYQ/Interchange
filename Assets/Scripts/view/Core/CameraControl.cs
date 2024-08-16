@@ -8,8 +8,10 @@ public class CameraControl : MonoBehaviour
     [SerializeField]
     CameraSettings cameraSettings;
     public static Vector3 CameraOffset;
+    public static float CamearSpin;
     float minHeight;
     Vector3 cameraVelocity;
+    public static Quaternion Quaternion { get => Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0);}
 
     void Start()
     {
@@ -19,14 +21,17 @@ public class CameraControl : MonoBehaviour
 
     void Update()
     {
+        Camera.main.transform.Rotate(0, CamearSpin * Time.deltaTime * cameraSettings.SpinMuliplier, 0, Space.World);
+
         SetCameraVelocity(CameraOffset);
-        Camera.main.transform.position += cameraVelocity * Time.deltaTime;
+        ApplyCameraVelocity();
         cameraVelocity *= math.pow(math.E, -Time.deltaTime * cameraSettings.driftDecayExponentMultiplier);
         ClampToBounds();
         Camera.main.orthographicSize = Camera.main.transform.position.y;
+
     }
 
-    public void SetCameraVelocity(Vector3 cameraOffset)
+    void SetCameraVelocity(Vector3 cameraOffset)
     {
         float cameraHeight = Camera.main.transform.position.y;
         float heightRatio = cameraHeight / (cameraSettings.MaxHeight - minHeight);
@@ -54,6 +59,12 @@ public class CameraControl : MonoBehaviour
             cameraVelocity.z = cameraOffset.z;
         }
     }
+
+    void ApplyCameraVelocity()
+    {
+        Camera.main.transform.position += Quaternion * cameraVelocity * Time.deltaTime;
+    }
+
     void ClampToBounds()
     {
         float3 cameraPos = Camera.main.transform.position;

@@ -291,8 +291,8 @@ public class DivideTest
     {
         Road road = RoadBuilder.Single(
             0,
-            Vector3.up * Constants.MinLaneLength,
-            2.01f * Constants.MinLaneLength * Vector3.up,
+            Vector3.right * Constants.MinLaneLength,
+            2.01f * Constants.MinLaneLength * Vector3.right,
             3
         );
         SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
@@ -306,8 +306,8 @@ public class DivideTest
         float longLength = 700;
         Road road = RoadBuilder.Single(
             0,
-            Vector3.up * longLength / 2,
-            Vector3.up * longLength,
+            Vector3.right * longLength / 2,
+            Vector3.right * longLength,
             1
         );
         SubRoads subRoads = Divide.DivideRoad(road, longLength - Constants.MinLaneLength - 0.5f);

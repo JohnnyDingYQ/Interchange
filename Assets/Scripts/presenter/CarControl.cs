@@ -14,9 +14,9 @@ public static class CarControl
     {
         foreach (Car car in Game.Cars.Values)
         {
-            if (car.IsDone)
+            if (car.Status == CarStatus.Finished || car.Status == CarStatus.Canceled)
             {
-                Game.CarServiced++;
+                if (car.Status == CarStatus.Finished) Game.CarServiced++;
                 toRemove.Add(car);
                 continue;
             }
@@ -27,12 +27,10 @@ public static class CarControl
             }
             else
             {
-                car.Cancel();
-                Game.CarServiced++;
                 toRemove.Add(car);
                 continue;
             }
-            
+
         }
         foreach (Car car in toRemove)
             Game.RemoveCar(car);

@@ -22,7 +22,7 @@ public static class Game
     public static Road HoveredRoad { get; set; }
     public static Zone HoveredZone { get; set; }
     public static District HoveredDistrict { get; set; }
-    public static uint CarServiced { get; set; }
+    public static uint CarServiced { get => GameSave.CarServiced; set => GameSave.CarServiced = value; }
     public static bool BuildModeOn { get; set; }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;
     public static event Action<Intersection> IntersectionAdded, IntersectionUpdated, IntersectionRemoved;
