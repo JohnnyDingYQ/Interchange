@@ -9,5 +9,6 @@ public enum HUDLayer
     Intersections,
     SupportLines,
     SnapPoints,
+    RoadArrows,
     BulkSelector
 }

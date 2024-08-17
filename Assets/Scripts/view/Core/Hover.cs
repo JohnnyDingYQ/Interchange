@@ -17,7 +17,7 @@ public class Hover
         Game.HoveredZone = null;
         Game.HoveredDistrict = null;
         if (Game.HoveredRoad != null)
-            Roads.UnHighLight(Game.HoveredRoad);
+            Roads.UnHover(Game.HoveredRoad);
         Game.HoveredRoad = null;
         bool roadFound = false;
 
@@ -32,7 +32,7 @@ public class Hover
                 if (!roadComp.Road.IsGhost)
                 {
                     Game.HoveredRoad = roadComp.Road;
-                    Roads.HighLight(Game.HoveredRoad);
+                    Roads.Hover(Game.HoveredRoad);
                     roadFound = true;
                 }
 

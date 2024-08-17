@@ -51,14 +51,13 @@ public static class CarScheduler
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
                 foreach (TargetZone target in  Game.TargetZones.Values)
-                    foreach (Vertex endV in target.Vertices)
+                    foreach (Vertex endV in target.Vertices.OrderBy(v => v.Id)) // order for testing purposes
                     {
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);
                         if (pathEdges != null)
                         {
                             changed = true;
                             AddPath(source, target, pathEdges);
-                            break;
                         }
                     }
             }

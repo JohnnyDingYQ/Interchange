@@ -159,7 +159,7 @@ public class Roads : MonoBehaviour
             Collider hitCollider = hitColliders[i];
             if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))
             {
-                HighLight(roadComp.gameObject);
+                Hover(roadComp.Road);
                 SelectedRoads.Add(roadComp);
             }
         }
@@ -171,29 +171,26 @@ public class Roads : MonoBehaviour
     {
         foreach (RoadObject g in SelectedRoads)
             if (g != null)
-                UnHighLight(g.gameObject);
+                UnHover(g.Road);
         SelectedRoads.Clear();
     }
 
-    static void HighLight(GameObject g)
-    {
-        g.layer = LayerMask.NameToLayer("Outline");
-    }
-
-    public static void HighLight(Road road)
+    public static void Hover(Road road)
     {
         GameObject g = roadMapping[road.Id].gameObject;
         g.layer = LayerMask.NameToLayer("Outline");
+        float3 roadArrowPos = g.transform.GetChild(0).transform.position;
+        roadArrowPos.y = Main.GetHUDObjectHeight(HUDLayer.RoadArrows);
+        g.transform.GetChild(0).transform.position = roadArrowPos;
     }
 
-    static void UnHighLight(GameObject g)
-    {
-        g.layer = LayerMask.NameToLayer(roadLayerName);
-    }
 
-    public static void UnHighLight(Road road)
+    public static void UnHover(Road road)
     {
         GameObject g = roadMapping[road.Id].gameObject;
         g.layer = LayerMask.NameToLayer(roadLayerName);
+        float3 roadArrowPos = g.transform.GetChild(0).transform.position;
+        roadArrowPos.y = MathF.Max(road.StartPos.y, road.EndPos.y);
+        g.transform.GetChild(0).transform.position = roadArrowPos;
     }
 }
