@@ -7,6 +7,10 @@ public class SquareSelector : MonoBehaviour
 {
     public bool Performed;
     public float3 StartPos;
+    public float Height;
+    public float Width;
+    public float3 Center;
+    public Quaternion Quaternion; 
     Mesh square;
     List<Vector3> unitSquareVerts;
     List<Vector3> updatedVerts;
@@ -33,9 +37,13 @@ public class SquareSelector : MonoBehaviour
         gameObject.GetComponent<MeshFilter>().sharedMesh = square;
     }
 
-    public void SetTransform(float widthScale, float heightScale, float3 center)
+    public void SetTransform(float widthScale, float heightScale, float3 center, Quaternion quaternion)
     {
         updatedVerts.Clear();
+        Height = heightScale;
+        Width = widthScale;
+        Center = center;
+        Quaternion = quaternion; 
         foreach (Vector3 vector in unitSquareVerts)
         {
             Vector3 copy = vector;
@@ -44,7 +52,7 @@ public class SquareSelector : MonoBehaviour
             updatedVerts.Add(copy);
         }
         square.SetVertices(updatedVerts);
-        center.y = Constants.MaxElevation + 1;
-        gameObject.transform.SetPositionAndRotation(center, Quaternion.identity);
+        center.y = Main.GetHUDObjectHeight(HUDLayer.BulkSelector);
+        gameObject.transform.SetPositionAndRotation(center, quaternion);
     }
 }

@@ -8,5 +8,6 @@ public enum HUDLayer
 {
     Intersections,
     SupportLines,
-    SnapPoints
+    SnapPoints,
+    BulkSelector
 }

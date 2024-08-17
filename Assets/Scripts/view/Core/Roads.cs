@@ -130,21 +130,30 @@ public class Roads : MonoBehaviour
     public void UpdateSquareSelector(float3 pos)
     {
         squareSelector.gameObject.SetActive(true);
-        float width = Math.Abs(squareSelector.StartPos.x - pos.x);
-        float height = Math.Abs(squareSelector.StartPos.z - pos.z);
-        squareSelector.SetTransform(width, height, squareSelector.StartPos + (pos - squareSelector.StartPos) / 2);
+        float3 reference = CameraControl.Quaternion * new float3(0, 0, -1);
+        if (MyNumerics.Get2DVectorsIntersection(squareSelector.StartPos, reference, pos, new float3(reference.z, 0, -reference.x), out Vector3 point))
+        {
+            squareSelector.StartPos.y = 0;
+            pos.y = 0;
+            float height = math.length(squareSelector.StartPos - (float3)point);
+            float width = math.length(pos - (float3)point);
+            squareSelector.SetTransform(width, height, squareSelector.StartPos + (pos - squareSelector.StartPos) / 2, CameraControl.Quaternion);
+        }
+        else
+        {
+            squareSelector.gameObject.SetActive(false);
+        }
     }
 
-    public void BulkSelect(float3 end)
+    public void BulkSelect()
     {
+        if (!squareSelector.Performed)
+            return;
         ClearSelected();
-        float3 diff = (squareSelector.StartPos - end) / 2;
-        float3 sum = squareSelector.StartPos + (end - squareSelector.StartPos) / 2;
-        float3 halfExtent = math.abs(new float3(diff.x, (Constants.MaxElevation + 0.5f) / 2, diff.z));
-        float3 center = new(sum.x, Constants.MaxElevation / 2, sum.z);
+        float3 halfExtent = new(squareSelector.Width / 2, (Constants.MaxElevation - Constants.MinElevation) / 1.8f, squareSelector.Height / 2);
 
         int layerMask = 1 << LayerMask.NameToLayer(roadLayerName) | 1 << LayerMask.NameToLayer("Outline");
-        int colliderCount = Physics.OverlapBoxNonAlloc(center, halfExtent, hitColliders, Quaternion.identity, layerMask);
+        int colliderCount = Physics.OverlapBoxNonAlloc(squareSelector.Center, halfExtent, hitColliders, squareSelector.Quaternion, layerMask);
         for (int i = 0; i < colliderCount; i++)
         {
             Collider hitCollider = hitColliders[i];

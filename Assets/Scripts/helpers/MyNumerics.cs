@@ -65,7 +65,13 @@ public static class MyNumerics
             return false;
         }
         return true;
-        
+    }
+
+    public static bool Get2DVectorsIntersection(Vector3 p1, Vector3 v1, Vector3 p2, Vector3 v2, out Vector3 pos)
+    {
+        bool status = Get2DVectorsIntersection(new(p1.x, p1.z), new(v1.x, v1.z), new(p2.x, p2.z), new(v2.x, v2.z), out Vector2 result);
+        pos = new(result.x, 0, result.y);
+        return status;
     }
 
     public static float Round(float n, int places)

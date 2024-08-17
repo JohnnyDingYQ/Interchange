@@ -230,7 +230,7 @@ public class InputSystem : MonoBehaviour
     }
     void BulkSelectEnd(InputAction.CallbackContext context)
     {
-        roads.BulkSelect(MouseWorldPos);
+        roads.BulkSelect();
     }
     void EnableStraightMode(InputAction.CallbackContext context)
     {
