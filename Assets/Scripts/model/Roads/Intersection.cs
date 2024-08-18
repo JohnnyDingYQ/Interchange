@@ -40,14 +40,6 @@ public class Intersection : IPersistable
         PointOnInSide = GetAttribute(AttributeTypes.PointOnInSide);
     }
 
-    public void SetNodes(List<Node> nodes)
-    {
-        foreach (Node node in nodes)
-            this.nodes[node.NodeIndex] = node;
-        foreach (Node node in nodes)
-            node.Intersection = this;
-    }
-
     public Node AddNode(int nodeIndex)
     {
         Assert.AreNotEqual(0, nodes.Count);
@@ -272,6 +264,15 @@ public class Intersection : IPersistable
             }
         }
         IsSafe = true;
+    }
+
+    public bool IsMajorRoad(Road road)
+    {
+        if (Roads.Count == 1)
+            return false;
+        if (Roads.Where(r => r != road).All(r => r.LaneCount < road.LaneCount))
+            return true;
+        return false;
     }
 
     public override string ToString()

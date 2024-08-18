@@ -29,6 +29,8 @@ public class Road : IPersistable
     public float3 EndPos { get => Curve.EndPos; }
     [NotSaved]
     public float Length { get => Curve.Length; }
+    [NotSaved]
+    public bool IsMajorRoad { get => StartIntersection.IsMajorRoad(this) || EndIntersection.IsMajorRoad(this); }
 
     public Road()
     {

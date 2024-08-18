@@ -32,10 +32,7 @@ public class ReplaceTest
     public void ReplaceOneLaneWithThreeLane()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Build.LaneCount = 3;
-        Game.HoveredRoad = road;
-        Build.HandleHover(stride);
-        Build.HandleBuildCommand(stride);
+        ReplaceRoad(road, 3);
 
         Assert.AreEqual(1, Game.Roads.Count);
         Assert.AreEqual(6, Game.Nodes.Count);
@@ -170,18 +167,61 @@ public class ReplaceTest
     }
 
     [Test]
-    public void DeleteEmptyNode()
+    public void DeletesEmptyNode()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
-        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Node toDelete0 = road0.Lanes[0].EndNode;
         Node toDelete1 = road0.Lanes[2].EndNode;
-        Build.LaneCount = 1;
-        Game.HoveredRoad = road0;
-        Build.HandleHover(stride);
-        Build.HandleBuildCommand(stride);
+        ReplaceRoad(road0, 1);
         
         Assert.False(Game.Nodes.ContainsValue(toDelete0));
         Assert.False(Game.Nodes.ContainsValue(toDelete1));
+    }
+
+    [Test]
+    public void InvalidReplaceRoadTwoToOneOne()
+    {
+        Road two = RoadBuilder.Single(0, stride, 2 * stride, 2);
+        RoadBuilder.Single(two.Lanes[0].EndPos, 4 * stride, 6 * stride, 1);
+        RoadBuilder.Single(two.Lanes[1].EndPos, 3 * stride, 5 * stride, 1);
+
+        ReplaceRoad(two, 1);
+        Assert.True(Game.Roads.Values.Contains(two));
+    }
+
+    [Test]
+    public void InvalidReplaceRoadThreeToOne()
+    {
+        Road three = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+
+        Assert.False(ReplaceRoad(three, 1, -1));
+        Assert.False(ReplaceRoad(three, 1, 1));
+    }
+
+    [Test]
+    public void InvalidReplaceRoadOneToThree()
+    {
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Road three = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 3);
+
+        Assert.False(ReplaceRoad(three, 1, -1));
+        Assert.False(ReplaceRoad(three, 1, 1));
+    }
+
+    bool ReplaceRoad(Road road, int laneCount, int offset = 0)
+    {
+        Build.LaneCount = laneCount;
+        Game.HoveredRoad = road;
+        float3 midPos = road.Curve.EvaluateDistancePos(road.Length / 2);
+        midPos += Constants.LaneWidth * offset * road.Curve.EvaluateDistanceNormal(road.Length / 2);
+        Build.HandleHover(midPos);
+        if (Build.ReplaceSuggestionOn)
+        {
+            Build.HandleBuildCommand(midPos);
+            return true;
+        }
+        return false;
     }
 }

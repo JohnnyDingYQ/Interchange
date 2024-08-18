@@ -177,8 +177,9 @@ public class InputSystem : MonoBehaviour
     }
     void RemoveRoad(InputAction.CallbackContext context)
     {
-        if (Roads.HoveredRoad != null)
-            Game.RemoveRoad(Roads.HoveredRoad.Road);
+        if (Game.HoveredRoad != null)
+            Game.RemoveRoad(Game.HoveredRoad);
+            
         foreach (Road road in Roads.SelectedRoads.Select(r => r.Road))
             Game.RemoveRoad(road);
         Roads.ClearSelected();

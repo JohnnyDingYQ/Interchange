@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
@@ -70,10 +71,8 @@ public static class Build
 
     static void ReassignStartTarget()
     {
-        if (startAssigned)
-        {
+        if (startAssigned && StartTarget != null)
             StartTarget = Snapping.Snap(StartTarget.ClickPos, LaneCount, Side.Start);
-        }
     }
 
     public static void UndoBuildCommand()
@@ -151,8 +150,51 @@ public static class Build
             float offset = isOnLeftSide ? distance : -distance;
             StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
             EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
-            StartTarget.IsReplaceSuggestion = true;
-            EndTarget.IsReplaceSuggestion = true;
+
+            if (ReplaceIsValid(road))
+            {
+                StartTarget.IsReplaceSuggestion = true;
+                EndTarget.IsReplaceSuggestion = true;
+            }
+            else
+            {
+                StartTarget = null;
+                EndTarget = null;
+            }
+        }
+
+        bool ReplaceIsValid(Road road)
+        {
+            if (StartTarget.Intersection == null || EndTarget.Intersection == null)
+                return false;
+            if (StartTarget.Intersection != road.StartIntersection || EndTarget.Intersection != road.EndIntersection)
+                return false;
+            bool startGood = true;
+            bool endGood = true;
+            if (StartTarget.Intersection.IsMajorRoad(road))
+            {
+                HashSet<int> connected = new();
+                foreach (Node node in road.Lanes.Select(l => l.StartNode))
+                    if (node.InLane != null)
+                        connected.Add(node.NodeIndex);
+                for (int i = StartTarget.Offset; i < StartTarget.Offset + LaneCount; i++)
+                    connected.Remove(i);
+                if (connected.Count != 0)
+                    startGood = false;
+            }
+
+            if (EndTarget.Intersection.IsMajorRoad(road))
+            {
+                HashSet<int> connected = new();
+                foreach (Node node in road.Lanes.Select(l => l.EndNode))
+                    if (node.OutLane != null)
+                        connected.Add(node.NodeIndex);
+                for (int i = EndTarget.Offset; i < EndTarget.Offset + LaneCount; i++)
+                    connected.Remove(i);
+                if (connected.Count != 0)
+                    endGood = false;
+            }
+            return startGood && endGood;
         }
 
         void HandlePosAsStart(float3 pos)

@@ -17,7 +17,6 @@ public class Roads : MonoBehaviour
     private SquareSelector squareSelectorPrefab;
     SquareSelector squareSelector;
     private static Dictionary<uint, RoadObject> roadMapping;
-    public static RoadObject HoveredRoad { get; set; }
     public static List<RoadObject> SelectedRoads { get; set; }
     private const int MaxColliderHits = 100;
     private static readonly Collider[] hitColliders = new Collider[MaxColliderHits];
@@ -177,7 +176,9 @@ public class Roads : MonoBehaviour
 
     public static void Hover(Road road)
     {
-        GameObject g = roadMapping[road.Id].gameObject;
+        if (!roadMapping.TryGetValue(road.Id, out RoadObject roadObject))
+            return;
+        GameObject g = roadObject.gameObject;
         g.layer = LayerMask.NameToLayer("Outline");
         float3 roadArrowPos = g.transform.GetChild(0).transform.position;
         roadArrowPos.y = Main.GetHUDObjectHeight(HUDLayer.RoadArrows);
@@ -187,7 +188,9 @@ public class Roads : MonoBehaviour
 
     public static void UnHover(Road road)
     {
-        GameObject g = roadMapping[road.Id].gameObject;
+        if (!roadMapping.TryGetValue(road.Id, out RoadObject roadObject))
+            return;
+        GameObject g = roadObject.gameObject;
         g.layer = LayerMask.NameToLayer(roadLayerName);
         float3 roadArrowPos = g.transform.GetChild(0).transform.position;
         roadArrowPos.y = MathF.Max(road.StartPos.y, road.EndPos.y);

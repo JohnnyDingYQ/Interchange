@@ -139,4 +139,14 @@ public class RemoveRoadTest
         Assert.True(Game.RemoveRoad(road1));
         Assert.AreEqual(0, Game.Curves.Count);
     }
+
+    [Test]
+    public void CannotRemovePrimaryRoadTwotoOnOne()
+    {
+        Road two = RoadBuilder.Single(0, stride, 2 * stride, 2);
+        RoadBuilder.Single(two.Lanes[0].EndPos, 4 * stride, 6 * stride, 1);
+        RoadBuilder.Single(two.Lanes[1].EndPos, 3 * stride, 5 * stride, 1);
+
+        Assert.False(Game.RemoveRoad(two));
+    }
 }

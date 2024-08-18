@@ -289,6 +289,14 @@ public class Curve : IPersistable
         return math.normalize(CurveUtility.EvaluateTangent(bCurve, t));
     }
 
+    public float3 EvaluateDistanceNormal(float distance)
+    {
+        if (distance > SegmentLength && nextCurve != null)
+            return nextCurve.EvaluateDistanceNormal(distance - SegmentLength);
+        float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
+        return math.normalize(bCurve.Normalized2DNormal(t));
+    }
+
     public float GetNearestPoint(Ray ray, out float distanceOnCurve, int resolution = 10)
     {
         float minDistance = float.MaxValue;
