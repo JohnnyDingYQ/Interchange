@@ -93,8 +93,8 @@ public class GhostRoadTest
     {
         float3 up = new(0, 0, Constants.MinLaneLength);
         float3 offset = new(Constants.MinLaneLength, 0, 0);
-        Road start = RoadBuilder.Single(0, up, 2 * up, 2);
-        Road end = RoadBuilder.Single(offset + 3 * up, offset + 4 * up, offset + 5 * up, 2);
+        RoadBuilder.Single(0, up, 2 * up, 2);
+        RoadBuilder.Single(offset + 3 * up, offset + 4 * up, offset + 5 * up, 2);
 
         Build.LaneCount = 2;
         Build.HandleBuildCommand(2 * up);
@@ -105,22 +105,23 @@ public class GhostRoadTest
         
         Build.HandleHover(offset + 3 * up);
         Build.HandleBuildCommand(offset + 3 * up);
-        // Build.HandleHover(offset + 3 * up);
     }
 
+    [Test]
+    public void OneToThreeTestBuildNoError()
+    {
+        RoadBuilder.Single(0, stride, 2 * stride, 1);
+        Build.LaneCount = 3;
+        Build.HandleHover(2 * stride);
+        Build.HandleBuildCommand(2 * stride);
+        Build.HandleHover(3 * stride);
+        Build.HandleBuildCommand(3 * stride);
+        Build.HandleHover(4 * stride);
+        Assert.AreEqual(2, Game.Roads.Count);
+        Build.HandleBuildCommand(4 * stride);
+        Assert.AreEqual(2, Game.Roads.Count);
+    }
 
-    // Uncomment if I decide to divide ghost roads again
-    // [Test]
-    // public void BasicDividedGhostRoad()
-    // {
-    //     Build.HandleBuildCommand(0);
-    //     Build.HandleBuildCommand(Constants.MaximumLaneLength);
-    //     Build.HandleHover(2 * Constants.MaximumLaneLength);
-    //     Assert.IsTrue(Game.Roads.Count > 1);
-    //     Assert.IsFalse(ThereIsNoGhostRoad());
-    //     Build.HandleBuildCommand(2 * Constants.MaximumLaneLength);
-    //     Assert.IsTrue(ThereIsNoGhostRoad());
-    // }
 
     bool ThereIsNoGhostRoad()
     {

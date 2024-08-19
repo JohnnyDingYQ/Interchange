@@ -77,16 +77,6 @@ public class Intersection : IPersistable
         return null;
     }
 
-    public void SetInRoads(HashSet<Road> roads)
-    {
-        inRoads = roads;
-    }
-
-    public void SetOutRoads(HashSet<Road> roads)
-    {
-        outRoads = roads;
-    }
-
     public bool IsRoadEmpty()
     {
         return inRoads.Count == 0 && outRoads.Count == 0;

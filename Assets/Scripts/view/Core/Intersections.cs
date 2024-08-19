@@ -44,7 +44,9 @@ public class Intersections : MonoBehaviour
 
     void UpdateIntersection(Intersection ix)
     {
-        intersectionMapping[ix.Id].GetComponent<Renderer>().material.SetColor("_Color", ix.IsSafe ? safeColor : unsafeColor);
+        IntersectionObject ixObject = intersectionMapping[ix.Id];
+        ixObject.GetComponent<Renderer>().material.SetColor("_Color", ix.IsSafe ? safeColor : unsafeColor);
+        ixObject.transform.position = GetCenter(ix);
     }
 
     public void DestoryAll()

@@ -177,7 +177,7 @@ public static class Game
     {
         if (!Roads.ContainsKey(road.Id))
             return false;
-        if (road.IsMajorRoad && option == RoadRemovalOption.Default)
+        if (road.IsMajorRoad && option == RoadRemovalOption.Default && !road.IsGhost)
             return false;
         return Remove.RemoveRoad(road, option);
     }
