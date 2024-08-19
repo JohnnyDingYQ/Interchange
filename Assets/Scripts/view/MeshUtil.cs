@@ -84,10 +84,7 @@ public static class MeshUtil
         Assert.IsNotNull(splineContainer);
         Assert.AreEqual(1, splineContainer.Splines.Count);
         Spline spline = splineContainer.Splines.First();
-        Mesh mesh = new();
-        Polygon polygon = new();
-        List<TriangleNet.Geometry.Vertex> vertices = new();
-        List<Vector3> verts3D = new();
+        List<float3> verts3D = new();
         int numPoints = (int)(spline.GetLength() * zoneResolution - 1);
         List<float> knotInterpolations = new();
         for (int i = 0; i < spline.Knots.Count(); i++)
@@ -102,8 +99,7 @@ public static class MeshUtil
                 if (MyNumerics.AngleInDegrees(prevTangent, spline.EvaluateTangent(interpolation - TangnetApproximation)) > angleThreshold)
                 {
                     BezierKnot knot = spline.Knots.ElementAt(knotIndex);
-                    AddPoint(knot.Position);
-                    vertices.Add(new(knot.Position.x, knot.Position.z));
+                    verts3D.Add(knot.Position);
                     prevTangent = spline.EvaluateTangent(interpolation + TangnetApproximation);
                 }
                 knotIndex++;
@@ -113,11 +109,21 @@ public static class MeshUtil
             float angleFromPrev = MyNumerics.AngleInDegrees(prevTangent, tangent);
             if (prevTangent.Equals(0) || angleFromPrev > angleThreshold)
             {
-                AddPoint(pos);
+                verts3D.Add(pos);
                 prevTangent = tangent;
             }
         }
+        return GetPolygonMesh(verts3D, 0);
+    }
+
+    public static Mesh GetPolygonMesh(List<float3> points, float newY)
+    {
+        Mesh mesh = new();
+        Polygon polygon = new();
+        List<TriangleNet.Geometry.Vertex> vertices = new();
         TriangleNet.Geometry.Vertex prev = null;
+        foreach (float3 pos in points)
+            vertices.Add(new(pos.x, pos.z));
         foreach (TriangleNet.Geometry.Vertex vertex in vertices)
         {
             polygon.Add(vertex);
@@ -139,17 +145,26 @@ public static class MeshUtil
             triangles.Add(vertices.IndexOf(triangle.GetVertex(1)));
             triangles.Add(vertices.IndexOf(triangle.GetVertex(0)));
         }
+        List<Vector3> verts3D = new();
         foreach (TriangleNet.Geometry.Vertex vertex in imesh.Vertices)
-            verts3D.Add(new((float)vertex.X, 0, (float)vertex.Y));
+            verts3D.Add(new((float)vertex.X, newY, (float)vertex.Y));
 
         mesh.SetVertices(verts3D);
         mesh.SetTriangles(triangles.ToArray(), 0);
         mesh.SetNormals(Enumerable.Repeat(Vector3.up, verts3D.Count).ToArray());
         return mesh;
+    }
 
-        void AddPoint(float3 pos)
+    public static Mesh WorldToLocalSpace(Mesh mesh, Transform transform)
+    {
+        Vector3[] local = new Vector3[mesh.vertices.Count()];
+        for (int i = 0; i < mesh.vertexCount; i++)
         {
-            vertices.Add(new(pos.x, pos.z));
+            local[i] = transform.InverseTransformPoint(mesh.vertices[i]);
         }
+        mesh.vertices = local;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
     }
 }

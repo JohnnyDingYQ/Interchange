@@ -11,6 +11,8 @@ public class Intersections : MonoBehaviour
     Color safeColor;
     [SerializeField]
     Color unsafeColor;
+    [SerializeField]
+    GoreAreaObject goreAreaPrefab;
     readonly Dictionary<uint, IntersectionObject> intersectionMapping = new();
 
     void OnEnable()
@@ -35,6 +37,7 @@ public class Intersections : MonoBehaviour
         pos.y = Main.GetHUDObjectHeight(HUDLayer.Intersections);
         ixObject.transform.position = pos;
         intersectionMapping[ix.Id] = ixObject;
+        CreateGoreAreas(ix);
     }
 
     public void DestroyIntersection(Intersection ix)
@@ -47,6 +50,27 @@ public class Intersections : MonoBehaviour
         IntersectionObject ixObject = intersectionMapping[ix.Id];
         ixObject.GetComponent<Renderer>().material.SetColor("_Color", ix.IsSafe ? safeColor : unsafeColor);
         ixObject.transform.position = GetCenter(ix);
+        RemoveGoreAreas(ix);
+        CreateGoreAreas(ix);
+    }
+
+    void RemoveGoreAreas(Intersection ix)
+    {
+        IntersectionObject ixObject = intersectionMapping[ix.Id];
+        while (ixObject.transform.childCount > 0)
+            DestroyImmediate(ixObject.transform.GetChild(0).gameObject);
+    }
+
+    void CreateGoreAreas(Intersection ix)
+    {
+        IntersectionObject ixObject = intersectionMapping[ix.Id];
+        IEnumerable<GoreArea> goreAreas = ix.GetGoreAreas();
+        foreach (GoreArea goreArea in goreAreas)
+        {
+            GoreAreaObject goreAreaObject = Instantiate(goreAreaPrefab, ixObject.transform);
+            goreAreaObject.GoreArea = goreArea;
+            goreAreaObject.Init();
+        }
     }
 
     public void DestoryAll()
