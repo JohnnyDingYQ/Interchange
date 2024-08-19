@@ -180,14 +180,13 @@ public class InputSystem : MonoBehaviour
         if (Game.HoveredRoad != null)
             Game.RemoveRoad(Game.HoveredRoad);
             
-        foreach (Road road in Roads.SelectedRoads.Select(r => r.Road))
-            Game.RemoveRoad(road);
-        Roads.ClearSelected();
+        Game.BulkRemoveSelected();
+        roads.ClearSelected();
     }
     void Deselect(InputAction.CallbackContext context)
     {
         Build.UndoBuildCommand();
-        Roads.ClearSelected();
+        roads.ClearSelected();
     }
     void IncreaseElevation(InputAction.CallbackContext context)
     {

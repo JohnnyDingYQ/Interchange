@@ -221,22 +221,6 @@ public class BasicBuildTest
     }
 
     [Test]
-    public void ContinuousBuildButThreeLaneToTwoLane()
-    {
-        Build.ContinuousBuilding = true;
-        Build.LaneCount = 3;
-        Build.HandleBuildCommand(0);
-        Build.HandleBuildCommand(stride);
-        Road three = Build.HandleBuildCommand(2 * stride).Single();
-        Build.LaneCount = 2;
-        Build.HandleBuildCommand(3 * stride);
-        Road two = Build.HandleBuildCommand(4 * stride).Single();
-
-        Assert.True(MyNumerics.IsApproxEqual(three.Lanes[1].EndPos, two.Lanes[0].Curve.StartPos)
-            || MyNumerics.IsApproxEqual(three.Lanes[1].EndPos, two.Lanes[1].Curve.StartPos));
-    }
-
-    [Test]
     public void RoadTooSteepShouldNotBuild()
     {
         float acceptableDiff = Constants.MaxRampGrade / 100 * math.length(2 * stride) - 0.1f;

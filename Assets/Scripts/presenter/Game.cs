@@ -19,12 +19,14 @@ public static class Game
     public static Dictionary<uint, SourceZone> SourceZones { get => GameSave.SourceZones; }
     public static Dictionary<uint, TargetZone> TargetZones { get => GameSave.TargetZones; }
     public static Dictionary<uint, District> Districts { get => GameSave.Districts; }
+    public static uint CarServiced { get => GameSave.CarServiced; set => GameSave.CarServiced = value; }
     public static Road HoveredRoad { get; set; }
     public static Zone HoveredZone { get; set; }
     public static District HoveredDistrict { get; set; }
-    public static uint CarServiced { get => GameSave.CarServiced; set => GameSave.CarServiced = value; }
     public static bool BuildModeOn { get; set; }
-    public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved;
+    private static readonly HashSet<Road> selectedRoads = new();
+    public static ReadOnlySet<Road> SelectedRoads { get => selectedRoads.AsReadOnly(); }
+    public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved, RoadSelected, RoadUnselected;
     public static event Action<Intersection> IntersectionAdded, IntersectionUpdated, IntersectionRemoved;
     public static event Action<Car> CarAdded, CarRemoved;
     public static System.Random Random = new();
@@ -181,9 +183,33 @@ public static class Game
             return false;
         return Remove.RemoveRoad(road, option);
     }
+
     public static bool RemoveRoad(Road road)
     {
         return RemoveRoad(road, RoadRemovalOption.Default);
+    }
+
+    public static void BulkRemoveSelected()
+    {
+        foreach (Road road in SelectedRoads)
+            if (!road.IsMajorRoad)
+                RemoveRoad(road);
+
+        foreach (Road road in SelectedRoads)
+            if (Roads.ContainsKey(road.Id))
+                RemoveRoad(road);
+    }
+
+    public static void SelectRoad(Road road)
+    {
+        selectedRoads.Add(road);
+        RoadSelected?.Invoke(road);
+    }
+
+    public static void UnselectRoad(Road road)
+    {
+        selectedRoads.Remove(road);
+        RoadUnselected?.Invoke(road);
     }
 
     public static void RegisterCar(Car car)

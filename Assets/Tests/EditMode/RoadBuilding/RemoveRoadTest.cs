@@ -134,7 +134,7 @@ public class RemoveRoadTest
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 3);
         Road road1 = RoadBuilder.Single(0, stride, 2 * stride, 3);
-        
+
         Assert.True(Game.RemoveRoad(road0));
         Assert.True(Game.RemoveRoad(road1));
         Assert.AreEqual(0, Game.Curves.Count);
@@ -148,5 +148,20 @@ public class RemoveRoadTest
         RoadBuilder.Single(two.Lanes[1].EndPos, 3 * stride, 5 * stride, 1);
 
         Assert.False(Game.RemoveRoad(two));
+    }
+
+    [Test]
+    public void RemoveSelectedBranchTwoToOneOne()
+    {
+        Road two = RoadBuilder.Single(0, stride, 2 * stride, 2);
+        Road left = RoadBuilder.Single(two.Lanes[0].EndPos, 4 * stride, 6 * stride, 1);
+        Road right = RoadBuilder.Single(two.Lanes[1].EndPos, 3 * stride, 5 * stride, 1);
+        
+        Game.SelectRoad(two);
+        Game.SelectRoad(left);
+        Game.SelectRoad(right);
+        Game.BulkRemoveSelected();
+
+        Assert.AreEqual(0, Game.Roads.Count);
     }
 }

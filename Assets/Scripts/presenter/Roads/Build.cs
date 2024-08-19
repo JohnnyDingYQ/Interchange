@@ -14,7 +14,7 @@ public static class Build
     private static Zone startZone;
     static readonly SupportLine supportLine = new();
     private static int laneCount;
-    public static int LaneCount { get => laneCount; set { laneCount = value; ReassignStartTarget(); } }
+    public static int LaneCount { get => laneCount; set { laneCount = value; ResetSelection(); } }
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
     public static event Action<SupportLine> SupportedLineUpdated;
@@ -33,11 +33,11 @@ public static class Build
 
     static Build()
     {
+        GhostRoads = new();
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
         BuildsGhostRoad = true;
-        GhostRoads = new();
         StraightMode = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
         Game.RoadRemoved += RoadRemoved;
@@ -67,12 +67,6 @@ public static class Build
     public static bool StartAssigned()
     {
         return startAssigned;
-    }
-
-    static void ReassignStartTarget()
-    {
-        if (startAssigned && StartTarget != null)
-            StartTarget = Snapping.Snap(StartTarget.ClickPos, LaneCount, Side.Start);
     }
 
     public static void UndoBuildCommand()

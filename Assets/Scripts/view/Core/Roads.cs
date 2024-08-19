@@ -17,7 +17,6 @@ public class Roads : MonoBehaviour
     private SquareSelector squareSelectorPrefab;
     SquareSelector squareSelector;
     private static Dictionary<uint, RoadObject> roadMapping;
-    public static List<RoadObject> SelectedRoads { get; set; }
     private const int MaxColliderHits = 100;
     private static readonly Collider[] hitColliders = new Collider[MaxColliderHits];
     private const string roadLayerName = "Roads";
@@ -26,8 +25,9 @@ public class Roads : MonoBehaviour
         Game.RoadAdded += InstantiateRoad;
         Game.RoadUpdated += UpdateRoad;
         Game.RoadRemoved += DestroyRoad;
+        Game.RoadSelected += Hover;
+        Game.RoadUnselected += UnHover;
         roadMapping = new();
-        SelectedRoads = new();
         squareSelector = Instantiate(squareSelectorPrefab, transform);
     }
 
@@ -42,6 +42,8 @@ public class Roads : MonoBehaviour
         Game.RoadAdded -= InstantiateRoad;
         Game.RoadUpdated -= UpdateRoad;
         Game.RoadRemoved -= DestroyRoad;
+        Game.RoadSelected -= Hover;
+        Game.RoadUnselected -= UnHover;
     }
 
     void InstantiateRoad(Road road)
@@ -156,22 +158,19 @@ public class Roads : MonoBehaviour
         for (int i = 0; i < colliderCount; i++)
         {
             Collider hitCollider = hitColliders[i];
-            if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))
-            {
-                Hover(roadComp.Road);
-                SelectedRoads.Add(roadComp);
-            }
+            if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))            
+                Game.SelectRoad(roadComp.Road);
         }
         squareSelector.Performed = false;
         squareSelector.gameObject.SetActive(false);
     }
 
-    public static void ClearSelected()
+
+    public void ClearSelected()
     {
-        foreach (RoadObject g in SelectedRoads)
-            if (g != null)
-                UnHover(g.Road);
-        SelectedRoads.Clear();
+        IEnumerable<Road> copy = Game.SelectedRoads.ToList();
+        foreach (Road road in copy)
+            Game.UnselectRoad(road);
     }
 
     public static void Hover(Road road)
@@ -188,6 +187,8 @@ public class Roads : MonoBehaviour
 
     public static void UnHover(Road road)
     {
+        if (Game.SelectedRoads.Contains(road))
+            return;
         if (!roadMapping.TryGetValue(road.Id, out RoadObject roadObject))
             return;
         GameObject g = roadObject.gameObject;
