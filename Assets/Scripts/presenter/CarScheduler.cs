@@ -30,9 +30,7 @@ public static class CarScheduler
                 }
             }
             foreach (Vertex vertex in source.Vertices)
-            {
                 vertex.ScheduleCooldown -= deltaTime;
-            }
         }
 
         static Vertex GetStartingVertex(Path path)

@@ -8,6 +8,7 @@ public static class RoadBuilder
     public static Road Single(float3 start, float3 pivot, float3 end, int laneCount)
     {
         Build.ContinuousBuilding = false;
+        Build.ParallelBuildOn = false;
         Build.ResetSelection();
         Build.LaneCount = laneCount;
         Build.HandleBuildCommand(start);
@@ -19,9 +20,11 @@ public static class RoadBuilder
         return roads.First();
     }
 
-    public static List<Road> Many(float3 start, float3 pivot, float3 end, int laneCount)
+    public static List<Road> Parallel(float3 start, float3 pivot, float3 end, int laneCount)
     {
         Build.ContinuousBuilding = false;
+        Build.ParallelBuildOn = true;
+        Build.ResetSelection();
         Build.LaneCount = laneCount;
         Build.HandleBuildCommand(start);
         Build.HandleBuildCommand(pivot);

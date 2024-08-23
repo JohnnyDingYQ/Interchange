@@ -55,35 +55,6 @@ public class ZonePathTest
     }
 
     [Test]
-    public void ContinueRoadInSourceZone()
-    {
-        Game.HoveredZone = Game.SourceZones[1];
-        Build.HandleBuildCommand(2 * stride);
-        Game.HoveredZone = null;
-        Build.HandleBuildCommand(3 * stride);
-        Build.HandleBuildCommand(4 * stride);
-
-        Game.HoveredZone = Game.SourceZones[1];
-        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
-
-        Assert.AreEqual(1, Game.SourceZones[1].Vertices.Count);
-        Assert.AreEqual(road.Lanes.Single().StartVertex, Game.SourceZones[1].Vertices.Single());
-    }
-
-    [Test]
-    public void ContinueRoadInTargetZone()
-    {
-        Build.HandleBuildCommand(0);
-        Build.HandleBuildCommand(stride);
-        Game.HoveredZone = Game.TargetZones[1];
-        Build.HandleBuildCommand(2 * stride);
-        Road road = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-
-        Assert.AreEqual(1, Game.TargetZones[1].Vertices.Count);
-        Assert.AreEqual(road.Lanes.Single().EndVertex, Game.TargetZones[1].Vertices.Single());
-    }
-
-    [Test]
     public void RemovingRoadRemovesVertexFromZone()
     {
         Game.HoveredZone = Game.SourceZones[1];
@@ -185,5 +156,46 @@ public class ZonePathTest
         CarScheduler.FindNewConnection();
 
         Assert.True(Game.SourceZones[1].ConnectedTargets[Game.TargetZones[1]].Edges.Contains(shorter.Lanes[0].InnerEdge));
+    }
+
+    [Test]
+    public void ParallelBuildZoneConnection()
+    {
+        Build.ParallelBuildOn = true;
+        Game.HoveredZone = Game.SourceZones[1];
+        Build.HandleBuildCommand(0);
+        Game.HoveredZone = null;
+        Build.HandleBuildCommand(stride);
+        Game.HoveredZone = Game.TargetZones[1];
+        Build.HandleBuildCommand(2 * stride);
+
+        Assert.True(Game.SourceZones[1].ConnectedTargets.ContainsKey(Game.TargetZones[1]));
+    }
+
+    [Test]
+    public void ParallelBuildZoneConnectionReversed()
+    {
+        Build.ParallelBuildOn = true;
+        Game.HoveredZone = Game.TargetZones[1];
+        Build.HandleBuildCommand(0);
+        Game.HoveredZone = null;
+        Build.HandleBuildCommand(stride);
+        Game.HoveredZone = Game.SourceZones[1];
+        Build.HandleBuildCommand(2 * stride);
+
+        Assert.True(Game.SourceZones[1].ConnectedTargets.ContainsKey(Game.TargetZones[1]));
+    }
+
+    [Test]
+    public void ContinuousBuildingSetsZoneCorrectly()
+    {
+        Build.ContinuousBuilding = true;
+        Build.HandleBuildCommand(0);
+        Build.HandleBuildCommand(stride);
+        Game.HoveredZone = Game.TargetZones[1];
+        Build.HandleBuildCommand(2 * stride);
+        Game.HoveredZone = null;
+        Build.HandleBuildCommand(3 * stride);
+        Assert.NotNull(Build.StartZone);
     }
 }

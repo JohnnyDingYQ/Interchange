@@ -7,6 +7,7 @@ public class CarObject : MonoBehaviour
 
     void Update()
     {
-        gameObject.transform.position = Car.Pos;
+        if (Car.CurrentEdge != null)
+            gameObject.transform.position = Car.Pos;
     }
 }

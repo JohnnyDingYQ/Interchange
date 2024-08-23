@@ -20,15 +20,13 @@ public class Districts : MonoBehaviour
         InitZoneAndDistricts();
     }
 
-    void Update()
-    {
-    }
-
     public void InitZoneAndDistricts()
     {
         uint districtCount = 1;
         foreach (Transform districtTransform in districts.transform)
         {
+            if (!districtTransform.gameObject.activeSelf)
+                continue;
             Transform sourceZones = districtTransform.transform.GetChild(0);
             Transform targetZones = districtTransform.transform.GetChild(1);
             Transform spline = districtTransform.transform.GetChild(2);

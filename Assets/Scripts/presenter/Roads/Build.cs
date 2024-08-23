@@ -10,8 +10,8 @@ using UnityEngine.Splines;
 public static class Build
 {
     private static float3 pivotPos;
-    private static bool startAssigned, pivotAssigned, roadEndInZone;
-    private static Zone startZone;
+    private static bool startAssigned, pivotAssigned;
+    public static Zone StartZone { get; private set; }
     static readonly SupportLine supportLine = new();
     private static int laneCount;
     public static int LaneCount { get => laneCount; set { laneCount = value; ResetSelection(); } }
@@ -51,7 +51,6 @@ public static class Build
         GhostRoads = new();
         ParallelBuildOn = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
-        roadEndInZone = false;
         ContinuousBuilding = false;
         LaneCount = 1;
     }
@@ -89,7 +88,6 @@ public static class Build
         StartTarget = null;
         EndTarget = null;
         StraightMode = false;
-        roadEndInZone = false;
         RemoveAllGhostRoads();
     }
 
@@ -277,7 +275,7 @@ public static class Build
         }
         if (!startAssigned)
         {
-            startZone = Game.HoveredZone;
+            StartZone = Game.HoveredZone;
             startAssigned = true;
             return null;
         }
@@ -290,17 +288,17 @@ public static class Build
             roads = BuildParallelRoads(StartTarget, pivotPos, EndTarget, BuildMode.Actual);
         else
             roads = new() { BuildRoad(StartTarget, pivotPos, EndTarget, BuildMode.Actual) };
-        if (!EndTarget.Snapped && !roadEndInZone && ContinuousBuilding)
-        {
-            ResetSelection();
-            UpdateBuildTargetsAndPivot(clickPos);
-            startAssigned = true;
-        }
+
+        if (!EndTarget.Snapped && ContinuousBuilding)
+            ContinueBuild(clickPos);
         else
             ResetSelection();
+
         if (roads != null)
             CarScheduler.FindNewConnection();
+
         Assert.IsTrue(Game.GameSave.IPersistableAreInDict());
+        
         return roads;
 
         static Road BuildSuggested()
@@ -314,15 +312,21 @@ public static class Build
 
             road = ProcessRoad(road, StartTarget, EndTarget);
             foreach (Node node in StartTarget.Intersection.Nodes)
-            {
                 if (!road.Lanes.Contains(node.OutLane) && node.InLane == null)
                     Game.RemoveNode(node);
-            }
 
             foreach (Node node in EndTarget.Intersection.Nodes)
                 if (!road.Lanes.Contains(node.InLane) && node.OutLane == null)
                     Game.RemoveNode(node);
             return road;
+        }
+
+        static void ContinueBuild(float3 clickPos)
+        {
+            ResetSelection();
+            UpdateBuildTargetsAndPivot(clickPos);
+            startAssigned = true;
+            StartZone = Game.HoveredZone;
         }
     }
 
@@ -345,7 +349,7 @@ public static class Build
         offsetted = offsetted.ReverseChain();
         BuildTargets startTargetParallel = Snapping.Snap(offsetted.StartPos, LaneCount, Side.Start);
         BuildTargets endTargetParallel = Snapping.Snap(offsetted.EndPos, LaneCount, Side.End);
-        Road parallel = new(offsetted, LaneCount);
+        Road parallel = new(offsetted, LaneCount) { IsParallel = true };
         if (buildMode == BuildMode.Ghost)
         {
             road.IsGhost = true;
@@ -420,9 +424,7 @@ public static class Build
         if (road.IsGhost)
             GhostRoads.Add(road.Id);
         else
-        {
             HandleZoneConnection();
-        }
 
         Game.UpdateIntersection(road.StartIntersection);
         Game.UpdateIntersection(road.EndIntersection);
@@ -431,25 +433,19 @@ public static class Build
         # region extracted funcitons
         void HandleZoneConnection()
         {
-            if (road.LaneCount == 1)
+            if (road.StartPos.y == Constants.MinElevation)
             {
-                if (startZone is SourceZone && road.StartPos.y == Constants.MinElevation)
-                {
-                    startZone.AddVertex(road.Lanes.Single().StartVertex);
-                    road.EndIntersection.OutRoads
-                        .Where(r => r.LaneCount == 1)
-                        .Select(r => r.Lanes.Single()).ToList()
-                        .ForEach(l => startZone.RemoveVertex(l.StartVertex));
-                }
-                if (Game.HoveredZone is TargetZone && road.EndPos.y == Constants.MinElevation)
-                {
-                    roadEndInZone = true;
-                    Game.HoveredZone.AddVertex(road.Lanes.Single().EndVertex);
-                    road.StartIntersection.InRoads
-                        .Where(r => r.LaneCount == 1)
-                        .Select(r => r.Lanes.Single()).ToList()
-                        .ForEach(l => Game.HoveredZone.RemoveVertex(l.EndVertex));
-                }
+                if (StartZone is SourceZone && !road.IsParallel)
+                    StartZone.AddVertex(road.Lanes.Last().StartVertex);
+                if (Game.HoveredZone is SourceZone && road.IsParallel)
+                    Game.HoveredZone.AddVertex(road.Lanes.Last().StartVertex);
+            }
+            if (road.EndPos.y == Constants.MinElevation)
+            {
+                if (Game.HoveredZone is TargetZone && !road.IsParallel)
+                    Game.HoveredZone.AddVertex(road.Lanes.Last().EndVertex);
+                if (StartZone is TargetZone && road.IsParallel)
+                    StartZone.AddVertex(road.Lanes.Last().EndVertex);
             }
         }
         #endregion

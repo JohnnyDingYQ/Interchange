@@ -18,7 +18,7 @@ public class Road : IPersistable
     [SaveID]
     public Intersection EndIntersection { get; set; }
     [NotSaved]
-    public bool IsGhost { get; set; }
+    public bool IsGhost, IsParallel;
     [NotSaved]
     public RoadOutline LeftOutline { get; set; }
     [NotSaved]
