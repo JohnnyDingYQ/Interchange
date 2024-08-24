@@ -10,22 +10,31 @@ public class Zone : IPersistable
     [SaveIDCollection]
     protected HashSet<Vertex> vertices = new();
     [NotSaved]
+    public Dictionary<Zone, Path> ConnectedTargets { get; private set; }
+    [NotSaved]
     public ReadOnlySet<Vertex> Vertices { get => vertices.AsReadOnly(); }
     [NotSaved]
     public const int DistrictBitWidth = 6;
 
-    public Zone() { }
+    public Zone() { ConnectedTargets = new(); }
 
     public Zone(uint id)
     {
         Enabled = true;
         Id = id;
+        ConnectedTargets = new();
     }
 
     public void AddVertex(Vertex v)
     {
         if (Enabled)
             vertices.Add(v);
+    }
+
+    public void AddVertex(IEnumerable<Vertex> v)
+    {
+        if (Enabled)
+            vertices.UnionWith(v);
     }
 
     public void RemoveVertex(Vertex v)

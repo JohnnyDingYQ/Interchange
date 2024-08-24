@@ -290,7 +290,7 @@ public static class Build
             roads = new() { BuildRoad(StartTarget, pivotPos, EndTarget, BuildMode.Actual) };
 
         if (!EndTarget.Snapped && ContinuousBuilding)
-            ContinueBuild(clickPos);
+            ContinueBuild(roads.First());
         else
             ResetSelection();
 
@@ -321,10 +321,10 @@ public static class Build
             return road;
         }
 
-        static void ContinueBuild(float3 clickPos)
+        static void ContinueBuild(Road road)
         {
             ResetSelection();
-            UpdateBuildTargetsAndPivot(clickPos);
+            StartTarget = Snapping.Snap(road.EndPos, LaneCount, Side.Start);
             startAssigned = true;
             StartZone = Game.HoveredZone;
         }
@@ -413,9 +413,7 @@ public static class Build
             IntersectionUtil.EvaluateOutline(road.StartIntersection);
 
         if (endTarget.Snapped)
-        {
             ConnectRoadEndToNodes(endTarget.Intersection, endTarget.Offset, road);
-        }
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
@@ -435,17 +433,17 @@ public static class Build
         {
             if (road.StartPos.y == Constants.MinElevation)
             {
-                if (StartZone is SourceZone && !road.IsParallel)
-                    StartZone.AddVertex(road.Lanes.Last().StartVertex);
-                if (Game.HoveredZone is SourceZone && road.IsParallel)
-                    Game.HoveredZone.AddVertex(road.Lanes.Last().StartVertex);
+                if (StartZone != null && !road.IsParallel)
+                    StartZone.AddVertex(road.Lanes.Select(l => l.StartVertex));
+                if (Game.HoveredZone != null && road.IsParallel)
+                    Game.HoveredZone.AddVertex(road.Lanes.Select(l => l.StartVertex));
             }
             if (road.EndPos.y == Constants.MinElevation)
             {
-                if (Game.HoveredZone is TargetZone && !road.IsParallel)
-                    Game.HoveredZone.AddVertex(road.Lanes.Last().EndVertex);
-                if (StartZone is TargetZone && road.IsParallel)
-                    StartZone.AddVertex(road.Lanes.Last().EndVertex);
+                if (Game.HoveredZone != null && !road.IsParallel)
+                    Game.HoveredZone.AddVertex(road.Lanes.Select(l => l.EndVertex));
+                if (StartZone != null && road.IsParallel)
+                    StartZone.AddVertex(road.Lanes.Select(l => l.EndVertex));
             }
         }
         #endregion

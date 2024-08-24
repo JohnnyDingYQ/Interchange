@@ -79,13 +79,13 @@ public static class MeshUtil
         }
     }
 
-    public static Mesh GetPolygonMesh(SplineContainer splineContainer, float zoneResolution = 0.1f, float angleThreshold = 4f)
+    public static Mesh GetPolygonMesh(SplineContainer splineContainer, float resolution = 0.1f, float angleThreshold = 4f)
     {
         Assert.IsNotNull(splineContainer);
         Assert.AreEqual(1, splineContainer.Splines.Count);
         Spline spline = splineContainer.Splines.First();
         List<float3> verts3D = new();
-        int numPoints = (int)(spline.GetLength() * zoneResolution - 1);
+        int numPoints = (int)(spline.GetLength() * resolution - 1);
         List<float> knotInterpolations = new();
         for (int i = 0; i < spline.Knots.Count(); i++)
             knotInterpolations.Add(SplineUtility.GetNormalizedInterpolation(spline, i, PathIndexUnit.Knot));
@@ -116,6 +116,11 @@ public static class MeshUtil
         return GetPolygonMesh(verts3D, 0);
     }
 
+    public static Mesh GetPolygonMesh(List<float3> points, float newY, Transform transform)
+    {
+        return WorldToLocalSpace(GetPolygonMesh(points, newY), transform);
+    }
+    
     public static Mesh GetPolygonMesh(List<float3> points, float newY)
     {
         Mesh mesh = new();
@@ -159,9 +164,7 @@ public static class MeshUtil
     {
         Vector3[] local = new Vector3[mesh.vertices.Count()];
         for (int i = 0; i < mesh.vertexCount; i++)
-        {
             local[i] = transform.InverseTransformPoint(mesh.vertices[i]);
-        }
         mesh.vertices = local;
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();

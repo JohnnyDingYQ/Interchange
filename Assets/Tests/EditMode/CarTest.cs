@@ -15,16 +15,13 @@ public class CarTest
     {
         Game.WipeState();
         for (uint i = 1; i < 4; i++)
-        {
-            Game.SourceZones.Add(i, new(i));
-            Game.TargetZones.Add(i, new(i));
-        }
+            Game.Zones.Add(i, new(i));
     }
 
     [Test]
     public void SimplePathCompletion()
     {
-        RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
+        RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
         CarScheduler.Schedule(0);
         Assert.AreEqual(1, Game.Cars.Count);
         Car car = Game.Cars.Values.Single();
@@ -38,10 +35,10 @@ public class CarTest
     public void SaveAndLoadCar()
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
         Road road2 = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
-        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
-        Game.TargetZones[1].AddVertex(road2.Lanes[0].EndVertex);
+        Game.Zones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.Zones[2].AddVertex(road2.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
         CarScheduler.Schedule(0);
         Car car = Game.Cars.Values.Single();
@@ -67,7 +64,7 @@ public class CarTest
     public void DivideCancelsCarOnRoad()
     {
         float totalLength = 100;
-        Road road = RoadBuilder.ZoneToZone(0, MyNumerics.Forward * totalLength / 2, MyNumerics.Forward * totalLength, Game.SourceZones[1], Game.TargetZones[1]);
+        Road road = RoadBuilder.ZoneToZone(0, MyNumerics.Forward * totalLength / 2, MyNumerics.Forward * totalLength, Game.Zones[1], Game.Zones[2]);
         CarScheduler.Schedule(0);
         Car car = Game.Cars.Values.Single();
 
@@ -83,8 +80,8 @@ public class CarTest
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
-        Game.TargetZones[1].AddVertex(road1.Lanes[0].EndVertex);
+        Game.Zones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.Zones[2].AddVertex(road1.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
         CarScheduler.Schedule(0);
         Assert.AreEqual(1, Game.Cars.Count);
@@ -111,8 +108,8 @@ public class CarTest
     {
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Road road1 = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
-        Game.SourceZones[1].AddVertex(road0.Lanes[0].StartVertex);
-        Game.TargetZones[1].AddVertex(road1.Lanes[0].EndVertex);
+        Game.Zones[1].AddVertex(road0.Lanes[0].StartVertex);
+        Game.Zones[2].AddVertex(road1.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
         CarScheduler.Schedule(0);
         Assert.AreEqual(1, Game.Cars.Count);
@@ -137,7 +134,7 @@ public class CarTest
     [Test]
     public void CarCancelsWhenRoadRemoved()
     {
-        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.SourceZones[1], Game.TargetZones[1]);
+        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
         CarScheduler.Schedule(0);
         Car car = Game.Cars.Values.Single();
         PassTime(0.2f);

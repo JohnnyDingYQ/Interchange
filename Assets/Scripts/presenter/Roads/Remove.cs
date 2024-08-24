@@ -17,12 +17,12 @@ public static class Remove
             List<Edge> toRemove = new();
             if (option == RoadRemovalOption.Default || option == RoadRemovalOption.Replace)
             {
-                Game.SourceZones?.Values.ToList().ForEach(zone =>
+                Game.Zones?.Values.ToList().ForEach(zone =>
                 {
                     zone.RemoveVertex(lane.StartVertex);
                     zone.RemoveVertex(lane.EndVertex);
                 });
-                Game.TargetZones?.Values.ToList().ForEach(zone =>
+                Game.Zones?.Values.ToList().ForEach(zone =>
                 {
                     zone.RemoveVertex(lane.StartVertex);
                     zone.RemoveVertex(lane.EndVertex);

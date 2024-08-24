@@ -21,34 +21,38 @@ public class DistrictObject : MonoBehaviour
         districtLabel?.ApplyWorldPos(Center);
     }
 
-    public void Init(SplineContainer splineContainer, DistrictLabel districtLabel)
+    public void Init(DistrictLabel districtLabel)
     {
+        SplineContainer splineContainer = GetComponent<SplineContainer>();
+        Assert.IsNotNull(splineContainer);
         Assert.AreEqual(1, splineContainer.Splines.Count());
 
         this.districtLabel = districtLabel;
-        SetupMeshCollider();
+        SetupMesh();
         CalculateCenter();
 
-        void SetupMeshCollider()
+        void SetupMesh()
         {
             Mesh mesh = MeshUtil.GetPolygonMesh(splineContainer);
             
-            MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+            MeshCollider meshCollider = splineContainer.gameObject.AddComponent<MeshCollider>();
             meshCollider.sharedMesh = mesh;
 
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+            MeshFilter meshFilter = splineContainer.gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
 
-            // gameObject.AddComponent<MeshRenderer>();
+            // splineContainer.gameObject.AddComponent<MeshRenderer>();
         }
 
         void CalculateCenter()
         {
+            Center = 0;
             Spline spline = splineContainer.Splines.Single();
             for (float i = 0; i < CenterSampleCount; i++)
                 Center += spline.EvaluatePosition(i / CenterSampleCount);
             
             Center /= CenterSampleCount;
+            Center = transform.TransformPoint(Center);
         }
     }
 }

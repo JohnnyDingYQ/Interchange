@@ -16,9 +16,9 @@ public class Car : IPersistable
     public float TimeTaken { get; private set; }
     public CarStatus Status { get; private set; }
     [SaveID]
-    readonly SourceZone sourceZone;
+    readonly Zone source;
     [SaveID]
-    readonly TargetZone targetZone;
+    readonly Zone target;
     [NotSaved]
     Path path;
     [NotSaved]
@@ -37,10 +37,10 @@ public class Car : IPersistable
         return path.Edges[edgeIndex];
     }
 
-    public Car(SourceZone sourceZone, TargetZone targetZone)
+    public Car(Zone source, Zone target)
     {
-        this.sourceZone = sourceZone;
-        this.targetZone = targetZone;
+        this.source = source;
+        this.target = target;
         path = GetPath();
         speed = 0;
         Status = CarStatus.Traveling;
@@ -48,7 +48,7 @@ public class Car : IPersistable
 
     Path GetPath()
     {
-        return sourceZone.ConnectedTargets.GetValueOrDefault(targetZone);
+        return source.ConnectedTargets.GetValueOrDefault(target);
     }
 
     public void UpdatePath()

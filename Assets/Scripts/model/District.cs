@@ -10,51 +10,43 @@ public class District : IPersistable
     public bool Enabled { get; private set; }
     public float Connectedness { get; private set; }
     [SaveIDCollection]
-    public HashSet<SourceZone> SourceZones { get; private set; }
-    [SaveIDCollection]
-    public HashSet<TargetZone> TargetZones { get; private set; }
+    public HashSet<Zone> Zones { get; private set; }
 
     public District()
     {
-        SourceZones = new();
-        TargetZones = new();
+        Zones = new();
     }
 
     public District(uint id, string name)
     {
         Id = id;
         Name = name;
-        SourceZones = new();
-        TargetZones = new();
+        Zones = new();
     }
 
     public void CalculateConnectedness()
     {
         int connectionCount = 0;
-        foreach (TargetZone targetZone in TargetZones)
-        {
-            foreach (SourceZone sourceZone in targetZone.ConnectedSources)
-                if (SourceZones.Contains(sourceZone))
-                    connectionCount++;
-        }
-        Connectedness = MyNumerics.Round((float) connectionCount / (SourceZones.Count * TargetZones.Count) * 100, 2); 
+        foreach (Zone zone in Zones)
+            connectionCount += zone.ConnectedTargets.Count;
+        Connectedness = MyNumerics.Round((float) connectionCount / (Zones.Count * (Zones.Count - 1)) * 100, 2); 
     }
 
     public void Enable()
     {
         Enabled = true;
-        foreach (Zone zone in SourceZones)
+        foreach (Zone zone in Zones)
             zone.Enabled = true;
-        foreach (Zone zone in TargetZones)
+        foreach (Zone zone in Zones)
             zone.Enabled = true;
     }
 
     public void Disable()
     {
         Enabled = false;
-        foreach (Zone zone in SourceZones)
+        foreach (Zone zone in Zones)
             zone.Enabled = false;
-        foreach (Zone zone in TargetZones)
+        foreach (Zone zone in Zones)
             zone.Enabled = false;
     }
 
@@ -62,8 +54,8 @@ public class District : IPersistable
     {
         if (obj is District other)
             return Id == other.Id && Name.Equals(other.Name) && Connectedness == other.Connectedness && Enabled == other.Enabled
-                && SourceZones.Select(v => Id).SequenceEqual(other.SourceZones.Select(v => Id))
-                && TargetZones.Select(v => Id).SequenceEqual(other.TargetZones.Select(v => Id));
+                && Zones.Select(v => Id).SequenceEqual(other.Zones.Select(v => Id))
+                && Zones.Select(v => Id).SequenceEqual(other.Zones.Select(v => Id));
         else
         return false;
     }

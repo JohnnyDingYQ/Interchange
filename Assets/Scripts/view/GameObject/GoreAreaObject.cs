@@ -17,8 +17,7 @@ public class GoreAreaObject : MonoBehaviour
         verts.AddRange(right);
         
     
-        Mesh mesh = MeshUtil.GetPolygonMesh(verts, 2);
-        mesh = MeshUtil.WorldToLocalSpace(mesh, transform);
+        Mesh mesh = MeshUtil.GetPolygonMesh(verts, 2, transform);
         gameObject.AddComponent<MeshFilter>().mesh = mesh;
         gameObject.AddComponent<MeshRenderer>();
     }

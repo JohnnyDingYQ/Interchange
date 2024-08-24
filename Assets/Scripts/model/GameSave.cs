@@ -25,9 +25,7 @@ public class GameSave : IPersistable
     [IPersistableDict]
     public Dictionary<uint, Curve> Curves { get; private set; }
     [IPersistableDict]
-    public static Dictionary<uint, SourceZone> SourceZones { get; private set; }
-    [IPersistableDict]
-    public static Dictionary<uint, TargetZone> TargetZones { get; private set; }
+    public static Dictionary<uint, Zone> Zones { get; private set; }
     [IPersistableDict]
     public static Dictionary<uint, District> Districts { get; private set; }
     [IPersistableDict]
@@ -44,8 +42,8 @@ public class GameSave : IPersistable
         Intersections = new();
         Cars = new();
         Curves = new();
-        SourceZones = new();
-        TargetZones = new();
+        Zones = new();
+        Zones = new();
         Districts = new();
         CarServiced = 0;
     }

@@ -16,8 +16,7 @@ public static class Game
     public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
     public static Dictionary<uint, Edge> Edges { get => GameSave.Edges; }
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
-    public static Dictionary<uint, SourceZone> SourceZones { get => GameSave.SourceZones; }
-    public static Dictionary<uint, TargetZone> TargetZones { get => GameSave.TargetZones; }
+    public static Dictionary<uint, Zone> Zones { get => GameSave.Zones; }
     public static Dictionary<uint, District> Districts { get => GameSave.Districts; }
     public static uint CarServiced { get => GameSave.CarServiced; set => GameSave.CarServiced = value; }
     public static Road HoveredRoad { get; set; }

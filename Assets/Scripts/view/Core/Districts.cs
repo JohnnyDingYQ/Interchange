@@ -27,38 +27,23 @@ public class Districts : MonoBehaviour
         {
             if (!districtTransform.gameObject.activeSelf)
                 continue;
-            Transform sourceZones = districtTransform.transform.GetChild(0);
-            Transform targetZones = districtTransform.transform.GetChild(1);
-            Transform spline = districtTransform.transform.GetChild(2);
-            Assert.IsTrue(sourceZones.name.Equals("Source Zones"));
-            Assert.IsTrue(targetZones.name.Equals("Target Zones"));
-            Assert.IsTrue(spline.name.Equals("Spline"));
 
             District newDistrict = new(districtCount, districtTransform.name);
             Game.Districts[newDistrict.Id] = newDistrict;
             DistrictObject districtObject = districtTransform.gameObject.AddComponent<DistrictObject>();
-            districtObject.Init(spline.GetComponent<SplineContainer>(), gameUI.AddDistrictLabel());
+            districtObject.Init(gameUI.AddDistrictLabel());
             DebugExtension.DebugPoint(districtObject.Center, Color.black, 50, 10000);
             districtObject.District = newDistrict;
             districtMapping[newDistrict.Id] = districtObject;
 
             uint zoneCount = 1;
-            foreach (Transform sourceZone in sourceZones.transform)
+            foreach (Transform zone in districtTransform.transform)
             {
-                uint id = (zoneCount++ << (Zone.DistrictBitWidth + 1)) + (districtCount << 1);
-                SourceZone newZone = new(id);
-                newDistrict.SourceZones.Add(newZone);
-                Game.SourceZones.Add(id, newZone);
-                InitZoneObject(sourceZone.gameObject, newZone);
-            }
-            zoneCount = 1;
-            foreach (Transform targetZone in targetZones.transform)
-            {
-                uint id = (zoneCount++ << (Zone.DistrictBitWidth + 1)) + (districtCount << 1) + 1;
-                TargetZone newZone = new(id);
-                newDistrict.TargetZones.Add(newZone);
-                Game.TargetZones.Add(id, newZone);
-                InitZoneObject(targetZone.gameObject, newZone);
+                uint id = (zoneCount++ << (Zone.DistrictBitWidth)) + districtCount;
+                Zone newZone = new(id);
+                newDistrict.Zones.Add(newZone);
+                Game.Zones.Add(id, newZone);
+                InitZoneObject(zone.gameObject, newZone);
             }
             newDistrict.Disable();
             districtCount++;
@@ -80,10 +65,10 @@ public class Districts : MonoBehaviour
     {
         foreach (ZoneObject zoneObject in zoneMapping.Values)
         {
-            if (zoneObject.Zone is SourceZone)
-                zoneObject.Zone = Game.SourceZones[zoneObject.Zone.Id];
+            if (zoneObject.Zone is Zone)
+                zoneObject.Zone = Game.Zones[zoneObject.Zone.Id];
             else
-                zoneObject.Zone = Game.TargetZones[zoneObject.Zone.Id];
+                zoneObject.Zone = Game.Zones[zoneObject.Zone.Id];
         }
 
         foreach (DistrictObject districtObject in districtMapping.Values)

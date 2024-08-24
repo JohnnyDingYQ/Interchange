@@ -266,13 +266,9 @@ public class Intersection : IPersistable
             left = nodes.Values.ElementAt(i - 1);
             right = nodes.Values.ElementAt(i);
             if (left.InLane != null && right.InLane != null && left.InLane.Road != right.InLane.Road)
-            {
                 goreAreas.Add(new(left.InLane.Road, right.InLane.Road, Side.End));
-            }
             if (left.OutLane != null && right.OutLane != null && left.OutLane.Road != right.OutLane.Road)
-            {
                 goreAreas.Add(new(left.OutLane.Road, right.OutLane.Road, Side.Start));
-            }
         }
         return goreAreas;
     }

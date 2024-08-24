@@ -15,10 +15,10 @@ public static class CarScheduler
 
     public static void Schedule(float deltaTime)
     {
-        foreach (SourceZone source in Game.SourceZones.Values)
+        foreach (Zone source in Game.Zones.Values)
         {
-            IEnumerable<TargetZone> randomOrder = source.ConnectedTargets.Keys.OrderBy(x => Game.Random.Next());
-            foreach (TargetZone target in randomOrder)
+            IEnumerable<Zone> randomOrder = source.ConnectedTargets.Keys.OrderBy(x => Game.Random.Next());
+            foreach (Zone target in randomOrder)
             {
                 Path path = source.ConnectedTargets[target];
                 Vertex startVertex = GetStartingVertex(path);
@@ -43,12 +43,15 @@ public static class CarScheduler
     public static void FindNewConnection()
     {
         bool changed = false;
-        foreach (SourceZone source in Game.SourceZones.Values)
+        foreach (Zone source in Game.Zones.Values)
         {
             foreach (Vertex startV in source.Vertices)
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
-                foreach (TargetZone target in  Game.TargetZones.Values)
+                foreach (Zone target in Game.Zones.Values)
+                {
+                    if (target == source)
+                        continue;   
                     foreach (Vertex endV in target.Vertices.OrderBy(v => v.Id)) // order for testing purposes
                     {
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);
@@ -58,12 +61,13 @@ public static class CarScheduler
                             AddPath(source, target, pathEdges);
                         }
                     }
+                }
             }
         }
         if (changed)
             Progression.CheckProgression();
 
-        static void AddPath(SourceZone source, TargetZone target, IEnumerable<Edge> pathEdges)
+        static void AddPath(Zone source, Zone target, IEnumerable<Edge> pathEdges)
         {
             float length = 0;
             foreach (Edge edge in pathEdges)
@@ -81,7 +85,6 @@ public static class CarScheduler
                 Path path = new(pathEdges);
                 source.ConnectedTargets[target] = path;
             }
-            target.ConnectedSources.Add(source);
         }
     }
 
@@ -95,14 +98,14 @@ public static class CarScheduler
     public static void DeleteMissingConnection()
     {
         bool changed = false;
-        foreach (SourceZone source in Game.SourceZones.Values.Where(z => z.ConnectedTargets.Count != 0))
+        foreach (Zone source in Game.Zones.Values.Where(z => z.ConnectedTargets.Count != 0))
         {
-            HashSet<TargetZone> unfoundTargets = source.ConnectedTargets.Keys.ToHashSet();
+            HashSet<Zone> unfoundTargets = source.ConnectedTargets.Keys.ToHashSet();
             foreach (Vertex startV in source.Vertices)
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
-                List<TargetZone> targets = new(source.ConnectedTargets.Keys);
-                foreach (TargetZone target in targets)
+                List<Zone> targets = new(source.ConnectedTargets.Keys);
+                foreach (Zone target in targets)
                     foreach (Vertex endV in target.Vertices)
                     {
                         tryFunc(endV, out IEnumerable<Edge> pathEdges);
@@ -114,11 +117,10 @@ public static class CarScheduler
 
                     }
             }
-            foreach (TargetZone unfound in unfoundTargets)
+            foreach (Zone unfound in unfoundTargets)
             {
                 changed = true;
                 source.ConnectedTargets.Remove(unfound);
-                unfound.ConnectedSources.Remove(source);
             }
         }
 

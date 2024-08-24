@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,7 +12,7 @@ public static class Progression
 
     public static void CheckProgression()
     {
-        UpdateConnectedness();
+        UpdateGlobalConnectedness();
         District prev = null;
         foreach (District district in Game.Districts.Values)
         {
@@ -22,14 +23,13 @@ public static class Progression
         }
     }
 
-    public static void UpdateConnectedness()
+    public static void UpdateGlobalConnectedness()
     {
         int connectionCount = 0;
-        IEnumerable<SourceZone> sourceZones = Game.SourceZones.Values.Where(z => z.Enabled);
-        IEnumerable<TargetZone> targetZones = Game.TargetZones.Values.Where(z => z.Enabled);
-        foreach (TargetZone targetZone in targetZones)
-            connectionCount += targetZone.ConnectedSources.Count;
-        GlobalConnectedness = (float)connectionCount / (sourceZones.Count() * targetZones.Count());
+        IEnumerable<Zone> zones = Game.Zones.Values.Where(z => z.Enabled);
+        foreach (Zone zone in zones)
+            connectionCount += zone.ConnectedTargets.Count;
+        GlobalConnectedness = connectionCount / (zones.Count() * (zones.Count() - 1));
         GlobalConnectedness = MyNumerics.Round(GlobalConnectedness * 100, 2);
 
         foreach (District district in Game.Districts.Values)

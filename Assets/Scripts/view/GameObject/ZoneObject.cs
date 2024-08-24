@@ -36,9 +36,7 @@ public class ZoneObject : MonoBehaviour
     {
         if (!Zone.Enabled)
             meshRenderer.material = zoneMaterial.DisbaledMaterial;
-        else if (Zone is SourceZone)
-            meshRenderer.material = zoneMaterial.SourceMaterial;
-        else if (Zone is TargetZone)
+        else
             meshRenderer.material = zoneMaterial.TargetMaterial;
     }
 }
