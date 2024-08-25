@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 
 /// <summary>
 /// Evaluates and updates the outlines and edges for the given intersection.

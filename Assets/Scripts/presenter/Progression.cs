@@ -28,7 +28,7 @@ public static class Progression
         int connectionCount = 0;
         IEnumerable<Zone> zones = Game.Zones.Values.Where(z => z.Enabled);
         foreach (Zone zone in zones)
-            connectionCount += zone.ConnectedTargets.Count;
+            connectionCount += zone.ConnectedZones.Count();
         GlobalConnectedness = connectionCount / (zones.Count() * (zones.Count() - 1));
         GlobalConnectedness = MyNumerics.Round(GlobalConnectedness * 100, 2);
 

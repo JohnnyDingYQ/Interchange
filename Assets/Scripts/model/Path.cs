@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 using Unity.Mathematics;
 
-public class Path : IPersistable
+public class Path
 {
-    public uint Id { get; set; }
-    [SaveIDCollection]
     public List<Edge> Edges { get; set; }
-    public float Length { get; private set; }
+    public float Cost { get; private set; }
+    public Vertex StartVertex { get => Edges.First().Source; }
+
 
     public Path() { Edges = new(); }
 
@@ -18,6 +18,6 @@ public class Path : IPersistable
     {
         Edges = edges.ToList();
         foreach (Edge edge in Edges)
-            Length += edge.Length;
+            Cost += edge.EdgeCost;
     }
 }

@@ -1,7 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine.Assertions;
 using UnityEngine;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -48,7 +48,8 @@ public class Car : IPersistable
 
     Path GetPath()
     {
-        return source.ConnectedTargets.GetValueOrDefault(target);
+        source.TryGetPathTo(target, out Path path);
+        return path;
     }
 
     public void UpdatePath()

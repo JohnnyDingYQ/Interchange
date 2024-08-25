@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 
 public static class Remove
 {

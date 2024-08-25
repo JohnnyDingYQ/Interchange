@@ -28,7 +28,7 @@ public class District : IPersistable
     {
         int connectionCount = 0;
         foreach (Zone zone in Zones)
-            connectionCount += zone.ConnectedTargets.Count;
+            connectionCount += zone.ConnectedZones.Count();
         Connectedness = MyNumerics.Round((float) connectionCount / (Zones.Count * (Zones.Count - 1)) * 100, 2); 
     }
 

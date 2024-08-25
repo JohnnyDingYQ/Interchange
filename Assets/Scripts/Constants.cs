@@ -18,4 +18,5 @@ public static class Constants
     public const float CarMinimumSeparation = MinLaneLength / 1.2f;
     public const float DefaultParallelSpacing = LaneWidth * 4.5f;
     public const float MaxRampGrade = 10;
+    public const float EdgeCostIncreaseForPath = 0.1f;
 }

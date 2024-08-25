@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;

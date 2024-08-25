@@ -197,7 +197,7 @@ public class SaveSystemTest
         Assert.AreEqual(1, Game.Zones[2].Vertices.Count);
         Assert.AreSame(road.Lanes[0].StartVertex, Game.Zones[1].Vertices.Single());
         Assert.AreSame(road.Lanes[0].EndVertex, Game.Zones[2].Vertices.Single());
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
     }
 
     [Test]

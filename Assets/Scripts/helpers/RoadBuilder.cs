@@ -32,10 +32,10 @@ public static class RoadBuilder
         return roads;
     }
 
-    public static Road ZoneToZone(float3 start, float3 pivot, float3 end, Zone source, Zone target)
+    public static Road ZoneToZone(float3 start, float3 pivot, float3 end, Zone source, Zone target, int laneCount = 1)
     {
         Build.ContinuousBuilding = false;
-        Build.LaneCount = 1;
+        Build.LaneCount = laneCount;
         Game.HoveredZone = source;
         Build.HandleBuildCommand(start);
         Build.HandleBuildCommand(pivot);

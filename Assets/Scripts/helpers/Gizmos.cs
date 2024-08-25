@@ -4,7 +4,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 
 public static class Gizmos
 {

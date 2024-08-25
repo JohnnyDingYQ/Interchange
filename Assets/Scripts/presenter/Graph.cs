@@ -5,7 +5,7 @@ using QuikGraph;
 using QuikGraph.Algorithms;
 using Unity.Mathematics;
 using UnityEngine.Assertions;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 
 public static class Graph
 {
@@ -123,11 +123,7 @@ public static class Graph
     {
         Assert.IsNotNull(start);
         Assert.IsNotNull(end);
-        TryFunc<Vertex, IEnumerable<Edge>> tryFunc = graph.ShortestPathsAStar(
-            (Edge p) => p.Length,
-            (Vertex to) => math.distance(start.Pos, to.Pos),
-            start
-        );
+        TryFunc<Vertex, IEnumerable<Edge>> tryFunc = GetAStarTryFunc(start);
         tryFunc(end, out IEnumerable<Edge> edges);
         return edges;
     }
@@ -136,7 +132,7 @@ public static class Graph
     {
         Assert.IsNotNull(start);
         return graph.ShortestPathsAStar(
-            (Edge p) => p.Length,
+            (Edge p) => p.EdgeCost,
             (Vertex to) => math.distance(start.Pos, to.Pos),
             start
         );

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Assertions;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 
 public static class Game
 {

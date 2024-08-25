@@ -3,11 +3,12 @@ using QuikGraph;
 using UnityEngine.Assertions;
 using UnityEngine;
 
-namespace Assets.Scripts.model.Roads
+namespace Assets.Scripts.Model.Roads
 {
     public class Edge : IEdge<Vertex>, IPersistable
     {
         public uint Id { get; set; }
+        public float CostFactor { get; set; }
         [SaveID]
         public Curve Curve { get; set; }
         [SaveID]
@@ -20,10 +21,13 @@ namespace Assets.Scripts.model.Roads
         public List<Car> Cars { get; set; }
         [SaveID]
         public Car IncomingCar { get; set; }
+
         [NotSaved]
         public bool IsInnerEdge { get; set; }
         [NotSaved]
         public float Length { get => Curve.Length; }
+        [NotSaved]
+        public float EdgeCost { get => Length * CostFactor; } 
 
         public Edge() { Cars = new(); }
 
@@ -33,6 +37,7 @@ namespace Assets.Scripts.model.Roads
             Source = source;
             Target = target;
             Cars = new();
+            CostFactor = 1;
         }
 
         public void AddCar(Car car)

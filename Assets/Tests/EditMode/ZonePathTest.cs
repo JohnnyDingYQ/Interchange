@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.model.Roads;
+using Assets.Scripts.Model.Roads;
 using NUnit.Framework;
 using Unity.Mathematics;
 using UnityEngine;
@@ -74,7 +74,7 @@ public class ZonePathTest
         Game.Zones[2].AddVertex(road0.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
 
-        Assert.AreNotEqual(0, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreNotEqual(0, Game.Zones[1].ConnectedZones.Count());
     }
 
 
@@ -84,17 +84,17 @@ public class ZonePathTest
         Road road0 = RoadBuilder.Single(0, stride, 2 * stride, 1);
         Game.Zones[1].AddVertex(road0.Lanes[0].StartVertex);
         Game.Zones[2].AddVertex(road0.Lanes[0].EndVertex);
-        Assert.AreEqual(0, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreEqual(0, Game.Zones[1].ConnectedZones.Count());
         CarScheduler.FindNewConnection();
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
     }
 
     [Test]
     public void BuildRoadBetweenZones()
     {
-        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
+        RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
         Assert.AreEqual(1, Game.Roads.Count);
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
     }
 
     
@@ -102,12 +102,13 @@ public class ZonePathTest
     public void DivideFindsNewPath()
     {
         Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
         Divide.DivideRoad(road, math.length(stride));
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Count);
-        Assert.AreEqual(3, Game.Zones[1].ConnectedTargets.Values.Single().Edges.Count);
+        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
+        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path path));
+        Assert.AreEqual(3, path.Edges.Count);
 
-        foreach (Edge edge in Game.Zones[1].ConnectedTargets.Values.Single().Edges)
+        foreach (Edge edge in path.Edges)
             Assert.True(Graph.ContainsEdge(edge));
     }
 
@@ -120,11 +121,12 @@ public class ZonePathTest
         Game.Zones[1].AddVertex(left.Lanes[0].StartVertex);
         Game.Zones[2].AddVertex(right.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Count);
+        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
 
         Combine.CombineRoads(left.EndIntersection);
-        Assert.AreEqual(1, Game.Zones[1].ConnectedTargets.Values.Single().Edges.Count);
-        foreach (Edge edge in Game.Zones[1].ConnectedTargets.Values.Single().Edges)
+        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path path));
+        Assert.AreEqual(1, path.Edges.Count);
+        foreach (Edge edge in path.Edges)
             Assert.True(Graph.ContainsEdge(edge));
     }
 
@@ -140,7 +142,8 @@ public class ZonePathTest
         Game.Zones[2].AddVertex(shorter.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
 
-        Assert.True(Game.Zones[1].ConnectedTargets[Game.Zones[2]].Edges.Contains(shorter.Lanes[0].InnerEdge));
+        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path path));
+        Assert.True(path.Edges.Contains(shorter.Lanes[0].InnerEdge));
     }
 
     [Test]
@@ -154,7 +157,7 @@ public class ZonePathTest
         Game.HoveredZone = Game.Zones[2];
         Build.HandleBuildCommand(2 * stride);
 
-        Assert.True(Game.Zones[1].ConnectedTargets.ContainsKey(Game.Zones[2]));
+        Assert.True(Game.Zones[1].ConnectedZones.Contains(Game.Zones[2]));
     }
 
     [Test]
@@ -168,7 +171,7 @@ public class ZonePathTest
         Game.HoveredZone = Game.Zones[2];
         Build.HandleBuildCommand(2 * stride);
 
-        Assert.True(Game.Zones[1].ConnectedTargets.ContainsKey(Game.Zones[2]));
+        Assert.True(Game.Zones[1].ConnectedZones.Contains(Game.Zones[2]));
     }
 
     [Test]
@@ -205,9 +208,20 @@ public class ZonePathTest
         
         Assert.NotNull(left);
         Assert.NotNull(right);
-        Assert.True(Game.Zones[1].ConnectedTargets.ContainsKey(Game.Zones[2]));
-        Assert.True(Game.Zones[2].ConnectedTargets.ContainsKey(Game.Zones[1]));
-        Assert.False(Game.Zones[1].ConnectedTargets.ContainsKey(Game.Zones[1]));
-        Assert.False(Game.Zones[2].ConnectedTargets.ContainsKey(Game.Zones[2]));
+        Assert.True(Game.Zones[1].ConnectedZones.Contains(Game.Zones[2]));
+        Assert.True(Game.Zones[2].ConnectedZones.Contains(Game.Zones[1]));
+        Assert.False(Game.Zones[1].ConnectedZones.Contains(Game.Zones[1]));
+        Assert.False(Game.Zones[2].ConnectedZones.Contains(Game.Zones[2]));
+    }
+
+    [Test]
+    public void UtilizeEmptyLane()
+    {
+        RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2], 2);
+        RoadBuilder.ZoneToZone(2 * stride, 3 * stride, 4 * stride, Game.Zones[2], Game.Zones[3], 2);
+
+        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path toTwo));
+        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[3], out Path toThree));
+        Assert.AreNotSame(toTwo.StartVertex, toThree.StartVertex);
     }
 }
