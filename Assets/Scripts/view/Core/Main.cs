@@ -43,8 +43,8 @@ public class Main : MonoBehaviour
         }
         frameElapsed++;
 
-        DevPanel.SetDebug1Text(Game.Districts[1].Connectedness.ToString());
-        DevPanel.SetDebug2Text(Game.Districts[2].Connectedness.ToString());
+        DevPanel.SetDebug1Text(Game.Cars.Count.ToString() + "Cars");
+        // DevPanel.SetDebug2Text(Game.Districts[2].Connectedness.ToString());
 
     }
 

@@ -19,12 +19,15 @@ public class Car : IPersistable
     readonly Zone source;
     [SaveID]
     readonly Zone target;
+    [SaveID]
+    readonly Vertex startVertex;
+
     [NotSaved]
     Path path;
     [NotSaved]
     public Edge CurrentEdge { get => GetCurrentEdge(); }
     [NotSaved]
-    public float3 Pos { get => CurrentEdge.Curve.EvaluateDistancePos(distanceOnEdge); }
+    public float3 Pos { get => CurrentEdge.Curve.EvaluatePosition(distanceOnEdge); }
 
     public Car() { }
 
@@ -37,19 +40,22 @@ public class Car : IPersistable
         return path.Edges[edgeIndex];
     }
 
-    public Car(Zone source, Zone target)
+    public Car(Zone source, Zone target, Path path)
     {
         this.source = source;
         this.target = target;
-        path = GetPath();
-        speed = 0;
+        this.path = path;
+        startVertex = path.StartVertex;
+        speed = Constants.CarMaxSpeed;
         Status = CarStatus.Traveling;
     }
 
     Path GetPath()
     {
-        source.TryGetPathTo(target, out Path path);
-        return path;
+        IEnumerable<Path> paths = source.GetPathsTo(target).Where(path => path.StartVertex == startVertex);
+        if (paths.Count() == 0)
+            return null;
+        return paths.Single();
     }
 
     public void UpdatePath()
@@ -168,6 +174,16 @@ public class Car : IPersistable
     void Finish()
     {
         Status = CarStatus.Finished;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Car other)
+            return Id == other.Id && distanceOnEdge == other.distanceOnEdge && edgeIndex == other.edgeIndex
+                && speed == other.speed && TimeTaken == other.TimeTaken && Status == other.Status
+                && IPersistable.Equals(source, other.source) && IPersistable.Equals(target, other.target)
+                && IPersistable.Equals(startVertex, other.startVertex);
+        return false;
     }
 
     public override int GetHashCode()

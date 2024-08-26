@@ -8,7 +8,6 @@ namespace Assets.Scripts.Model.Roads
     public class Edge : IEdge<Vertex>, IPersistable
     {
         public uint Id { get; set; }
-        public float CostFactor { get; set; }
         [SaveID]
         public Curve Curve { get; set; }
         [SaveID]
@@ -27,7 +26,7 @@ namespace Assets.Scripts.Model.Roads
         [NotSaved]
         public float Length { get => Curve.Length; }
         [NotSaved]
-        public float EdgeCost { get => Length * CostFactor; } 
+        public float EdgeCost { get => Length * 1; }
 
         public Edge() { Cars = new(); }
 
@@ -37,7 +36,6 @@ namespace Assets.Scripts.Model.Roads
             Source = source;
             Target = target;
             Cars = new();
-            CostFactor = 1;
         }
 
         public void AddCar(Car car)

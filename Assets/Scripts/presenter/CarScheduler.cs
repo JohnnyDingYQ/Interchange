@@ -10,23 +10,27 @@ public static class CarScheduler
 {
     static CarScheduler()
     {
-        Game.RoadRemoved += DeleteMissingConnection;
+        Game.RoadRemoved += FindNewConnection;
     }
 
     public static void Schedule(float deltaTime)
     {
         foreach (Zone source in Game.Zones.Values)
         {
-            IEnumerable<Zone> randomOrder = source.ConnectedZones.OrderBy(x => Game.Random.Next());
-            foreach (Zone target in randomOrder)
+            foreach (Zone target in source.ConnectedZones)
             {
-                source.TryGetPathTo(target, out Path path);
-                Vertex startVertex = path.StartVertex;
-                Assert.IsTrue(source.Vertices.Contains(startVertex));
-                if (startVertex.ScheduleCooldown <= 0)
+                HashSet<Path> paths = source.GetPathsTo(target);
+                Assert.IsNotNull(paths);
+                foreach (Path path in paths)
                 {
-                    Game.RegisterCar(new(source, target));
-                    startVertex.ScheduleCooldown = GenerateVertexInterval() + deltaTime;
+                    Vertex startVertex = path.StartVertex;
+                    Assert.IsTrue(source.Vertices.Contains(startVertex));
+                    if (startVertex.ScheduleCooldown <= 0)
+                    {
+                        Game.RegisterCar(new(source, target, path));
+                        startVertex.ScheduleCooldown = GenerateVertexInterval() + deltaTime;
+                        break;
+                    }
                 }
             }
             foreach (Vertex vertex in source.Vertices)
@@ -42,9 +46,9 @@ public static class CarScheduler
 
     public static void FindNewConnection()
     {
-        bool changed = false;
         foreach (Zone source in Game.Zones.Values)
         {
+            source.ClearPath();
             foreach (Vertex startV in source.Vertices)
             {
                 TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
@@ -53,71 +57,37 @@ public static class CarScheduler
                     if (target == source)
                         continue;
                     foreach (Vertex endV in target.Vertices.OrderBy(v => v.Id)) // order for testing purposes
-                    {
                         if (tryFunc(endV, out IEnumerable<Edge> pathEdges))
-                        {
-                            changed = true;
                             AddPath(source, target, pathEdges);
-                        }
-                    }
                 }
             }
         }
-        if (changed)
-            Progression.CheckProgression();
+        Progression.CheckProgression();
 
         static void AddPath(Zone source, Zone target, IEnumerable<Edge> pathEdges)
         {
             Path newPath = new(pathEdges);
-            if (source.TryGetPathTo(target, out Path existingPath))
+            IEnumerable<Path> paths = source.GetPathsTo(target).Where(p => p.StartVertex == newPath.StartVertex);
+            if (paths.Count() != 0)
             {
+                Path existingPath = paths.Single();
                 if (existingPath.Cost > newPath.Cost)
                 {
-                    Path shorterPath = newPath;
-                    source.SetPathTo(target, shorterPath);
+                    source.RemovePathTo(target, existingPath);
+                    source.AddPathTo(target, newPath);
                 }
             }
             else
-                source.SetPathTo(target, newPath);
+            {
+                source.AddPathTo(target, newPath);
+            }
         }
     }
 
-    public static void DeleteMissingConnection(Road road)
+    public static void FindNewConnection(Road road)
     {
         if (!road.IsGhost)
-            DeleteMissingConnection();
+            FindNewConnection();
     }
 
-
-    public static void DeleteMissingConnection()
-    {
-        bool changed = false;
-        foreach (Zone source in Game.Zones.Values.Where(z => z.ConnectedZones.Count() != 0))
-        {
-            HashSet<Zone> unfoundTargets = source.ConnectedZones.ToHashSet();
-            foreach (Vertex startV in source.Vertices)
-            {
-                TryFunc<Vertex, IEnumerable<Edge>> tryFunc = Graph.GetAStarTryFunc(startV);
-                List<Zone> targets = new(source.ConnectedZones);
-                foreach (Zone target in targets)
-                    foreach (Vertex endV in target.Vertices)
-                    {
-                        if (tryFunc(endV, out IEnumerable<Edge> pathEdges))
-                        {
-                            unfoundTargets.Remove(target);
-                            source.SetPathTo(target, new(pathEdges));
-                        }
-
-                    }
-            }
-            foreach (Zone unfound in unfoundTargets)
-            {
-                changed = true;
-                source.RemovePathTo(unfound);
-            }
-        }
-
-        if (changed)
-            Progression.CheckProgression();
-    }
 }

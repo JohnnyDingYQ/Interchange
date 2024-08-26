@@ -48,7 +48,8 @@ public class Districts : MonoBehaviour
             newDistrict.Disable();
             districtCount++;
         }
-
+        Game.SetupZones();
+        
         void InitZoneObject(GameObject gameObject, Zone newZone)
         {
             ZoneObject zoneObject = gameObject.AddComponent<ZoneObject>();

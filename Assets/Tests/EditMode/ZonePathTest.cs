@@ -15,6 +15,7 @@ public class ZonePathTest
         Game.WipeState();
         for (uint i = 1; i < 4; i++)
             Game.Zones.Add(i, new(i));
+        Game.SetupZones();
     }
 
     [Test]
@@ -105,7 +106,7 @@ public class ZonePathTest
         Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
         Divide.DivideRoad(road, math.length(stride));
         Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
-        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path path));
+        Path path = Game.Zones[1].GetPathsTo(Game.Zones[2]).Single();
         Assert.AreEqual(3, path.Edges.Count);
 
         foreach (Edge edge in path.Edges)
@@ -124,7 +125,7 @@ public class ZonePathTest
         Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
 
         Combine.CombineRoads(left.EndIntersection);
-        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path path));
+        Path path = Game.Zones[1].GetPathsTo(Game.Zones[2]).Single();
         Assert.AreEqual(1, path.Edges.Count);
         foreach (Edge edge in path.Edges)
             Assert.True(Graph.ContainsEdge(edge));
@@ -142,7 +143,7 @@ public class ZonePathTest
         Game.Zones[2].AddVertex(shorter.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
 
-        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path path));
+        Path path = Game.Zones[1].GetPathsTo(Game.Zones[2]).Single();
         Assert.True(path.Edges.Contains(shorter.Lanes[0].InnerEdge));
     }
 
@@ -215,13 +216,13 @@ public class ZonePathTest
     }
 
     [Test]
-    public void UtilizeEmptyLane()
+    public void UsesAllStartVertices()
     {
         RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2], 2);
         RoadBuilder.ZoneToZone(2 * stride, 3 * stride, 4 * stride, Game.Zones[2], Game.Zones[3], 2);
+        CarScheduler.FindNewConnection();
 
-        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[2], out Path toTwo));
-        Assert.True(Game.Zones[1].TryGetPathTo(Game.Zones[3], out Path toThree));
-        Assert.AreNotSame(toTwo.StartVertex, toThree.StartVertex);
+        Assert.AreEqual(2, Game.Zones[1].GetPathsTo(Game.Zones[2]).Count);
+        Assert.AreEqual(2, Game.Zones[1].GetPathsTo(Game.Zones[3]).Count);
     }
 }

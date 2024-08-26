@@ -7,6 +7,9 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
+/// <summary>
+/// Container for Unity Spline's BezierCurve to allow offsetting/Stroking
+/// </summary>
 public class Curve : IPersistable
 {
     public uint Id { get; set; }
@@ -56,7 +59,7 @@ public class Curve : IPersistable
 
     public void CreateDistanceCache()
     {
-        lut = new DistanceToInterpolation[30];
+        lut = new DistanceToInterpolation[10];
         CurveUtility.CalculateCurveLengths(bCurve, lut);
     }
 
@@ -145,19 +148,7 @@ public class Curve : IPersistable
         return count;
     }
 
-    public int GetChainDepth()
-    {
-        int chainDepth = 1;
-        Curve current = this;
-        while (current.nextCurve != null)
-        {
-            chainDepth++;
-            current = current.nextCurve;
-        }
-        return chainDepth;
-    }
-
-    public float GetDistanceToInterpolation(float distance)
+    float GetDistanceToInterpolation(float distance)
     {
         return CurveUtility.GetDistanceToInterpolation(lut, distance);
     }
@@ -265,34 +256,32 @@ public class Curve : IPersistable
     {
         Curve last = GetLastCurve();
         if (!MyNumerics.IsApproxEqual(EndPos, other.StartPos))
-        {
             Debug.Log("Left curve misaligns with right curve... Diff: " + math.length(EndPos - other.StartPos));
-        }
         last.nextCurve = other.Duplicate();
     }
 
-    public float3 EvaluateDistancePos(float distance)
+    public float3 EvaluatePosition(float distance)
     {
         if (distance > SegmentLength && nextCurve != null)
-            return nextCurve.EvaluateDistancePos(distance - SegmentLength);
+            return nextCurve.EvaluatePosition(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         if (offsetDistance == 0)
             return CurveUtility.EvaluatePosition(bCurve, t);
         return CurveUtility.EvaluatePosition(bCurve, t) + bCurve.Normalized2DNormal(t) * offsetDistance;
     }
 
-    public float3 EvaluateDistanceTangent(float distance)
+    public float3 EvaluateTangent(float distance)
     {
         if (distance > SegmentLength && nextCurve != null)
-            return nextCurve.EvaluateDistanceTangent(distance - SegmentLength);
+            return nextCurve.EvaluateTangent(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         return math.normalize(CurveUtility.EvaluateTangent(bCurve, t));
     }
 
-    public float3 EvaluateDistanceNormal(float distance)
+    public float3 EvaluateNormal(float distance)
     {
         if (distance > SegmentLength && nextCurve != null)
-            return nextCurve.EvaluateDistanceNormal(distance - SegmentLength);
+            return nextCurve.EvaluateNormal(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         return math.normalize(bCurve.Normalized2DNormal(t));
     }
@@ -305,7 +294,7 @@ public class Curve : IPersistable
         float localMin = 0;
         while (currDist <= Length)
         {
-            float3 pos = EvaluateDistancePos(currDist);
+            float3 pos = EvaluatePosition(currDist);
             float distance = GetDistanceToCurve(pos);
             if (distance < minDistance)
             {
@@ -314,20 +303,20 @@ public class Curve : IPersistable
             }
             currDist += distanceStep;
         }
-        float low = localMin - distanceStep >= 0 ? localMin - distanceStep : localMin;
-        float high = localMin + distanceStep <= Length ? localMin + distanceStep : localMin;
+        float low = localMin - distanceStep >= 0 ? localMin - distanceStep : 0;
+        float high = localMin + distanceStep <= Length ? localMin + distanceStep : Length;
         do
         {
             float mid = (low + high) / 2;
-            if (GetDistanceToCurve(EvaluateDistancePos(mid - GetNearestPointTolerance))
-                < GetDistanceToCurve(EvaluateDistancePos(mid + GetNearestPointTolerance)))
+            if (GetDistanceToCurve(EvaluatePosition(mid - GetNearestPointTolerance))
+                < GetDistanceToCurve(EvaluatePosition(mid + GetNearestPointTolerance)))
                 high = mid;
             else
                 low = mid;
         } while (high - low > GetNearestPointTolerance);
 
         distanceOnCurve = low;
-        return GetDistanceToCurve(EvaluateDistancePos(low));
+        return GetDistanceToCurve(EvaluatePosition(low));
 
         float GetDistanceToCurve(float3 pos)
         {
@@ -408,7 +397,7 @@ public class Curve : IPersistable
             float currDistance = 0;
             while (count++ < numPoints)
             {
-                yield return curve.EvaluateDistancePos(currDistance);
+                yield return curve.EvaluatePosition(currDistance);
                 currDistance += pointSeparation;
             }
         }

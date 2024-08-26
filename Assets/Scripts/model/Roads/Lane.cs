@@ -18,6 +18,7 @@ public class Lane : IPersistable
     public Node EndNode { get; set; }
     [SaveID]
     public Road Road { get; set; }
+
     [NotSaved]
     public Curve Curve { get; set; }
     [SaveID]

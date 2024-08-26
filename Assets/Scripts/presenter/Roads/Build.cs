@@ -135,10 +135,10 @@ public static class Build
 
         void SetupReplaceSuggestion(Road road, float distOnRoad)
         {
-            float distance = math.distance(road.Curve.EvaluateDistancePos(distOnRoad), pos);
+            float distance = math.distance(road.Curve.EvaluatePosition(distOnRoad), pos);
             bool isOnLeftSide = math.cross(
-                road.Curve.EvaluateDistanceTangent(distOnRoad),
-                road.Curve.EvaluateDistancePos(distOnRoad) - pos).y > 0;
+                road.Curve.EvaluateTangent(distOnRoad),
+                road.Curve.EvaluatePosition(distOnRoad) - pos).y > 0;
             float offset = isOnLeftSide ? distance : -distance;
             StartTarget = Snapping.Snap(road.StartPos + offset * road.Curve.StartNormal, LaneCount, Side.Both);
             EndTarget = Snapping.Snap(road.EndPos + offset * road.Curve.EndNormal, LaneCount, Side.Both);
@@ -373,7 +373,7 @@ public static class Build
         if (road.HasLaneShorterThanMinLaneLength() || RoadIsTooSteep())
             return null;
         int segmemtCount = (int)MathF.Ceiling(road.Curve.Length / Constants.MaxRoadCurveLength);
-        road.Curve = road.Curve.SplitInToSegments(segmemtCount);
+        // road.Curve = road.Curve.SplitInToSegments(segmemtCount);
         return road;
 
         bool RoadIsTooBent()

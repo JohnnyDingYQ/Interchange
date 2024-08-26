@@ -250,4 +250,10 @@ public static class Game
         Assert.AreEqual(0, (Constants.MaxElevation - Constants.MinElevation) % Constants.ElevationStep);
         Assert.AreEqual(0, Constants.MinElevation);
     }
+
+    public static void SetupZones()
+    {
+        foreach (Zone zone in Zones.Values)
+            zone.InitConnectedTargets(Zones.Values);
+    }
 }

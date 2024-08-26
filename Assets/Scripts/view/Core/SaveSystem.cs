@@ -24,6 +24,8 @@ public class SaveSystem
 
         static void InitializeGameSave()
         {
+            Game.SetupZones();
+
             foreach (Vertex v in Game.Vertices.Values)
                 Graph.AddVertex(v);
 
@@ -37,7 +39,7 @@ public class SaveSystem
             {
                 l.InitCurve();
             }
-            
+
             // set inner outline
             foreach (Road r in Game.Roads.Values)
                 r.SetInnerOutline();

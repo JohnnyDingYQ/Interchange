@@ -16,6 +16,7 @@ public class CarTest
         Game.WipeState();
         for (uint i = 1; i < 4; i++)
             Game.Zones.Add(i, new(i));
+        Game.SetupZones();
     }
 
     [Test]
@@ -94,11 +95,11 @@ public class CarTest
         ResetVertexCooldown();
         CarScheduler.Schedule(0);
         car = Game.Cars.Values.Single();
-        PassTime(timeTaken * 0.7f);
+        PassTime(timeTaken * 0.8f);
         Divide.DivideRoad(road0, math.length(stride));
         PassTime(0.2f);
         Assert.True(Graph.ContainsEdge(car.CurrentEdge));
-        PassTime(timeTaken * 0.3f);
+        PassTime(timeTaken * 0.8f);
         Assert.AreEqual(0, Game.Cars.Count);
         Assert.AreEqual(2, Game.CarServiced);
     }
@@ -122,11 +123,11 @@ public class CarTest
         ResetVertexCooldown();
         CarScheduler.Schedule(0);
         car = Game.Cars.Values.Single();
-        PassTime(timeTaken * 0.3f);
+        PassTime(timeTaken * 0.2f);
         Divide.DivideRoad(road1, math.length(stride));
-        PassTime(0.2f);
+        CarControl.PassTime(0);
         Assert.True(Graph.ContainsEdge(car.CurrentEdge));
-        PassTime(timeTaken * 0.7f);
+        PassTime(timeTaken);
         Assert.AreEqual(0, Game.Cars.Count);
         Assert.AreEqual(2, Game.CarServiced);
     }

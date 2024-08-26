@@ -9,8 +9,8 @@ namespace CurveExtensions
         public static float3 Normalized2DNormal(this BezierCurve curve, float t)
         {
             float3 tangent = CurveUtility.EvaluateTangent(curve, t);
-            tangent.y = 0;
-            return Vector3.Cross(tangent, Vector3.up).normalized;
+            float3 normal = new(-tangent.z, 0, tangent.x);
+            return math.normalize(normal);
         }
 
         public static float InterpolationOfPoint(this BezierCurve curve, float3 pt)

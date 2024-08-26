@@ -81,10 +81,10 @@ public class Roads : MonoBehaviour
             arrow = Instantiate(arrowPrefab, roadObject.transform);
         else
             arrow = roadObject.transform.GetChild(0).gameObject;
-        float3 pos = roadObject.Road.Curve.EvaluateDistancePos(roadObject.Road.Curve.Length / 2);
+        float3 pos = roadObject.Road.Curve.EvaluatePosition(roadObject.Road.Curve.Length / 2);
         pos.y = MathF.Max(roadObject.Road.StartPos.y, roadObject.Road.EndPos.y);
         arrow.transform.position = pos;
-        float3 tangent = roadObject.Road.Curve.EvaluateDistanceTangent(roadObject.Road.Curve.Length / 2);
+        float3 tangent = roadObject.Road.Curve.EvaluateTangent(roadObject.Road.Curve.Length / 2);
         float angle = Vector3.Angle(tangent, Vector3.forward);
         if (math.cross(tangent, Vector3.forward).y > 0)
             angle = 360 - angle;

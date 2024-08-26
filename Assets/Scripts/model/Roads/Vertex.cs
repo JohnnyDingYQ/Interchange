@@ -20,6 +20,7 @@ public class Vertex : IPersistable
     public Vertex(Lane lane, Side side)
     {
         SetOwnerLane(lane, side);
+        ScheduleCooldown = ScheduleInterval / Lane.Road.LaneCount * Lane.LaneIndex;
     }
 
     public void SetOwnerLane(Lane l, Side side)
@@ -32,16 +33,16 @@ public class Vertex : IPersistable
     {
         Curve curve = Lane.Curve;
         return side == Side.Start
-            ? curve.EvaluateDistancePos(Constants.VertexDistanceFromRoadEnds)
-            : curve.EvaluateDistancePos(curve.Length - Constants.VertexDistanceFromRoadEnds);
+            ? curve.EvaluatePosition(Constants.VertexDistanceFromRoadEnds)
+            : curve.EvaluatePosition(curve.Length - Constants.VertexDistanceFromRoadEnds);
     }
 
     float3 GetTangent()
     {
         Curve curve = Lane.Curve;
         return side == Side.Start
-            ? curve.EvaluateDistanceTangent(Constants.VertexDistanceFromRoadEnds)
-            : curve.EvaluateDistanceTangent(curve.Length - Constants.VertexDistanceFromRoadEnds);
+            ? curve.EvaluateTangent(Constants.VertexDistanceFromRoadEnds)
+            : curve.EvaluateTangent(curve.Length - Constants.VertexDistanceFromRoadEnds);
     }
 
     public override string ToString()

@@ -12,7 +12,7 @@ public static class Progression
 
     public static void CheckProgression()
     {
-        UpdateGlobalConnectedness();
+        UpdateConnectedness();
         District prev = null;
         foreach (District district in Game.Districts.Values)
         {
@@ -23,16 +23,23 @@ public static class Progression
         }
     }
 
-    public static void UpdateGlobalConnectedness()
+    public static void UpdateConnectedness()
     {
+        foreach (District district in Game.Districts.Values)
+            district.CalculateConnectedness();
         int connectionCount = 0;
         IEnumerable<Zone> zones = Game.Zones.Values.Where(z => z.Enabled);
+        if (zones.Count() <= 1)
+        {
+            GlobalConnectedness = 0;
+            return;
+        }
+
         foreach (Zone zone in zones)
             connectionCount += zone.ConnectedZones.Count();
         GlobalConnectedness = connectionCount / (zones.Count() * (zones.Count() - 1));
         GlobalConnectedness = MyNumerics.Round(GlobalConnectedness * 100, 2);
 
-        foreach (District district in Game.Districts.Values)
-            district.CalculateConnectedness();
+
     }
 }

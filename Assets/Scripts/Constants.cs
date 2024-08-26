@@ -11,9 +11,9 @@ public static class Constants
     public const int MaxElevation = 20;
     public const int MinElevation = 0;
     public const int ElevationStep = 4;
-    public const float CarAcceleration = 15;
-    public const float CarDeceleration = 15f;
-    public const float CarMaxSpeed = 20f;
+    public const float CarAcceleration = 35;
+    public const float CarDeceleration = 35f;
+    public const float CarMaxSpeed = 50f;
     public const float CarMinSpeed = 0f;
     public const float CarMinimumSeparation = MinLaneLength / 1.2f;
     public const float DefaultParallelSpacing = LaneWidth * 4.5f;

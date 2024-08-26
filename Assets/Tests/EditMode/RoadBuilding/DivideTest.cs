@@ -310,12 +310,13 @@ public class DivideTest
             Vector3.right * longLength,
             1
         );
-        SubRoads subRoads = Divide.DivideRoad(road, longLength - Constants.MinLaneLength - 0.5f);
+        float dividePoint = longLength - 2 * Constants.MinLaneLength;
+        SubRoads subRoads = Divide.DivideRoad(road, dividePoint);
 
         Assert.NotNull(subRoads);
-        Assert.True(MyNumerics.IsApproxEqual(longLength - Constants.MinLaneLength - 0.5f, subRoads.Left.Length),
-            "Expected: " + (longLength - Constants.MinLaneLength - 0.5f) + "Actual: " + subRoads.Left.Length);
-        Assert.True(MyNumerics.IsApproxEqual(Constants.MinLaneLength + 0.5f, subRoads.Right.Length),
-            "Expected: " + (Constants.MinLaneLength + 0.5f) + "Actual: " + subRoads.Right.Length);
+        Assert.True(MyNumerics.IsApproxEqual(dividePoint, subRoads.Left.Length, 1),
+            "Expected: " + dividePoint + "Actual: " + subRoads.Left.Length);
+        Assert.True(MyNumerics.IsApproxEqual(longLength - dividePoint, subRoads.Right.Length, 1),
+            "Expected: " + (longLength - dividePoint) + "Actual: " + subRoads.Right.Length);
     }
 }

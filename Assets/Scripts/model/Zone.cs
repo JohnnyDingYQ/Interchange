@@ -12,21 +12,28 @@ public class Zone : IPersistable
     [SaveIDCollection]
     protected HashSet<Vertex> vertices = new();
     [NotSaved]
-    readonly Dictionary<Zone, Path> connectedTargets;
+    Dictionary<Zone, HashSet<Path>> connectedTargets;
     [NotSaved]
     public ReadOnlySet<Vertex> Vertices { get => vertices.AsReadOnly(); }
     [NotSaved]
-    public IEnumerable<Zone> ConnectedZones { get => connectedTargets.Keys; }
+    public HashSet<Zone> ConnectedZones { get; set; }
     [NotSaved]
     public const int DistrictBitWidth = 6;
 
-    public Zone() { connectedTargets = new(); }
+    public Zone() { ConnectedZones = new(); }
 
     public Zone(uint id)
     {
         Enabled = true;
         Id = id;
+        ConnectedZones = new();
+    }
+
+    public void InitConnectedTargets(IEnumerable<Zone> otherZones)
+    {
         connectedTargets = new();
+        foreach (Zone zone in otherZones)
+            connectedTargets.Add(zone, new());
     }
 
     public void AddVertex(Vertex v)
@@ -47,36 +54,33 @@ public class Zone : IPersistable
             vertices.Remove(v);
     }
 
-    public void SetPathTo(Zone target, Path path)
+    public void AddPathTo(Zone target, Path path)
     {
-        if (connectedTargets.ContainsKey(target))
-            RemovePathTo(target);
-        IncreaseEdgeCost(path);
-        connectedTargets.Add(target, path);
+        Assert.IsNotNull(connectedTargets);
+        connectedTargets[target].Add(path);
+        ConnectedZones.Add(target);
     }
 
-    public void RemovePathTo(Zone target)
+    public void RemovePathTo(Zone target, Path path)
     {
-        Assert.IsTrue(connectedTargets.ContainsKey(target));
-        DecreaseEdgeCost(connectedTargets[target]);
-        connectedTargets.Remove(target);
+        Assert.IsNotNull(connectedTargets);
+        Assert.IsTrue(connectedTargets[target].Contains(path));
+        connectedTargets[target].Remove(path);
+        if (connectedTargets[target].Count == 0)
+            ConnectedZones.Remove(target);
     }
 
-    public bool TryGetPathTo(Zone target, out Path path)
+    public void ClearPath()
     {
-        return connectedTargets.TryGetValue(target, out path);
+        Assert.IsNotNull(connectedTargets);
+        foreach (var set in connectedTargets.Values)
+            set.Clear();
+        ConnectedZones.Clear();
     }
 
-    void IncreaseEdgeCost(Path path)
+    public HashSet<Path> GetPathsTo(Zone target)
     {
-        foreach (Edge edge in path.Edges)
-            edge.CostFactor += Constants.EdgeCostIncreaseForPath;
-    }
-
-    void DecreaseEdgeCost(Path path)
-    {
-        foreach (Edge edge in path.Edges)
-            edge.CostFactor -= Constants.EdgeCostIncreaseForPath;
+        return connectedTargets[target];
     }
 
     public override bool Equals(object obj)
