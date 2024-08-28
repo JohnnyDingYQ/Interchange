@@ -215,7 +215,7 @@ public class ReplaceTest
         Build.LaneCount = laneCount;
         Game.HoveredRoad = road;
         float3 midPos = road.Curve.EvaluatePosition(road.Length / 2);
-        midPos += Constants.LaneWidth * offset * road.Curve.EvaluateNormal(road.Length / 2);
+        midPos += Constants.LaneWidth * offset * road.Curve.Evaluate2DNormal(road.Length / 2);
         Build.HandleHover(midPos);
         if (Build.ReplaceSuggestionOn)
         {

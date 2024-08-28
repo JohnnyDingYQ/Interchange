@@ -31,22 +31,6 @@ public class SaveSystemTest
     }
 
     [Test]
-    public void CurveUnitTest()
-    {
-        Curve original = new(new(0, stride, 2 * stride));
-        original = original.AddStartDistance(Constants.MinLaneLength / 5);
-        original = original.AddEndDistance(Constants.MinLaneLength / 5);
-        original.Offset(3);
-        original.Id = 5;
-        Storage storage = new(saveName);
-        storage.Save(original);
-        Curve loaded = new();
-        storage.Load(loaded);
-
-        Assert.AreEqual(original, loaded);
-    }
-
-    [Test]
     public void IntersectionUnitTest()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);

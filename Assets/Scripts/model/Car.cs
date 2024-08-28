@@ -27,7 +27,7 @@ public class Car : IPersistable
     [NotSaved]
     public Edge CurrentEdge { get => GetCurrentEdge(); }
     [NotSaved]
-    public float3 Pos { get => CurrentEdge.Curve.EvaluatePosition(distanceOnEdge); }
+    public float3 Pos { get => CurrentEdge.Curve.LerpPosition(distanceOnEdge); }
 
     public Car() { }
 

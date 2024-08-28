@@ -346,7 +346,7 @@ public static class Build
         if (road == null)
             return null;
         Curve offsetted = road.Curve.Duplicate().Offset(ParallelSpacing);
-        offsetted = offsetted.ReverseChain();
+        offsetted = offsetted.Reverse();
         BuildTargets startTargetParallel = Snapping.Snap(offsetted.StartPos, LaneCount, Side.Start);
         BuildTargets endTargetParallel = Snapping.Snap(offsetted.EndPos, LaneCount, Side.End);
         Road parallel = new(offsetted, LaneCount) { IsParallel = true };

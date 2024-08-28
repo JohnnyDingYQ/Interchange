@@ -32,7 +32,7 @@ public static class IntersectionUtil
             Edge p = GetEdge(road, orientation, direction);
             if (p != null)
             {
-                p.Curve.GetNearestPoint(new(ix.Nodes.Last().Pos, ix.Normal), out float distanceOnCurve);
+                p.Curve.GetNearestDistance(new(ix.Nodes.Last().Pos, ix.Normal), out float distanceOnCurve);
                 Curve curve = p.Curve.Duplicate();
                 if (orientation == Orientation.Left)
                     curve.Offset(Constants.RoadOutlineSeparation);

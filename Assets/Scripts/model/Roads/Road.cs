@@ -110,7 +110,7 @@ public class Road : IPersistable
     {
         clickPos.y = Constants.MinElevation - 1;
         Ray ray = new(clickPos, Vector3.up);
-        Curve.GetNearestPoint(ray, out float distanceOnCurve);
+        Curve.GetNearestDistance(ray, out float distanceOnCurve);
         return distanceOnCurve;
     }
     
