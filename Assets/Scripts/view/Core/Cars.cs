@@ -38,7 +38,7 @@ public class Cars : MonoBehaviour
             (o) => Destroy(o.gameObject),
             false,
             200,
-            10000
+            Constants.MaxCarCount
         );
     }
 

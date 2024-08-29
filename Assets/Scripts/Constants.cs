@@ -15,6 +15,7 @@ public static class Constants
     public const float CarDeceleration = 35f;
     public const float CarMaxSpeed = 50f;
     public const float CarMinSpeed = 0f;
+    public const int MaxCarCount = 5000;
     public const float CarMinimumSeparation = MinLaneLength / 1.2f;
     public const float DefaultParallelSpacing = LaneWidth * 4.5f;
     public const float MaxRampGrade = 10;

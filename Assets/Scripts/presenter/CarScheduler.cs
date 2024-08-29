@@ -15,6 +15,8 @@ public static class CarScheduler
 
     public static void Schedule(float deltaTime)
     {
+        if (Game.Cars.Count >= Constants.MaxCarCount)
+            return;
         foreach (Zone source in Game.Zones.Values)
         {
             foreach (Zone target in source.ConnectedZones)
