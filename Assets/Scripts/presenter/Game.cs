@@ -78,16 +78,8 @@ public static class Game
 
     public static void RegisterCurve(Curve curve)
     {
-        if (curve.Id != 0)
-        {
-            if (curve.GetNextCurve() != null)
-                RegisterCurve(curve.GetNextCurve());
-            return;
-        }
         curve.Id = FindNextAvailableKey(Curves.Keys);
         Curves[curve.Id] = curve;
-        if (curve.GetNextCurve() != null)
-            RegisterCurve(curve.GetNextCurve());
     }
 
     public static void RemoveCurve(Curve curve)
@@ -96,8 +88,6 @@ public static class Game
         if (curve.Id != 0)
             Assert.IsTrue(success);
         curve.Id = 0;
-        if (curve.GetNextCurve() != null)
-            RemoveCurve(curve.GetNextCurve());
     }
 
     public static void RegisterIntersection(Intersection i)

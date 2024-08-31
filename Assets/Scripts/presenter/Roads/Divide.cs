@@ -51,6 +51,8 @@ public static class Divide
 
             leftRoad.StartIntersection.AddRoad(leftRoad, Direction.Out);
             rightRoad.EndIntersection.AddRoad(rightRoad, Direction.In);
+
+            leftRoad.EndIntersection.CreatedByDivision = true;
         }
 
         void OperateNodes()

@@ -17,8 +17,8 @@ public class CompoundOperationTest
     [Test]
     public void CombineAndReplace()
     {
-        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road = RoadBuilder.Single(0, 2 * stride, 4 * stride, 1);
+        Road left = Divide.DivideRoad(road, road.Length / 2).Left;
         Road combined = Combine.CombineRoads(left.EndIntersection);
         Game.HoveredRoad = combined;
 
@@ -32,12 +32,11 @@ public class CompoundOperationTest
     [Test]
     public void CombineAndDivideMultipleTimes()
     {
-        Road left = RoadBuilder.Single(0, 2 * stride, 4 * stride, 2);
-        RoadBuilder.Single(4 * stride, 6 * stride, 8 * stride, 2);
-        Road combined = Combine.CombineRoads(left.EndIntersection);
+        Road left = RoadBuilder.Single(0, 4 * stride, 8 * stride, 2);
 
-        SubRoads subRoads = Divide.HandleDivideCommand(combined, 4.5f * stride);
+        SubRoads subRoads = Divide.HandleDivideCommand(left, 4.5f * stride);
 
+        Road combined;
         for (int i = 0; i < 5; i++)
         {
             combined = Combine.CombineRoads(subRoads.Left.EndIntersection);
@@ -61,20 +60,5 @@ public class CompoundOperationTest
             combined = Combine.CombineRoads(subRoads.Left.EndIntersection);
             Assert.AreEqual(2, Game.Intersections.Count);
         }
-    }
-
-    [Test]
-    public void CombineAndDivideNextCurveRegistered()
-    {
-        Road left = RoadBuilder.Single(0, 2 * stride, 4 * stride, 3);
-        SubRoads subRoads = Divide.DivideRoad(left, math.length(2 * stride));
-        left = Combine.CombineRoads(subRoads.Left.EndIntersection);
-        subRoads = Divide.DivideRoad(left, math.length(2 * stride) + 0.01f);
-        left = Combine.CombineRoads(subRoads.Left.EndIntersection);
-        subRoads = Divide.DivideRoad(left, math.length(2 * stride) + 0.01f);
-
-        foreach (Curve curve in Game.Curves.Values)
-            if (curve.GetNextCurve() != null)
-                Assert.AreNotEqual(0, curve.GetNextCurve().Id);
     }
 }

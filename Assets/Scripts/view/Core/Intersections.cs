@@ -8,9 +8,7 @@ public class Intersections : MonoBehaviour
     [SerializeField]
     IntersectionObject intersectionPrefab;
     [SerializeField]
-    Color safeColor;
-    [SerializeField]
-    Color unsafeColor;
+    Color safeColor, unsafeColor, createdColor;
     [SerializeField]
     GoreAreaObject goreAreaPrefab;
     readonly Dictionary<uint, IntersectionObject> intersectionMapping = new();
@@ -48,7 +46,7 @@ public class Intersections : MonoBehaviour
     void UpdateIntersection(Intersection ix)
     {
         IntersectionObject ixObject = intersectionMapping[ix.Id];
-        ixObject.GetComponent<Renderer>().material.SetColor("_Color", ix.IsSafe ? safeColor : unsafeColor);
+        ixObject.GetComponent<Renderer>().material.SetColor("_Color", !ix.IsSafe ? unsafeColor : ix.CreatedByDivision ? createdColor : safeColor);
         ixObject.transform.position = GetCenter(ix);
         RemoveGoreAreas(ix);
         CreateGoreAreas(ix);

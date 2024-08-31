@@ -37,6 +37,15 @@ public class DivideTest
     }
 
     [Test]
+    public void IntersectionCreatedByDivisionTagExistence()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+
+        SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
+        Assert.True(subRoads.Left.EndIntersection.CreatedByDivision);
+    }
+
+    [Test]
     public void RemovesOriginalEdges()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);

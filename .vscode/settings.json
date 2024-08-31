@@ -54,5 +54,4 @@
     "dotnet.defaultSolution": "Interchange.sln",
     "editor.tabSize": 4,
     "dotnet.preferCSharpExtension": true,
-    "codium.codeCompletion.enable": false
 }

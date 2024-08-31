@@ -17,9 +17,13 @@ public class CombineTest
     [Test]
     public void BasicCombineOneLaneRoads()
     {
-        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Road right = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 1);
+        SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
+
+        Road left = subRoads.Left;
+        Road right = subRoads.Right;
         float leftLength = left.Length;
+        float rightLength = right.Length;
 
         Assert.True(Combine.CombineIsValid(left.EndIntersection));
         Road combined = Combine.CombineRoads(left.EndIntersection);
@@ -39,7 +43,7 @@ public class CombineTest
         Assert.True(Game.Vertices.Values.Contains(combined.Lanes[0].EndVertex));
         Assert.True(Graph.ContainsVertex(combined.Lanes[0].StartVertex));
         Assert.True(Graph.ContainsVertex(combined.Lanes[0].EndVertex));
-        Assert.AreEqual(leftLength + right.Length, combined.Length);
+        Assert.AreEqual(leftLength + rightLength, combined.Length);
         Assert.AreSame(right.EndIntersection, combined.EndIntersection);
         Assert.False(combined.EndIntersection.InRoads.Contains(right));
         Assert.False(combined.EndIntersection.IsEmpty());
@@ -57,8 +61,8 @@ public class CombineTest
     [Test]
     public void RemoveAfterCombining()
     {
-        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road = RoadBuilder.Single(0, 2 * stride, 4 * stride, 1);
+        Road left = Divide.DivideRoad(road, road.Length / 2).Left;
         Road toDelete = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);
 
         Road combined = Combine.CombineRoads(left.EndIntersection);
@@ -76,8 +80,8 @@ public class CombineTest
     [Test]
     public void ConnectRoadWithCombined()
     {
-        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road = RoadBuilder.Single(0, 2 * stride, 4 * stride, 1);
+        Road left = Divide.DivideRoad(road, road.Length / 2).Left;
         Road combined = Combine.CombineRoads(left.EndIntersection);
 
         Road connected = RoadBuilder.Single(4 * stride, 5 * stride, 6 * stride, 1);

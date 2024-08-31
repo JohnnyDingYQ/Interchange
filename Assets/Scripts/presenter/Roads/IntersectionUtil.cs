@@ -106,13 +106,7 @@ public static class IntersectionUtil
             foreach (Node node in ix.Nodes)
                 if (node.InLane != null && node.OutLane != null)
                 {
-                    Curve left = node.InLane.Curve.Duplicate();
-                    left = left.AddStartDistance(left.Length - Constants.VertexDistanceFromRoadEnds);
-                    Curve right = node.OutLane.Curve.Duplicate();
-                    right = right.AddEndDistance(right.Length - Constants.VertexDistanceFromRoadEnds);
-                    left.Add(right);
-                    Edge edge = new(left, node.InLane.EndVertex, node.OutLane.StartVertex);
-                    Graph.AddEdge(edge);
+                    BuildEdgeNode2Node(node, node);
                 }
 
         }
@@ -129,8 +123,6 @@ public static class IntersectionUtil
                     Edge rightEdge = BuildEdgeLane2Lane(previousNode.InLane, currentNode.OutLane);
                     leftEdge.InterweavingEdge = rightEdge;
                     rightEdge.InterweavingEdge = leftEdge;
-                    Assert.IsTrue(Game.Edges.Values.Contains(leftEdge));
-                    Assert.IsTrue(Game.Edges.Values.Contains(rightEdge));
                 }
             }
         }

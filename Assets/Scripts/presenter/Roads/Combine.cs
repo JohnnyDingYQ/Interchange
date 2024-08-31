@@ -6,7 +6,7 @@ public static class Combine
 
     public static bool CombineIsValid(Intersection ix)
     {
-        return ix.IsForLaneChangeOnly();
+        return ix.IsForLaneChangeOnly() && ix.CreatedByDivision;
     }
 
     public static Road CombineRoads(Intersection ix)

@@ -117,13 +117,16 @@ public class ZonePathTest
     [Test]
     public void CombineFindsNewPath()
     {
-        Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);
-        Road right = RoadBuilder.Single(2 * stride, 3 * stride, 4 * stride, 1);
+        Road road = RoadBuilder.Single(0, 2 * stride, 4 * stride, 1);
+        SubRoads subRoads = Divide.DivideRoad(road, road.Length / 2);
+        Road left = subRoads.Left;
+        Road right = subRoads.Right;
         Game.Zones[1].AddVertex(left.Lanes[0].StartVertex);
         Game.Zones[2].AddVertex(right.Lanes[0].EndVertex);
         CarScheduler.FindNewConnection();
         Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
 
+        Combine.CombineRoads(left.EndIntersection);
         Combine.CombineRoads(left.EndIntersection);
         Path path = Game.Zones[1].GetPathsTo(Game.Zones[2]).Single();
         Assert.AreEqual(1, path.Edges.Count);

@@ -19,14 +19,10 @@ public class Curve : IPersistable
     float offsetDistance;
     float startDistance, endDistance;
     float startT = 0, endT = 1;
-    [SaveID]
-    Curve nextCurve;
     [NotSaved]
     DistanceToInterpolation[] lut;
     [NotSaved]
-    public float SegmentLength { get => bCurveLength - startDistance - endDistance; }
-    [NotSaved]
-    public float Length { get => GetLength(); }
+    public float Length { get => bCurveLength - startDistance - endDistance; }
     [NotSaved]
     public float3 StartPos { get => GetStartPos(); }
     [NotSaved]
@@ -48,32 +44,20 @@ public class Curve : IPersistable
     [NotSaved]
     const float getNearestPointTolerance = 0.001f;
     [NotSaved]
-    const float minimumCurveLength = 0.005f;
-    [NotSaved]
     const int distanceToInterpolationCacheSize = 30;
 
     public Curve() { }
 
     #region Getters
-    Curve GetLastCurve()
-    {
-        Curve c = this;
-        while (c.nextCurve != null && c.nextCurve.SegmentLength != 0)
-            c = c.nextCurve;
-        return c;
-    }
 
     float3 GetStartPos()
     {
-        if (SegmentLength == 0)
-            return nextCurve.GetStartPos();
         return CurveUtility.EvaluatePosition(bCurve, startT) + StartNormal * offsetDistance;
     }
 
     float3 GetEndPos()
     {
-        Curve last = GetLastCurve();
-        return CurveUtility.EvaluatePosition(last.bCurve, last.endT) + last.EndNormal * last.offsetDistance;
+        return CurveUtility.EvaluatePosition(bCurve, endT) + EndNormal * offsetDistance;
     }
 
     float3 GetStartTangent()
@@ -83,8 +67,7 @@ public class Curve : IPersistable
 
     float3 GetEndTangent()
     {
-        Curve last = GetLastCurve();
-        return math.normalize(CurveUtility.EvaluateTangent(last.bCurve, last.endT));
+        return math.normalize(CurveUtility.EvaluateTangent(bCurve, endT));
     }
 
     float3 GetStartNormal()
@@ -94,22 +77,14 @@ public class Curve : IPersistable
 
     float3 GetEndNormal()
     {
-        Curve last = GetLastCurve();
-        return Normalized2DNormal(last.bCurve, last.endT);
+        return Normalized2DNormal(bCurve, endT);
     }
 
     float3 Normalized2DNormal(BezierCurve bezierCurve, float t)
     {
         float3 tangent = CurveUtility.EvaluateTangent(bezierCurve, t);
         float3 normal = new(-tangent.z, 0, tangent.x);
-        return math.normalize(normal);
-    }
-
-    float GetLength()
-    {
-        if (nextCurve != null)
-            return SegmentLength + nextCurve.Length;
-        return SegmentLength;
+        return math.normalizesafe(normal);
     }
 
     #endregion
@@ -133,28 +108,17 @@ public class Curve : IPersistable
     /// <returns>Deep copy</returns>
     public Curve Duplicate()
     {
-        Curve newCurve = DuplicateHelper();
-        if (newCurve.nextCurve != null)
-            newCurve.nextCurve = newCurve.nextCurve.Duplicate();
-
-        return newCurve;
-
-        Curve DuplicateHelper()
+        return new()
         {
-            Curve newCurve = new()
-            {
-                bCurve = bCurve,
-                bCurveLength = bCurveLength,
-                offsetDistance = offsetDistance,
-                startDistance = startDistance,
-                endDistance = endDistance,
-                startT = startT,
-                endT = endT,
-                nextCurve = nextCurve,
-                lut = lut
-            };
-            return newCurve;
-        }
+            bCurve = bCurve,
+            bCurveLength = bCurveLength,
+            offsetDistance = offsetDistance,
+            startDistance = startDistance,
+            endDistance = endDistance,
+            startT = startT,
+            endT = endT,
+            lut = lut
+        };
     }
 
     /// <summary>
@@ -162,20 +126,13 @@ public class Curve : IPersistable
     /// </summary>
     /// <param name="distance">Distance from start</param>
     /// <returns>Truncated Curve</returns>
-    /// <exception cref="ArgumentException">Given distance is negative</exception>
     public Curve AddStartDistance(float distance)
     {
-        if (distance < 0)
-            throw new ArgumentException("distance cannot be negative", "distance");
-        Curve curr = this;
-        while (curr.SegmentLength < distance)
-        {
-            distance -= curr.SegmentLength;
-            curr = curr.nextCurve;
-        }
-        curr.startDistance += distance;
-        curr.startT = CurveUtility.GetDistanceToInterpolation(curr.lut, curr.startDistance);
-        return curr;
+        startDistance += distance;
+        Assert.IsTrue(startDistance >= 0 && startDistance <= bCurveLength,
+            $"startDistance: {startDistance}, bCurveLength: {bCurveLength}");
+        startT = CurveUtility.GetDistanceToInterpolation(lut, startDistance);
+        return this;
     }
 
     /// <summary>
@@ -183,21 +140,12 @@ public class Curve : IPersistable
     /// </summary>
     /// <param name="distance">Distance from end</param>
     /// <returns>Truncated Curve</returns>
-    /// <exception cref="ArgumentException">Given distance is negative</exception>
     public Curve AddEndDistance(float distance)
     {
-        if (distance < 0)
-            throw new ArgumentException("distance cannot be negative", "distance");
-        int index = GetChainLength() - 1;
-        Curve curr = GetCurveByIndex(index);
-        while (curr.SegmentLength < distance)
-        {
-            distance -= curr.SegmentLength;
-            curr = GetCurveByIndex(--index);
-            curr.nextCurve = null;
-        }
-        curr.endDistance += distance;
-        curr.endT = CurveUtility.GetDistanceToInterpolation(curr.lut, curr.bCurveLength - curr.endDistance);
+        endDistance += distance;
+        Assert.IsTrue(endDistance >= 0 && endDistance <= bCurveLength,
+            $"endDistance: {endDistance}, bCurveLength: {bCurveLength}");
+        endT = CurveUtility.GetDistanceToInterpolation(lut, bCurveLength - endDistance);
         return this;
     }
 
@@ -207,47 +155,18 @@ public class Curve : IPersistable
     /// <returns>The reversed curve</returns>
     public Curve Reverse()
     {
-        Curve newHead = ReverseLinkedList(this);
-
-        newHead = ReverseHelper(newHead);
-        return newHead;
-
-        static Curve ReverseLinkedList(Curve head)
+        Curve reversed = new()
         {
-            if (head == null || head.nextCurve == null)
-                return head;
-            Curve prev = null;
-            Curve curr = head;
-            while (curr != null)
-            {
-                Curve next = curr.nextCurve;
-                curr.nextCurve = prev;
-                prev = curr;
-                curr = next;
-            }
-
-            return prev;
-        }
-
-        static Curve ReverseHelper(Curve curve)
-        {
-            if (curve == null)
-                return null;
-            Curve reversed = new()
-            {
-                bCurve = curve.bCurve.GetInvertedCurve(),
-                startDistance = curve.endDistance,
-                endDistance = curve.startDistance,
-                bCurveLength = curve.bCurveLength,
-                offsetDistance = -curve.offsetDistance,
-                nextCurve = curve.nextCurve
-            };
-            reversed.nextCurve = ReverseHelper(reversed.nextCurve);
-            reversed.CreateDistanceCache();
-            reversed.startT = reversed.GetDistanceToInterpolation(curve.startDistance);
-            reversed.endT = reversed.GetDistanceToInterpolation(curve.bCurveLength - curve.endDistance);
-            return reversed;
-        }
+            bCurve = bCurve.GetInvertedCurve(),
+            startDistance = endDistance,
+            endDistance = startDistance,
+            bCurveLength = bCurveLength,
+            offsetDistance = -offsetDistance,
+        };
+        reversed.CreateDistanceCache();
+        reversed.startT = reversed.GetDistanceToInterpolation(startDistance);
+        reversed.endT = reversed.GetDistanceToInterpolation(bCurveLength - endDistance);
+        return reversed;
     }
 
     /// <summary>
@@ -257,12 +176,7 @@ public class Curve : IPersistable
     /// <returns>Offsetted Curve</returns>
     public Curve Offset(float distance)
     {
-        Curve curve = this;
-        while (curve != null)
-        {
-            curve.offsetDistance += distance;
-            curve = curve.nextCurve;
-        }
+        offsetDistance += distance;
         return this;
     }
 
@@ -282,8 +196,12 @@ public class Curve : IPersistable
     /// <param name="other">The other curve</param>
     public void Add(Curve other)
     {
-        Curve last = GetLastCurve();
-        last.nextCurve = other.Duplicate();
+        if (!bCurve.P0.Equals(other.bCurve.P0) || !bCurve.P1.Equals(other.bCurve.P1)
+            || !bCurve.P2.Equals(other.bCurve.P2) || !bCurve.P3.Equals(other.bCurve.P3))
+            throw new ArgumentException("given curve have different control points", "other");
+        float length = Length;
+        AddEndDistance(-other.Length);
+        other.AddStartDistance(-length);
     }
 
     /// <summary>
@@ -296,8 +214,6 @@ public class Curve : IPersistable
     {
         if (distance < 0)
             throw new ArgumentException("distance cannot be negative", "distance");
-        if (distance > SegmentLength && nextCurve != null)
-            return nextCurve.EvaluatePosition(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         if (offsetDistance == 0)
             return CurveUtility.EvaluatePosition(bCurve, t);
@@ -312,10 +228,6 @@ public class Curve : IPersistable
     /// <exception cref="ArgumentException">Given distance is negative</exception>
     public float3 EvaluateTangent(float distance)
     {
-        if (distance < 0)
-            throw new ArgumentException("distance cannot be negative", "distance");
-        if (distance > SegmentLength && nextCurve != null)
-            return nextCurve.EvaluateTangent(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         return math.normalize(CurveUtility.EvaluateTangent(bCurve, t));
     }
@@ -328,10 +240,6 @@ public class Curve : IPersistable
     /// <exception cref="ArgumentException">Given distance is negative</exception>
     public float3 Evaluate2DNormal(float distance)
     {
-        if (distance < 0)
-            throw new ArgumentException("distance cannot be negative", "distance");
-        if (distance > SegmentLength && nextCurve != null)
-            return nextCurve.Evaluate2DNormal(distance - SegmentLength);
         float t = CurveUtility.GetDistanceToInterpolation(lut, startDistance + distance);
         return math.normalize(Normalized2DNormal(bCurve, t));
     }
@@ -390,53 +298,10 @@ public class Curve : IPersistable
     /// <exception cref="ArgumentException">Split distance is greater than curve length</exception>
     public void Split(float distance, out Curve left, out Curve right)
     {
-        if (distance >= Length)
-            throw new ArgumentException("distance has to be smaller than curve length", "distance");
-        int index = 0;
-        Curve toSplit = this;
-        float currDistance = distance;
-
-        while (true)
-        {
-            if (Math.Abs(currDistance - toSplit.SegmentLength) < minimumCurveLength)
-            {
-                left = this;
-                right = toSplit.nextCurve;
-                toSplit.nextCurve = null;
-                return;
-            }
-            if (currDistance >= toSplit.SegmentLength)
-            {
-                currDistance -= toSplit.SegmentLength;
-                toSplit = toSplit.nextCurve;
-                index++;
-            }
-            else
-                break;
-        }
-
-        CurveUtility.Split(toSplit.bCurve, toSplit.GetDistanceToInterpolation(currDistance), out BezierCurve l, out BezierCurve r);
-        left = new(l) { offsetDistance = offsetDistance };
-        left = left.AddStartDistance(startDistance);
-        right = new(r) { offsetDistance = offsetDistance };
-        right = right.AddEndDistance(endDistance);
-
-        if (index == 0)
-        {
-            right.nextCurve = nextCurve;
-            return;
-        }
-        Curve newHead = Duplicate();
-        Curve prev = newHead;
-        while (index != 1)
-        {
-            prev = prev.nextCurve;
-            index--;
-        }
-        Curve next = prev.nextCurve.nextCurve;
-        prev.nextCurve = left;
-        left = newHead;
-        right.nextCurve = next;
+        left = Duplicate();
+        right = Duplicate();
+        left = left.AddEndDistance(Length - distance);
+        right = right.AddStartDistance(distance);
     }
 
     public float3 LerpPosition(float distance)
@@ -453,11 +318,6 @@ public class Curve : IPersistable
         if (index + 1 >= segmentCache.Length)
             index += 0;
         return math.lerp(segmentCache[index], segmentCache[index + 1], (distance - index * segmentLength) / segmentLength);
-    }
-
-    public Curve GetNextCurve()
-    {
-        return nextCurve;
     }
 
     public void CreateDistanceCache()
@@ -494,27 +354,6 @@ public class Curve : IPersistable
         }
     }
 
-
-    private Curve GetCurveByIndex(int index)
-    {
-        Curve curve = this;
-        for (int i = 0; i < index; i++)
-            curve = curve.nextCurve;
-        return curve;
-    }
-
-    private int GetChainLength()
-    {
-        int count = 0;
-        Curve curve = this;
-        while (curve != null)
-        {
-            count++;
-            curve = curve.nextCurve;
-        }
-        return count;
-    }
-
     float GetDistanceToInterpolation(float distance)
     {
         return CurveUtility.GetDistanceToInterpolation(lut, distance);
@@ -526,8 +365,7 @@ public class Curve : IPersistable
             return bCurve.P0.Equals(other.bCurve.P0) && bCurve.P1.Equals(other.bCurve.P1)
                 && bCurve.P2.Equals(other.bCurve.P2) && bCurve.P3.Equals(other.bCurve.P3) && bCurveLength == other.bCurveLength
                 && offsetDistance == other.offsetDistance && startDistance == other.startDistance && endDistance == other.endDistance
-                && startT == other.startT && endT == other.endT && !(nextCurve == null ^ other.nextCurve == null)
-                && ((nextCurve == null && other.nextCurve == null) || nextCurve.Equals(other.nextCurve));
+                && startT == other.startT && endT == other.endT;
         else
             return false;
     }

@@ -10,12 +10,12 @@ public class Intersection : IPersistable
 {
     public uint Id { get; set; }
     [SaveIDCollection]
-    private HashSet<Road> inRoads = new();
+    private readonly HashSet<Road> inRoads = new();
     [SaveIDCollection]
-    private HashSet<Road> outRoads = new();
+    private readonly HashSet<Road> outRoads = new();
     [IPersistableImplemented]
     private readonly PersistableSortedList nodes = new();
-    public bool IsSafe { get; set; }
+    public bool IsSafe, CreatedByDivision;
     public float3 Normal { get; private set; }
     public float3 Tangent { get; private set; }
     public float3 PointOnInSide { get; private set; }
