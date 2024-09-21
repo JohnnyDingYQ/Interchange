@@ -21,7 +21,7 @@ public static class CarScheduler
         {
             foreach (Zone target in source.ConnectedZones)
             {
-                HashSet<Path> paths = source.GetPathsTo(target);
+                List<Path> paths = source.GetPathsTo(target);
                 Assert.IsNotNull(paths);
                 foreach (Path path in paths)
                 {

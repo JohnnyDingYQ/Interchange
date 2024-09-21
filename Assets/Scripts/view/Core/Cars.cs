@@ -38,7 +38,7 @@ public class Cars : MonoBehaviour
             CarControl.PassTime(Time.deltaTime * TimeScale);
         if (carMapping.Count > curveData.Length)
         {
-            int newSize = curveData.Length * 2;
+            int newSize = Mathf.Max(carMapping.Count, curveData.Length * 2);
             curveData.Dispose();
             distanceOnCurves.Dispose();
             results.Dispose();

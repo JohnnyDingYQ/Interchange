@@ -52,10 +52,14 @@ public class Car : IPersistable
 
     Path GetPath()
     {
-        IEnumerable<Path> paths = source.GetPathsTo(target).Where(path => path.StartVertex == startVertex);
-        if (paths.Count() == 0)
-            return null;
-        return paths.Single();
+        List<Path> paths = source.GetPathsTo(target);
+        for (int i = 0; i < paths.Count; i++)
+        {
+            Path path = paths[i];
+            if (path.StartVertex == startVertex)
+                return path;
+        }
+        return null;
     }
 
     public void UpdatePath()
@@ -87,7 +91,7 @@ public class Car : IPersistable
 
     public void Move(float deltaTime)
     {
-        CheckForPathChange();
+        // CheckForPathChange();
         if (Status != CarStatus.Traveling)
             return;
 

@@ -12,7 +12,7 @@ public class Zone : IPersistable
     [SaveIDCollection]
     protected HashSet<Vertex> vertices = new();
     [NotSaved]
-    Dictionary<Zone, HashSet<Path>> connectedTargets;
+    Dictionary<Zone, List<Path>> connectedTargets;
     [NotSaved]
     public ReadOnlySet<Vertex> Vertices { get => vertices.AsReadOnly(); }
     [NotSaved]
@@ -78,7 +78,7 @@ public class Zone : IPersistable
         ConnectedZones.Clear();
     }
 
-    public HashSet<Path> GetPathsTo(Zone target)
+    public List<Path> GetPathsTo(Zone target)
     {
         return connectedTargets[target];
     }
@@ -86,7 +86,9 @@ public class Zone : IPersistable
     public override bool Equals(object obj)
     {
         if (obj is Zone other)
-            return Id == other.Id && Enabled == other.Enabled && vertices.Select(v => Id).SequenceEqual(other.vertices.Select(v => Id));
+            // return Id == other.Id && Enabled == other.Enabled && vertices.Select(v => Id).SequenceEqual(other.vertices.Select(v => Id));
+            // above is necessary but inefficient
+            return Id == other.Id && Enabled == other.Enabled;
         else
             return false;
     }
