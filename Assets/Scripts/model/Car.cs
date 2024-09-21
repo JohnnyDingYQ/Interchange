@@ -10,7 +10,7 @@ using System.Collections.Generic;
 public class Car : IPersistable
 {
     public uint Id { get; set; }
-    float distanceOnEdge;
+    public float distanceOnEdge;
     int edgeIndex;
     float speed;
     public float TimeTaken { get; private set; }

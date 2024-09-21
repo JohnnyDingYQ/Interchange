@@ -11,6 +11,15 @@ using UnityEngine.Splines;
 /// <summary>
 /// Container for Unity Spline's BezierCurve to allow offsetting/Stroking
 /// </summary>
+public struct CurveData
+{
+    public float3 P0;
+    public float3 P1;
+    public float3 P2;
+    public float3 P3;
+    public float length;
+    public float offsetDistance;
+}
 public class Curve : IPersistable
 {
     public uint Id { get; set; }
@@ -91,6 +100,18 @@ public class Curve : IPersistable
 
     #region Public Methods
 
+    public CurveData GetCurveData()
+    {
+        return new()
+        {
+            P0 = bCurve.P0,
+            P1 = bCurve.P1,
+            P2 = bCurve.P2,
+            P3 = bCurve.P3,
+            length = Length,
+            offsetDistance = offsetDistance
+        };
+    }
     /// <summary>
     /// Containerize a BeizerCurve to allow offsetting/stroking
     /// </summary>
