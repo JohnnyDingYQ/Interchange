@@ -34,8 +34,6 @@ public class Cars : MonoBehaviour
 
     void Update()
     {
-        if (!Game.BuildModeOn)
-            CarControl.PassTime(Time.deltaTime * TimeScale);
         if (carMapping.Count > curveData.Length)
         {
             int newSize = Mathf.Max(carMapping.Count, curveData.Length * 2);
@@ -58,6 +56,8 @@ public class Cars : MonoBehaviour
             distanceOnCurve = distanceOnCurves,
             results = results
         }.Schedule(carMapping.Count, 64);
+        if (!Game.BuildModeOn)
+            CarControl.PassTime(Time.deltaTime * TimeScale);
     }
 
     void LateUpdate()

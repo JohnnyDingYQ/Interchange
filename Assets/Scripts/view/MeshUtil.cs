@@ -122,43 +122,66 @@ public static class MeshUtil
     }
     
     public static Mesh GetPolygonMesh(List<float3> points, float newY)
+{
+    // Initialize the mesh and polygon objects
+    Mesh mesh = new();
+    Polygon polygon = new();
+    
+    int pointCount = points.Count;
+    List<TriangleNet.Geometry.Vertex> vertices = new(pointCount);
+
+    // Convert points to TriangleNet vertices and add to the polygon
+    for (int i = 0; i < pointCount; i++)
     {
-        Mesh mesh = new();
-        Polygon polygon = new();
-        List<TriangleNet.Geometry.Vertex> vertices = new();
-        TriangleNet.Geometry.Vertex prev = null;
-        foreach (float3 pos in points)
-            vertices.Add(new(pos.x, pos.z));
-        foreach (TriangleNet.Geometry.Vertex vertex in vertices)
-        {
-            polygon.Add(vertex);
-            if (prev != null)
-                polygon.Add(new Segment(prev, vertex));
-            else
-                polygon.Add(new Segment(vertices.Last(), vertex));
-            prev = vertex;
-        }
+        var pos = points[i];
+        var vertex = new TriangleNet.Geometry.Vertex(pos.x, pos.z);
+        vertices.Add(vertex);
+        polygon.Add(vertex);
 
-        var options = new ConstraintOptions() { ConformingDelaunay = true, Convex = false };
-        var qualityOptions = new QualityOptions { MinimumAngle = 10.0f };
-        IMesh imesh = polygon.Triangulate(options, qualityOptions);
-        var triangles = new List<int>();
-        vertices = imesh.Vertices.ToList();
-        foreach (var triangle in imesh.Triangles)
-        {
-            triangles.Add(vertices.IndexOf(triangle.GetVertex(2)));
-            triangles.Add(vertices.IndexOf(triangle.GetVertex(1)));
-            triangles.Add(vertices.IndexOf(triangle.GetVertex(0)));
-        }
-        List<Vector3> verts3D = new();
-        foreach (TriangleNet.Geometry.Vertex vertex in imesh.Vertices)
-            verts3D.Add(new((float)vertex.X, newY, (float)vertex.Y));
-
-        mesh.SetVertices(verts3D);
-        mesh.SetTriangles(triangles.ToArray(), 0);
-        mesh.SetNormals(Enumerable.Repeat(Vector3.up, verts3D.Count).ToArray());
-        return mesh;
+        // Add a segment to close the polygon loop
+        if (i > 0)
+            polygon.Add(new Segment(vertices[i - 1], vertex));
     }
+    // Add the last segment to close the loop
+    polygon.Add(new Segment(vertices[pointCount - 1], vertices[0]));
+
+    // Define triangulation options
+    var options = new ConstraintOptions() { ConformingDelaunay = true, Convex = false };
+    var qualityOptions = new QualityOptions { MinimumAngle = 1.0f };
+
+    // Perform triangulation
+    IMesh imesh = polygon.Triangulate(options, qualityOptions);
+
+    // Prepare triangles and vertices for the Unity mesh
+    int vertexCount = imesh.Vertices.Count;
+    int triangleCount = imesh.Triangles.Count;
+
+    List<Vector3> verts3D = new(vertexCount);
+    Dictionary<TriangleNet.Geometry.Vertex, int> vertexIndexMap = new(vertexCount);
+
+    int index = 0;
+    foreach (var vertex in imesh.Vertices)
+    {
+        verts3D.Add(new Vector3((float)vertex.X, newY, (float)vertex.Y));
+        vertexIndexMap[vertex] = index++;
+    }
+
+    List<int> triangles = new(triangleCount * 3);
+    foreach (var triangle in imesh.Triangles)
+    {
+        triangles.Add(vertexIndexMap[triangle.GetVertex(2)]);
+        triangles.Add(vertexIndexMap[triangle.GetVertex(1)]);
+        triangles.Add(vertexIndexMap[triangle.GetVertex(0)]);
+    }
+
+    // Set mesh data
+    mesh.SetVertices(verts3D);
+    mesh.SetTriangles(triangles, 0);
+    mesh.SetNormals(Enumerable.Repeat(Vector3.up, verts3D.Count).ToArray());
+
+    return mesh;
+}
+
 
     public static Mesh WorldToLocalSpace(Mesh mesh, Transform transform)
     {
