@@ -74,3 +74,4 @@ MonoBehaviour:
   PanMultiplier: 3750
   driftDecayExponentMultiplier: 10
   SpinMuliplier: 40
+  ShowCarHeightBar: 500

@@ -16,7 +16,6 @@ namespace Assets.Scripts.Model.Roads
         public Vertex Target { get; set; }
         [SaveID]
         public Edge InterweavingEdge { get; set; }
-        [SaveIDCollection]
         public List<Car> Cars { get; set; }
         [SaveID]
         public Car IncomingCar { get; set; }

@@ -29,7 +29,6 @@ public static class CarScheduler
                     Assert.IsTrue(source.Vertices.Contains(startVertex));
                     if (startVertex.ScheduleCooldown <= 0)
                     {
-                        Game.RegisterCar(new(source, target, path));
                         startVertex.ScheduleCooldown = GenerateVertexInterval() + deltaTime;
                         break;
                     }

@@ -4262,6 +4262,7 @@ MonoBehaviour:
   intersectionPrefab: {fileID: 797989268070218883, guid: 3a8efc3aa4fa95142bbfc3201fd74eef, type: 3}
   safeColor: {r: 0.21351361, g: 0.9245283, b: 0.15990254, a: 0}
   unsafeColor: {r: 0.8745098, g: 0.101960786, b: 0.10953837, a: 0}
+  createdColor: {r: 0.015723169, g: 0.19393665, b: 1, a: 0}
   goreAreaPrefab: {fileID: 3773296957136746736, guid: b461549f06207cd49b639d19ddbc20ce, type: 3}
 --- !u!1 &1057264704
 GameObject:
@@ -4800,6 +4801,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   carPrefab: {fileID: -3605712955071445668, guid: 8be02272782f14b709a54f46c60c715c, type: 3}
+  cameraSettings: {fileID: 11400000, guid: 50c25a1e54252e642b28cd139d20d9a4, type: 2}
+  roads: {fileID: 11189983}
 --- !u!1 &1272015123
 GameObject:
   m_ObjectHideFlags: 0

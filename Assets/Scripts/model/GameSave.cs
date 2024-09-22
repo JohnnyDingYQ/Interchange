@@ -28,8 +28,6 @@ public class GameSave : IPersistable
     public static Dictionary<uint, Zone> Zones { get; private set; }
     [IPersistableDict]
     public static Dictionary<uint, District> Districts { get; private set; }
-    [IPersistableDict]
-    public Dictionary<uint, Car> Cars { get; private set; }
     public uint Id { get; set; }
 
     public GameSave()
@@ -40,7 +38,6 @@ public class GameSave : IPersistable
         Roads = new();
         Nodes = new();
         Intersections = new();
-        Cars = new();
         Curves = new();
         Zones = new();
         Zones = new();
@@ -104,7 +101,10 @@ public class GameSave : IPersistable
                                 }
                             }
                             else
+                            {
+                                Debug.Log(itemType);
                                 throw new InvalidOperationException();
+                            }
                             continue;
                         }
                     }

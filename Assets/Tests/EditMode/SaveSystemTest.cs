@@ -198,24 +198,4 @@ public class SaveSystemTest
         Assert.AreEqual(oldSave, Game.GameSave);
 
     }
-
-    [Test]
-    public void RecoverCars()
-    {
-        Game.Zones.Add(1, new(1));
-        Game.Zones.Add(2, new(2));
-        Game.SetupZones();
-        RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
-        CarScheduler.Schedule(0);
-        Assert.AreEqual(1, Game.Cars.Count);
-
-        GameSave oldSave = Game.GameSave;
-        testSaveSystem.SaveGame();
-        testSaveSystem.LoadGame();
-        Assert.AreEqual(oldSave, Game.GameSave);
-
-        CarControl.PassTime(0.1f);
-        CarControl.PassTime(0.1f);
-        Assert.True(Game.Cars.Values.Single().Status == CarStatus.Traveling);
-    }
 }

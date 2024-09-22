@@ -158,11 +158,33 @@ public class Roads : MonoBehaviour
         for (int i = 0; i < colliderCount; i++)
         {
             Collider hitCollider = hitColliders[i];
-            if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))            
+            if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))
                 Game.SelectRoad(roadComp.Road);
         }
         squareSelector.Performed = false;
         squareSelector.gameObject.SetActive(false);
+    }
+
+    public List<Road> GetRoadsInSight()
+    {
+        List<Road> roads = new();
+        int layerMask = 1 << LayerMask.NameToLayer(roadLayerName) | 1 << LayerMask.NameToLayer("Outline");
+        Camera camera = Camera.main;
+        float cameraHeight = camera.orthographicSize * 2f;
+        float cameraWidth = cameraHeight * camera.aspect;
+        float3 halfExtent = new(cameraWidth / 2, camera.transform.position.y, cameraHeight / 2);
+        int colliderCount = Physics.OverlapBoxNonAlloc(camera.transform.position, halfExtent, hitColliders, squareSelector.Quaternion, layerMask);
+        for (int i = 0; i < colliderCount; i++)
+        {
+            Collider hitCollider = hitColliders[i];
+            if (hitCollider.TryGetComponent<RoadObject>(out var roadComp))
+            {
+                Road road = roadComp.Road;
+                if (!road.IsGhost)
+                    roads.Add(roadComp.Road);
+            }
+        }
+        return roads;
     }
 
 

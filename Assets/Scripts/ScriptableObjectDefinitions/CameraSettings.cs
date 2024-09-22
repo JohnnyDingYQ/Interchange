@@ -11,4 +11,5 @@ public class CameraSettings : ScriptableObject
     public float PanMultiplier;
     public float driftDecayExponentMultiplier;
     public float SpinMuliplier;
+    public float ShowCarHeightBar;
 }

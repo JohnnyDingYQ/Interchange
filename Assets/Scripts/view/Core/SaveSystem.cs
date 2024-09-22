@@ -50,10 +50,6 @@ public class SaveSystem
 
             // paths
             CarScheduler.FindNewConnection();
-            foreach (Car car in Game.Cars.Values)
-            {
-                car.UpdatePath();
-            }
         }
     }
 

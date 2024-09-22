@@ -7,86 +7,19 @@ using System.Linq;
 using System.Collections.Generic;
 
 
-public class Car : IPersistable
+public class Car
 {
     public uint Id { get; set; }
-    public float distanceOnEdge;
-    int edgeIndex;
-    float speed;
-    public float TimeTaken { get; private set; }
-    public CarStatus Status { get; private set; }
-    [SaveID]
-    readonly Zone source;
-    [SaveID]
-    readonly Zone target;
-    [SaveID]
-    readonly Vertex startVertex;
-
-    [NotSaved]
     Path path;
-    [NotSaved]
-    public Edge CurrentEdge { get => GetCurrentEdge(); }
-    [NotSaved]
-    public float3 Pos { get => CurrentEdge.Curve.LerpPosition(distanceOnEdge); }
+    public float3 Pos { get; private set; }
+    public CarStatus Status;
+    float distanceOnEdge, speed;
+    public float TimeTaken;
+    int edgeIndex;
 
-    public Car() { }
-
-    Edge GetCurrentEdge()
+    public Car(Path path)
     {
-        if (path == null)
-            return null;
-        if (edgeIndex >= path.Edges.Count)
-            return null;
-        return path.Edges[edgeIndex];
-    }
-
-    public Car(Zone source, Zone target, Path path)
-    {
-        this.source = source;
-        this.target = target;
         this.path = path;
-        startVertex = path.StartVertex;
-        speed = Constants.CarMaxSpeed;
-        Status = CarStatus.Traveling;
-    }
-
-    Path GetPath()
-    {
-        List<Path> paths = source.GetPathsTo(target);
-        for (int i = 0; i < paths.Count; i++)
-        {
-            Path path = paths[i];
-            if (path.StartVertex == startVertex)
-                return path;
-        }
-        return null;
-    }
-
-    public void UpdatePath()
-    {
-        path = GetPath();
-    }
-
-    void CheckForPathChange()
-    {
-        if (path != GetPath())
-        {
-            Edge currentEdge = CurrentEdge;
-            UpdatePath();
-            if (path == null)
-            {
-                Cancel();
-                return;
-            }
-            int index = path.Edges.IndexOf(currentEdge);
-            if (index == -1) // does not exist
-            {
-                Cancel();
-                return;
-            }
-            Assert.IsTrue(Graph.ContainsEdge(currentEdge));
-            edgeIndex = index;
-        }
     }
 
     public void Move(float deltaTime)
@@ -128,6 +61,8 @@ public class Car : IPersistable
             }
             return;
         }
+
+        Pos = edge.Curve.EvaluatePosition(distanceOnEdge);
 
         # region EXTRACTED FUNCTIONS
         int GetCarIndex()
@@ -178,20 +113,5 @@ public class Car : IPersistable
     void Finish()
     {
         Status = CarStatus.Finished;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (obj is Car other)
-            return Id == other.Id && distanceOnEdge == other.distanceOnEdge && edgeIndex == other.edgeIndex
-                && speed == other.speed && TimeTaken == other.TimeTaken && Status == other.Status
-                && IPersistable.Equals(source, other.source) && IPersistable.Equals(target, other.target)
-                && IPersistable.Equals(startVertex, other.startVertex);
-        return false;
-    }
-
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
     }
 }

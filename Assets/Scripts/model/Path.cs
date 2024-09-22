@@ -9,7 +9,7 @@ public class Path
 {
     public List<Edge> Edges { get; set; }
     public float Cost { get; private set; }
-    public Vertex StartVertex { get => Edges.First().Source; }
+    public Vertex StartVertex { get => Edges[0].Source; }
 
 
     public Path() { Edges = new(); }

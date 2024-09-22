@@ -13,7 +13,7 @@ public static class Game
     public static Dictionary<uint, Intersection> Intersections { get => GameSave.Intersections; }
     public static Dictionary<uint, Lane> Lanes { get => GameSave.Lanes; }
     public static Dictionary<uint, Vertex> Vertices { get => GameSave.Vertices; }
-    public static Dictionary<uint, Car> Cars { get => GameSave.Cars; }
+    public static Dictionary<uint, Car> Cars { get; private set; }
     public static Dictionary<uint, Edge> Edges { get => GameSave.Edges; }
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
     public static Dictionary<uint, Zone> Zones { get => GameSave.Zones; }
@@ -35,6 +35,7 @@ public static class Game
         SanityCheck();
         GameSave = new();
         BuildModeOn = true;
+        Cars = new();
     }
 
     public static void WipeState()
@@ -46,6 +47,7 @@ public static class Game
         HoveredRoad = null;
         HoveredZone = null;
         HoveredDistrict = null;
+        Cars = new();
     }
 
     public static uint FindNextAvailableKey(ICollection<uint> dict)

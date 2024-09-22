@@ -7,139 +7,112 @@ using Assets.Scripts.Model.Roads;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Burst;
+using System.Linq;
 
 public class Cars : MonoBehaviour
 {
     [SerializeField] CarObject carPrefab;
-    static Dictionary<uint, CarObject> carMapping;
+    Dictionary<uint, CarObject> carMapping;
     ObjectPool<CarObject> carPool;
+    [SerializeField] CameraSettings cameraSettings;
+    [SerializeField] Roads roads;
     public static float TimeScale = 1;
+    List<Vertex> verticesInSight;
+    List<Car> toRemove;
 
-    JobHandle jobHandle;
-    NativeArray<float3> results;
-    NativeArray<CurveData> curveData;
-    NativeArray<float> distanceOnCurves;
-    readonly int initialCapacity = 2000;
     void Awake()
     {
         Game.CarAdded += CarAdded;
         Game.CarRemoved += RemoveCar;
-        carMapping = new();
         CreatePool();
-
-        curveData = new(initialCapacity, Allocator.Persistent);
-        distanceOnCurves = new(initialCapacity, Allocator.Persistent);
-        results = new(initialCapacity, Allocator.Persistent);
+        carMapping = new();
+        verticesInSight = new();
+        toRemove = new();
     }
 
     void Update()
     {
-        if (carMapping.Count > curveData.Length)
+        if (Camera.main.transform.position.y < cameraSettings.ShowCarHeightBar)
         {
-            int newSize = Mathf.Max(carMapping.Count, curveData.Length * 2);
-            curveData.Dispose();
-            distanceOnCurves.Dispose();
-            results.Dispose();
-            curveData = new(newSize, Allocator.Persistent);
-            distanceOnCurves = new(newSize, Allocator.Persistent);
-            results = new(newSize, Allocator.Persistent);
-        }
-        int index = 0;
-        foreach (CarObject carObject in carMapping.Values)
-        {
-            distanceOnCurves[index] = carObject.Car.distanceOnEdge;
-            curveData[index++] = carObject.Car.CurrentEdge.Curve.GetCurveData();
-        }
-        jobHandle = new EvaluatePositionJob()
-        {
-            curveData = curveData,
-            distanceOnCurve = distanceOnCurves,
-            results = results
-        }.Schedule(carMapping.Count, 64);
-        if (!Game.BuildModeOn)
-            CarControl.PassTime(Time.deltaTime * TimeScale);
-    }
-
-    void LateUpdate()
-    {
-        jobHandle.Complete();
-        int index = 0;
-        foreach (CarObject carObject in carMapping.Values)
-        {
-            carObject.transform.position = results[index++];
-        }
-    }
-
-    [BurstCompile]
-    struct EvaluatePositionJob : IJobParallelFor
-    {
-        [ReadOnly]
-        public NativeArray<CurveData> curveData;
-        [ReadOnly]
-        public NativeArray<float> distanceOnCurve;
-        [WriteOnly]
-        public NativeArray<float3> results;
-        public void Execute(int index)
-        {
-            results[index] = EvaluatePostion(curveData[index], distanceOnCurve[index]);
-        }
-
-        struct DistanceToInterpolationPair
-        {
-            public float distance;
-            public float interpolation;
-        }
-
-        readonly float3 EvaluatePostion(CurveData curveData, float distance)
-        {
-            float t = DistanceToInterpolation(curveData, distance);
-            return EvaluatePositionT(curveData, t) + EvaluateNormalT(curveData, t) * curveData.offsetDistance;
-        }
-
-        readonly float DistanceToInterpolation(CurveData curveData, float distance)
-        {
-            DistanceToInterpolationPair low = new() { distance = 0, interpolation = 0 };
-            DistanceToInterpolationPair high = new() { distance = curveData.length, interpolation = 1 };
-
-            float midT = math.lerp(low.interpolation, high.interpolation, 0.5f);
-            float midDistance = low.distance + math.length(EvaluatePositionT(curveData, midT) - EvaluatePositionT(curveData, low.interpolation));
-            DistanceToInterpolationPair mid = new() { distance = midDistance, interpolation = midT };
-
-            int maxIterations = 20;
-            while (math.abs(mid.distance - distance) > 0.0001f && maxIterations-- > 0)
+            foreach (Car car in Game.Cars.Values)
             {
-                if (mid.distance < distance)
-                    low = mid;
-                else
-                    high = mid;
-
-                mid.interpolation = math.lerp(low.interpolation, high.interpolation, 0.5f);
-                mid.distance = low.distance + math.length(EvaluatePositionT(curveData, mid.interpolation) - EvaluatePositionT(curveData, low.interpolation));
+                car.Move(Time.deltaTime);
+                if (car.Status == CarStatus.Finished)
+                {
+                    Debug.Log(toRemove.Count);
+                    Assert.IsTrue(!toRemove.Contains(car));
+                    toRemove.Add(car);
+                }
             }
-
-            return mid.interpolation;
+            List<Road> roadsInSight = roads.GetRoadsInSight();
+            GetVertexInSight(roadsInSight);
+            int numCarsInSight = CountCarInSight();
+            if (numCarsInSight < verticesInSight.Count() && verticesInSight.Count() > 1)
+            {
+                int numCarToSpawn = verticesInSight.Count() - numCarsInSight;
+                for (int i = 0; i < numCarToSpawn; i++)
+                {
+                    Vertex selectedV = verticesInSight[MyNumerics.GetRandomIndex(verticesInSight.Count)];
+                    Vertex otherV = verticesInSight[MyNumerics.GetRandomIndex(verticesInSight.Count)];
+                    IEnumerable<Edge> edges = Graph.AStar(selectedV, otherV);
+                    if (edges == null)
+                        continue;
+                    Path path = new(edges);
+                    Assert.AreNotEqual(selectedV.Id, otherV.Id);
+                    Game.RegisterCar(new(path));
+                }
+            }
+            verticesInSight.Clear();
+        }
+        else
+        {
+            toRemove.AddRange(Game.Cars.Values);
+            foreach (Edge edge in Game.Edges.Values)
+                edge.Cars.Clear();
         }
 
-        readonly float3 EvaluatePositionT(CurveData curveData, float t)
-        {
-            return curveData.P0 * math.pow(1 - t, 3)
-                   + 3 * math.pow(1 - t, 2) * t * curveData.P1
-                   + (1 - t) * 3 * math.pow(t, 2) * curveData.P2
-                   + math.pow(t, 3) * curveData.P3;
-        }
+        for (int i = 0; i < toRemove.Count; i++)
+            Game.RemoveCar(toRemove[i]);
+        toRemove.Clear();
 
-        readonly float3 EvaluateTangentT(CurveData curveData, float t)
+        void GetVertexInSight(List<Road> roadsInSight)
         {
-            return 3 * math.pow(1 - t, 2) * (curveData.P1 - curveData.P0) + 6 * (1 - t) * t * (curveData.P2 - curveData.P1) + 3 * math.pow(t, 2) * (curveData.P3 - curveData.P2);
-        }
-
-        readonly float3 EvaluateNormalT(CurveData curveData, float t)
-        {
-            float3 tangent = EvaluateTangentT(curveData, t);
-            float3 normal = new(-tangent.z, 0, tangent.x);
-            return math.normalizesafe(normal);
+            for (int i = 0; i < roadsInSight.Count; i++)
+            {
+                Road road = roadsInSight[i];
+                for (int j = 0; j < road.LaneCount; j++)
+                {
+                    Lane lane = road.Lanes[j];
+                    if (PosInSight(lane.StartVertex.Pos))
+                        verticesInSight.Add(lane.StartVertex);
+                    if (PosInSight(lane.EndVertex.Pos))
+                        verticesInSight.Add(lane.EndVertex);
+                }
+            }
         }
     }
+
+    bool PosInSight(float3 pos)
+    {
+        Vector3 viewportPoint = Camera.main.WorldToViewportPoint(pos);
+
+        if (viewportPoint.x >= 0 && viewportPoint.x <= 1 &&
+               viewportPoint.y >= 0 && viewportPoint.y <= 1 &&
+               viewportPoint.z >= 0)
+            return true;
+        return false;
+    }
+
+    int CountCarInSight()
+    {
+        int count = 0;
+        foreach (Car car in Game.Cars.Values)
+            if (PosInSight(car.Pos))
+                count++;
+        return count;
+    }
+
+
 
     void OnDestroy()
     {
