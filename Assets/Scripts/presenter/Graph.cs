@@ -132,7 +132,7 @@ public static class Graph
     {
         Assert.IsNotNull(start);
         return graph.ShortestPathsAStar(
-            (Edge p) => p.EdgeCost,
+            (Edge p) => p.Length,
             (Vertex to) => math.distance(start.Pos, to.Pos),
             start
         );

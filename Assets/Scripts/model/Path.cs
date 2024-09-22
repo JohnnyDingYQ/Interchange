@@ -17,7 +17,5 @@ public class Path
     public Path(IEnumerable<Edge> edges)
     {
         Edges = edges.ToList();
-        foreach (Edge edge in Edges)
-            Cost += edge.EdgeCost;
     }
 }

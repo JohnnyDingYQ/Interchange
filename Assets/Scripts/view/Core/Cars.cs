@@ -32,48 +32,19 @@ public class Cars : MonoBehaviour
 
     void Update()
     {
-        if (Camera.main.transform.position.y < cameraSettings.ShowCarHeightBar)
+        if (Camera.main.transform.position.y < cameraSettings.ShowCarHeightBar && !Game.BuildModeOn)
         {
-            foreach (Car car in Game.Cars.Values)
-            {
-                car.Move(Time.deltaTime);
-                if (car.Status == CarStatus.Finished)
-                {
-                    Debug.Log(toRemove.Count);
-                    Assert.IsTrue(!toRemove.Contains(car));
-                    toRemove.Add(car);
-                }
-            }
+            MoveCars();
             List<Road> roadsInSight = roads.GetRoadsInSight();
             GetVertexInSight(roadsInSight);
             int numCarsInSight = CountCarInSight();
-            if (numCarsInSight < verticesInSight.Count() && verticesInSight.Count() > 1)
-            {
-                int numCarToSpawn = verticesInSight.Count() - numCarsInSight;
-                for (int i = 0; i < numCarToSpawn; i++)
-                {
-                    Vertex selectedV = verticesInSight[MyNumerics.GetRandomIndex(verticesInSight.Count)];
-                    Vertex otherV = verticesInSight[MyNumerics.GetRandomIndex(verticesInSight.Count)];
-                    IEnumerable<Edge> edges = Graph.AStar(selectedV, otherV);
-                    if (edges == null)
-                        continue;
-                    Path path = new(edges);
-                    Assert.AreNotEqual(selectedV.Id, otherV.Id);
-                    Game.RegisterCar(new(path));
-                }
-            }
+            if (numCarsInSight < verticesInSight.Count() && Game.Vertices.Count() > 1)
+                SpawnCars(numCarsInSight);
             verticesInSight.Clear();
         }
         else
-        {
-            toRemove.AddRange(Game.Cars.Values);
-            foreach (Edge edge in Game.Edges.Values)
-                edge.Cars.Clear();
-        }
-
-        for (int i = 0; i < toRemove.Count; i++)
-            Game.RemoveCar(toRemove[i]);
-        toRemove.Clear();
+            RemoveAllCars();
+        ApplyCarRemoval();
 
         void GetVertexInSight(List<Road> roadsInSight)
         {
@@ -89,6 +60,45 @@ public class Cars : MonoBehaviour
                         verticesInSight.Add(lane.EndVertex);
                 }
             }
+        }
+
+        void MoveCars()
+        {
+            foreach (Car car in Game.Cars.Values)
+            {
+                car.Move(Time.deltaTime);
+                if (car.Status == CarStatus.Finished)
+                    toRemove.Add(car);
+            }
+        }
+
+        void SpawnCars(int numCarsInSight)
+        {
+            int numCarToSpawn = verticesInSight.Count() - numCarsInSight;
+            for (int i = 0; i < numCarToSpawn; i++)
+            {
+                Vertex selectedV = verticesInSight[MyNumerics.GetRandomIndex(verticesInSight.Count)];
+                Vertex otherV = Game.Vertices.Values.ElementAt(MyNumerics.GetRandomIndex(Game.Vertices.Count));
+                IEnumerable<Edge> edges = Graph.AStar(selectedV, otherV);
+                if (edges == null)
+                    continue;
+                Path path = new(edges);
+                Game.RegisterCar(new(path));
+            }
+        }
+
+        void RemoveAllCars()
+        {
+            toRemove.AddRange(Game.Cars.Values);
+            foreach (Edge edge in Game.Edges.Values)
+                edge.Cars.Clear();
+        }
+
+        void ApplyCarRemoval()
+        {
+            for (int i = 0; i < toRemove.Count; i++)
+                Game.RemoveCar(toRemove[i]);
+            toRemove.Clear();
         }
     }
 

@@ -16,16 +16,15 @@ namespace Assets.Scripts.Model.Roads
         public Vertex Target { get; set; }
         [SaveID]
         public Edge InterweavingEdge { get; set; }
-        public List<Car> Cars { get; set; }
         [SaveID]
         public Car IncomingCar { get; set; }
 
         [NotSaved]
+        public List<Car> Cars { get; set; }
+        [NotSaved]
         public bool IsInnerEdge { get; set; }
         [NotSaved]
         public float Length { get => Curve.Length; }
-        [NotSaved]
-        public float EdgeCost { get => Length * 1; }
 
         public Edge() { Cars = new(); }
 
@@ -37,9 +36,26 @@ namespace Assets.Scripts.Model.Roads
             Cars = new();
         }
 
-        public void AddCar(Car car)
+        public int Insert(Car car)
         {
-            Cars.Add(car);
+            int carIndex = Cars.Count;
+            for (int i = 0; i < Cars.Count; i++)
+            {
+                if (Cars[i].DistanceOnEdge <= car.DistanceOnEdge)
+                {
+                    carIndex = i;
+                    break;
+                }
+            }
+            Cars.Insert(carIndex, car);
+
+            for (int i = 0; i < Cars.Count - 1; i++)
+            {
+                Assert.IsTrue(Cars[i].DistanceOnEdge >= Cars[i + 1].DistanceOnEdge);
+            }
+
+            return carIndex;
+
         }
 
         public bool IsBlockedFor(Car car)
