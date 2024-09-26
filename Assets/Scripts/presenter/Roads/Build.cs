@@ -135,7 +135,7 @@ public static class Build
 
         void SetupReplaceSuggestion(Road road, float distOnRoad)
         {
-            float distance = math.distance(road.Curve.EvaluatePosition(distOnRoad), pos);
+            float distance = math.distance(road.Curve.EvaluatePosition(distOnRoad), new float3(pos.x, 0, pos.z));
             bool isOnLeftSide = math.cross(
                 road.Curve.EvaluateTangent(distOnRoad),
                 road.Curve.EvaluatePosition(distOnRoad) - pos).y > 0;

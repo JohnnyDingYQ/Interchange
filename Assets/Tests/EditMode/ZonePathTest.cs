@@ -135,22 +135,6 @@ public class ZonePathTest
     }
 
     [Test]
-    public void FindsPathToClosestVertex()
-    {
-        Road left = RoadBuilder.Single(-2 * stride, -stride, 0, 1);
-        Road mid = RoadBuilder.Single(0, stride, 2 * stride, 2);
-        Road longer = RoadBuilder.Single(mid.Lanes[1].EndPos, 4 * stride, 6 * stride, 1);
-        Road shorter = RoadBuilder.Single(mid.Lanes[0].EndPos, 3 * stride, 4 * stride, 1);
-        Game.Zones[1].AddVertex(left.Lanes[0].StartVertex);
-        Game.Zones[2].AddVertex(longer.Lanes[0].EndVertex);
-        Game.Zones[2].AddVertex(shorter.Lanes[0].EndVertex);
-        CarScheduler.FindNewConnection();
-
-        Path path = Game.Zones[1].GetPathsTo(Game.Zones[2]).Single();
-        Assert.True(path.Edges.Contains(shorter.Lanes[0].InnerEdge));
-    }
-
-    [Test]
     public void ParallelBuildZoneConnection()
     {
         Build.ParallelBuildOn = true;

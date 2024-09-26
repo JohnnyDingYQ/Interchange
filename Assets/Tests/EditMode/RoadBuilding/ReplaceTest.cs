@@ -209,6 +209,20 @@ public class ReplaceTest
         Assert.False(ReplaceRoad(three, 1, -1));
         Assert.False(ReplaceRoad(three, 1, 1));
     }
+    
+    [Test]
+    public void ReplaceRoadWithDifferentElevation()
+    {
+        Road road = RoadBuilder.Single(0, stride, 2 * stride, 3);
+        Build.LaneCount = 3;
+        Build.Elevation = 4;
+        Game.HoveredRoad = road;
+
+        Build.HandleHover(new float3(stride.x, Build.Elevation, stride.z));
+        Assert.True(Build.ReplaceSuggestionOn);
+        Assert.AreEqual(0, Build.StartTarget.Offset);
+        Assert.AreEqual(0, Build.EndTarget.Offset);
+    }
 
     bool ReplaceRoad(Road road, int laneCount, int offset = 0)
     {

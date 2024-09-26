@@ -8,6 +8,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Burst;
 using System.Linq;
+using KaimiraGames;
 
 public class Cars : MonoBehaviour
 {
@@ -74,10 +75,15 @@ public class Cars : MonoBehaviour
 
         void SpawnCars(int numCarsInSight)
         {
+            WeightedList<Vertex> myWL = new();
+            foreach (Vertex vertex in verticesInSight)
+            {
+                myWL.Add(vertex, (int) vertex.Lane.Length);
+            }
             int numCarToSpawn = verticesInSight.Count() - numCarsInSight;
             for (int i = 0; i < numCarToSpawn; i++)
             {
-                Vertex selectedV = verticesInSight[MyNumerics.GetRandomIndex(verticesInSight.Count)];
+                Vertex selectedV = myWL.Next();
                 Vertex otherV = Game.Vertices.Values.ElementAt(MyNumerics.GetRandomIndex(Game.Vertices.Count));
                 IEnumerable<Edge> edges = Graph.AStar(selectedV, otherV);
                 if (edges == null)
