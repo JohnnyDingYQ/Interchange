@@ -33,7 +33,7 @@ public class Cars : MonoBehaviour
 
     void Update()
     {
-        if (Camera.main.transform.position.y < cameraSettings.ShowCarHeightBar && !Game.BuildModeOn)
+        if (Camera.main.transform.position.y < cameraSettings.ShowCarHeightBar)
         {
             MoveCars();
             List<Road> roadsInSight = roads.GetRoadsInSight();
@@ -67,8 +67,13 @@ public class Cars : MonoBehaviour
         {
             foreach (Car car in Game.Cars.Values)
             {
-                car.Move(Time.deltaTime);
-                if (car.Status == CarStatus.Finished)
+                if (Game.Edges.ContainsValue(car.CurrentEdge))
+                {
+                    car.Move(Time.deltaTime);
+                    if (car.Status == CarStatus.Finished)
+                        toRemove.Add(car);
+                }
+                else
                     toRemove.Add(car);
             }
         }
@@ -78,7 +83,7 @@ public class Cars : MonoBehaviour
             WeightedList<Vertex> myWL = new();
             foreach (Vertex vertex in verticesInSight)
             {
-                myWL.Add(vertex, (int) vertex.Lane.Length);
+                myWL.Add(vertex, (int)vertex.Lane.Length);
             }
             int numCarToSpawn = verticesInSight.Count() - numCarsInSight;
             for (int i = 0; i < numCarToSpawn; i++)

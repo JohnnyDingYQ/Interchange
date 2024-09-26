@@ -15,8 +15,6 @@ public class Main : MonoBehaviour
     [SerializeField]
     Cars cars;
     [SerializeField]
-    ModeToggle modeToggle;
-    [SerializeField]
     Districts zones;
     uint frameElapsed = 0;
 
@@ -34,8 +32,6 @@ public class Main : MonoBehaviour
 
     void Update()
     {
-        if (!Game.BuildModeOn)
-            CarScheduler.Schedule(Time.deltaTime);
         if (frameElapsed % 2 == 0)
         {
             Hover.UpdateHovered();
@@ -67,8 +63,6 @@ public class Main : MonoBehaviour
 
         foreach (Car car in Game.Cars.Values)
             Game.InvokeCarAdded(car);
-
-        modeToggle.SwitchToBuildMode();
         zones.UpdateZoneObjectReferences();
     }
 }

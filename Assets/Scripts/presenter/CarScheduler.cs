@@ -47,8 +47,12 @@ public static class CarScheduler
 
     public static void FindNewConnection()
     {
+        int activeZonesCount = 0;
         foreach (Zone source in Game.Zones.Values)
         {
+            if (!source.Enabled)
+                continue;
+            activeZonesCount++;
             source.ClearPath();
             foreach (Vertex startV in source.Vertices)
             {
@@ -62,6 +66,12 @@ public static class CarScheduler
                             AddPath(source, target, pathEdges);
                 }
             }
+        }
+        foreach (Zone source in Game.Zones.Values)
+        {
+            if (!source.Enabled)
+                continue;
+            source.CalculateConnectedness(activeZonesCount);
         }
         Progression.CheckProgression();
 

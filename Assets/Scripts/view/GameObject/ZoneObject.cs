@@ -3,10 +3,9 @@ using UnityEngine.Splines;
 
 public class ZoneObject : MonoBehaviour
 {
-    public ZoneMaterial zoneMaterial;
+    public ZoneColor zoneColor;
     public Zone Zone { get; set; }
-    bool prev;
-    Renderer meshRenderer;
+    public Renderer meshRenderer;
 
     public void Init(SplineContainer splineContainer)
     {
@@ -27,16 +26,18 @@ public class ZoneObject : MonoBehaviour
 
     void Update()
     {
-        if (prev != Zone.Enabled)
+        if (Zone.Enabled)
             UpdateMaterial();
-        prev = Zone.Enabled;
     }
 
     void UpdateMaterial()
     {
         if (!Zone.Enabled)
-            meshRenderer.material = zoneMaterial.DisbaledMaterial;
+            meshRenderer.material.SetColor("_Color", zoneColor.Disbaled);
         else
-            meshRenderer.material = zoneMaterial.TargetMaterial;
+            meshRenderer.material.SetColor(
+                "_Color",
+                zoneColor.FullyConnected * Zone.Connectedness + zoneColor.Unconnected * (1 - Zone.Connectedness)
+            );
     }
 }

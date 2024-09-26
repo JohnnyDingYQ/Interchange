@@ -15,8 +15,6 @@ public class InputSystem : MonoBehaviour
     private bool isDraggingCamera;
     private bool parallelSpacingDragEnabled;
     [SerializeField]
-    ModeToggle modeToggle;
-    [SerializeField]
     Main main;
     [SerializeField]
     Roads roads;
@@ -49,7 +47,6 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DragCamera.performed += DragScreenStarted;
         gameActions.InGame.DragCamera.canceled += DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed += ToggleParallelBuild;
-        gameActions.InGame.ToggleBuildMode.performed += ToggleBuildMode;
         gameActions.InGame.BulkSelect.started += BulkSelectStarted;
         gameActions.InGame.BulkSelect.performed += BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled += BulkSelectEnd;
@@ -76,7 +73,6 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.DragCamera.performed -= DragScreenStarted;
         gameActions.InGame.DragCamera.canceled -= DragScreenCanceled;
         gameActions.InGame.ToggleParallelBuildMode.performed -= ToggleParallelBuild;
-        gameActions.InGame.ToggleBuildMode.performed -= ToggleBuildMode;
         gameActions.InGame.BulkSelect.started -= BulkSelectStarted;
         gameActions.InGame.BulkSelect.performed -= BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled -= BulkSelectEnd;
@@ -215,10 +211,6 @@ public class InputSystem : MonoBehaviour
     void ToggleParallelBuild(InputAction.CallbackContext context)
     {
         Build.ToggletParallelBuild();
-    }
-    void ToggleBuildMode(InputAction.CallbackContext context)
-    {
-        modeToggle.ToggleMode();
     }
     void BulkSelectStarted(InputAction.CallbackContext context)
     {

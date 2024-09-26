@@ -13,6 +13,7 @@ public class Car
     public float TimeTaken;
     int edgeIndex;
     public float DistanceOnEdge { get; private set; }
+    public Edge CurrentEdge { get => path.Edges[edgeIndex]; }
 
     public Car(Path path)
     {

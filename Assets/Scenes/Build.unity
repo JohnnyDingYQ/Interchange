@@ -241,7 +241,6 @@ Transform:
   - {fileID: 11189982}
   - {fileID: 1260736908}
   - {fileID: 2094254131}
-  - {fileID: 2084363008}
   - {fileID: 985838738}
   - {fileID: 190404219}
   m_Father: {fileID: 0}
@@ -970,7 +969,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   districts: {fileID: 467897665}
-  zoneMaterial: {fileID: 11400000, guid: ea70320d92554a4479162c4eaf6b2472, type: 2}
+  zoneColor: {fileID: 11400000, guid: ea70320d92554a4479162c4eaf6b2472, type: 2}
+  zoneMaterial: {fileID: 2100000, guid: 9f747fb5fd441004d8606a07d45817c7, type: 2}
   gameUI: {fileID: 1478157752}
 --- !u!1 &197285136
 GameObject:
@@ -2943,7 +2943,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c78b01980fcb2424190c06a53624a7b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modeToggle: {fileID: 2084363009}
   main: {fileID: 948732634}
   roads: {fileID: 11189983}
 --- !u!1 &762135887
@@ -4045,7 +4044,6 @@ MonoBehaviour:
   roads: {fileID: 11189983}
   intersections: {fileID: 985838739}
   cars: {fileID: 1260736909}
-  modeToggle: {fileID: 2084363009}
   zones: {fileID: 190404220}
 --- !u!1 &963194225
 GameObject:
@@ -8414,51 +8412,6 @@ LightingSettings:
   m_PVRTiledBaking: 0
   m_NumRaysToShootPerTexel: -1
   m_RespectSceneVisibilityWhenBakingGI: 0
---- !u!1 &2084363007
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2084363008}
-  - component: {fileID: 2084363009}
-  m_Layer: 0
-  m_Name: ModeToggle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2084363008
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2084363007}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 37504657}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2084363009
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2084363007}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b58c337dba1b9b4a9d87249b39ae320, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameUI: {fileID: 1478157752}
 --- !u!1 &2091355791
 GameObject:
   m_ObjectHideFlags: 0

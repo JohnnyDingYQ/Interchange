@@ -262,8 +262,6 @@ public static class Build
 
     public static List<Road> HandleBuildCommand(float3 clickPos)
     {
-        if (!Game.BuildModeOn)
-            return null;
         List<Road> roads;
         RemoveAllGhostRoads();
         UpdateBuildTargetsAndPivot(clickPos);
@@ -372,8 +370,6 @@ public static class Build
         Road road = new(GetCurve(), LaneCount);
         if (road.HasLaneShorterThanMinLaneLength() || RoadIsTooSteep())
             return null;
-        int segmemtCount = (int)MathF.Ceiling(road.Curve.Length / Constants.MaxRoadCurveLength);
-        // road.Curve = road.Curve.SplitInToSegments(segmemtCount);
         return road;
 
         bool RoadIsTooBent()

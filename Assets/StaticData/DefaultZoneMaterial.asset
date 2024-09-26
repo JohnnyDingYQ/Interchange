@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5bf2022f6f8f9949a70aaa3c21e031f, type: 3}
   m_Name: DefaultZoneMaterial
   m_EditorClassIdentifier: 
-  SourceMaterial: {fileID: 2100000, guid: faf303b05bed8444b9e75501c69ca896, type: 2}
-  TargetMaterial: {fileID: 2100000, guid: 703325ac24c57034a8b223085d718e6b, type: 2}
-  DisbaledMaterial: {fileID: 2100000, guid: 9f747fb5fd441004d8606a07d45817c7, type: 2}
+  FullyConnected: {r: 0, g: 1, b: 0.073405266, a: 0}
+  Unconnected: {r: 1, g: 0.11125838, b: 0.059748232, a: 0}
+  Disbaled: {r: 0.14465404, g: 0.105988644, b: 0.105988644, a: 0}

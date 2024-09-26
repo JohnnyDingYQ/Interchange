@@ -22,7 +22,6 @@ public static class Game
     public static Road HoveredRoad { get; set; }
     public static Zone HoveredZone { get; set; }
     public static District HoveredDistrict { get; set; }
-    public static bool BuildModeOn { get; set; }
     private static readonly HashSet<Road> selectedRoads = new();
     public static ReadOnlySet<Road> SelectedRoads { get => selectedRoads.AsReadOnly(); }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved, RoadSelected, RoadUnselected;
@@ -34,7 +33,6 @@ public static class Game
     {
         SanityCheck();
         GameSave = new();
-        BuildModeOn = true;
         Cars = new();
     }
 
@@ -43,7 +41,6 @@ public static class Game
         Build.Reset();
         Graph.Wipe();
         GameSave = new();
-        BuildModeOn = true;
         HoveredRoad = null;
         HoveredZone = null;
         HoveredDistrict = null;

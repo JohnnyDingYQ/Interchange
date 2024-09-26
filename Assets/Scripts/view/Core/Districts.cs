@@ -9,7 +9,9 @@ public class Districts : MonoBehaviour
     [SerializeField]
     GameObject districts;
     [SerializeField]
-    ZoneMaterial zoneMaterial;
+    ZoneColor zoneColor;
+    [SerializeField]
+    Material zoneMaterial;
     [SerializeField]
     GameUI gameUI;
     readonly Dictionary<uint, ZoneObject> zoneMapping = new();
@@ -55,9 +57,10 @@ public class Districts : MonoBehaviour
             ZoneObject zoneObject = gameObject.AddComponent<ZoneObject>();
             gameObject.name = newZone.Id.ToString();
             zoneObject.Zone = newZone;
-            zoneObject.zoneMaterial = zoneMaterial;
+            zoneObject.zoneColor = zoneColor;
             zoneMapping[newZone.Id] = zoneObject;
             zoneObject.Init(gameObject.GetComponent<SplineContainer>());
+            zoneObject.meshRenderer.material = zoneMaterial;
         }
 
     }

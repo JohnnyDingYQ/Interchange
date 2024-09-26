@@ -18,6 +18,8 @@ public class Zone : IPersistable
     [NotSaved]
     public HashSet<Zone> ConnectedZones { get; set; }
     [NotSaved]
+    public float Connectedness { get; private set; }
+    [NotSaved]
     public const int DistrictBitWidth = 6;
 
     public Zone() { ConnectedZones = new(); }
@@ -68,6 +70,11 @@ public class Zone : IPersistable
         connectedTargets[target].Remove(path);
         if (connectedTargets[target].Count == 0)
             ConnectedZones.Remove(target);
+    }
+
+    public void CalculateConnectedness(int activeZonesCount)
+    {
+        Connectedness = (float) ConnectedZones.Count / activeZonesCount;
     }
 
     public void ClearPath()
