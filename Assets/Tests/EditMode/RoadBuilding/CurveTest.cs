@@ -89,17 +89,4 @@ public class CurveTest
             Assert.AreNotEqual(distA, distB);
         }
     }
-
-    [Test]
-    public void LerpPositionTest()
-    {
-        float3 up = new(0, 0, 100);
-        float3 right = new(100, 0, 0);
-        Curve curve = new(new(0, up, up + right));
-
-        int numPoints = 20;
-        for (float i = 0; i <= curve.Length; i += curve.Length / numPoints)
-            Assert.True(MyNumerics.IsApproxEqual(curve.EvaluatePosition(i), curve.LerpPosition(i), 0.2f),
-            $"Expected: {curve.EvaluatePosition(i)}, Actural: {curve.LerpPosition(i)}");
-    }
 }

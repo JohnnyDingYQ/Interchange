@@ -325,22 +325,6 @@ public class Curve : IPersistable
         right = right.AddStartDistance(distance);
     }
 
-    public float3 LerpPosition(float distance)
-    {
-        if (distance >= Length)
-            return segmentCache[^1];
-        if (segmentCache == null)
-            InitSegmentCache();
-        float segmentLength = Length / (segmentCache.Length - 1);
-        int index = (int)(distance / segmentLength);
-        if (index == segmentCache.Length - 1)
-            index--;
-        Assert.IsTrue(segmentLength != 0);
-        if (index + 1 >= segmentCache.Length)
-            index += 0;
-        return math.lerp(segmentCache[index], segmentCache[index + 1], (distance - index * segmentLength) / segmentLength);
-    }
-
     public void CreateDistanceCache()
     {
         lut = new DistanceToInterpolation[distanceToInterpolationCacheSize];
