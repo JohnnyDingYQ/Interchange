@@ -39,7 +39,6 @@ public static class Divide
         Game.RemoveRoad(road, RoadRemovalOption.Divide);
         Build.ConnectRoadStartToNodes(leftRoad.EndIntersection, 0, rightRoad);
         Game.UpdateIntersection(leftRoad.EndIntersection);
-        CarScheduler.FindNewConnection();
 
         return new SubRoads(leftRoad, rightRoad);
 

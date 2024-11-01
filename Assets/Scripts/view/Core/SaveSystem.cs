@@ -24,8 +24,6 @@ public class SaveSystem
 
         static void InitializeGameSave()
         {
-            Game.SetupZones();
-
             foreach (Vertex v in Game.Vertices.Values)
                 Graph.AddVertex(v);
 
@@ -47,9 +45,6 @@ public class SaveSystem
             // set outline at ends 
             foreach (Intersection i in Game.Intersections.Values)
                 IntersectionUtil.EvaluateOutline(i);
-
-            // paths
-            CarScheduler.FindNewConnection();
         }
     }
 

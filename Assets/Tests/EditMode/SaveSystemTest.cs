@@ -166,25 +166,6 @@ public class SaveSystemTest
     }
 
     [Test]
-    public void SaveLoadAndConnectZones()
-    {
-        Game.Zones.Add(1, new(1));
-        Game.Zones.Add(2, new(2));
-        GameSave oldSave = Game.GameSave;
-        testSaveSystem.SaveGame();
-        testSaveSystem.LoadGame();
-        Assert.AreEqual(oldSave, Game.GameSave);
-        Road road = RoadBuilder.ZoneToZone(0, stride, 2 * stride, Game.Zones[1], Game.Zones[2]);
-
-        Assert.NotNull(road);
-        Assert.AreEqual(1, Game.Zones[1].Vertices.Count);
-        Assert.AreEqual(1, Game.Zones[2].Vertices.Count);
-        Assert.AreSame(road.Lanes[0].StartVertex, Game.Zones[1].Vertices.Single());
-        Assert.AreSame(road.Lanes[0].EndVertex, Game.Zones[2].Vertices.Single());
-        Assert.AreEqual(1, Game.Zones[1].ConnectedZones.Count());
-    }
-
-    [Test]
     public void CombineAndSaveLoad()
     {
         Road left = RoadBuilder.Single(0, stride, 2 * stride, 1);

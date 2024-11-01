@@ -24,10 +24,6 @@ public class GameSave : IPersistable
     public Dictionary<uint, Edge> Edges { get; private set; }
     [IPersistableDict]
     public Dictionary<uint, Curve> Curves { get; private set; }
-    [IPersistableDict]
-    public static Dictionary<uint, Zone> Zones { get; private set; }
-    [IPersistableDict]
-    public static Dictionary<uint, District> Districts { get; private set; }
     public uint Id { get; set; }
 
     public GameSave()
@@ -39,9 +35,6 @@ public class GameSave : IPersistable
         Nodes = new();
         Intersections = new();
         Curves = new();
-        Zones = new();
-        Zones = new();
-        Districts = new();
         CarServiced = 0;
     }
 

@@ -50,11 +50,4 @@ public class GameUI: MonoBehaviour
         yield return waitAnimationDuration;
         pause.style.display = DisplayStyle.None;
     }
-
-    public DistrictLabel AddDistrictLabel()
-    {
-        TextElement label = new();
-        districtLabels.Add(label);
-        return new(label);
-    }
 }

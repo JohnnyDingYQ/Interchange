@@ -15,7 +15,6 @@ public class Main : MonoBehaviour
     [SerializeField]
     Cars cars;
     [SerializeField]
-    Districts zones;
     uint frameElapsed = 0;
 
     void Start()
@@ -26,7 +25,6 @@ public class Main : MonoBehaviour
         Debug.Log("Seed: " + now);
         // UnityEngine.Random.InitState(1439289702);
 
-        Game.Districts[1].Enable();
         devPanel.gameObject.SetActive(debugMode);
     }
 
@@ -63,6 +61,5 @@ public class Main : MonoBehaviour
 
         foreach (Car car in Game.Cars.Values)
             Game.InvokeCarAdded(car);
-        zones.UpdateZoneObjectReferences();
     }
 }

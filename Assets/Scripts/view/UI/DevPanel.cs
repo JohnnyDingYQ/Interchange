@@ -88,12 +88,6 @@ public class DevPanel : MonoBehaviour
         stringBuilder.Append("Cars Serviced: ");
         stringBuilder.Append(Game.CarServiced);
         carServiced.text = stringBuilder.ToString();
-
-        stringBuilder.Clear();
-        stringBuilder.Append("Connectedness: ");
-        stringBuilder.Append(Progression.GlobalConnectedness);
-        stringBuilder.Append(" %");
-        connectedness.text = stringBuilder.ToString();
     }
 
     public static void SetDebug1Text(string s)

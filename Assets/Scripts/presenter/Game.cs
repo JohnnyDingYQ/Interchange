@@ -16,12 +16,8 @@ public static class Game
     public static Dictionary<uint, Car> Cars { get; private set; }
     public static Dictionary<uint, Edge> Edges { get => GameSave.Edges; }
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
-    public static Dictionary<uint, Zone> Zones { get => GameSave.Zones; }
-    public static Dictionary<uint, District> Districts { get => GameSave.Districts; }
     public static uint CarServiced { get => GameSave.CarServiced; set => GameSave.CarServiced = value; }
     public static Road HoveredRoad { get; set; }
-    public static Zone HoveredZone { get; set; }
-    public static District HoveredDistrict { get; set; }
     private static readonly HashSet<Road> selectedRoads = new();
     public static ReadOnlySet<Road> SelectedRoads { get => selectedRoads.AsReadOnly(); }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved, RoadSelected, RoadUnselected;
@@ -42,8 +38,6 @@ public static class Game
         Graph.Wipe();
         GameSave = new();
         HoveredRoad = null;
-        HoveredZone = null;
-        HoveredDistrict = null;
         Cars = new();
     }
 
@@ -238,11 +232,5 @@ public static class Game
         Assert.IsTrue(Constants.MinElevation < Constants.MaxElevation);
         Assert.AreEqual(0, (Constants.MaxElevation - Constants.MinElevation) % Constants.ElevationStep);
         Assert.AreEqual(0, Constants.MinElevation);
-    }
-
-    public static void SetupZones()
-    {
-        foreach (Zone zone in Zones.Values)
-            zone.InitConnectedTargets(Zones.Values);
     }
 }

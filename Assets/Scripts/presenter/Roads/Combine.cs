@@ -51,7 +51,6 @@ public static class Combine
         }
         left.EndIntersection.AddRoad(left, Direction.In);
         Game.UpdateIntersection(left.StartIntersection);
-        CarScheduler.FindNewConnection();
         return left;
 
     }

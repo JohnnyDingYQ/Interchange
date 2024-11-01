@@ -14,8 +14,6 @@ public class Hover
         // Perform the raycast and store the number of hits
         int hitCount = Physics.RaycastNonAlloc(new Ray(mousePos, new float3(0, -1, 0)), hitResults, Constants.MaxElevation + 3);
 
-        Game.HoveredZone = null;
-        Game.HoveredDistrict = null;
         if (Game.HoveredRoad != null)
             Roads.UnHover(Game.HoveredRoad);
         Game.HoveredRoad = null;
@@ -24,10 +22,6 @@ public class Hover
         for (int i = 0; i < hitCount; i++)
         {
             RaycastHit hit = hitResults[i];
-            if (hit.collider.gameObject.TryGetComponent<ZoneObject>(out var zoneObject))
-                Game.HoveredZone = zoneObject.Zone;
-            if (hit.collider.gameObject.TryGetComponent<DistrictObject>(out var districtObject))
-                Game.HoveredDistrict = districtObject.District;
             if (!Build.StartAssigned() && !roadFound && hit.collider.gameObject.TryGetComponent<RoadObject>(out var roadComp))
                 if (!roadComp.Road.IsGhost)
                 {

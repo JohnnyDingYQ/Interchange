@@ -31,17 +31,4 @@ public static class RoadBuilder
         List<Road> roads = Build.HandleBuildCommand(end);
         return roads;
     }
-
-    public static Road ZoneToZone(float3 start, float3 pivot, float3 end, Zone source, Zone target, int laneCount = 1)
-    {
-        Build.ContinuousBuilding = false;
-        Build.LaneCount = laneCount;
-        Game.HoveredZone = source;
-        Build.HandleBuildCommand(start);
-        Build.HandleBuildCommand(pivot);
-        Game.HoveredZone = target;
-        Road road = Build.HandleBuildCommand(end).Single();
-        Game.HoveredZone = null;
-        return road;
-    }
 }
