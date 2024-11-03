@@ -398,12 +398,12 @@ public static class Build
         Game.RegisterRoad(road);
 
         if (startTarget.Snapped)
-            ConnectRoadStartToNodes(startTarget.Intersection, startTarget.Offset, road);
+            ConnectRoadStartToIntersection(startTarget.Intersection, startTarget.Offset, road);
         else
             IntersectionUtil.EvaluateOutline(road.StartIntersection);
 
         if (endTarget.Snapped)
-            ConnectRoadEndToNodes(endTarget.Intersection, endTarget.Offset, road);
+            ConnectRoadEndToIntersection(endTarget.Intersection, endTarget.Offset, road);
         else
             IntersectionUtil.EvaluateOutline(road.EndIntersection);
 
@@ -460,7 +460,7 @@ public static class Build
         return p;
     }
 
-    public static void ConnectRoadStartToNodes(Intersection ix, int index, Road road)
+    public static void ConnectRoadStartToIntersection(Intersection ix, int index, Road road)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         List<Node> nodes = ix.WalkNodes(index, road.LaneCount);
@@ -476,7 +476,7 @@ public static class Build
         IntersectionUtil.EvaluateOutline(road.StartIntersection);
     }
 
-    public static void ConnectRoadEndToNodes(Intersection ix, int index, Road road)
+    public static void ConnectRoadEndToIntersection(Intersection ix, int index, Road road)
     {
         Assert.IsTrue(Game.Roads.ContainsKey(road.Id));
         List<Node> nodes = ix.WalkNodes(index, road.LaneCount);

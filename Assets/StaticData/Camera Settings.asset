@@ -71,7 +71,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   MaxHeight: 2500
   ZoomMultiplier: 220
-  PanMultiplier: 3750
+  PanMultiplier: 1500
   driftDecayExponentMultiplier: 10
   SpinMuliplier: 40
   ShowCarHeightBar: 500
