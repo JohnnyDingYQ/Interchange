@@ -15,6 +15,7 @@ public class Main : MonoBehaviour
     [SerializeField]
     Cars cars;
     [SerializeField]
+    GameSettings gameSettings;
     uint frameElapsed = 0;
 
     void Start()
@@ -26,6 +27,8 @@ public class Main : MonoBehaviour
         // UnityEngine.Random.InitState(1439289702);
 
         devPanel.gameObject.SetActive(debugMode);
+        Build.DisplaysGhost = gameSettings.displaysGhost;
+        Build.ContinuousBuilding = gameSettings.continuousBuild;
     }
 
     void Update()

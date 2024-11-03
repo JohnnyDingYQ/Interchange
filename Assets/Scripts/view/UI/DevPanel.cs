@@ -14,12 +14,9 @@ public class DevPanel : MonoBehaviour
     private Toggle drawOutline;
     private Toggle drawPx;
     private Toggle drawVertices;
-    private Toggle ghostRoad;
     private Toggle supportLines;
-    private Toggle continuousBuilding;
     private static TextElement elevation;
     private static TextElement carServiced;
-    private static TextElement connectedness;
     private static TextElement debug1;
     private static TextElement debug2;
     private Button button1;
@@ -33,7 +30,6 @@ public class DevPanel : MonoBehaviour
 
         elevation = root.Q<TextElement>("Elevation");
         carServiced = root.Q<TextElement>("CarServiced");
-        connectedness = root.Q<TextElement>("Connectedness");
         debug1 = root.Q<TextElement>("Debug1");
         debug2 = root.Q<TextElement>("Debug2");
 
@@ -43,9 +39,7 @@ public class DevPanel : MonoBehaviour
         drawOutline = root.Q<Toggle>("RoadOutline");
         drawPx = root.Q<Toggle>("RoadPx");
         drawVertices = root.Q<Toggle>("RoadVertices");
-        ghostRoad = root.Q<Toggle>("Ghost");
         supportLines = root.Q<Toggle>("SupportLines");
-        continuousBuilding = root.Q<Toggle>("ContinuousBuilding");
         button1 = root.Q<Button>("DrawGizmos");
         button2 = root.Q<Button>("DeleteCars");
 
@@ -63,17 +57,19 @@ public class DevPanel : MonoBehaviour
         drawVertices.value = false;
         supportLines.RegisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
         supportLines.value = true;
-        ghostRoad.RegisterCallback<ChangeEvent<bool>>(ToggleGhost);
-        ghostRoad.value = true;
-        continuousBuilding.RegisterCallback<ChangeEvent<bool>>(ToggleContinuousBuilding);
-        continuousBuilding.value = true;
         button1.RegisterCallback((ClickEvent evt) => DrawGizmos.Draw());
         button2.RegisterCallback((ClickEvent evt) =>
         {
             List<uint> ids = Game.Cars.Keys.ToList();
-            foreach (uint id in ids) Game.RemoveCar(Game.Cars[id]);
-            foreach (Edge edge in Game.Edges.Values) {edge.IncomingCar = null; edge.Cars.Clear(); }
-            foreach (Vertex vertex in Game.Vertices.Values) vertex.ScheduleCooldown = 0;
+            foreach (uint id in ids)
+                Game.RemoveCar(Game.Cars[id]);
+            foreach (Edge edge in Game.Edges.Values)
+            {
+                edge.IncomingCar = null;
+                edge.Cars.Clear();
+            }
+            foreach (Vertex vertex in Game.Vertices.Values)
+                vertex.ScheduleCooldown = 0;
         });
     }
 
@@ -117,8 +113,6 @@ public class DevPanel : MonoBehaviour
         drawOutline.UnregisterCallback<ChangeEvent<bool>>(ToggleOutline);
         drawVertices.UnregisterCallback<ChangeEvent<bool>>(ToggleVertices);
         supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
-        ghostRoad.UnregisterCallback<ChangeEvent<bool>>(ToggleGhost);
-        continuousBuilding.UnregisterCallback<ChangeEvent<bool>>(ToggleContinuousBuilding);
     }
 
     void MouseReturnGameWorld(MouseEnterEvent e)
@@ -153,16 +147,8 @@ public class DevPanel : MonoBehaviour
     {
         DrawGizmos.DrawVertices = e.newValue;
     }
-    void ToggleGhost(ChangeEvent<bool> e)
-    {
-        Build.BuildsGhostRoad = e.newValue;
-    }
     void ToggleSupportLines(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawSupportLines = e.newValue;
-    }
-    void ToggleContinuousBuilding(ChangeEvent<bool> e)
-    {
-        Build.ContinuousBuilding = e.newValue;
     }
 }

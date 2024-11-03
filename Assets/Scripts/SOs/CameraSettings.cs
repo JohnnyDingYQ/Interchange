@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Camera Settings", menuName = "Camera Settings", order = 51)]
+[CreateAssetMenu(fileName = "New Camera Settings", menuName = "Scriptable Objects/Camera Settings", order = 51)]
 public class CameraSettings : ScriptableObject
 {
     public AnimationCurve ZoomSpeed;

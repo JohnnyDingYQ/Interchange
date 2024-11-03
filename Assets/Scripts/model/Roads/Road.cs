@@ -10,6 +10,7 @@ public class Road : IPersistable
     public uint Id { get; set; }
     [SaveID]
     public Curve Curve { get; set; }
+    public RoadProperty RoadProperty { get; set; }
     public int LaneCount { get; private set; }
     [SaveIDCollection]
     public List<Lane> Lanes { get; set; }
@@ -32,6 +33,7 @@ public class Road : IPersistable
     [NotSaved]
     public bool IsMajorRoad { get => StartIntersection.IsMajorRoad(this) || EndIntersection.IsMajorRoad(this); }
 
+    // Loading used empty argument constructor
     public Road()
     {
         LeftOutline = new();
@@ -40,6 +42,7 @@ public class Road : IPersistable
 
     public Road(Curve curve, int laneCount)
     {
+        RoadProperty = RoadProperty.PlayerBuilt;
         Curve = curve;
         LaneCount = laneCount;
 
@@ -53,7 +56,7 @@ public class Road : IPersistable
             Lanes.Add(new(this, i));
         if (HasLaneShorterThanMinLaneLength())
             return;
-    
+
         foreach (Lane l in Lanes)
         {
             l.InitNodes();
@@ -113,7 +116,7 @@ public class Road : IPersistable
         Curve.GetNearestDistance(ray, out float distanceOnCurve);
         return distanceOnCurve;
     }
-    
+
     public override bool Equals(object obj)
     {
         if (obj is Road other)

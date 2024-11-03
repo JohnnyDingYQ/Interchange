@@ -583,7 +583,7 @@ MonoBehaviour:
   roads: {fileID: 11189983}
   intersections: {fileID: 985838739}
   cars: {fileID: 1260736909}
-  frameElapsed: 0
+  gameSettings: {fileID: 11400000, guid: ef5045fc5500fd6419e147b2175a9e49, type: 2}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

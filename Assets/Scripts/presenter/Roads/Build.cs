@@ -17,7 +17,7 @@ public static class Build
     public static BuildTargets StartTarget { get; set; }
     public static BuildTargets EndTarget { get; set; }
     public static event Action<SupportLine> SupportedLineUpdated;
-    public static bool BuildsGhostRoad { get; set; }
+    public static bool DisplaysGhost { get; set; }
     public static List<uint> GhostRoads { get; private set; }
     public static bool ParallelBuildOn { get; set; }
     public static float ParallelSpacing { get; set; }
@@ -36,7 +36,7 @@ public static class Build
         LaneCount = 1;
         startAssigned = false;
         pivotAssigned = false;
-        BuildsGhostRoad = true;
+        DisplaysGhost = true;
         StraightMode = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;
         Game.RoadRemoved += RoadRemoved;
@@ -46,7 +46,7 @@ public static class Build
     {
         ResetSelection();
         RemoveAllGhostRoads();
-        BuildsGhostRoad = true;
+        DisplaysGhost = true;
         GhostRoads = new();
         ParallelBuildOn = false;
         ParallelSpacing = Constants.DefaultParallelSpacing;

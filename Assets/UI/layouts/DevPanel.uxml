@@ -3,7 +3,6 @@
     <ui:VisualElement class="devPanel" style="flex-grow: 1;">
         <ui:TextElement text="Elevation:" name="Elevation" />
         <ui:TextElement text="Serviced:" name="CarServiced" />
-        <ui:TextElement text="Connectedness: " name="Connectedness" />
         <ui:TextElement text="Debug1: " name="Debug1" />
         <ui:TextElement text="Debug2: " name="Debug2" />
         <ui:Foldout text="Roads" name="MyFoldout" value="true">
@@ -14,8 +13,6 @@
             <ui:Toggle text="Control Points" name="RoadPx" />
             <ui:Toggle text="Vertices" name="RoadVertices" />
             <ui:Toggle text="Support Lines" name="SupportLines" />
-            <ui:Toggle text="Builds Ghost" name="Ghost" />
-            <ui:Toggle text="Continuous Building" name="ContinuousBuilding" />
         </ui:Foldout>
         <ui:Button text="Draw Gizmos" parse-escape-sequences="true" display-tooltip-when-elided="true" name="DrawGizmos" />
         <ui:Button text="Delete Cars" parse-escape-sequences="true" display-tooltip-when-elided="true" name="DeleteCars" />

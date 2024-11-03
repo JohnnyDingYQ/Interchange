@@ -9,6 +9,8 @@ public static class Remove
     // only called in Game.cs
     public static bool RemoveRoad(Road road, RoadRemovalOption option)
     {
+        if (road.RoadProperty == RoadProperty.InnateSource || road.RoadProperty == RoadProperty.InnateTarget)
+            return false;
         Game.Roads.Remove(road.Id);
         Game.RemoveCurve(road.Curve);
         foreach (Lane lane in road.Lanes)

@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5bf2022f6f8f9949a70aaa3c21e031f, type: 3}
-  m_Name: DefaultZoneMaterial
+  m_Script: {fileID: 11500000, guid: 66aea7bf55baff34589c0bfc917d7eee, type: 3}
+  m_Name: GameSettings
   m_EditorClassIdentifier: 
-  FullyConnected: {r: 0, g: 1, b: 0.073405266, a: 0}
-  Unconnected: {r: 1, g: 0.11125838, b: 0.059748232, a: 0}
-  Disbaled: {r: 0.14465404, g: 0.105988644, b: 0.105988644, a: 0}
+  continuousBuild: 1
+  displaysGhost: 1
