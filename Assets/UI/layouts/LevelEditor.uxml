@@ -23,12 +23,13 @@
             <ui:Button text="Set Center" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setBoundaryCenter"/>
             <ui:Button text="Display" parse-escape-sequences="true" display-tooltip-when-elided="true" name="displayBoundary"/>
             <ui:FloatField label="Boundary Radius" value="1" name="boundaryRadiusField"/>
+            <ui:Toggle text="Bound Camera" name="boundCamera" />
         </ui:VisualElement>
         <ui:VisualElement class="boundaries">
             <ui:TextElement text="Save/Load" />
-            <ui:FloatField label="Name" value="1" />
+            <ui:IntegerField label="Level ID" value="1" />
             <ui:Button text="Save" parse-escape-sequences="true" display-tooltip-when-elided="true" name="save"/>
-            <ui:FloatField label="Name" value="1" />
+            <ui:IntegerField label="Level ID" value="1" />
             <ui:Button text="Load" parse-escape-sequences="true" display-tooltip-when-elided="true" name="load"/>
         </ui:VisualElement>
     </ui:VisualElement>

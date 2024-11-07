@@ -97,8 +97,8 @@ public class InputSystem : MonoBehaviour
         
         if (isDraggingCamera)
         {
-            cameraOffset.x += (prevScreenMousePos.x - Input.mousePosition.x) * MouseDragScreenMultiplier;
-            cameraOffset.z += (prevScreenMousePos.y - Input.mousePosition.y) * MouseDragScreenMultiplier;
+            cameraOffset.x += (prevScreenMousePos.x - Mouse.current.position.ReadValue().x) * MouseDragScreenMultiplier;
+            cameraOffset.z += (prevScreenMousePos.y - Mouse.current.position.ReadValue().y) * MouseDragScreenMultiplier;
         }
         CameraControl.CameraOffset = cameraOffset;
         CameraControl.CamearSpin = gameActions.InGame.SpinCamera.ReadValue<float>();
@@ -106,18 +106,12 @@ public class InputSystem : MonoBehaviour
 
     void UpdateMouseWorldPos()
     {
-        float3 mouseWorldPos = new()
-        {
-            x = Input.mousePosition.x,
-            y = Input.mousePosition.y,
-            z = Camera.main.transform.position.y
-        };
-        mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseWorldPos);
+        float3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         mouseWorldPos.y = Build.Elevation;
         MouseWorldPos = mouseWorldPos;
 
-        prevScreenMousePos.x = Input.mousePosition.x;
-        prevScreenMousePos.y = Input.mousePosition.y;
+        prevScreenMousePos.x = Mouse.current.position.ReadValue().x;
+        prevScreenMousePos.y = Mouse.current.position.ReadValue().y;
     }
 
     void ProcessParallelSpacingDrag()

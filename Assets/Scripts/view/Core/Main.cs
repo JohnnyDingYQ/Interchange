@@ -24,11 +24,13 @@ public class Main : MonoBehaviour
         Application.targetFrameRate = 165;
         Physics.queriesHitTriggers = false;
         int now = (int)DateTime.Now.Ticks;
-        Debug.Log("Seed: " + now);
+        Debug.Log("Running with seed: " + now);
         // UnityEngine.Random.InitState(1439289702);
 
         devPanel.gameObject.SetActive(gameSettings.debugPanelOn);
         levelEditor.gameObject.SetActive(gameSettings.levelEditorOn);
+        if (!gameSettings.levelEditorOn)
+            Game.CameraBoundOn = true;
         Game.LevelEditorOn = gameSettings.levelEditorOn;
         Build.DisplaysGhost = gameSettings.displaysGhost;
         Build.ContinuousBuilding = gameSettings.continuousBuild;

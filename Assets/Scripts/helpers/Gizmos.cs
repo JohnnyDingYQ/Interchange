@@ -116,4 +116,15 @@ public static class Gizmos
             prev = pos;
         }
     }
+
+    public static void DrawCircle(float3 center, float radius, int resolution, Color color, float duration)
+    {
+        List<float3> points = new();
+        for (float i = 0; i < resolution; i++)
+        {
+            float radian = 2 * math.PI / resolution * i;
+            points.Add(new(center.x + radius * math.cos(radian), center.y, center.z + radius * math.sin(radian)));
+        }
+        DrawListofPoints(points, color, duration);
+    }
 }
