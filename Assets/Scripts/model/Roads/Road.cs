@@ -10,7 +10,7 @@ public class Road : IPersistable
     public uint Id { get; set; }
     [SaveID]
     public Curve Curve { get; set; }
-    public RoadProperty RoadProperty { get; set; }
+    public RoadProp RoadProp { get; set; }
     public int LaneCount { get; private set; }
     [SaveIDCollection]
     public List<Lane> Lanes { get; set; }
@@ -42,7 +42,7 @@ public class Road : IPersistable
 
     public Road(Curve curve, int laneCount)
     {
-        RoadProperty = RoadProperty.PlayerBuilt;
+        RoadProp = RoadProp.PlayerBuilt;
         Curve = curve;
         LaneCount = laneCount;
 

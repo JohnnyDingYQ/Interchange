@@ -69,8 +69,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  MaxHeight: 2500
-  ZoomMultiplier: 220
+  MaxHeight: 1000
+  ZoomMultiplier: 100
   PanMultiplier: 1500
   driftDecayExponentMultiplier: 10
   SpinMuliplier: 40

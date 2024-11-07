@@ -2,7 +2,6 @@
     <Style src="project://database/Assets/UI/styles/DevPanel.uss?fileID=7433441132597879392&amp;guid=28de604cf2fee904f96c092088db9480&amp;type=3#DevPanel" />
     <ui:VisualElement class="devPanel" style="flex-grow: 1;">
         <ui:TextElement text="Elevation:" name="Elevation" />
-        <ui:TextElement text="Serviced:" name="CarServiced" />
         <ui:TextElement text="Debug1: " name="Debug1" />
         <ui:TextElement text="Debug2: " name="Debug2" />
         <ui:Foldout text="Roads" name="MyFoldout" value="true">

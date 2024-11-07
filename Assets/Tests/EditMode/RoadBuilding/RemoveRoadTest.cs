@@ -169,15 +169,15 @@ public class RemoveRoadTest
     public void CanOnlyRemovePlayerBuildRoads()
     {
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
-        road.RoadProperty = RoadProperty.PlayerBuilt;
+        road.RoadProp = RoadProp.PlayerBuilt;
         Assert.True(Game.RemoveRoad(road));
     
         road = RoadBuilder.Single(0, stride, 2 * stride, 2);
-        road.RoadProperty = RoadProperty.InnateSource;
+        road.RoadProp = RoadProp.InnateSource;
         Assert.False(Game.RemoveRoad(road));
     
         road = RoadBuilder.Single(0, stride, 2 * stride, 2);
-        road.RoadProperty = RoadProperty.InnateTarget;
+        road.RoadProp = RoadProp.InnateTarget;
         Assert.False(Game.RemoveRoad(road));
     
     }

@@ -145,7 +145,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ToggleBuildMode"",
+                    ""name"": ""LevelEditorSelect"",
                     ""type"": ""Button"",
                     ""id"": ""cd1fb85d-9bfc-42eb-9ae7-24fb551a6bb8"",
                     ""expectedControlType"": ""Button"",
@@ -416,7 +416,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ToggleBuildMode"",
+                    ""action"": ""LevelEditorSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -539,7 +539,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         m_InGame_ParallelSpacingDrag = m_InGame.FindAction("ParallelSpacingDrag", throwIfNotFound: true);
         m_InGame_DragCamera = m_InGame.FindAction("DragCamera", throwIfNotFound: true);
         m_InGame_ToggleParallelBuildMode = m_InGame.FindAction("ToggleParallelBuildMode", throwIfNotFound: true);
-        m_InGame_ToggleBuildMode = m_InGame.FindAction("ToggleBuildMode", throwIfNotFound: true);
+        m_InGame_LevelEditorSelect = m_InGame.FindAction("LevelEditorSelect", throwIfNotFound: true);
         m_InGame_BulkSelect = m_InGame.FindAction("BulkSelect", throwIfNotFound: true);
         m_InGame_DecreaseElevation = m_InGame.FindAction("DecreaseElevation", throwIfNotFound: true);
         m_InGame_IncreaseElevation = m_InGame.FindAction("IncreaseElevation", throwIfNotFound: true);
@@ -619,7 +619,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_InGame_ParallelSpacingDrag;
     private readonly InputAction m_InGame_DragCamera;
     private readonly InputAction m_InGame_ToggleParallelBuildMode;
-    private readonly InputAction m_InGame_ToggleBuildMode;
+    private readonly InputAction m_InGame_LevelEditorSelect;
     private readonly InputAction m_InGame_BulkSelect;
     private readonly InputAction m_InGame_DecreaseElevation;
     private readonly InputAction m_InGame_IncreaseElevation;
@@ -642,7 +642,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         public InputAction @ParallelSpacingDrag => m_Wrapper.m_InGame_ParallelSpacingDrag;
         public InputAction @DragCamera => m_Wrapper.m_InGame_DragCamera;
         public InputAction @ToggleParallelBuildMode => m_Wrapper.m_InGame_ToggleParallelBuildMode;
-        public InputAction @ToggleBuildMode => m_Wrapper.m_InGame_ToggleBuildMode;
+        public InputAction @LevelEditorSelect => m_Wrapper.m_InGame_LevelEditorSelect;
         public InputAction @BulkSelect => m_Wrapper.m_InGame_BulkSelect;
         public InputAction @DecreaseElevation => m_Wrapper.m_InGame_DecreaseElevation;
         public InputAction @IncreaseElevation => m_Wrapper.m_InGame_IncreaseElevation;
@@ -696,9 +696,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @ToggleParallelBuildMode.started += instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.performed += instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.canceled += instance.OnToggleParallelBuildMode;
-            @ToggleBuildMode.started += instance.OnToggleBuildMode;
-            @ToggleBuildMode.performed += instance.OnToggleBuildMode;
-            @ToggleBuildMode.canceled += instance.OnToggleBuildMode;
+            @LevelEditorSelect.started += instance.OnLevelEditorSelect;
+            @LevelEditorSelect.performed += instance.OnLevelEditorSelect;
+            @LevelEditorSelect.canceled += instance.OnLevelEditorSelect;
             @BulkSelect.started += instance.OnBulkSelect;
             @BulkSelect.performed += instance.OnBulkSelect;
             @BulkSelect.canceled += instance.OnBulkSelect;
@@ -757,9 +757,9 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
             @ToggleParallelBuildMode.started -= instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.performed -= instance.OnToggleParallelBuildMode;
             @ToggleParallelBuildMode.canceled -= instance.OnToggleParallelBuildMode;
-            @ToggleBuildMode.started -= instance.OnToggleBuildMode;
-            @ToggleBuildMode.performed -= instance.OnToggleBuildMode;
-            @ToggleBuildMode.canceled -= instance.OnToggleBuildMode;
+            @LevelEditorSelect.started -= instance.OnLevelEditorSelect;
+            @LevelEditorSelect.performed -= instance.OnLevelEditorSelect;
+            @LevelEditorSelect.canceled -= instance.OnLevelEditorSelect;
             @BulkSelect.started -= instance.OnBulkSelect;
             @BulkSelect.performed -= instance.OnBulkSelect;
             @BulkSelect.canceled -= instance.OnBulkSelect;
@@ -807,7 +807,7 @@ public partial class @GameActions: IInputActionCollection2, IDisposable
         void OnParallelSpacingDrag(InputAction.CallbackContext context);
         void OnDragCamera(InputAction.CallbackContext context);
         void OnToggleParallelBuildMode(InputAction.CallbackContext context);
-        void OnToggleBuildMode(InputAction.CallbackContext context);
+        void OnLevelEditorSelect(InputAction.CallbackContext context);
         void OnBulkSelect(InputAction.CallbackContext context);
         void OnDecreaseElevation(InputAction.CallbackContext context);
         void OnIncreaseElevation(InputAction.CallbackContext context);

@@ -4,7 +4,7 @@ public enum Orientation { Left, Right }
 public enum BuildMode { Ghost, Actual }
 public enum RoadRemovalOption { Default, Divide, Combine, Replace }
 public enum CarStatus { Traveling, Canceled, Finished }
-public enum RoadProperty { PlayerBuilt, InnateSource, InnateTarget };
+public enum RoadProp { PlayerBuilt, Innate, InnateSource, InnateTarget };
 public enum HUDLayer
 {
     Intersections,

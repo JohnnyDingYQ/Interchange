@@ -17,6 +17,9 @@ public class CameraControl : MonoBehaviour
     {
         HUDLayer[] enums = (HUDLayer[])Enum.GetValues(typeof(HUDLayer));
         minHeight = Main.GetHUDObjectHeight(enums[^1]) + Camera.main.nearClipPlane + 1f;
+        Camera.main.orthographicSize = math.lerp(minHeight, cameraSettings.MaxHeight, 0.5f);
+        Camera.main.transform.position = new(Camera.main.transform.position.x, Camera.main.orthographicSize, Camera.main.transform.position.z);
+
     }
 
     void Update()

@@ -1,0 +1,35 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/styles/LevelEditor.uss?fileID=7433441132597879392&amp;guid=b57d0c1a6815e400dbf6e1a83c6cfe9e&amp;type=3#LevelEditor" />
+    <ui:VisualElement class="root">
+        <ui:TextElement text="Level Editor" class="header" />
+        <ui:VisualElement class="innates">
+            <ui:TextElement text="Sources" />
+            <ui:Button text="Set Source" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setSource"/>
+            <ui:Button text="Highlight Sources" parse-escape-sequences="true" display-tooltip-when-elided="true" name="hightlightSources"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="innates">
+            <ui:TextElement text="Targets" />
+            <ui:Button text="Set Target" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setTarget"/>
+            <ui:Button text="Highlight Targets" parse-escape-sequences="true" display-tooltip-when-elided="true" name="hightlightTargets"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="innates">
+            <ui:TextElement text="Innates" />
+            <ui:Button text="Set Innate" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setInnate"/>
+            <ui:Button text="Highlight Innates" parse-escape-sequences="true" display-tooltip-when-elided="true" name="highLightInnates"/>
+        </ui:VisualElement>
+        <ui:Button text="All Roads Innate?" parse-escape-sequences="true" display-tooltip-when-elided="true" name="allRoadsInnate" />
+        <ui:VisualElement class="boundaries">
+            <ui:TextElement text="Boundary" />
+            <ui:Button text="Set Center" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setBoundaryCenter"/>
+            <ui:Button text="Display" parse-escape-sequences="true" display-tooltip-when-elided="true" name="displayBoundary"/>
+            <ui:FloatField label="Boundary Radius" value="1" name="boundaryRadiusField"/>
+        </ui:VisualElement>
+        <ui:VisualElement class="boundaries">
+            <ui:TextElement text="Save/Load" />
+            <ui:FloatField label="Name" value="1" />
+            <ui:Button text="Save" parse-escape-sequences="true" display-tooltip-when-elided="true" name="save"/>
+            <ui:FloatField label="Name" value="1" />
+            <ui:Button text="Load" parse-escape-sequences="true" display-tooltip-when-elided="true" name="load"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

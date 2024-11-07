@@ -39,6 +39,12 @@ public class Writer
         writer.Write(value);
     }
 
+    public void Write(float2 value)
+    {
+        Offset += 32 * 2;
+        writer.Write(value.x);
+        writer.Write(value.y);
+    }
     public void Write(float3 value)
     {
         Offset += 32 * 3;

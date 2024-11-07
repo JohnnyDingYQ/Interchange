@@ -25,8 +25,8 @@ public class Roads : MonoBehaviour
         Game.RoadAdded += InstantiateRoad;
         Game.RoadUpdated += UpdateRoad;
         Game.RoadRemoved += DestroyRoad;
-        Game.RoadSelected += Hover;
-        Game.RoadUnselected += UnHover;
+        Game.RoadSelected += Highlight;
+        Game.RoadUnselected += Unhighlight;
         roadMapping = new();
         squareSelector = Instantiate(squareSelectorPrefab, transform);
     }
@@ -42,8 +42,8 @@ public class Roads : MonoBehaviour
         Game.RoadAdded -= InstantiateRoad;
         Game.RoadUpdated -= UpdateRoad;
         Game.RoadRemoved -= DestroyRoad;
-        Game.RoadSelected -= Hover;
-        Game.RoadUnselected -= UnHover;
+        Game.RoadSelected -= Highlight;
+        Game.RoadUnselected -= Unhighlight;
     }
 
     void InstantiateRoad(Road road)
@@ -195,19 +195,16 @@ public class Roads : MonoBehaviour
             Game.UnselectRoad(road);
     }
 
-    public static void Hover(Road road)
+    public static void Highlight(Road road)
     {
         if (!roadMapping.TryGetValue(road.Id, out RoadObject roadObject))
             return;
         GameObject g = roadObject.gameObject;
         g.layer = LayerMask.NameToLayer("Outline");
-        float3 roadArrowPos = g.transform.GetChild(0).transform.position;
-        roadArrowPos.y = Main.GetHUDObjectHeight(HUDLayer.RoadArrows);
-        g.transform.GetChild(0).transform.position = roadArrowPos;
     }
 
 
-    public static void UnHover(Road road)
+    public static void Unhighlight(Road road)
     {
         if (Game.SelectedRoads.Contains(road))
             return;
@@ -215,8 +212,5 @@ public class Roads : MonoBehaviour
             return;
         GameObject g = roadObject.gameObject;
         g.layer = LayerMask.NameToLayer(roadLayerName);
-        float3 roadArrowPos = g.transform.GetChild(0).transform.position;
-        roadArrowPos.y = MathF.Max(road.StartPos.y, road.EndPos.y);
-        g.transform.GetChild(0).transform.position = roadArrowPos;
     }
 }

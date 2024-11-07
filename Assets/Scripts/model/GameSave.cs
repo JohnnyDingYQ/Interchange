@@ -9,7 +9,8 @@ using Assets.Scripts.Model.Roads;
 public class GameSave : IPersistable
 {
     public readonly float versionNumber = 0.1f;
-    public uint CarServiced { get; set; }
+    [IPersistableImplemented]
+    public LevelData LevelData { get; private set; }
     [IPersistableDict]
     public Dictionary<uint, Node> Nodes { get; private set; }
     [IPersistableDict]
@@ -35,7 +36,7 @@ public class GameSave : IPersistable
         Nodes = new();
         Intersections = new();
         Curves = new();
-        CarServiced = 0;
+        LevelData = new();
     }
 
     public bool IPersistableAreInDict()

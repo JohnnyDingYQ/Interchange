@@ -15,7 +15,7 @@ public class Hover
         int hitCount = Physics.RaycastNonAlloc(new Ray(mousePos, new float3(0, -1, 0)), hitResults, Constants.MaxElevation + 3);
 
         if (Game.HoveredRoad != null)
-            Roads.UnHover(Game.HoveredRoad);
+            Roads.Unhighlight(Game.HoveredRoad);
         Game.HoveredRoad = null;
         bool roadFound = false;
 
@@ -26,7 +26,7 @@ public class Hover
                 if (!roadComp.Road.IsGhost)
                 {
                     Game.HoveredRoad = roadComp.Road;
-                    Roads.Hover(Game.HoveredRoad);
+                    Roads.Highlight(Game.HoveredRoad);
                     roadFound = true;
                 }
 

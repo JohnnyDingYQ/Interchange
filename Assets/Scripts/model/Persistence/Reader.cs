@@ -60,6 +60,14 @@ public class Reader
         return reader.ReadBoolean();
     }
 
+    public float2 ReadFloat2()
+    {
+        Offset += 32 * 2;
+        return new(
+            reader.ReadSingle(),
+            reader.ReadSingle()
+        );
+    }
     public float3 ReadFloat3()
     {
         Offset += 32 * 3;
@@ -85,6 +93,8 @@ public class Reader
     {
         if (typeof(T) == typeof(float))
             return (T)(object)ReadFloat();
+        if (typeof(T) == typeof(float2))
+            return (T)(object)ReadFloat2();
         if (typeof(T) == typeof(float3))
             return (T)(object)ReadFloat3();
         if (typeof(T) == typeof(int))

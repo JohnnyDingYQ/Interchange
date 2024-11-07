@@ -5,7 +5,6 @@ using UnityEngine.Assertions;
 
 public class Main : MonoBehaviour
 {
-    readonly bool debugMode = true;
     [SerializeField]
     DevPanel devPanel;
     [SerializeField]
@@ -16,9 +15,11 @@ public class Main : MonoBehaviour
     Cars cars;
     [SerializeField]
     GameSettings gameSettings;
+    [SerializeField]
+    LevelEditor levelEditor;
     uint frameElapsed = 0;
 
-    void Start()
+    void Awake()
     {
         Application.targetFrameRate = 165;
         Physics.queriesHitTriggers = false;
@@ -26,7 +27,9 @@ public class Main : MonoBehaviour
         Debug.Log("Seed: " + now);
         // UnityEngine.Random.InitState(1439289702);
 
-        devPanel.gameObject.SetActive(debugMode);
+        devPanel.gameObject.SetActive(gameSettings.debugPanelOn);
+        levelEditor.gameObject.SetActive(gameSettings.levelEditorOn);
+        Game.LevelEditorOn = gameSettings.levelEditorOn;
         Build.DisplaysGhost = gameSettings.displaysGhost;
         Build.ContinuousBuilding = gameSettings.continuousBuild;
     }

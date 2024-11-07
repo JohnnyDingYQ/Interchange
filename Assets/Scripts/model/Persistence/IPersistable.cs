@@ -143,10 +143,8 @@ public interface IPersistable
 
         static void LoadIPersistable(Reader reader, FieldProperty fieldProperty)
         {
-            object restored = Activator.CreateInstance(fieldProperty.Type());
-            MethodInfo loadMethod = fieldProperty.Type().GetMethod("Load")
-                ?? throw new InvalidOperationException("Type does not support Load method");
-            loadMethod.Invoke(restored, new object[] { reader });
+            IPersistable restored = (IPersistable) Activator.CreateInstance(fieldProperty.Type());
+            restored.Load(reader);
             fieldProperty.SetValue(restored);
         }
 

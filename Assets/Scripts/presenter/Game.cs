@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Assertions;
 using Assets.Scripts.Model.Roads;
+using Unity.Mathematics;
 
 public static class Game
 {
@@ -16,9 +17,11 @@ public static class Game
     public static Dictionary<uint, Car> Cars { get; private set; }
     public static Dictionary<uint, Edge> Edges { get => GameSave.Edges; }
     public static Dictionary<uint, Curve> Curves { get => GameSave.Curves; }
-    public static uint CarServiced { get => GameSave.CarServiced; set => GameSave.CarServiced = value; }
     public static Road HoveredRoad { get; set; }
-    private static readonly HashSet<Road> selectedRoads = new();
+    static readonly HashSet<Road> selectedRoads = new();
+    public static bool LevelEditorOn;
+    public static float BoundaryRadius { get => GameSave.LevelData.boundaryRadius; set => GameSave.LevelData.boundaryRadius = value; }
+    public static float2 BoundaryCenter { get => GameSave.LevelData.boundaryCenter; set => GameSave.LevelData.boundaryCenter = value; }
     public static ReadOnlySet<Road> SelectedRoads { get => selectedRoads.AsReadOnly(); }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved, RoadSelected, RoadUnselected;
     public static event Action<Intersection> IntersectionAdded, IntersectionUpdated, IntersectionRemoved;

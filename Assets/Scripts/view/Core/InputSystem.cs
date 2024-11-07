@@ -51,6 +51,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.BulkSelect.performed += BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled += BulkSelectEnd;
         gameActions.InGame.StraightMode.performed += EnableStraightMode;
+        gameActions.InGame.LevelEditorSelect.performed += LevelEditorSelectEnabled;
 
         gameActions.InGame.Enable();
     }
@@ -77,6 +78,7 @@ public class InputSystem : MonoBehaviour
         gameActions.InGame.BulkSelect.performed -= BulkSelectPerformed;
         gameActions.InGame.BulkSelect.canceled -= BulkSelectEnd;
         gameActions.InGame.StraightMode.performed -= EnableStraightMode;
+        gameActions.InGame.LevelEditorSelect.performed -= LevelEditorSelectEnabled;
 
 
         gameActions.InGame.Disable();
@@ -227,5 +229,9 @@ public class InputSystem : MonoBehaviour
     void EnableStraightMode(InputAction.CallbackContext context)
     {
         Build.StraightMode = true;
+    }
+    void LevelEditorSelectEnabled(InputAction.CallbackContext context)
+    {
+        LevelEditor.SetSelected();
     }
 }

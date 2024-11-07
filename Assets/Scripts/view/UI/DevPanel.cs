@@ -7,21 +7,11 @@ using UnityEngine.UIElements;
 
 public class DevPanel : MonoBehaviour
 {
-    private VisualElement root;
-    private Toggle drawCenter;
-    private Toggle drawLanes;
-    private Toggle drawEdges;
-    private Toggle drawOutline;
-    private Toggle drawPx;
-    private Toggle drawVertices;
-    private Toggle supportLines;
-    private static TextElement elevation;
-    private static TextElement carServiced;
-    private static TextElement debug1;
-    private static TextElement debug2;
-    private Button button1;
-    private Button button2;
-    private static readonly StringBuilder stringBuilder = new();
+    VisualElement root;
+    Toggle drawCenter, drawLanes, drawEdges, drawOutline, drawPx, drawVertices, supportLines;
+    static TextElement elevation, debug1, debug2;
+    Button button1, button2;
+    static readonly StringBuilder stringBuilder = new();
     void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
@@ -29,7 +19,6 @@ public class DevPanel : MonoBehaviour
         root.RegisterCallback<MouseLeaveEvent>(MouseLeaveGameWorld);
 
         elevation = root.Q<TextElement>("Elevation");
-        carServiced = root.Q<TextElement>("CarServiced");
         debug1 = root.Q<TextElement>("Debug1");
         debug2 = root.Q<TextElement>("Debug2");
 
@@ -43,7 +32,7 @@ public class DevPanel : MonoBehaviour
         button1 = root.Q<Button>("DrawGizmos");
         button2 = root.Q<Button>("DeleteCars");
 
-        drawCenter.RegisterCallback<ChangeEvent<bool>>(TogglecCenter);
+        drawCenter.RegisterCallback<ChangeEvent<bool>>(ToggleCenter);
         drawCenter.value = false;
         drawEdges.RegisterCallback<ChangeEvent<bool>>(ToggleEdge);
         drawEdges.value = true;
@@ -79,11 +68,6 @@ public class DevPanel : MonoBehaviour
         stringBuilder.Append("Elevation: ");
         stringBuilder.Append(Build.Elevation);
         elevation.text = stringBuilder.ToString();
-
-        stringBuilder.Clear();
-        stringBuilder.Append("Cars Serviced: ");
-        stringBuilder.Append(Game.CarServiced);
-        carServiced.text = stringBuilder.ToString();
     }
 
     public static void SetDebug1Text(string s)
@@ -102,19 +86,6 @@ public class DevPanel : MonoBehaviour
         debug2.text = stringBuilder.ToString();
     }
 
-    void OnDisable()
-    {
-        root.UnregisterCallback<MouseEnterEvent>(MouseReturnGameWorld);
-        root.UnregisterCallback<MouseLeaveEvent>(MouseLeaveGameWorld);
-        drawCenter.UnregisterCallback<ChangeEvent<bool>>(TogglecCenter);
-        drawEdges.UnregisterCallback<ChangeEvent<bool>>(ToggleEdge);
-        drawLanes.UnregisterCallback<ChangeEvent<bool>>(ToggleLanes);
-        drawPx.UnregisterCallback<ChangeEvent<bool>>(TogglePx);
-        drawOutline.UnregisterCallback<ChangeEvent<bool>>(ToggleOutline);
-        drawVertices.UnregisterCallback<ChangeEvent<bool>>(ToggleVertices);
-        supportLines.UnregisterCallback<ChangeEvent<bool>>(ToggleSupportLines);
-    }
-
     void MouseReturnGameWorld(MouseEnterEvent e)
     {
         InputSystem.MouseIsInGameWorld = false;
@@ -123,7 +94,7 @@ public class DevPanel : MonoBehaviour
     {
         InputSystem.MouseIsInGameWorld = true;
     }
-    void TogglecCenter(ChangeEvent<bool> e)
+    void ToggleCenter(ChangeEvent<bool> e)
     {
         DrawGizmos.DrawCenter = e.newValue;
     }
