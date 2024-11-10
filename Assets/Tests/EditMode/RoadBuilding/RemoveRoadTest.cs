@@ -168,6 +168,7 @@ public class RemoveRoadTest
     [Test]
     public void CanOnlyRemovePlayerBuildRoads()
     {
+        Game.LevelEditorOn = false;
         Road road = RoadBuilder.Single(0, stride, 2 * stride, 2);
         road.RoadProp = RoadProp.PlayerBuilt;
         Assert.True(Game.RemoveRoad(road));

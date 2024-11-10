@@ -101,7 +101,7 @@ public class InputSystem : MonoBehaviour
             cameraOffset.z += (prevScreenMousePos.y - Mouse.current.position.ReadValue().y) * MouseDragScreenMultiplier;
         }
         CameraControl.CameraOffset = cameraOffset;
-        CameraControl.CamearSpin = gameActions.InGame.SpinCamera.ReadValue<float>();
+        CameraControl.CameraSpin = gameActions.InGame.SpinCamera.ReadValue<float>();
     }
 
     void UpdateMouseWorldPos()
@@ -144,13 +144,13 @@ public class InputSystem : MonoBehaviour
     }
     void SaveGame(InputAction.CallbackContext context)
     {
-        SaveSystem saveSystem = new("saveFile");
+        SaveSystem saveSystem = new(System.IO.Path.Combine(Application.persistentDataPath, "testSave"));
         saveSystem.SaveGame();
         Debug.Log("Game Saved");
     }
     void LoadGame(InputAction.CallbackContext context)
     {
-        SaveSystem saveSystem = new("saveFile");
+        SaveSystem saveSystem = new(System.IO.Path.Combine(Application.persistentDataPath, "testSave"));
         saveSystem.LoadGame();
         main.ComplyToGameSave();
         Debug.Log("Game Loaded");

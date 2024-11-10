@@ -29,8 +29,6 @@ public class Main : MonoBehaviour
 
         devPanel.gameObject.SetActive(gameSettings.debugPanelOn);
         levelEditor.gameObject.SetActive(gameSettings.levelEditorOn);
-        if (!gameSettings.levelEditorOn)
-            Game.CameraBoundOn = true;
         Game.LevelEditorOn = gameSettings.levelEditorOn;
         Build.DisplaysGhost = gameSettings.displaysGhost;
         Build.ContinuousBuilding = gameSettings.continuousBuild;
@@ -38,6 +36,11 @@ public class Main : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(InputSystem.MouseIsInGameWorld);
+        levelEditor.gameObject.SetActive(Game.LevelEditorOn);
+        if (!Game.LevelEditorOn)
+            Game.CameraBoundOn = true;
+
         if (frameElapsed % 2 == 0)
         {
             Hover.UpdateHovered();

@@ -8,20 +8,24 @@ using UnityEngine.UIElements;
 
 public class LevelEditor : MonoBehaviour
 {
+    [SerializeField]
+    Main main;
     VisualElement root;
     Button setSource, hightlightSources, setTarget, hightlightTargets, setInnate, highLightInnates, setBoundaryCenter, displayBoundary;
-    Button save, load, allRoadsInnate;
+    Button save, load, allRoadsInnate, exitEditor;
     FloatField boundaryRadiusField;
+    IntegerField levelField;
     Toggle boundCamera;
     bool shouldSetSource, shouldSetTarget, shouldSetInnate, shouldSetBoundaryCenter;
     readonly WaitForSeconds waitAnimationDuration = new(3);
+    int level;
     public static bool selected;
 
     void Start()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
-        root.RegisterCallback<MouseEnterEvent>(evt => InputSystem.MouseIsInGameWorld = false);
-        root.RegisterCallback<MouseLeaveEvent>(evt => InputSystem.MouseIsInGameWorld = true);
+        
+
 
         setSource = root.Q<Button>("setSource");
         hightlightSources = root.Q<Button>("hightlightSources");
@@ -34,22 +38,42 @@ public class LevelEditor : MonoBehaviour
         displayBoundary = root.Q<Button>("displayBoundary");
         boundaryRadiusField = root.Q<FloatField>("boundaryRadiusField");
         boundCamera = root.Q<Toggle>("boundCamera");
+        levelField = root.Q<IntegerField>("levelField");
         save = root.Q<Button>("save");
         load = root.Q<Button>("load");
+        exitEditor = root.Q<Button>("exitEditor");
 
-        setSource.RegisterCallback((ClickEvent evt) => { ResetAll(); shouldSetSource = true; });
-        setTarget.RegisterCallback((ClickEvent evt) => { ResetAll(); shouldSetTarget = true; });
-        setBoundaryCenter.RegisterCallback((ClickEvent evt) => { ResetAll(); shouldSetBoundaryCenter = true; });
-        setInnate.RegisterCallback((ClickEvent evt) => { ResetAll(); shouldSetInnate = true; });
+        setSource.RegisterCallback((ClickEvent evt) => { ResetTriggers(); shouldSetSource = true; });
+        setTarget.RegisterCallback((ClickEvent evt) => { ResetTriggers(); shouldSetTarget = true; });
+        setBoundaryCenter.RegisterCallback((ClickEvent evt) => { ResetTriggers(); shouldSetBoundaryCenter = true; });
+        setInnate.RegisterCallback((ClickEvent evt) => { ResetTriggers(); shouldSetInnate = true; });
         hightlightSources.RegisterCallback((ClickEvent evt) => StartCoroutine(TempHighLight(RoadProp.InnateSource)));
         hightlightTargets.RegisterCallback((ClickEvent evt) => StartCoroutine(TempHighLight(RoadProp.InnateTarget)));
         highLightInnates.RegisterCallback((ClickEvent evt) => StartCoroutine(TempHighLight(RoadProp.Innate)));
-        displayBoundary.RegisterCallback((ClickEvent evt) => Gizmos.DrawCircle(
-            new(Game.BoundaryCenter.x, 0, Game.BoundaryCenter.y), Game.BoundaryRadius, 20, Color.cyan, 3
+        displayBoundary.RegisterCallback((ClickEvent evt) => Gizmos.DrawSquare(
+            new(Game.BoundaryCenter.x, 5, Game.BoundaryCenter.y), Game.BoundaryRadius, new(1, 0.65f, 0, 1), 3
         ));
-        boundCamera.RegisterCallback<ChangeEvent<bool>>((evt) => Game.CameraBoundOn = evt.newValue);
-
         allRoadsInnate.RegisterCallback((ClickEvent evt) => Debug.Log("All roads innate: " + AllRoadsAreInnate()));
+        save.RegisterCallback((ClickEvent evt) =>
+        {
+            SaveSystem saveSystem = new(Application.dataPath + "/Levels/Saves/" + level);
+            saveSystem.SaveGame();
+            Debug.Log($"Level saved to {level} ");
+        });
+        load.RegisterCallback((ClickEvent evt) =>
+        {
+            SaveSystem saveSystem = new(Application.dataPath + "/Levels/Saves/" + level);
+            saveSystem.LoadGame();
+            main.ComplyToGameSave();
+            Debug.Log($"Loaded level {level} ");
+        });
+        exitEditor.RegisterCallback((ClickEvent evt) => Game.LevelEditorOn = false);
+
+        boundCamera.RegisterCallback<ChangeEvent<bool>>((evt) =>
+        {
+            Game.CameraBoundOn = evt.newValue;
+            InputSystem.MouseIsInGameWorld = true;
+        });
 
         boundaryRadiusField.RegisterValueChangedCallback(evt =>
         {
@@ -57,7 +81,9 @@ public class LevelEditor : MonoBehaviour
             Debug.Log($"Level Editor: boundary radius set to {evt.newValue}");
         });
 
-        void ResetAll()
+        levelField.RegisterValueChangedCallback(evt => level = evt.newValue);
+
+        void ResetTriggers()
         {
             shouldSetSource = false;
             shouldSetTarget = false;
@@ -87,6 +113,18 @@ public class LevelEditor : MonoBehaviour
                 if (road.RoadProp == roadProp)
                     Roads.Unhighlight(road);
         }
+    }
+
+    void OnEnable()
+    {
+        root.RegisterCallback<MouseEnterEvent>(MouseEnter);
+        root.RegisterCallback<MouseLeaveEvent>(MouseLeave);
+    }
+
+    void OnDisable()
+    {
+        root.UnregisterCallback<MouseEnterEvent>(MouseEnter);
+        root.UnregisterCallback<MouseLeaveEvent>(MouseLeave);
     }
 
     void Update()
@@ -129,5 +167,15 @@ public class LevelEditor : MonoBehaviour
     public static void SetSelected()
     {
         selected = true;
+    }
+
+    void MouseEnter(MouseEnterEvent evt)
+    {
+        InputSystem.MouseIsInGameWorld = false;
+    }
+
+    void MouseLeave(MouseLeaveEvent evt)
+    {
+        InputSystem.MouseIsInGameWorld = true;
     }
 }

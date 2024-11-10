@@ -127,4 +127,17 @@ public static class Gizmos
         }
         DrawListofPoints(points, color, duration);
     }
+
+    public static void DrawSquare(float3 center, float halfExtent, Color color, float duration)
+    {
+        List<float3> points = new()
+        {
+            new(center.x + halfExtent, center.y, center.z + halfExtent),
+            new(center.x - halfExtent, center.y, center.z + halfExtent),
+            new(center.x - halfExtent, center.y, center.z - halfExtent),
+            new(center.x + halfExtent, center.y, center.z - halfExtent),
+            new(center.x + halfExtent, center.y, center.z + halfExtent)
+        };
+        DrawListofPoints(points, color, duration);
+    }
 }

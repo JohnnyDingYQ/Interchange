@@ -9,7 +9,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField]
     CameraSettings cameraSettings;
     public static Vector3 CameraOffset;
-    public static float CamearSpin;
+    public static float CameraSpin;
     float minHeight;
     Vector3 cameraVelocity;
     public static Quaternion Quaternion { get => Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0); }
@@ -23,24 +23,18 @@ public class CameraControl : MonoBehaviour
 
     }
 
-    void Update()
+    void LateUpdate()
     {
-        Camera.main.transform.Rotate(0, CamearSpin * Time.deltaTime * cameraSettings.SpinMuliplier, 0, Space.World);
+        Camera.main.transform.Rotate(0, CameraSpin * Time.deltaTime * cameraSettings.SpinMuliplier, 0, Space.World);
 
         SetCameraVelocity(CameraOffset);
         ApplyCameraVelocity();
-        if (Game.CameraBoundOn && OutsideBounds())
-        {
-            UnapplyCameraVelocity();
-            cameraVelocity = new(0, 0, 0);
-        }
-        else
-        {
-            cameraVelocity *= math.pow(math.E, -Time.deltaTime * cameraSettings.driftDecayExponentMultiplier);
-        }
         ClampHeight();
+        if (Game.CameraBoundOn)
+            ClampToBounds();
+        cameraVelocity *= math.pow(math.E, -Time.deltaTime * cameraSettings.driftDecayExponentMultiplier);
+        
         Camera.main.orthographicSize = Camera.main.transform.position.y;
-
     }
 
     void SetCameraVelocity(Vector3 cameraOffset)
@@ -76,19 +70,19 @@ public class CameraControl : MonoBehaviour
     {
         Camera.main.transform.position += Quaternion * cameraVelocity * Time.deltaTime;
     }
-    void UnapplyCameraVelocity()
-    {
-        Camera.main.transform.position -= Quaternion * cameraVelocity * Time.deltaTime;
-    }
 
     void ClampHeight()
     {
-        float3 cameraPos = Camera.main.transform.position;
-        cameraPos.y = Math.Clamp(cameraPos.y, minHeight, cameraSettings.MaxHeight);
-        Camera.main.transform.position = cameraPos;
+        Camera cam = Camera.main;
+        float3 cameraPos = cam.transform.position;
+        if (Game.CameraBoundOn)
+            cameraPos.y = Math.Clamp(cameraPos.y, minHeight, math.min(Game.BoundaryRadius, Game.BoundaryRadius / cam.aspect) - 5);
+        else
+            cameraPos.y = Math.Clamp(cameraPos.y, minHeight, cameraSettings.MaxHeight);
+        cam.transform.position = cameraPos;
     }
 
-    bool OutsideBounds()
+    void ClampToBounds()
     {
         // Get the main camera
         Camera cam = Camera.main;
@@ -104,12 +98,23 @@ public class CameraControl : MonoBehaviour
             new(1, 1, Camera.main.transform.position.y)     // Top-right corner
         };
 
+        Vector3 camPos = cam.transform.position;
         foreach (Vector3 corner in screenCorners)
         {
             Vector3 worldPos = cam.ViewportToWorldPoint(corner);
-            if (worldPos.x > maxX || worldPos.x < minX || worldPos.z > maxZ || worldPos.z < minZ)
-                return true;
+            if (worldPos.x > maxX)
+                camPos.x += maxX - worldPos.x;
+            if (worldPos.x < minX)
+                camPos.x += minX - worldPos.x;
+            if (worldPos.z > maxZ)
+                camPos.z += maxZ - worldPos.z;
+            if (worldPos.z < minZ)
+                camPos.z += minZ - worldPos.z;
         }
-        return false;
+        if (cam.transform.position != camPos)
+        {
+            cameraVelocity = Vector3.zero;
+            cam.transform.position = camPos;
+        }
     }
 }

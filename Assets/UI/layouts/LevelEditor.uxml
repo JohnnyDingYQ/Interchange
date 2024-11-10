@@ -17,7 +17,10 @@
             <ui:Button text="Set Innate" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setInnate"/>
             <ui:Button text="Highlight Innates" parse-escape-sequences="true" display-tooltip-when-elided="true" name="highLightInnates"/>
         </ui:VisualElement>
-        <ui:Button text="All Roads Innate?" parse-escape-sequences="true" display-tooltip-when-elided="true" name="allRoadsInnate" />
+        <ui:VisualElement class="other-buttons">
+            <ui:Button text="All Roads Innate?" parse-escape-sequences="true" display-tooltip-when-elided="true" name="allRoadsInnate" />
+            <ui:Button text="Exit Editor" parse-escape-sequences="true" display-tooltip-when-elided="true" name="exitEditor" />
+        </ui:VisualElement>
         <ui:VisualElement class="boundaries">
             <ui:TextElement text="Boundary" />
             <ui:Button text="Set Center" parse-escape-sequences="true" display-tooltip-when-elided="true" name="setBoundaryCenter"/>
@@ -27,10 +30,9 @@
         </ui:VisualElement>
         <ui:VisualElement class="boundaries">
             <ui:TextElement text="Save/Load" />
-            <ui:IntegerField label="Level ID" value="1" />
             <ui:Button text="Save" parse-escape-sequences="true" display-tooltip-when-elided="true" name="save"/>
-            <ui:IntegerField label="Level ID" value="1" />
             <ui:Button text="Load" parse-escape-sequences="true" display-tooltip-when-elided="true" name="load"/>
+            <ui:IntegerField label="Level ID" value="0" name="levelField"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

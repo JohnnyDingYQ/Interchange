@@ -6,7 +6,7 @@ using UnityEngine;
 public class SaveSystemTest
 {
     float3 stride = Constants.MinLaneLength * new float3(1, 0, 1);
-    static readonly string saveName = "testSave";
+    static readonly string saveName = System.IO.Path.Combine(Application.persistentDataPath, "testSave");
     readonly SaveSystem testSaveSystem = new(saveName);
 
     [SetUp]
@@ -177,6 +177,16 @@ public class SaveSystemTest
         testSaveSystem.SaveGame();
         testSaveSystem.LoadGame();
         Assert.AreEqual(oldSave, Game.GameSave);
+    }
 
+    [Test]
+    public void RestoreLevelData()
+    {
+        Game.BoundaryCenter = new(1, 1);
+        Game.BoundaryRadius = 500;
+        testSaveSystem.SaveGame();
+        testSaveSystem.LoadGame();
+        Assert.AreEqual(new float2(1, 1), Game.BoundaryCenter);
+        Assert.AreEqual(500, Game.BoundaryRadius);
     }
 }

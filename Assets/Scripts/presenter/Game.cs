@@ -20,8 +20,8 @@ public static class Game
     public static Road HoveredRoad { get; set; }
     static readonly HashSet<Road> selectedRoads = new();
     public static bool LevelEditorOn, CameraBoundOn;
-    public static float BoundaryRadius { get => GameSave.LevelData.boundaryRadius; set => GameSave.LevelData.boundaryRadius = value; }
-    public static float2 BoundaryCenter { get => GameSave.LevelData.boundaryCenter; set => GameSave.LevelData.boundaryCenter = value; }
+    public static float BoundaryRadius { get => GameSave.LevelData.BoundaryRadius; set => GameSave.LevelData.BoundaryRadius = value; }
+    public static float2 BoundaryCenter { get => GameSave.LevelData.BoundaryCenter; set => GameSave.LevelData.BoundaryCenter = value; }
     public static ReadOnlySet<Road> SelectedRoads { get => selectedRoads.AsReadOnly(); }
     public static event Action<Road> RoadAdded, RoadUpdated, RoadRemoved, RoadSelected, RoadUnselected;
     public static event Action<Intersection> IntersectionAdded, IntersectionUpdated, IntersectionRemoved;

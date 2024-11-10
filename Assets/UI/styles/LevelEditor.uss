@@ -76,3 +76,8 @@
     max-width: 60px;
     padding: 6px 10px;
 }
+
+.other-buttons Button {
+    font-size: 11px;
+    padding: 6px 10px;
+}

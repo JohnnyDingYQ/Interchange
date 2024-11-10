@@ -41,9 +41,7 @@ Shader "Custom/TerrainShader" {
 			}
 
 			float4 FragmentProgram (Interpolators i) : SV_TARGET {				
-				float4 tex = tex2D(_MainTex, i.uv);
-
-				if (tex.r == 0)
+				if (abs(round(i.worldPos.x / 100) * 100 - i.worldPos.x) < 2 || abs(round(i.worldPos.z / 100) * 100 - i.worldPos.z) < 2)
 					return _WaterColor;
 				return _LandColor;
 			}
